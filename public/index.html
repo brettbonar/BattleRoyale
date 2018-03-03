@@ -1,0 +1,33 @@
+<!DOCTYPE HTML>
+<html lang="en-US">
+
+<head>
+  <meta charset="UTF-8">
+  <title>BattleRoyale</title>
+  <link rel="stylesheet" type="text/css" href="style.css">
+  <link rel="stylesheet" type="text/css" href="Engine/gameUI.css">
+  <link rel="icon" type="image/png" href="Assets/ball.png?v=1">
+  <script>
+    var Game = {};
+    var Graphics = {};
+  </script>
+  <script src="lib/lodash/lodash.min.js"></script>
+  <script src="lib/jquery/dist/jquery.min.js"></script>
+  <script src="lib/Javascript-Voronoi/rhill-voronoi-core.min.js"></script>
+  <script src="util/keyCodes.js" type="module"></script>
+  <script src="BattleRoyale/BattleRoyaleController.js" type="module"></script>
+  <script src="Engine/Game.js" type="module"></script>
+  <script src="Engine/GameController.js" type="module"></script>
+  <script src="Engine/GameUI.js" type="module"></script>
+</head>
+
+<body>
+  <div game-controller="BattleRoyaleController">
+    <div id="canvas-group" class="canvas-group">
+      <canvas class="game-canvas primary-canvas" id="canvas-main" width="1000" height="1000"></canvas>
+      <canvas class="game-canvas" id="canvas-demo" width="2000" height="1000"></canvas>
+    </div>
+  </div>
+</body>
+
+</html>
