@@ -123,7 +123,7 @@ export default class Game {
   handleKeyEvent(keyEvent) {
     let event = this.keyBindings[keyEvent.keyCode];
     if (event) {
-      this.keyEvents.push(event);
+      this.inputEvents.push(event);
     }
   }
 
@@ -154,9 +154,9 @@ export default class Game {
   }
 
   quit() {
-    this.canvas.removeEventListener("mousemove", this.mouseMoveListener);
-    this.canvas.removeEventListener("keyup", this.keyEventListener);
-    this.canvas.removeEventListener("mousedown", this.mouseDownListener);
+    document.removeEventListener("mousemove", this.mouseMoveListener);
+    document.removeEventListener("keydown", this.keyEventListener);
+    document.removeEventListener("mousedown", this.mouseDownListener);
     if (this._settings.requestPointerLock) {
       document.removeEventListener("pointerlockchange", this.pointerLockListener, false);
       document.removeEventListener("mozpointerlockchange", this.pointerLockListener, false);
@@ -172,10 +172,10 @@ export default class Game {
       document.exitPointerLock = document.exitPointerLock || document.mozExitPointerLock;
       this.canvas.requestPointerLock();
     } else {
-      this.canvas.addEventListener("mousemove", this.mouseMoveListener);
+      window.addEventListener("mousemove", this.mouseMoveListener);
     }
-    this.canvas.addEventListener("keyup", this.keyEventListener);
-    this.canvas.addEventListener("mousedown", this.mouseDownListener);
+    document.addEventListener("keydown", this.keyEventListener);
+    document.addEventListener("mousedown", this.mouseDownListener);
 
 
     this.previousTime = performance.now();

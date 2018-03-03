@@ -25,6 +25,10 @@ hr {
   float: right;
 }
 
+.map-canvas {
+  display: none;
+}
+
 .choose-difficulty {
   text-align: center;
 }

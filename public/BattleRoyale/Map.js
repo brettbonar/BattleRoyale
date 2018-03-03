@@ -43,7 +43,7 @@ export default class Map {
     Object.assign(this, params);
     _.defaults(this, {
       mapSize: 100,
-      cellSize: 3,
+      cellSize: 32,
       tileSize: 32,
       map: [],
       seeds: {
@@ -97,6 +97,10 @@ export default class Map {
 
   static get BIOMES() { return BIOMES; }
 
+  drawTerrain(type) {
+
+  }
+
   initializeMap() {
     for (const x in _.range(this.mapSize)) {
       let cells = [];
@@ -126,118 +130,6 @@ export default class Map {
         if (y < this.map[x].length - 1) {
           cell.neighbors.down = this.map[x][y + 1];
         }
-      }
-    }
-  }
-
-  jagged(seeds, used) {
-    while (seeds.some((cells) => cells.length > 0)) {
-      for (const cells of seeds) {
-        let cell;
-        while (!cell && cells.length > 0) {
-          cell = cells[cells.length - 1];
-          let neighbors = _.shuffle(cell.neighbors);
-          let next;
-          for (const neighbor of neighbors) {
-            if (neighbor && !used.includes(neighbor)) {
-              next = neighbor;
-              next.type = cell.type;
-              cells.push(next);
-              used.push(next);
-              break;
-            }
-          }
-
-          if (!next) {
-            cells.pop();
-          }
-        }
-      }
-    }
-  }
-
-  smooth(seeds, used) {
-    while (seeds.some((cells) => cells.length > 0)) {
-      for (const cells of seeds) {
-        if (cells.length === 0) continue;
-        let weight = this.weights[cells[0].type];
-        for (let i = 0; i < weight; i++) {
-        }
-      }
-    }
-  }
-  
-  iterativeJagged(seeds, used) {
-    while (seeds.some((cells) => cells.length > 0)) {
-      for (const cells of seeds) {
-        if (cells.length === 0) continue;
-        let weight = this.weights[cells[0].type];
-        for (let i = 0; i < weight; i++) {
-          let cell;
-          while (!cell && cells.length > 0) {
-            cell = cells[cells.length - 1];
-            let neighbors = _.shuffle(cell.neighbors);
-            let next;
-            for (const neighbor of neighbors) {
-              if (neighbor && !used.includes(neighbor)) {
-                next = neighbor;
-                next.type = cell.type;
-                cells.push(next);
-                used.push(next);
-                break;
-              }
-            }
-
-            if (!next) {
-              cells.pop();
-            }
-          }
-        }
-      }
-    }
-  }
-
-  random(seeds, used) {
-
-    while (seeds.some((cells) => cells.length > 0)) {
-      let cells = _.sample(seeds);
-      //for (const cells of seeds) {
-        let cell;
-        while (!cell && cells.length > 0) {
-          cell = cells[0];
-          let neighbors = _.shuffle(cell.neighbors);
-          let next;
-          for (const neighbor of neighbors) {
-            if (neighbor && !used.includes(neighbor)) {
-              next = neighbor;
-              next.type = cell.type;
-              cells.push(next);
-              used.push(next);
-              break;
-            }
-          }
-
-          if (!next) {
-            cells.shift();
-          }
-
-          // cell = cells[cells.length - 1];
-          // let neighbors = _.shuffle(cell.neighbors);
-          // let next;
-          // for (const neighbor of neighbors) {
-          //   if (neighbor && !used.includes(neighbor)) {
-          //     next = neighbor;
-          //     next.type = cell.type;
-          //     cells.push(next);
-          //     used.push(next);
-          //     break;
-          //   }
-          // }
-
-          // if (!next) {
-          //   cells.pop();
-          // }
-        //}
       }
     }
   }
@@ -306,6 +198,66 @@ export default class Map {
     }
   }
 
+  saveMap() {
+    this.canvas = document.getElementById("canvas-map");
+    this.canvas.width = this.cellSize * this.mapSize;
+    this.canvas.height = this.cellSize * this.mapSize;
+    this.context = this.canvas.getContext("2d");
+
+    // FOREST: "forest",
+    // DESERT: "desert",
+    // DEATH: "death",
+    // PLAIN: "plain"
+    let size = this.cellSize;
+    for (const column of this.map) {
+      for (const cell of column) {
+        let offset;
+        if (cell.type === "forest") {
+          offset = {
+            x: size * 6 + size * _.random(0, 2),
+            y: size * 11
+          };
+        } else if (cell.type === "desert") {
+          offset = {
+            x: size * 18 + size * _.random(0, 2),
+            y: size * 11
+          };
+        } else if (cell.type === "death") {
+          offset = {
+            x: size * 9 + size * _.random(0, 2),
+            y: size * 5
+          };
+        } else if (cell.type === "plain") {
+          offset = {
+            x: 0 + size * _.random(0, 2),
+            y: size * 11
+          };
+        } else if (cell.type === "water") {
+          offset = {
+            x: size * 15 + size * _.random(0, 2),
+            y: size * 17
+          };
+        } else if (cell.type === "fire") {
+          offset = {
+            x: size * 15 + size * _.random(0, 2),
+            y: size * 5
+          };
+        }
+
+        this.context.drawImage(this.terrain, offset.x, offset.y, size, size,
+          parseInt(cell.position.x, 10) * size, parseInt(cell.position.y, 10) * size, size, size);
+      }
+    }
+  }
+
+  render(context, position) {
+    if (this.canvas) {
+    context.drawImage(this.canvas, position.x - context.canvas.width / 2, position.y - context.canvas.height / 2,
+      context.canvas.width, context.canvas.height, 0, 0, context.canvas.width, context.canvas.height);
+    }
+    //context.drawImage(this.canvas, 0, 0, context.canvas.width, context.canvas.height);
+  }
+
   // TODO: clean this up a lot
   generate() {
     let seeds = [];
@@ -334,5 +286,9 @@ export default class Map {
     });
 
     this.growCells(seeds, used);
+
+    this.terrain = new Image();
+    this.terrain.src = "../Assets/terrain.png";
+    this.terrain.onload = () => this.saveMap();
   }
 }
