@@ -25,15 +25,17 @@ export default class BattleRoyaleController extends GameController {
       for (const cell of column) {
         let color;
         if (cell.type === "forest") {
-          color = "green";
+          color = "ForestGreen";
         } else if (cell.type === "desert") {
-          color = "red";
+          color = "yellow";
         } else if (cell.type === "death") {
           color = "black";
         } else if (cell.type === "plain") {
-          color = "yellow";
+          color = "GoldenRod";
         } else if (cell.type === "water") {
           color = "blue";
+        } else if (cell.type === "fire") {
+          color = "red";
         }
 
         context.fillStyle = color;

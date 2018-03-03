@@ -5,8 +5,20 @@ const BIOMES = {
   DESERT: "desert",
   DEATH: "death",
   PLAIN: "plain",
-  WATER: "water"
+  WATER: "water",
+  FIRE: "fire"
 };
+
+const GROWTH_TYPE = {
+  JAGGED: "jagged",
+  SMOOTH: "smooth"
+};
+
+class Biome {
+  constructor(params) {
+    Object.assign(this, params);  
+  }
+}
 
 class Tile {
   constructor(params) {
@@ -39,16 +51,46 @@ export default class Map {
         "desert": 2,
         "death": 2,
         "plain": 1,
-        "water": 5
+        "water": 3,
+        "fire": 3
       },
       weights: {
-        "forest": 10,
-        "desert": 10,
-        "death": 10,
-        "plain": 50,
-        "water": 1
+        "forest": 25,
+        "desert": 15,
+        "death": 1,
+        "plain": 40,
+        "water": 1,
+        "fire": 1
       }
     });
+    this.biomes = {
+      forest: new Biome({
+        type: BIOMES.FOREST,
+        growthType: GROWTH_TYPE.SMOOTH
+      }),
+      desert: new Biome({
+        type: BIOMES.DESERT,
+        growthType: GROWTH_TYPE.SMOOTH
+      }),
+      death: new Biome({
+        type: BIOMES.DEATH,
+        growthType: GROWTH_TYPE.JAGGED
+      }),
+      plain: new Biome({
+        type: BIOMES.PLAIN,
+        growthType: GROWTH_TYPE.SMOOTH
+      }),
+      water: new Biome({
+        type: BIOMES.WATER,
+        growthType: GROWTH_TYPE.JAGGED
+      }),
+      fire: new Biome({
+        type: BIOMES.FIRE,
+        growthType: GROWTH_TYPE.JAGGED
+      })
+    };
+
+
     this.initializeMap();
     this.generate();
   }
@@ -117,24 +159,9 @@ export default class Map {
   smooth(seeds, used) {
     while (seeds.some((cells) => cells.length > 0)) {
       for (const cells of seeds) {
-        let cell;
-        while (!cell && cells.length > 0) {
-          cell = cells[0];
-          let neighbors = _.shuffle(cell.neighbors);
-          let next;
-          for (const neighbor of neighbors) {
-            if (neighbor && !used.includes(neighbor)) {
-              next = neighbor;
-              next.type = cell.type;
-              cells.push(next);
-              used.push(next);
-              break;
-            }
-          }
-
-          if (!next) {
-            cells.shift();
-          }
+        if (cells.length === 0) continue;
+        let weight = this.weights[cells[0].type];
+        for (let i = 0; i < weight; i++) {
         }
       }
     }
@@ -213,7 +240,70 @@ export default class Map {
         //}
       }
     }
+  }
 
+  growJagged(cells, used) {
+    let cell;
+    while (!cell && cells.length > 0) {
+      cell = cells[cells.length - 1];
+      let neighbors = _.shuffle(cell.neighbors);
+      let next;
+      for (const neighbor of neighbors) {
+        if (neighbor && !used.includes(neighbor)) {
+          next = neighbor;
+          next.type = cell.type;
+          next.biome = cell.biome;
+          cells.push(next);
+          used.push(next);
+          break;
+        }
+      }
+
+      if (!next) {
+        cells.pop();
+      }
+    }
+
+  }
+
+  growSmooth(cells, used) {
+    let cell;
+    while (!cell && cells.length > 0) {
+      cell = cells[0];
+      let neighbors = _.shuffle(cell.neighbors);
+      let next;
+      for (const neighbor of neighbors) {
+        if (neighbor && !used.includes(neighbor)) {
+          next = neighbor;
+          next.type = cell.type;
+          next.biome = cell.biome;
+          cells.push(next);
+          used.push(next);
+          break;
+        }
+      }
+
+      if (!next) {
+        cells.shift();
+      }
+    }
+  }
+
+  growCells(seeds, used) {
+    while (seeds.some((cells) => cells.length > 0)) {
+      for (const cells of seeds) {
+        if (cells.length === 0) continue;
+        let growthType = cells[0].biome.growthType;
+        let weight = this.weights[cells[0].type];
+        for (let i = 0; i < weight; i++) {
+          if (growthType === GROWTH_TYPE.JAGGED) {
+            this.growJagged(cells, used);
+          } else if (growthType === GROWTH_TYPE.SMOOTH) {
+            this.growSmooth(cells, used);
+          }
+        }
+      }
+    }
   }
 
   // TODO: clean this up a lot
@@ -237,11 +327,12 @@ export default class Map {
 
         let cell = this.map[position.x][position.y];
         cell.type = type;
+        cell.biome = this.biomes[type];
         used.push(cell);
         seeds.push([cell]);
       }
     });
 
-    this.iterativeJagged(seeds, used);
+    this.growCells(seeds, used);
   }
 }
