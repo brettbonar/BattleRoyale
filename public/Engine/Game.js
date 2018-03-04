@@ -50,7 +50,10 @@ export default class Game {
       this.handleKeyEvent(event, true);
     };
     this.mouseDownListener = (event) => {
-      this.handleMouseDownImpl(event);
+      this.handleMouseEventImpl(event);
+    };
+    this.mouseUpListener = (event) => {
+      this.handleMouseEventImpl(event, true);
     };
     this.pointerLockListener = (event) => {
       this.pointerLockChangeAlert(event);
@@ -82,9 +85,30 @@ export default class Game {
     this.handleMouseMove(event);
   }
 
-  handleMouseDownImpl(event) {
-    if (this._settings.requestPointerLock) {
+  handleKeyEvent(inputEvent, keyUp) {
+    let event = this.keyBindings[inputEvent.keyCode];
+    if (event) {
+      this.inputEvents.push({
+        event: event,
+        inputEvent: inputEvent,
+        release: keyUp
+      });
+    }
+  }
+
+  handleMouseEventImpl(inputEvent, mouseUp) {
+    if (!mouseUp && this._settings.requestPointerLock) {
       this.canvas.requestPointerLock();
+    }
+
+    // TODO: make into constants
+    let event = this.keyBindings["leftclick"];
+    if (event) {
+      this.inputEvents.push({
+        event: event,
+        inputEvent: inputEvent,
+        release: mouseUp
+      });
     }
   }
 
@@ -123,17 +147,6 @@ export default class Game {
     }
   }
 
-  handleKeyEvent(keyEvent, keyUp) {
-    let event = this.keyBindings[keyEvent.keyCode];
-    if (event) {
-      this.inputEvents.push({
-        event: event,
-        keyEvent: keyEvent,
-        keyUp: keyUp
-      });
-    }
-  }
-
   addEventHandler(event, handler) {
     let handlers = this.eventHandlers[event];
     if (!handlers) {
@@ -165,6 +178,7 @@ export default class Game {
     document.removeEventListener("keydown", this.keyDownListener);
     document.removeEventListener("keyup", this.keyUpListener);
     document.removeEventListener("mousedown", this.mouseDownListener);
+    document.removeEventListener("mouseup", this.mouseUpListener);
     if (this._settings.requestPointerLock) {
       document.removeEventListener("pointerlockchange", this.pointerLockListener, false);
       document.removeEventListener("mozpointerlockchange", this.pointerLockListener, false);
@@ -185,6 +199,7 @@ export default class Game {
     document.addEventListener("keydown", this.keyDownListener);
     document.addEventListener("keyup", this.keyUpListener);
     document.addEventListener("mousedown", this.mouseDownListener);
+    document.addEventListener("mouseup", this.mouseUpListener);
 
 
     this.previousTime = performance.now();

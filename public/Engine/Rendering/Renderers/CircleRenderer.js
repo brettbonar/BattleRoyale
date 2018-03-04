@@ -6,10 +6,11 @@ export default class CircleRenderer extends Renderer {
   }
 
   render(context, object, elapsedTime) {
+    let position = object.renderPosition || object.position;
     context.save();
 
     context.beginPath();
-    context.arc(object.position.x, object.position.y, object.radius, 0, 2 * Math.PI);
+    context.arc(position.x, position.y, object.radius, 0, 2 * Math.PI);
     context.closePath();
 
     context.shadowColor = this.shadowColor;
@@ -25,6 +26,11 @@ export default class CircleRenderer extends Renderer {
       context.stroke();
     }
 
+    // DEBUG
+    let box = object.boundingBox.box;
+    context.strokeStyle = "magenta";
+    context.strokeRect(box.ul.x, box.ul.y, object.width, object.height);
+    
     context.restore();
 
     // DEBUG

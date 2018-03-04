@@ -62,7 +62,7 @@ export default class CharacterRenderer {
 
   initBody(params) {
     this.body = new Image();
-    this.body.src = "../../Assets/Universal-LPC-spritesheet-master/body/" + params.gender + "/" + params.body + ".png";
+    this.body.src = "../../Assets/character/body/" + params.gender + "/" + params.body + ".png";
     this.body.onload = () => this.render = this._render;
 
     this.loadout = {};
@@ -104,10 +104,10 @@ export default class CharacterRenderer {
     context.strokeStyle = "magenta";
     context.strokeRect(box.ul.x, box.ul.y, object.width, object.height);
 
-    let terrainBox = object.terrainBoundingBox.box;
-    context.strokeStyle = "aqua";
-    context.strokeRect(terrainBox.ul.x, terrainBox.ul.y,
-      object.terrainDimensions.width, object.terrainDimensions.height);
+    // let terrainBox = object.terrainBoundingBox.box;
+    // context.strokeStyle = "aqua";
+    // context.strokeRect(terrainBox.ul.x, terrainBox.ul.y,
+    //   object.terrainDimensions.width, object.terrainDimensions.height);
   }
 
   render() {}

@@ -57,16 +57,16 @@ export default class PhysicsEngine {
   //   return collisions;
   // }
 
-  detectTerrainCollisions(obj, objects) {
+  detectCollisions(obj, objects) {
     //let vector = obj.terrainVector;
-    let terrainBox = obj.terrainBoundingBox;
+    let objBox = obj.boundingBox;
     let collisions = [];
     for (const target of objects) {
       if (target === obj) continue;
       
       if (target.physics.surfaceType === SURFACE_TYPE.TERRAIN) {
         //let intersections = this.getIntersections(vector, target);
-        if (terrainBox.intersects(target.boundingBox)) {
+        if (objBox.intersects(target.boundingBox)) {
           let targetBox = target.boundingBox.box;
           //let lastTerrainBox = obj.lastTerrainBoundingBox.box;
           collisions.push({
@@ -118,7 +118,7 @@ export default class PhysicsEngine {
       //   collisions = collisions.concat(this.detectCollisions(obj, objects));
       // }
       if (obj.physics.surfaceType === SURFACE_TYPE.CHARACTER) {
-        collisions = collisions.concat(this.detectTerrainCollisions(obj, objects));
+        collisions = collisions.concat(this.detectCollisions(obj, objects));
       }
     }   
 

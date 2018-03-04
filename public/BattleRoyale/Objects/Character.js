@@ -5,13 +5,17 @@ export default class Character extends GameObject {
   constructor(params) {
     super(params);
     this.physics.surfaceType = "character";
+    // this.dimensions = {
+    //   width: 32,
+    //   height: 52
+    // };
+    // this.terrainDimensions = {
+    //   width: 32,
+    //   height: 8
+    // };
     this.dimensions = {
       width: 32,
-      height: 52
-    };
-    this.terrainDimensions = {
-      width: 32,
-      height: 8
+      height: 16
     };
     this.direction = {
       x: 0,
