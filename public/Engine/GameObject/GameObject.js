@@ -101,8 +101,8 @@ export default class GameObject {
 
   update(elapsedTime) {}
 
-  render(context, elapsedTime) {
-    this.renderer.render(context, this, elapsedTime);
+  render(context, elapsedTime, center) {
+    this.renderer.render(context, this, elapsedTime, center);
   }
 
   get left() {

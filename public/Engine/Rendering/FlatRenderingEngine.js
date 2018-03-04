@@ -5,9 +5,9 @@ export default class FlatRenderingEngine extends RenderingEngine {
     super(params);
   }
 
-  render(objects, elapsedTime) {
+  render(objects, elapsedTime, center) {
     for (const object of objects) {
-      object.render(this.context, elapsedTime);
+      object.render(this.context, elapsedTime, center);
     }
   }
 }

@@ -9,13 +9,13 @@ export default class PlainTreeRenderer {
 
     this.imageDimensions = {
       x: 928 * 2,
-      y: 896 * 2,
+      y: 897 * 2,
       width: 96 * 2,
       height: 128 * 2 - 10
     };
   }
 
-  _render(context, object, elapsedTime) {
+  _render(context, object, elapsedTime, center) {
     let pos = {
       x: object.position.x - (this.imageDimensions.width) / 2,
       y: object.position.y - this.imageDimensions.height

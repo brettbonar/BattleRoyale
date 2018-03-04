@@ -82,7 +82,7 @@ export default class CharacterRenderer {
     }
   }
 
-  _render(context, object, elapsedTime) {
+  _render(context, object, elapsedTime, center) {
     let pos = {
       x: object.position.x - imageSize / 2,
       y: object.position.y - imageSize

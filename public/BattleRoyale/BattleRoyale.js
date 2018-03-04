@@ -44,8 +44,8 @@ export default class BattleRoyale extends Game {
           hands: "../../Assets/Universal-LPC-spritesheet-master/hands/bracers/male/leather_bracers_male.png"
         },
         position: {
-          x: params.canvas.width / 2,
-          y: params.canvas.height / 2
+          x: 255,
+          y: 255
         }
       }),
       cursor: {
@@ -150,7 +150,7 @@ export default class BattleRoyale extends Game {
     this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
     this.map.render(this.context, this.gameState.player.position);
-    this.renderingEngine.render(this.getRenderObjects());
+    this.renderingEngine.render(this.getRenderObjects(), elapsedTime, this.gameState.player.position);
 
     // TODO: put somewhere else
     // Render cursor
@@ -165,7 +165,10 @@ export default class BattleRoyale extends Game {
   }
 
   _update(elapsedTime) {
-    this.gameState.player.setTarget(this.gameState.cursor.position);
+    this.gameState.player.setTarget({
+      x: this.gameState.cursor.position.x + (this.gameState.player.position.x - this.canvas.width / 2),
+      y: this.gameState.cursor.position.y + (this.gameState.player.position.y - this.canvas.height / 2)
+    });
     this.gameState.player.update(elapsedTime);
     this.physicsEngine.update(elapsedTime, this.getPhysicsObjects());
   }
