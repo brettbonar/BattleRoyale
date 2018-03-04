@@ -103,6 +103,11 @@ export default class CharacterRenderer {
     let box = object.boundingBox.box;
     context.strokeStyle = "magenta";
     context.strokeRect(box.ul.x, box.ul.y, object.width, object.height);
+
+    let terrainBox = object.terrainBoundingBox.box;
+    context.strokeStyle = "aqua";
+    context.strokeRect(terrainBox.ul.x, terrainBox.ul.y,
+      object.terrainDimensions.width, object.terrainDimensions.height);
   }
 
   render() {}

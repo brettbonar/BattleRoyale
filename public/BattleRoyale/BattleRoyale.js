@@ -88,15 +88,22 @@ export default class BattleRoyale extends Game {
     // this.stateFunctions[Game.STATE.INITIALIZING].update = _.noop;//(elapsedTime) => this._update(elapsedTime);
     // this.stateFunctions[Game.STATE.INITIALIZING].render = _.noop;//(elapsedTime) => this._render(elapsedTime);
 
-    // for (let i = 0; i < 10; i++) {
-    //   this.gameState.staticObjects.push(new GameObject({
-    //     position: {
-    //       x: _.random(0, this.canvas.width),
-    //       y: _.random(0, this.canvas.height)
-    //     },
-    //     renderer: new PlainTreeRenderer()
-    //   }));
-    // }
+    for (let i = 0; i < 10; i++) {
+      this.gameState.staticObjects.push(new GameObject({
+        position: {
+          x: _.random(0, this.canvas.width),
+          y: _.random(0, this.canvas.height)
+        },
+        physics: {
+          surfaceType: "terrain"
+        },
+        dimensions: {
+          width: 106,
+          height: 56
+        },
+        renderer: new PlainTreeRenderer()
+      }));
+    }
   }
 
   handleMouseMove(event) {
@@ -130,13 +137,20 @@ export default class BattleRoyale extends Game {
     }
   }
 
+  getRenderObjects() {
+    return this.gameState.staticObjects.concat([this.gameState.player]);
+  }
+
+  getPhysicsObjects() {
+    return this.gameState.staticObjects.concat([this.gameState.player]);
+  }
+
   _render(elapsedTime) {
     this.context.save();
     this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
     this.map.render(this.context, this.gameState.player.position);
-    let renderObjects = this.gameState.staticObjects.concat([this.gameState.player]);
-    this.renderingEngine.render(renderObjects);
+    this.renderingEngine.render(this.getRenderObjects());
 
     // TODO: put somewhere else
     // Render cursor
@@ -153,5 +167,6 @@ export default class BattleRoyale extends Game {
   _update(elapsedTime) {
     this.gameState.player.setTarget(this.gameState.cursor.position);
     this.gameState.player.update(elapsedTime);
+    this.physicsEngine.update(elapsedTime, this.getPhysicsObjects());
   }
 }

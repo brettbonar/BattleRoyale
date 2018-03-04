@@ -4,15 +4,20 @@ import CharacterRenderer from "../Renderers/CharacterRenderer.js"
 export default class Character extends GameObject {
   constructor(params) {
     super(params);
+    this.physics.surfaceType = "character";
     this.dimensions = {
       width: 32,
       height: 52
+    };
+    this.terrainDimensions = {
+      width: 32,
+      height: 8
     };
     this.direction = {
       x: 0,
       y: 0
     };
-    this.speed = 32;
+    this.speed = 64;
     this.renderer = new CharacterRenderer({
       gender: params.gender,
       body: params.body,
@@ -50,8 +55,8 @@ export default class Character extends GameObject {
   }
 
   update(elapsedTime) {
-    this.position.x += this.direction.x * this.speed * (elapsedTime / 1000);
-    this.position.y += this.direction.y * this.speed * (elapsedTime / 1000);
+    // this.position.x += this.direction.x * this.speed * (elapsedTime / 1000);
+    // this.position.y += this.direction.y * this.speed * (elapsedTime / 1000);
     this.renderer.update(elapsedTime);
   }
 }

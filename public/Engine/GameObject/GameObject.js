@@ -26,7 +26,7 @@ export default class GameObject {
     });
     _.defaultsDeep(this, {
       physics: {
-        surfaceType: SURFACE_TYPE.DEFAULT,
+        surfaceType: SURFACE_TYPE.IMMOVABLE,
         movementType: MOVEMENT_TYPE.NORMAL
       }
     });
@@ -141,6 +141,24 @@ export default class GameObject {
     //   return this.position;
     // } else if ()
   }
+  
+  get lastTerrainBoundingBox() {
+    return this.terrainDimensions && 
+      new Bounds({
+        position: this.lastPosition,
+        dimensions: this.terrainDimensions,
+        boundsType: this.boundsType
+      });
+  }
+  
+  get terrainBoundingBox() {
+    return this.terrainDimensions && 
+      new Bounds({
+        position: this.position,
+        dimensions: this.terrainDimensions,
+        boundsType: this.boundsType
+      });
+  }
 
   get boundingBox() {
     return this.staticBox || 
@@ -163,6 +181,15 @@ export default class GameObject {
   get radius() {
     return this.dimensions.radius ||
       Math.sqrt(this.dimensions.height * this.dimensions.height + this.dimensions.width * this.dimensions.width) / 2;
+  }
+
+  get terrainVector() {
+    let mid = new Vector([this.lastPosition, this.position]);
+    let radius = Math.sqrt(this.terrainDimensions.height * this.terrainDimensions.height + this.terrainDimensions.width * this.terrainDimensions.width) / 2;
+    mid.extend(radius);
+    let left = mid.getParallelLine(radius);
+    let right = mid.getParallelLine(-radius);
+    return [mid, left, right];    
   }
 
   get vector() {

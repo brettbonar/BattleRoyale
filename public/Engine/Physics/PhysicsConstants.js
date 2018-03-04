@@ -1,6 +1,8 @@
 const SURFACE_TYPE = {
   DEFAULT: "default",
-  REFLECTIVE: "reflective"
+  REFLECTIVE: "reflective",
+  TERRAIN: "terrain",
+  CHARACTER: "character"
 };
 
 const MOVEMENT_TYPE = {
