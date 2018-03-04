@@ -39,11 +39,12 @@ export default class BattleRoyale extends Game {
         body: "tanned",
         gender: "male",
         loadout: {
+          weapon: "../../Assets/character/weapons/both hand/spear.png",
           torso: "../../Assets/character/torso/leather/chest_male.png",
           pants: "../../Assets/character/legs/pants/male/teal_pants_male.png",
           head: "../../Assets/character/head/hoods/male/cloth_hood_male.png",
           feet: "../../Assets/character/feet/shoes/male/brown_shoes_male.png",
-          hands: "../../Assets/character/hands/bracers/male/leather_bracers_male.png"
+          hands: "../../Assets/character/hands/bracers/male/leather_bracers_male.png"          
         },
         position: {
           x: 255,

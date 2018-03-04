@@ -14,6 +14,7 @@ const ANIMATION_SETTINGS = {
       y: 11 * imageSize
     },
     frames: 9,
+    cycleStart: 2,
     rate: 5
   },
   [ANIMATIONS.MOVING_DOWN]: {
@@ -22,6 +23,7 @@ const ANIMATION_SETTINGS = {
       y: 10 * imageSize
     },
     frames: 9,
+    cycleStart: 2,
     rate: 5
   },
   [ANIMATIONS.MOVING_LEFT]: {
@@ -30,6 +32,7 @@ const ANIMATION_SETTINGS = {
       y: 9 * imageSize
     },
     frames: 9,
+    cycleStart: 2,
     rate: 5
   },
   [ANIMATIONS.MOVING_UP]: {
@@ -38,8 +41,18 @@ const ANIMATION_SETTINGS = {
       y: 8 * imageSize
     },
     frames: 9,
+    cycleStart: 2,
     rate: 5
   }
+};
+
+const LOADOUT_ORDER = {
+  hands: 10,
+  head: 9,
+  weapon: 5,
+  torso: 3,
+  pants: 1,
+  feet: 0
 };
 
 function getOffset(animation, frame) {
@@ -57,6 +70,7 @@ export default class CharacterRenderer {
     this.animation = ANIMATIONS.MOVING_DOWN;
     this.frame = 0;
     this.currentTime = 0;
+    this.direction = 1;
     this.initBody(params);
   }
 
@@ -67,8 +81,11 @@ export default class CharacterRenderer {
 
     this.loadout = {};
     _.each(params.loadout, (path, type) => {
-      this.loadout[type] = new Image();
-      this.loadout[type].src = path;
+      this.loadout[type] = {
+        image: new Image(),
+        type: type
+      };
+      this.loadout[type].image.src = path;
     });
   }
 
@@ -79,7 +96,25 @@ export default class CharacterRenderer {
       this.animation = animation;
       this.frame = 0;
       this.currentTime = 0;
+      this.direction = 1;
     }
+  }
+
+  drawLoadout(context, pos, offset) {
+    let loadout = _.sortBy(this.loadout, (item) => {
+      let order = LOADOUT_ORDER[item.type];
+      // if (item.type === "weapon" && this.animation === ANIMATIONS.MOVING_RIGHT) {
+      //   order = LOADOUT_ORDER.torso + 1;
+      // }
+      return order;
+    });
+
+    for (const item of loadout) {
+      if (item.image.complete) {
+        context.drawImage(item.image, offset.x, offset.y, imageSize, imageSize,
+          pos.x, pos.y, imageSize, imageSize);
+      }
+    }    
   }
 
   _render(context, object, elapsedTime, center) {
@@ -91,18 +126,12 @@ export default class CharacterRenderer {
 
     context.drawImage(this.body, offset.x, offset.y, imageSize, imageSize,
       pos.x, pos.y, imageSize, imageSize);
-
-    _.each(this.loadout, (image) => {
-      if (image.complete) {
-        context.drawImage(image, offset.x, offset.y, imageSize, imageSize,
-          pos.x, pos.y, imageSize, imageSize);
-      }
-    });
+    this.drawLoadout(context, pos, offset);
 
     // DEBUG
-    let box = object.boundingBox.box;
-    context.strokeStyle = "magenta";
-    context.strokeRect(box.ul.x, box.ul.y, object.width, object.height);
+    // let box = object.boundingBox.box;
+    // context.strokeStyle = "magenta";
+    // context.strokeRect(box.ul.x, box.ul.y, object.width, object.height);
 
     // let terrainBox = object.terrainBoundingBox.box;
     // context.strokeStyle = "aqua";
@@ -118,7 +147,24 @@ export default class CharacterRenderer {
       this.currentTime += elapsedTime;
       while (this.currentTime > 1000 / animationSettings.rate) {
         this.currentTime -= 1000 / animationSettings.rate;
-        this.frame = (this.frame + 1) % animationSettings.frames;
+        this.frame++;
+        if (this.frame >= animationSettings.frames) {
+          this.frame = animationSettings.cycleStart;
+        }
+
+
+        //this.frame += this.direction;
+        // if (this.frame >= animationSettings.frames) {
+        //   this.frame = animationSettings.frames - 2;
+        //   this.direction = -1;
+        // }
+
+        // if (prevFrame === animationSettings.cycleStart && this.frame < animationSettings.cycleStart) {
+        //   this.frame = animationSettings.cycleStart + 1;
+        //   this.direction = 1;
+        // }
+        console.log(this.frame);
+        //fthis.frame = ((this.frame + 1) % animationSettings.frames);
       }
     }
   }
