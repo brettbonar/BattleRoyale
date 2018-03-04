@@ -4,9 +4,12 @@ import GameObject from "../Engine/GameObject/GameObject.js"
 import Bounds from "../Engine/GameObject/Bounds.js"
 import FloatingText from "../Graphics/FloatingText.js"
 import PhysicsEngine from "../Engine/Physics/PhysicsEngine.js"
-import FlatRenderingEngine from "../Engine/Rendering/FlatRenderingEngine.js"
+import PerspectiveRenderingEngine from "../Engine/Rendering/PerspectiveRenderingEngine.js"
 import ParticleEngine from "../Engine/Effects/ParticleEngine.js"
 import { MOVEMENT_TYPE } from "../Engine/Physics/PhysicsConstants.js";
+
+import PlainTreeRenderer from "./Renderers/PlainTreeRenderer.js"
+import Character from "./Objects/Character.js";
 
 const EVENTS = {
   MOVE_UP: "moveUp",
@@ -17,11 +20,10 @@ const EVENTS = {
 
 export default class BattleRoyale extends Game {
   constructor(params) {
-    super(params);
-    //super(Object.assign(params, { requestPointerLock: true }));
+    super(Object.assign(params, { requestPointerLock: true }));
     this.map = params.map;
     this.physicsEngine = new PhysicsEngine();
-    this.renderingEngine = new FlatRenderingEngine({
+    this.renderingEngine = new PerspectiveRenderingEngine({
       context: this.context
     });
     this.particleEngine = new ParticleEngine({
@@ -31,10 +33,29 @@ export default class BattleRoyale extends Game {
     let scale = this.canvas.width / 1000;
 
     this.gameState = {
-      playerPosition: {
-        x: params.canvas.width / 2,
-        y: params.canvas.height / 2
-      }
+      player: new Character({
+        body: "tanned",
+        gender: "male",
+        loadout: {
+          torso: "../../Assets/Universal-LPC-spritesheet-master/torso/leather/chest_male.png",
+          pants: "../../Assets/Universal-LPC-spritesheet-master/legs/pants/male/teal_pants_male.png",
+          head: "../../Assets/Universal-LPC-spritesheet-master/head/hoods/male/cloth_hood_male.png",
+          feet: "../../Assets/Universal-LPC-spritesheet-master/feet/shoes/male/brown_shoes_male.png",
+          hands: "../../Assets/Universal-LPC-spritesheet-master/hands/bracers/male/leather_bracers_male.png"
+        },
+        position: {
+          x: params.canvas.width / 2,
+          y: params.canvas.height / 2
+        }
+      }),
+      cursor: {
+        position: {
+          x: params.canvas.width / 2,
+          y: params.canvas.height / 2
+        }
+      },
+      dynamicObjects: [],
+      staticObjects: []
     };
 
 
@@ -66,25 +87,71 @@ export default class BattleRoyale extends Game {
     // this.stateFunctions[Game.STATE.GAME_OVER].render = (elapsedTime) => this.renderGameOver(elapsedTime);
     // this.stateFunctions[Game.STATE.INITIALIZING].update = _.noop;//(elapsedTime) => this._update(elapsedTime);
     // this.stateFunctions[Game.STATE.INITIALIZING].render = _.noop;//(elapsedTime) => this._render(elapsedTime);
+
+    // for (let i = 0; i < 10; i++) {
+    //   this.gameState.staticObjects.push(new GameObject({
+    //     position: {
+    //       x: _.random(0, this.canvas.width),
+    //       y: _.random(0, this.canvas.height)
+    //     },
+    //     renderer: new PlainTreeRenderer()
+    //   }));
+    // }
+  }
+
+  handleMouseMove(event) {
+    // TODO: put in cursor update function
+    let x = this.gameState.cursor.position.x + event.movementX;
+    let y = this.gameState.cursor.position.y + event.movementY;
+    this.gameState.cursor.position.x = x;
+    this.gameState.cursor.position.y = y;
+    if (this.gameState.cursor.position.x > this.canvas.width) {
+      this.gameState.cursor.position.x = this.canvas.width;
+    } else if (this.gameState.cursor.position.x < 0) {
+      this.gameState.cursor.position.x = 0;
+    }
+    if (this.gameState.cursor.position.y > this.canvas.height) {
+      this.gameState.cursor.position.y = this.canvas.height;
+    } else if (this.gameState.cursor.position.y < 0) {
+      this.gameState.cursor.position.y = 0;
+    }
+    //this.gameState.cursor.position.x =  Math.min(Math.max(x, 0), this.gameSettings.playArea.width - this.gameState.cursor.width);
   }
 
   move(event) {
-    if (event === EVENTS.MOVE_UP) {
-      this.gameState.playerPosition.y -= 1;
-    } else if (event === EVENTS.MOVE_DOWN) {
-      this.gameState.playerPosition.y += 1;
-    } else if (event === EVENTS.MOVE_LEFT) {
-      this.gameState.playerPosition.x -= 1;
-    } else if (event === EVENTS.MOVE_RIGHT) {
-      this.gameState.playerPosition.x += 1;
+    if (event.event === EVENTS.MOVE_UP) {
+      this.gameState.player.setDirection({ y: event.keyUp ? 0 : -1 });
+    } else if (event.event === EVENTS.MOVE_DOWN) {
+      this.gameState.player.setDirection({ y: event.keyUp ? 0 : 1 });
+    } else if (event.event === EVENTS.MOVE_LEFT) {
+      this.gameState.player.setDirection({ x: event.keyUp ? 0 : -1 });
+    } else if (event.event === EVENTS.MOVE_RIGHT) {
+      this.gameState.player.setDirection({ x: event.keyUp ? 0 : 1 });
     }
   }
 
   _render(elapsedTime) {
-    this.map.render(this.context, this.gameState.playerPosition);
+    this.context.save();
+    this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+
+    this.map.render(this.context, this.gameState.player.position);
+    let renderObjects = this.gameState.staticObjects.concat([this.gameState.player]);
+    this.renderingEngine.render(renderObjects);
+
+    // TODO: put somewhere else
+    // Render cursor
+    this.context.beginPath();
+    this.context.arc(this.gameState.cursor.position.x, this.gameState.cursor.position.y, 5, 0, 2 * Math.PI);
+    this.context.closePath();
+
+    this.context.strokeStyle = "red";
+    this.context.stroke();
+
+    this.context.restore();
   }
 
   _update(elapsedTime) {
-
+    this.gameState.player.setTarget(this.gameState.cursor.position);
+    this.gameState.player.update(elapsedTime);
   }
 }

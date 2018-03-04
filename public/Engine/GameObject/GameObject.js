@@ -59,14 +59,21 @@ export default class GameObject {
     return this.getDimensionsType(this.dimensions);
   }
 
-  normalizeDirection() {
-    if (this.direction) {
-      let norm = Math.sqrt(this.direction.x * this.direction.x + this.direction.y * this.direction.y);
+  normalize(point) {
+    if (point) {
+      let norm = Math.sqrt(point.x * point.x + point.y * point.y);
       if (norm !== 0) {
-        this.direction.x = this.direction.x / norm;
-        this.direction.y = this.direction.y / norm;
+        return {
+          x: point.x / norm,
+          y: point.y / norm
+        }
       }
     }
+    return point;
+  }
+
+  normalizeDirection() {
+    this.normalize(this.direction);
   }
 
   getCenterOfPoints(points) {
@@ -80,8 +87,8 @@ export default class GameObject {
       return this.getCenterOfPoints(points);
     } else if (type === Bounds.TYPE.RECTANGLE) {
       return {
-        x: this.position.x + dimensions.width / 2,
-        y: this.position.y + dimensions.height / 2
+        x: this.position.x,
+        y: this.position.y - dimensions.height / 2
       };
     } else if (type === Bounds.TYPE.POINT) { // point or circle
       return dimensions;

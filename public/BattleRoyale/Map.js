@@ -32,11 +32,47 @@ class Cell {
     this.neighbors = {
       left: null,
       right: null,
-      up: null,
-      down: null
+      top: null,
+      bottom: null
     };
   }
 }
+
+const TERRAIN_PRIORITY = {
+  [BIOMES.DEATH]: 1,
+  [BIOMES.FIRE]: 0,
+  [BIOMES.WATER]: -1,
+  [BIOMES.DESERT]: 2,
+  [BIOMES.FOREST]: 3,
+  [BIOMES.PLAIN]: 4
+};
+
+const TERRAIN_OFFSETS = {
+  [BIOMES.DEATH]: {
+    x: 32 * 10,
+    y: 32 * 3
+  },
+  [BIOMES.FIRE]: {
+    x: 32 * 16,
+    y: 32 * 3
+  },
+  [BIOMES.WATER]: {
+    x: 32 * 28,
+    y: 32 * 3
+  },
+  [BIOMES.DESERT]: {
+    x: 32 * 19,
+    y: 32 * 9
+  },
+  [BIOMES.FOREST]: {
+    x: 32 * 7,
+    y: 32 * 9
+  },
+  [BIOMES.PLAIN]: {
+    x: 32,
+    y: 32 * 9
+  }
+};
 
 export default class Map {
   constructor(params) {
@@ -125,11 +161,21 @@ export default class Map {
           cell.neighbors.right = this.map[x + 1][y];
         }
         if (y > 0) {
-          cell.neighbors.up = this.map[x][y - 1];
+          cell.neighbors.top = this.map[x][y - 1];
         }
         if (y < this.map[x].length - 1) {
-          cell.neighbors.down = this.map[x][y + 1];
+          cell.neighbors.bottom = this.map[x][y + 1];
         }
+        cell.neighbors.topLeft = this.getCell(x - 1, y - 1);
+        cell.neighbors.topRight = this.getCell(x + 1, y - 1);
+        cell.neighbors.bottomRight = this.getCell(x + 1, y + 1);
+        cell.neighbors.bottomLeft = this.getCell(x - 1, y + 1);
+        cell.growNeighbors = [
+          cell.neighbors.left,
+          cell.neighbors.right,
+          cell.neighbors.top,
+          cell.neighbors.bottom
+        ];
       }
     }
   }
@@ -138,10 +184,41 @@ export default class Map {
     let cell;
     while (!cell && cells.length > 0) {
       cell = cells[cells.length - 1];
-      let neighbors = _.shuffle(cell.neighbors);
+      let neighbors = _.shuffle(cell.growNeighbors);
       let next;
       for (const neighbor of neighbors) {
         if (neighbor && !used.includes(neighbor)) {
+          // if (neighbor === cell.neighbors.left || neighbor === cell.neighbors.right) {
+          //   let top = cell.neighbors.top;
+          //   if (top && !used.includes(top)) {
+          //     top.type = cell.type;
+          //     top.biome = cell.biome;
+          //     cells.push(top);
+          //     used.push(top);
+          //   }
+          //   let bottom = cell.neighbors.bottom;
+          //   if (bottom && !used.includes(bottom)) {
+          //     bottom.type = cell.type;
+          //     bottom.biome = cell.biome;
+          //     cells.push(bottom);
+          //     used.push(bottom);
+          //   }
+          // } else if (neighbor === cell.neighbors.top || neighbor === cell.neighbors.bottom) {
+          //   let left = cell.neighbors.left;
+          //   if (left && !used.includes(left)) {
+          //     left.type = cell.type;
+          //     left.biome = cell.biome;
+          //     cells.push(left);
+          //     used.push(left);
+          //   }
+          //   let right = cell.neighbors.right;
+          //   if (right && !used.includes(right)) {
+          //     right.type = cell.type;
+          //     right.biome = cell.biome;
+          //     cells.push(right);
+          //     used.push(right);
+          //   }
+          // }
           next = neighbor;
           next.type = cell.type;
           next.biome = cell.biome;
@@ -162,7 +239,7 @@ export default class Map {
     let cell;
     while (!cell && cells.length > 0) {
       cell = cells[0];
-      let neighbors = _.shuffle(cell.neighbors);
+      let neighbors = _.shuffle(cell.growNeighbors);
       let next;
       for (const neighbor of neighbors) {
         if (neighbor && !used.includes(neighbor)) {
@@ -182,6 +259,7 @@ export default class Map {
   }
 
   growCells(seeds, used) {
+    // TODO: grow smooth cells first then add jagged on top
     while (seeds.some((cells) => cells.length > 0)) {
       for (const cells of seeds) {
         if (cells.length === 0) continue;
@@ -196,6 +274,163 @@ export default class Map {
         }
       }
     }
+    
+    // Ensure there are no isolated tiles
+    for (const column of this.map) {
+      for (const cell of column) {
+        if (cell.neighbors.bottom && cell.neighbors.bottom.type !== cell.type && cell.neighbors.top && cell.neighbors.top.type !== cell.type) {
+          cell.neighbors.bottom.type = cell.type;
+          cell.neighbors.bottom.biome = cell.biome;
+        }
+        if (cell.neighbors.left && cell.neighbors.left.type !== cell.type && cell.neighbors.right && cell.neighbors.right.type !== cell.type) {
+          cell.neighbors.right.type = cell.type;
+          cell.neighbors.right.biome = cell.biome;
+        }
+        // if (cell.neighbors.topLeft && cell.neighbors.topLeft.type !== cell.type && cell.neighbors.bottomRight && cell.neighbors.bottomRight.type !== cell.type) {
+        //   cell.neighbors.bottomRight.type = cell.type;
+        //   cell.neighbors.bottomRight.biome = cell.biome;
+        // }
+        // if (cell.neighbors.topRight && cell.neighbors.topRight.type !== cell.type && cell.neighbors.bottomLeft && cell.neighbors.bottomLeft.type !== cell.type) {
+        //   cell.neighbors.bottomLeft.type = cell.type;
+        //   cell.neighbors.bottomLeft.biome = cell.biome;
+        // }
+      }
+    }
+  }
+
+  getCell(x, y) {
+    if (x >= 0 && x < this.map.length && y >= 0 && y < this.map.length) {
+      return this.map[x][y];
+    }
+    return null;
+  }
+
+  renderCell(cell, offset, position) {
+    let size = this.cellSize;
+    offset = offset || Object.assign({}, TERRAIN_OFFSETS[cell.type]);
+    position = position || cell.position;
+
+    this.context.drawImage(this.terrain, offset.x, offset.y, size, size,
+      position.x * size, position.y * size, size, size);
+    //this.context.strokeRect(position.x * size, position.y * size, size, size);
+  }
+
+  getOffset(cell) {
+    let size = this.cellSize;
+    let priority = TERRAIN_PRIORITY[cell.type];
+    let offset = Object.assign({}, TERRAIN_OFFSETS[cell.type]);
+    let neighbor;
+    let sides = {
+      topLeft: false,
+      topRight: false,
+      bottomRight: false,
+      bottomLeft: false,
+      top: false,
+      right: false,
+      bottom: false,
+      left: false
+    }
+    if (cell.neighbors.topLeft && TERRAIN_PRIORITY[cell.neighbors.topLeft.type] > priority) {
+      sides.topLeft = true;
+      neighbor = cell.neighbors.topLeft;
+    }
+    if (cell.neighbors.topRight && TERRAIN_PRIORITY[cell.neighbors.topRight.type] > priority) {
+      sides.topRight = true;
+      neighbor = cell.neighbors.topRight;
+    }
+    if (cell.neighbors.bottomRight && TERRAIN_PRIORITY[cell.neighbors.bottomRight.type] > priority) {
+      sides.bottomRight = true;
+      neighbor = cell.neighbors.bottomRight;
+    }
+    if (cell.neighbors.bottomLeft && TERRAIN_PRIORITY[cell.neighbors.bottomLeft.type] > priority) {
+      sides.bottomLeft = true;
+      neighbor = cell.neighbors.bottomLeft;
+    }
+    if (cell.neighbors.bottom && TERRAIN_PRIORITY[cell.neighbors.bottom.type] > priority) {
+      sides.bottom = true;
+      neighbor = cell.neighbors.bottom;
+    }
+    if (cell.neighbors.top && TERRAIN_PRIORITY[cell.neighbors.top.type] > priority) {
+      sides.top = true;
+      neighbor = cell.neighbors.top;
+    }
+    if (cell.neighbors.right && TERRAIN_PRIORITY[cell.neighbors.right.type] > priority) {
+      sides.right = true;
+      neighbor = cell.neighbors.right;
+    }
+    if (cell.neighbors.left && TERRAIN_PRIORITY[cell.neighbors.left.type] > priority) {
+      sides.left = true;
+      neighbor = cell.neighbors.left;
+    }
+    
+    if (sides.topLeft && sides.topRight && sides.bottomRight && sides.bottomLeft && sides.bottom && sides.top && sides.right && sides.left) {
+      offset.x -= size;
+      offset.y -= size * 3;
+    } else if (sides.top && !sides.right && !sides.left) {
+      offset.y -= size;
+    } else if (sides.bottom && !sides.right && !sides.left) {
+      offset.y += size;
+    } else if (sides.right && !sides.top && !sides.bottom) {
+      offset.x += size;
+    } else if (sides.left && !sides.top && !sides.bottom) {
+      offset.x -= size;
+    }  else if (sides.bottomLeft && !sides.right && !sides.top && sides.left && sides.bottom) {
+      offset.x -= size;
+      offset.y += size;
+    } else if (sides.bottomRight && sides.right && !sides.top && !sides.left && sides.bottom) {
+      offset.x += size;
+      offset.y += size;
+    } else if (sides.topRight && sides.right && sides.top && !sides.left && !sides.bottom) {
+      offset.x += size;
+      offset.y -= size;
+    } else if (sides.topLeft && !sides.right && sides.top && sides.left && !sides.bottom) {
+      offset.x -= size;
+      offset.y -= size;
+    } else if (sides.topRight && !sides.right && !sides.top && !sides.left && !sides.bottom) {
+      offset.y -= size * 2;
+    } else if (sides.topLeft && !sides.right && !sides.top && !sides.left && !sides.bottom) {
+      offset.x += size;
+      offset.y -= size * 2;
+    } else if (sides.bottomRight && !sides.right && !sides.top && !sides.left && !sides.bottom) {
+      offset.y -= size * 3;
+    } else if (sides.bottomLeft && !sides.right && !sides.top && !sides.left && !sides.bottom) {
+      offset.x += size;
+      offset.y -= size * 3;
+    } else if (sides.left && sides.top && !sides.bottom && !sides.right) {
+      offset.x -= size;
+      offset.y -= size;
+    } else if (sides.bottom && sides.right && !sides.top && !sides.left) {
+      offset.x += size;
+      offset.y += size;
+    }
+
+    return { offset: offset, neighbor: neighbor };
+  }
+
+  drawCell(cell) {
+    let size = this.cellSize;
+    let offset = Object.assign({}, TERRAIN_OFFSETS[cell.type]);
+    let priority = TERRAIN_PRIORITY[cell.type];
+    let neighbor;
+    let sides = {
+      top: false,
+      bottom: false,
+      left: false,
+      right: false
+    };
+
+    let result = this.getOffset(cell);
+
+    if (result.neighbor) {
+      let neighborCell = new Cell({
+        position: cell.position
+      });
+      neighborCell.neighbors = cell.neighbors;
+      neighborCell.type = result.neighbor.type;
+      this.renderCell(neighborCell, null, cell.position);
+    }
+    
+    this.renderCell(cell, result.offset);
   }
 
   saveMap() {
@@ -208,54 +443,19 @@ export default class Map {
     // DESERT: "desert",
     // DEATH: "death",
     // PLAIN: "plain"
-    let size = this.cellSize;
     for (const column of this.map) {
       for (const cell of column) {
-        let offset;
-        if (cell.type === "forest") {
-          offset = {
-            x: size * 6 + size * _.random(0, 2),
-            y: size * 11
-          };
-        } else if (cell.type === "desert") {
-          offset = {
-            x: size * 18 + size * _.random(0, 2),
-            y: size * 11
-          };
-        } else if (cell.type === "death") {
-          offset = {
-            x: size * 9 + size * _.random(0, 2),
-            y: size * 5
-          };
-        } else if (cell.type === "plain") {
-          offset = {
-            x: 0 + size * _.random(0, 2),
-            y: size * 11
-          };
-        } else if (cell.type === "water") {
-          offset = {
-            x: size * 15 + size * _.random(0, 2),
-            y: size * 17
-          };
-        } else if (cell.type === "fire") {
-          offset = {
-            x: size * 15 + size * _.random(0, 2),
-            y: size * 5
-          };
-        }
-
-        this.context.drawImage(this.terrain, offset.x, offset.y, size, size,
-          parseInt(cell.position.x, 10) * size, parseInt(cell.position.y, 10) * size, size, size);
+        this.drawCell(cell);
       }
     }
   }
 
   render(context, position) {
     if (this.canvas) {
-    context.drawImage(this.canvas, position.x - context.canvas.width / 2, position.y - context.canvas.height / 2,
-      context.canvas.width, context.canvas.height, 0, 0, context.canvas.width, context.canvas.height);
+      context.drawImage(this.canvas, position.x - context.canvas.width / 2, position.y - context.canvas.height / 2,
+        context.canvas.width, context.canvas.height, 0, 0, context.canvas.width, context.canvas.height);
+      //context.drawImage(this.canvas, 0, 0, context.canvas.width, context.canvas.height);
     }
-    //context.drawImage(this.canvas, 0, 0, context.canvas.width, context.canvas.height);
   }
 
   // TODO: clean this up a lot

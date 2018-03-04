@@ -1,7 +1,7 @@
 import RenderingEngine from "./RenderingEngine.js"
 
 function sortByPosition(obj) {
-  return -obj.position.y;
+  return obj.position.y;
 }
 
 export default class PerspectiveRenderingEngine extends RenderingEngine{
@@ -11,8 +11,8 @@ export default class PerspectiveRenderingEngine extends RenderingEngine{
 
   // Render highest to lowest y
   render(objects, elapsedTime) {
-    _.sortBy(objects, sortByPosition);
-    for (const object of objects) {
+    let objs = _.sortBy(objects, sortByPosition);
+    for (const object of objs) {
       object.render(this.context, elapsedTime);
     }
   }

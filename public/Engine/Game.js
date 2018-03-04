@@ -43,8 +43,11 @@ export default class Game {
     this.mouseMoveListener = (event) => {
       this.handleMouseMoveImpl(event);
     };
-    this.keyEventListener = (event) => {
+    this.keyDownListener = (event) => {
       this.handleKeyEvent(event);
+    };
+    this.keyUpListener = (event) => {
+      this.handleKeyEvent(event, true);
     };
     this.mouseDownListener = (event) => {
       this.handleMouseDownImpl(event);
@@ -112,7 +115,7 @@ export default class Game {
   }
 
   callEvent(event) {
-    let handlers = this.eventHandlers[event];
+    let handlers = this.eventHandlers[event.event];
     if (handlers) {
       for (const handler of handlers) {
         handler(event);
@@ -120,10 +123,14 @@ export default class Game {
     }
   }
 
-  handleKeyEvent(keyEvent) {
+  handleKeyEvent(keyEvent, keyUp) {
     let event = this.keyBindings[keyEvent.keyCode];
     if (event) {
-      this.inputEvents.push(event);
+      this.inputEvents.push({
+        event: event,
+        keyEvent: keyEvent,
+        keyUp: keyUp
+      });
     }
   }
 
@@ -155,7 +162,8 @@ export default class Game {
 
   quit() {
     document.removeEventListener("mousemove", this.mouseMoveListener);
-    document.removeEventListener("keydown", this.keyEventListener);
+    document.removeEventListener("keydown", this.keyDownListener);
+    document.removeEventListener("keyup", this.keyUpListener);
     document.removeEventListener("mousedown", this.mouseDownListener);
     if (this._settings.requestPointerLock) {
       document.removeEventListener("pointerlockchange", this.pointerLockListener, false);
@@ -174,7 +182,8 @@ export default class Game {
     } else {
       window.addEventListener("mousemove", this.mouseMoveListener);
     }
-    document.addEventListener("keydown", this.keyEventListener);
+    document.addEventListener("keydown", this.keyDownListener);
+    document.addEventListener("keyup", this.keyUpListener);
     document.addEventListener("mousedown", this.mouseDownListener);
 
 

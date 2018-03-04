@@ -46,7 +46,6 @@ hr {
 
 .primary-canvas {
   z-index: -1;
-  cursor: none;
 }
 
 .game-canvas {
@@ -54,8 +53,8 @@ hr {
   position: absolute;
   left: 0;
   top: 0;
-  width: calc(100vmin);
-  height: calc(100vmin);
+  width: 100vmin;
+  height: 100vmin;
 }
 /* 
 .canvas-width-max {

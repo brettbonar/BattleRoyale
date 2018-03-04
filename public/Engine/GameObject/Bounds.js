@@ -59,11 +59,18 @@ export default class Bounds {
 
   constructFromRectangle(params) {
     // TODO: handle line width?
+    // this.box = {
+    //   ul: { x: params.position.x, y: params.position.y },
+    //   ur: { x: params.position.x + params.dimensions.width, y: params.position.y },
+    //   lr: { x: params.position.x + params.dimensions.width, y: params.position.y + params.dimensions.height },
+    //   ll: { x: params.position.x, y: params.position.y + params.dimensions.height }
+    // };
+
     this.box = {
-      ul: { x: params.position.x, y: params.position.y },
-      ur: { x: params.position.x + params.dimensions.width, y: params.position.y },
-      lr: { x: params.position.x + params.dimensions.width, y: params.position.y + params.dimensions.height },
-      ll: { x: params.position.x, y: params.position.y + params.dimensions.height }
+      ul: { x: params.position.x - params.dimensions.width / 2, y: params.position.y - params.dimensions.height },
+      ur: { x: params.position.x + params.dimensions.width / 2, y: params.position.y - params.dimensions.height },
+      lr: { x: params.position.x + params.dimensions.width / 2, y: params.position.y },
+      ll: { x: params.position.x - params.dimensions.width / 2, y: params.position.y }
     };
 
     this.lines = {
