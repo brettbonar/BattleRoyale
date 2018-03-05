@@ -500,6 +500,7 @@ export default {
   },
   brokenHeadstone: {
     biome: "death",
+    group: "headstone",
     imageSource: "../../Assets/terrain_atlas.png",
     imageDimensions: {
       x: 449,
@@ -516,14 +517,92 @@ export default {
     },
     losObstacle: false
   },
-  cross: {
+  headstone1: {
     biome: "death",
+    group: "headstone",
+    imageSource: "../../Assets/obj_misk_atlas.png",
+    imageDimensions: {
+      x: 713,
+      y: 851,
+      width: 49,
+      height: 45
+    },
+    physics: {
+      surfaceType: "terrain"
+    },
+    dimensions: {
+      width: 45,
+      height: 16
+    },
+    losObstacle: false
+  },
+  headstone2: {
+    biome: "death",
+    group: "headstone",
+    imageSource: "../../Assets/obj_misk_atlas.png",
+    imageDimensions: {
+      x: 704,
+      y: 801,
+      width: 34,
+      height: 34
+    },
+    physics: {
+      surfaceType: "terrain"
+    },
+    dimensions: {
+      width: 31,
+      height: 16
+    },
+    losObstacle: false
+  },
+  headstone3: {
+    biome: "death",
+    group: "headstone",
+    imageSource: "../../Assets/obj_misk_atlas.png",
+    imageDimensions: {
+      x: 738,
+      y: 803,
+      width: 30,
+      height: 29
+    },
+    physics: {
+      surfaceType: "terrain"
+    },
+    dimensions: {
+      width: 28,
+      height: 16
+    },
+    losObstacle: false
+  },
+  // TODO: split into ground box and terrain box
+  grave: {
+    biome: "death",
+    group: "headstone",
+    imageSource: "../../Assets/obj_misk_atlas.png",
+    imageDimensions: {
+      x: 641,
+      y: 801,
+      width: 63,
+      height: 95
+    },
+    physics: {
+      surfaceType: "terrain"
+    },
+    dimensions: {
+      width: 61,
+      height: 63
+    },
+    losObstacle: false
+  },
+  cross1: {
+    biome: "death",
+    group: "cross",
     imageSource: "../../Assets/terrain_atlas.png",
     imageDimensions: {
       x: 481,
-      y: 678,
+      y: 679,
       width: 30,
-      height: 45
+      height: 44
     },
     physics: {
       surfaceType: "terrain"
@@ -531,6 +610,63 @@ export default {
     dimensions: {
       width: 30,
       height: 16
+    },
+    losObstacle: false
+  },
+  cross2: {
+    biome: "death",
+    group: "cross",
+    imageSource: "../../Assets/obj_misk_atlas.png",
+    imageDimensions: {
+      x: 741,
+      y: 897,
+      width: 20,
+      height: 30
+    },
+    physics: {
+      surfaceType: "terrain"
+    },
+    dimensions: {
+      width: 18,
+      height: 8
+    },
+    losObstacle: false
+  },
+  cross3: {
+    biome: "death",
+    group: "cross",
+    imageSource: "../../Assets/obj_misk_atlas.png",
+    imageDimensions: {
+      x: 739,
+      y: 927,
+      width: 26,
+      height: 33
+    },
+    physics: {
+      surfaceType: "terrain"
+    },
+    dimensions: {
+      width: 24,
+      height: 8
+    },
+    losObstacle: false
+  },
+  cross4: {
+    biome: "death",
+    group: "cross",
+    imageSource: "../../Assets/obj_misk_atlas.png",
+    imageDimensions: {
+      x: 734,
+      y: 960,
+      width: 33,
+      height: 64
+    },
+    physics: {
+      surfaceType: "terrain"
+    },
+    dimensions: {
+      width: 31,
+      height: 15
     },
     losObstacle: false
   },
@@ -549,6 +685,28 @@ export default {
     dimensions: {
       width: 26,
       height: 17
+    },
+    losObstacle: false
+  },
+  deadTree: {
+    biome: "death",
+    imageSource: "../../Assets/obj_misk_atlas-64.png",
+    imageDimensions: {
+      x: 1043,
+      y: 3,
+      width: 154,
+      height: 186,
+      offset: {
+        x: 70,
+        y: 166
+      }
+    },
+    physics: {
+      surfaceType: "terrain"
+    },
+    dimensions: {
+      width: 64,
+      height: 36
     },
     losObstacle: false
   }

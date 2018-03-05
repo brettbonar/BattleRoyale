@@ -13,6 +13,7 @@ import Character from "./Objects/Character.js"
 import Projectile from "./Objects/Projectile.js"
 import objects from "./Objects/objects.js"
 import objects32 from "./Objects/objects-32.js"
+import Building from "./Objects/Building.js";
 
 const EVENTS = {
   MOVE_UP: "moveUp",
@@ -96,9 +97,9 @@ export default class BattleRoyale extends Game {
     // this.stateFunctions[Game.STATE.INITIALIZING].render = _.noop;//(elapsedTime) => this._render(elapsedTime);
 
     // for (let i = 0; i < 10; i++) {
-    //   let type = _.sample(_.filter(objects, { biome: "ruins" }));
+    //   let type = _.sample(_.filter(objects, { biome: "death" }));
     //   //let type = _.sample(objects);
-    //   type = objects.corn1;
+    //   //type = objects.deadTree;
     //   this.gameState.staticObjects.push(new GameObject(Object.assign({
     //     position: {
     //       x: _.random(0, this.canvas.width),
@@ -108,20 +109,28 @@ export default class BattleRoyale extends Game {
     //   }, type)));
     // }
 
-    let x = 250;
-    let y = 250;
-    for (let i = 0; i < 10; i++) {
-      for (let j = 0; j < 5; j++) {
-        let type = _.sample(_.filter(objects, { group: "corn" }));
-        this.gameState.staticObjects.push(new GameObject(Object.assign({
-          position: {
-            x: x + i * (objects.corn1.imageDimensions.width * 3/4) + y,
-            y: y + j * (objects.corn1.imageDimensions.height / 3)
-          },
-          renderer: new ObjectRenderer(Object.assign({}, type))
-        }, type)));
-      }
-    }
+    // let x = 250;
+    // let y = 250;
+    // for (let i = 0; i < 10; i++) {
+    //   for (let j = 0; j < 5; j++) {
+    //     let type = _.sample(_.filter(objects, { group: "corn" }));
+    //     this.gameState.staticObjects.push(new GameObject(Object.assign({
+    //       position: {
+    //         x: x + i * (objects.corn1.imageDimensions.width * 3/4) + y,
+    //         y: y + j * (objects.corn1.imageDimensions.height / 3)
+    //       },
+    //       renderer: new ObjectRenderer(Object.assign({}, type))
+    //     }, type)));
+    //   }
+    // }
+
+    // this.gameState.staticObjects.push(new Building({
+    //   type: "house",
+    //   position: {
+    //     x: 500,
+    //     y: 500
+    //   }
+    // }));
   }
 
   handleMouseMove(event) {

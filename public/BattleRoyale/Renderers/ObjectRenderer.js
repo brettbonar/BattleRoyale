@@ -24,9 +24,9 @@ export default class ObjectRenderer {
       position.x, position.y, this.imageDimensions.width, this.imageDimensions.height);
 
     // DEBUG
-    let box = object.boundingBox.box;
-    context.strokeStyle = "magenta";
-    context.strokeRect(box.ul.x, box.ul.y, object.width, object.height);
+    // let box = object.boundingBox.box;
+    // context.strokeStyle = "magenta";
+    // context.strokeRect(box.ul.x, box.ul.y, object.width, object.height);
       
     // let terrainBox = object.terrainBoundingBox.box;
     // context.strokeStyle = "aqua";
