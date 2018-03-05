@@ -16,8 +16,8 @@ export default class GameObject {
     _.defaults(this, {
       boundsType: Bounds.TYPE.RECTANGLE,
       dimensions: {
-        width: 1,
-        height: 1
+        width: 0,
+        height: 0
       },
       position: {
         x: 0,

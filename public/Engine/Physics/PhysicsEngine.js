@@ -64,7 +64,7 @@ export default class PhysicsEngine {
     for (const target of objects) {
       if (target === obj) continue;
       
-      if (target.physics.surfaceType === SURFACE_TYPE.TERRAIN) {
+      if (target.physics.surfaceType === SURFACE_TYPE.TERRAIN || target.physics.surfaceType === SURFACE_TYPE.GROUND) {
         //let intersections = this.getIntersections(vector, target);
         if (objBox.intersects(target.boundingBox)) {
           let targetBox = target.boundingBox.box;

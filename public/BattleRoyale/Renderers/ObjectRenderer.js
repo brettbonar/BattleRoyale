@@ -1,27 +1,27 @@
 //import Renderer from "../../Engine/Rendering/Renderer.js"
 
-export default class PlainTreeRenderer {
+export default class ObjectRenderer {
   constructor(params) {
     Object.assign(this, params);
     this.image = new Image();
-    this.image.src = "../../Assets/terrain_atlas-64.png";
+    this.image.src = params.imageSource;
     this.image.onload = () => this.render = this._render;
-
-    this.imageDimensions = {
-      x: 928 * 2,
-      y: 897 * 2,
-      width: 96 * 2,
-      height: 128 * 2 - 10
-    };
   }
 
   _render(context, object, elapsedTime, center) {
-    let pos = {
-      x: object.position.x - (this.imageDimensions.width) / 2,
-      y: object.position.y - this.imageDimensions.height
+    let offset = {
+      x: (this.imageDimensions.width) / 2,
+      y: this.imageDimensions.height
+    };
+    if (this.imageDimensions.offset) {
+      Object.assign(offset, this.imageDimensions.offset);
     }
+    let position = {
+      x: object.position.x - offset.x,
+      y: object.position.y - offset.y
+    };
     context.drawImage(this.image, this.imageDimensions.x, this.imageDimensions.y, this.imageDimensions.width, this.imageDimensions.height,
-      pos.x, pos.y, this.imageDimensions.width, this.imageDimensions.height);
+      position.x, position.y, this.imageDimensions.width, this.imageDimensions.height);
 
     // DEBUG
     let box = object.boundingBox.box;

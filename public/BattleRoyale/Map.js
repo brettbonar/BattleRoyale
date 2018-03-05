@@ -1,4 +1,5 @@
 // import perlin from "./Perlin.js"
+import { getDistance, normalize } from "../Engine/util.js"
 
 const BIOMES = {
   FOREST: "forest",
@@ -83,12 +84,12 @@ export default class Map {
       tileSize: 32,
       map: [],
       seeds: {
-        "forest": 2,
-        "desert": 2,
+        "forest": 4,
+        "desert": 3,
         "death": 2,
-        "plain": 1,
-        "water": 3,
-        "fire": 3
+        "plain": 6,
+        "water": 2,
+        "fire": 2
       },
       weights: {
         "forest": 25,
@@ -128,7 +129,7 @@ export default class Map {
 
 
     this.initializeMap();
-    this.generate();
+    this.generateVoronoi();
   }
 
   static get BIOMES() { return BIOMES; }
@@ -363,10 +364,8 @@ export default class Map {
       neighbor = cell.neighbors.left;
     }
     
-    if (sides.topLeft && sides.topRight && sides.bottomRight && sides.bottomLeft && sides.bottom && sides.top && sides.right && sides.left) {
-      offset.x -= size;
-      offset.y -= size * 3;
-    } else if (sides.top && !sides.right && !sides.left) {
+    //if (sides.topLeft && sides.topRight && sides.bottomRight && sides.bottomLeft && sides.bottom && sides.top && sides.right && sides.left) {
+    if (sides.top && !sides.right && !sides.left) {
       offset.y -= size;
     } else if (sides.bottom && !sides.right && !sides.left) {
       offset.y += size;
@@ -402,6 +401,9 @@ export default class Map {
     } else if (sides.bottom && sides.right && !sides.top && !sides.left) {
       offset.x += size;
       offset.y += size;
+    } else if (_.sum(_.toArray(sides)) >= 5) {
+      offset.x -= size;
+      offset.y -= size * 3;
     }
 
     return { offset: offset, neighbor: neighbor };
@@ -456,6 +458,60 @@ export default class Map {
         context.canvas.width, context.canvas.height, 0, 0, context.canvas.width, context.canvas.height);
       //context.drawImage(this.canvas, 0, 0, context.canvas.width, context.canvas.height);
     }
+  }
+
+  growVoronoi(seeds) {
+    // let box = {
+    //   xl: 0,
+    //   xr: this.mapSize * this.cellSize - 1,
+    //   yt: 0,
+    //   yb: this.mapSize * this.cellSize - 1
+    // };
+
+    // let voronoi = new Voronoi();
+    // voronoi.compute(_.map(seeds, "position"), box).cells;
+    
+    for (const column of this.map) {
+      for (const cell of column) {
+        let seed = _.minBy(seeds, (seed) => {
+          return getDistance(seed.position, cell.position);
+        });
+        cell.type = seed.type;
+        cell.biome = seed.biome;        
+      }
+    }
+  }
+
+  generateVoronoi() {
+    let seeds = [];
+
+    _.each(BIOMES, (type) => {
+      for (let i = 0; i < this.seeds[type]; i++) {
+        let position = {
+          x: _.random(this.map.length - 1),
+          y: _.random(this.map.length - 1)
+        };
+        // TODO: make sure they're some distance apart
+        while (seeds.some((cell) => _.isEqual(cell.position, position))) {
+          let position = {
+            x: _.random(this.map.length - 1),
+            y: _.random(this.map.length - 1)
+          };
+        }
+
+        let cell = this.map[position.x][position.y];
+        cell.type = type;
+        cell.biome = this.biomes[type];
+        seeds.push(cell);
+      }
+    });
+
+    this.growVoronoi(seeds);
+
+    this.terrain = new Image();
+    this.terrain.src = "../Assets/terrain.png";
+    this.terrain.onload = () => this.saveMap();
+
   }
 
   // TODO: clean this up a lot

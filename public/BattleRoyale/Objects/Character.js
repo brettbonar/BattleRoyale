@@ -21,7 +21,7 @@ export default class Character extends GameObject {
       x: 0,
       y: 0
     };
-    this.speed = 64;
+    this.speed = 96;
     this.renderer = new CharacterRenderer({
       gender: params.gender,
       body: params.body,

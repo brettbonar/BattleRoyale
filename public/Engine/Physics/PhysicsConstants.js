@@ -2,7 +2,9 @@ const SURFACE_TYPE = {
   DEFAULT: "default",
   REFLECTIVE: "reflective",
   TERRAIN: "terrain",
-  CHARACTER: "character"
+  CHARACTER: "character",
+  GROUND: "ground",
+  NONE: "none"
 };
 
 const MOVEMENT_TYPE = {

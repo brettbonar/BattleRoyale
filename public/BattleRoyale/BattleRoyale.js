@@ -6,11 +6,13 @@ import FloatingText from "../Graphics/FloatingText.js"
 import PhysicsEngine from "../Engine/Physics/PhysicsEngine.js"
 import PerspectiveRenderingEngine from "../Engine/Rendering/PerspectiveRenderingEngine.js"
 import ParticleEngine from "../Engine/Effects/ParticleEngine.js"
-import { MOVEMENT_TYPE } from "../Engine/Physics/PhysicsConstants.js";
+import { MOVEMENT_TYPE } from "../Engine/Physics/PhysicsConstants.js"
 
-import PlainTreeRenderer from "./Renderers/PlainTreeRenderer.js"
-import Character from "./Objects/Character.js";
-import Projectile from "./Objects/Projectile.js";
+import ObjectRenderer from "./Renderers/ObjectRenderer.js"
+import Character from "./Objects/Character.js"
+import Projectile from "./Objects/Projectile.js"
+import objects from "./Objects/objects.js"
+import objects32 from "./Objects/objects-32.js"
 
 const EVENTS = {
   MOVE_UP: "moveUp",
@@ -93,29 +95,32 @@ export default class BattleRoyale extends Game {
     // this.stateFunctions[Game.STATE.INITIALIZING].update = _.noop;//(elapsedTime) => this._update(elapsedTime);
     // this.stateFunctions[Game.STATE.INITIALIZING].render = _.noop;//(elapsedTime) => this._render(elapsedTime);
 
+    // for (let i = 0; i < 10; i++) {
+    //   let type = _.sample(_.filter(objects, { biome: "ruins" }));
+    //   //let type = _.sample(objects);
+    //   type = objects.corn1;
+    //   this.gameState.staticObjects.push(new GameObject(Object.assign({
+    //     position: {
+    //       x: _.random(0, this.canvas.width),
+    //       y: _.random(0, this.canvas.height)
+    //     },
+    //     renderer: new ObjectRenderer(Object.assign({}, type))
+    //   }, type)));
+    // }
+
+    let x = 250;
+    let y = 250;
     for (let i = 0; i < 10; i++) {
-      this.gameState.staticObjects.push(new GameObject({
-        position: {
-          x: _.random(0, this.canvas.width),
-          y: _.random(0, this.canvas.height)
-        },
-        physics: {
-          surfaceType: "terrain"
-        },
-        dimensions: {
-          width: 106,
-          height: 56
-        },
-        // dimensions: {
-        //   width: 64,
-        //   height: 32
-        // },
-        // terrainDimensions: {
-        //   width: 106,
-        //   height: 56
-        // },
-        renderer: new PlainTreeRenderer()
-      }));
+      for (let j = 0; j < 5; j++) {
+        let type = _.sample(_.filter(objects, { group: "corn" }));
+        this.gameState.staticObjects.push(new GameObject(Object.assign({
+          position: {
+            x: x + i * (objects.corn1.imageDimensions.width * 3/4) + y,
+            y: y + j * (objects.corn1.imageDimensions.height / 3)
+          },
+          renderer: new ObjectRenderer(Object.assign({}, type))
+        }, type)));
+      }
     }
   }
 

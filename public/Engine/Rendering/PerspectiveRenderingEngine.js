@@ -18,7 +18,12 @@ export default class PerspectiveRenderingEngine extends RenderingEngine{
       this.context.translate(-(center.x - this.context.canvas.width / 2), -(center.y - this.context.canvas.height / 2));
     }
     for (const object of objs) {
+      this.context.save();
+      if (object.losObstacle && object.boundingBox.box.ul.y > center.y - 10) {
+        this.context.globalAlpha = 0.5;
+      }
       object.render(this.context, elapsedTime, center);
+      this.context.restore();
     }
     this.context.restore();
   }

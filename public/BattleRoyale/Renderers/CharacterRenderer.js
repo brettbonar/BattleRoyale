@@ -15,7 +15,7 @@ const ANIMATION_SETTINGS = {
     },
     frames: 9,
     cycleStart: 2,
-    rate: 5
+    rate: 7
   },
   [ANIMATIONS.MOVING_DOWN]: {
     offset: {
@@ -24,7 +24,7 @@ const ANIMATION_SETTINGS = {
     },
     frames: 9,
     cycleStart: 2,
-    rate: 5
+    rate: 7
   },
   [ANIMATIONS.MOVING_LEFT]: {
     offset: {
@@ -33,7 +33,7 @@ const ANIMATION_SETTINGS = {
     },
     frames: 9,
     cycleStart: 2,
-    rate: 5
+    rate: 7
   },
   [ANIMATIONS.MOVING_UP]: {
     offset: {
@@ -42,7 +42,7 @@ const ANIMATION_SETTINGS = {
     },
     frames: 9,
     cycleStart: 2,
-    rate: 5
+    rate: 7
   }
 };
 
@@ -94,7 +94,7 @@ export default class CharacterRenderer {
   setAnimation(animation) {
     if (this.animation !== animation) {
       this.animation = animation;
-      this.frame = 0;
+      //this.frame = 0;
       this.currentTime = 0;
       this.direction = 1;
     }
@@ -163,7 +163,6 @@ export default class CharacterRenderer {
         //   this.frame = animationSettings.cycleStart + 1;
         //   this.direction = 1;
         // }
-        console.log(this.frame);
         //fthis.frame = ((this.frame + 1) % animationSettings.frames);
       }
     }
