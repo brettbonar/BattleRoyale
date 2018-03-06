@@ -46,7 +46,7 @@ export default class BattleRoyale extends Game {
         gender: "male",
         isPlayer: true,
         loadout: {
-          weapon: "../../Assets/character/weapons/both hand/spear.png",
+          weapon: "../../Assets/character/weapons/right hand/male/spear_male.png",
           torso: "../../Assets/character/torso/leather/chest_male.png",
           pants: "../../Assets/character/legs/pants/male/teal_pants_male.png",
           head: "../../Assets/character/head/hoods/male/cloth_hood_male.png",
@@ -66,15 +66,15 @@ export default class BattleRoyale extends Game {
       },
       dynamicObjects: [
         new Character({
-          body: "tanned",
+          body: "darkelf",
           gender: "female",
           loadout: {
-            weapon: "../../Assets/character/weapons/both hand/spear.png",
-            torso: "../../Assets/character/torso/leather/chest_male.png",
-            pants: "../../Assets/character/legs/pants/male/teal_pants_male.png",
-            head: "../../Assets/character/head/hoods/male/cloth_hood_male.png",
-            feet: "../../Assets/character/feet/shoes/male/brown_shoes_male.png",
-            hands: "../../Assets/character/hands/bracers/male/leather_bracers_male.png"          
+            weapon: "../../Assets/character/weapons/right hand/either/axe.png",
+            torso: "../../Assets/character/torso/corset_female/corset_red.png",
+            pants: "../../Assets/character/legs/pants/female/red_pants_female.png",
+            head: "../../Assets/character/head/tiaras_female/silver.png",
+            feet: "../../Assets/character/feet/shoes/female/black_shoes_female.png",
+            hands: "../../Assets/character/hands/gloves/female/golden_gloves_female.png"          
           },
           position: {
             x: 550,
@@ -219,7 +219,7 @@ export default class BattleRoyale extends Game {
       this.gameState.dynamicObjects.push(new Magic({
         target: position,
         source: this.gameState.player.center,
-        type: "fireLion"
+        type: "snake"
       }));
     }
   }

@@ -8,6 +8,10 @@ export default {
           offset: {
             x: 0,
             y: 80
+          },
+          perspectiveOffset: {
+            x: 0,
+            y: 48
           }
         },
         down: {

@@ -27,6 +27,7 @@ export default class Magic extends GameObject {
       }
       image = this.magic.rendering.images[imageDirection];
     }
+    this.image = image;
     this.imageOffset = image.offset;
     this.renderer = new MagicRenderer(this.magic.rendering, image);
     this.currentTime = 0;
@@ -41,9 +42,12 @@ export default class Magic extends GameObject {
   }
   
   get perspectivePosition() {
-    return {
-      x: this.position.x,// - (this.magic.rendering.imageSize / 2 - this.imageOffset.x),
-      y: this.position.y// + (this.magic.rendering.imageSize - this.imageOffset.y)
-    };
+    if (this.image.perspectiveOffset) {
+      return {
+        x: this.position.x + this.image.perspectiveOffset.x,// - (this.magic.rendering.imageSize / 2 - this.imageOffset.x),
+        y: this.position.y + this.image.perspectiveOffset.y// + (this.magic.rendering.imageSize - this.imageOffset.y)
+      };
+    }
+    return this.position;
   }
 }
