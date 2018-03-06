@@ -40,20 +40,27 @@ export default class Character extends GameObject {
     }
   }
 
+  get center() {
+    return {
+      x: this.position.x,
+      y: this.position.y - 32
+    }
+  }
+
   setTarget(target) {
     let center = this.center;
     let direction = this.normalize({
-      x: target.x - this.position.x,
-      y: target.y - this.position.y
+      x: target.x - center.x,
+      y: target.y - center.y
     });
 
-    if (target.x < this.position.x && Math.abs(direction.x) >= Math.abs(direction.y)) {
+    if (target.x < center.x && Math.abs(direction.x) >= Math.abs(direction.y)) {
       this.renderer.setAnimation(CharacterRenderer.ANIMATIONS.MOVING_LEFT);
-    } else if (target.x > this.position.x && Math.abs(direction.x) >= Math.abs(direction.y)) {
+    } else if (target.x > center.x && Math.abs(direction.x) >= Math.abs(direction.y)) {
       this.renderer.setAnimation(CharacterRenderer.ANIMATIONS.MOVING_RIGHT);
-    } else if (target.y > this.position.y && Math.abs(direction.y) >= Math.abs(direction.x)) {
+    } else if (target.y > center.y && Math.abs(direction.y) >= Math.abs(direction.x)) {
       this.renderer.setAnimation(CharacterRenderer.ANIMATIONS.MOVING_DOWN);
-    } else if (target.y < this.position.x && Math.abs(direction.y) >= Math.abs(direction.x)) {
+    } else if (target.y < center.y && Math.abs(direction.y) >= Math.abs(direction.x)) {
       this.renderer.setAnimation(CharacterRenderer.ANIMATIONS.MOVING_UP);
     }
   }

@@ -14,13 +14,15 @@ import Projectile from "./Objects/Projectile.js"
 import objects from "./Objects/objects.js"
 import objects32 from "./Objects/objects-32.js"
 import Building from "./Objects/Building.js";
+import Magic from "./Magic/Magic.js";
 
 const EVENTS = {
   MOVE_UP: "moveUp",
   MOVE_DOWN: "moveDown",
   MOVE_LEFT: "moveLeft",
   MOVE_RIGHT: "moveRight",
-  PRIMARY_FIRE: "primaryFire"
+  PRIMARY_FIRE: "primaryFire",
+  SECONDARY_FIRE: "secondaryFire"
 }
 
 export default class BattleRoyale extends Game {
@@ -37,10 +39,12 @@ export default class BattleRoyale extends Game {
     this.menus = params.menus;
     let scale = this.canvas.width / 1000;
 
+    this.fireReady = true;
     this.gameState = {
       player: new Character({
         body: "tanned",
         gender: "male",
+        isPlayer: true,
         loadout: {
           weapon: "../../Assets/character/weapons/both hand/spear.png",
           torso: "../../Assets/character/torso/leather/chest_male.png",
@@ -60,7 +64,23 @@ export default class BattleRoyale extends Game {
           y: params.canvas.height / 2
         }
       },
-      dynamicObjects: [],
+      dynamicObjects: [
+        new Character({
+          body: "tanned",
+          gender: "female",
+          loadout: {
+            weapon: "../../Assets/character/weapons/both hand/spear.png",
+            torso: "../../Assets/character/torso/leather/chest_male.png",
+            pants: "../../Assets/character/legs/pants/male/teal_pants_male.png",
+            head: "../../Assets/character/head/hoods/male/cloth_hood_male.png",
+            feet: "../../Assets/character/feet/shoes/male/brown_shoes_male.png",
+            hands: "../../Assets/character/hands/bracers/male/leather_bracers_male.png"          
+          },
+          position: {
+            x: 550,
+            y: 550
+          }
+        })],
       staticObjects: []
     };
 
@@ -70,7 +90,9 @@ export default class BattleRoyale extends Game {
     this.keyBindings[KEY_CODE.S] = EVENTS.MOVE_DOWN;
     this.keyBindings[KEY_CODE.A] = EVENTS.MOVE_LEFT;
     this.keyBindings[KEY_CODE.D] = EVENTS.MOVE_RIGHT;
-    this.keyBindings["leftclick"] = EVENTS.PRIMARY_FIRE;
+    this.keyBindings["leftClick"] = EVENTS.PRIMARY_FIRE;
+    this.keyBindings["rightClick"] = EVENTS.SECONDARY_FIRE;
+    this.activeEvents = [];
 
     // this.eventHandlers = {};
     // this.eventHandlers[EVENT.PAUSE] = () => {
@@ -81,6 +103,7 @@ export default class BattleRoyale extends Game {
     this.addEventHandler(EVENTS.MOVE_LEFT, (event) => this.move(event));
     this.addEventHandler(EVENTS.MOVE_RIGHT, (event) => this.move(event));
     this.addEventHandler(EVENTS.PRIMARY_FIRE, (event) => this.primaryFire(event));
+    this.addEventHandler(EVENTS.SECONDARY_FIRE, (event) => this.secondaryFire(event));
 
     this.stateFunctions[Game.STATE.PLAYING].update = (elapsedTime) => this._update(elapsedTime);
     this.stateFunctions[Game.STATE.PLAYING].render = (elapsedTime) => this._render(elapsedTime);
@@ -124,13 +147,13 @@ export default class BattleRoyale extends Game {
     //   }
     // }
 
-    // this.gameState.staticObjects.push(new Building({
-    //   type: "house",
-    //   position: {
-    //     x: 500,
-    //     y: 500
-    //   }
-    // }));
+    this.gameState.staticObjects.push(new Building({
+      type: "house",
+      position: {
+        x: 500,
+        y: 500
+      }
+    }));
   }
 
   handleMouseMove(event) {
@@ -172,28 +195,59 @@ export default class BattleRoyale extends Game {
       this.fireReady = false;
       let direction = this.normalize({
         x: this.gameState.cursor.position.x - this.canvas.width / 2,
-        y: this.gameState.cursor.position.y - this.canvas.height / 2
+        y: this.gameState.cursor.position.y - this.canvas.height / 2 + 32
       });
       this.gameState.dynamicObjects.push(new Projectile({
         position: {
-          x: this.gameState.player.position.x + direction.x * 16,
-          y: this.gameState.player.position.y + direction.y * 16,
+          x: this.gameState.player.position.x,
+          y: this.gameState.player.position.y
         },
         direction: direction
       }));
     }
   }
 
-  move(event) {
-    if (event.event === EVENTS.MOVE_UP) {
-      this.gameState.player.setDirection({ y: event.release ? 0 : -1 });
-    } else if (event.event === EVENTS.MOVE_DOWN) {
-      this.gameState.player.setDirection({ y: event.release ? 0 : 1 });
-    } else if (event.event === EVENTS.MOVE_LEFT) {
-      this.gameState.player.setDirection({ x: event.release ? 0 : -1 });
-    } else if (event.event === EVENTS.MOVE_RIGHT) {
-      this.gameState.player.setDirection({ x: event.release ? 0 : 1 });
+  secondaryFire(event) {
+    if (event.release) {
+      this.fireReady = true;
+    } else if (this.fireReady) {
+      this.fireReady = false;
+      let position = {
+        x: this.gameState.player.position.x + (this.gameState.cursor.position.x - this.canvas.width / 2),
+        y: this.gameState.player.position.y + (this.gameState.cursor.position.y - this.canvas.height / 2)
+      };
+      this.gameState.dynamicObjects.push(new Magic({
+        target: position,
+        source: this.gameState.player.center,
+        type: "fireLion"
+      }));
     }
+  }
+
+  move(event) {
+    let direction = {
+      x: 0,
+      y: 0
+    };
+    if (event.release) {
+      _.pull(this.activeEvents, event.event);
+    } else {
+      this.activeEvents.push(event.event);
+    }
+
+    if (this.activeEvents.includes(EVENTS.MOVE_UP)) {
+      direction.y -= 1;
+    }
+    if (this.activeEvents.includes(EVENTS.MOVE_DOWN)) {
+      direction.y += 1;
+    }
+    if (this.activeEvents.includes(EVENTS.MOVE_LEFT)) {
+      direction.x -= 1;
+    }
+    if (this.activeEvents.includes(EVENTS.MOVE_RIGHT)) {
+      direction.x += 1;
+    }
+    this.gameState.player.setDirection(direction);
   }
 
   getRenderObjects() {
@@ -224,11 +278,16 @@ export default class BattleRoyale extends Game {
   }
 
   _update(elapsedTime) {
+    _.remove(this.gameState.dynamicObjects, "done");
+
     this.gameState.player.setTarget({
       x: this.gameState.cursor.position.x + (this.gameState.player.position.x - this.canvas.width / 2),
       y: this.gameState.cursor.position.y + (this.gameState.player.position.y - this.canvas.height / 2)
     });
     this.gameState.player.update(elapsedTime);
+    for (const obj of this.getPhysicsObjects()) {
+      obj.update(elapsedTime);
+    }
     let collisions = this.physicsEngine.update(elapsedTime, this.getPhysicsObjects());
 
     for (const collision of collisions) {

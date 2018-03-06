@@ -1,5 +1,6 @@
 import Bounds from "./Bounds.js"
 import Vector from "./Vector.js"
+import Renderer from "../Rendering/Renderers/Renderer.js"
 import { SURFACE_TYPE, MOVEMENT_TYPE } from "../../Engine/Physics/PhysicsConstants.js"
 
 // boundsType: RECTANGLE, CIRCLE, POINT, LINE
@@ -22,11 +23,12 @@ export default class GameObject {
       position: {
         x: 0,
         y: 0
-      }
+      },
+      renderer: new Renderer()
     });
     _.defaultsDeep(this, {
       physics: {
-        surfaceType: SURFACE_TYPE.IMMOVABLE,
+        surfaceType: SURFACE_TYPE.TERRAIN,
         movementType: MOVEMENT_TYPE.NORMAL
       }
     });
@@ -72,6 +74,20 @@ export default class GameObject {
     return point;
   }
 
+  getAllFunctionBounds() {
+    return [];
+  }
+
+  get perspectivePosition() {
+    if (this.renderOffset) {
+      return {
+        x: this.position.x + this.renderOffset.x,
+        y: this.position.y + this.renderOffset.y
+      };
+    }
+    return this.position;
+  }
+
   normalizeDirection() {
     this.normalize(this.direction);
   }
@@ -103,6 +119,24 @@ export default class GameObject {
 
   render(context, elapsedTime, center) {
     this.renderer.render(context, this, elapsedTime, center);
+  }
+
+  getAllRenderObjects() {
+    return [this];
+  }
+
+  getAllBounds() {
+    if (this.bounds) {
+      return this.bounds.map((bounds) => {
+        return new Bounds(Object.assign({
+          position: {
+            x: this.position.x + bounds.offset.x,
+            y: this.position.y + bounds.offset.y
+          }
+        }, bounds));
+      });
+    }
+    return [this.boundingBox];
   }
 
   get left() {

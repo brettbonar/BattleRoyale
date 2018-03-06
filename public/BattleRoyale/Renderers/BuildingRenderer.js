@@ -2,21 +2,13 @@ import buildings from "../Objects/buildings.js"
 import buildingObjects from "../Objects/buildingObjects.js"
 
 export default class BuildingRenderer {
-  constructor(params) {
-    Object.assign(this, params);
-
-    let building = buildings[params];
-    this.outside = _.map(building.outside, (object) => {
-      let obj = buildingObjects[object.name];
-      let image = new Image();
-      image.src = obj.imageSource;
-      return {
-        image: image,
-        name: object.name,
-        offset: object.offset,
-        imageDimensions: obj.imageDimensions
-      };
-    });
+  constructor(building) {
+    this.building = building;
+    this.buildingImage = {
+      image: new Image(),
+      imageDimensions: building.imageDimensions
+    };
+    this.buildingImage.image.src = building.imageSource;
   }
 
   render(context, object, elapsedTime, center) {
@@ -33,10 +25,10 @@ export default class BuildingRenderer {
     // };
     let position = object.position;
 
-    for (const piece of this.outside) {
-      context.drawImage(piece.image, piece.imageDimensions.x, piece.imageDimensions.y, piece.imageDimensions.width, piece.imageDimensions.height,
-        position.x + piece.offset.x, position.y + piece.offset.y,
-        piece.imageDimensions.width, piece.imageDimensions.height);
+    if (this.buildingImage.image.complete) {
+      context.drawImage(this.buildingImage.image, this.buildingImage.imageDimensions.x, this.buildingImage.imageDimensions.y, this.buildingImage.imageDimensions.width, this.buildingImage.imageDimensions.height,
+        position.x, position.y,
+        this.buildingImage.imageDimensions.width, this.buildingImage.imageDimensions.height);
     }
 
     // DEBUG

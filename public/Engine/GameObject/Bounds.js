@@ -1,5 +1,6 @@
 const TYPE = {
   RECTANGLE: "rectangle",
+  RECTANGLE_UL: "rectangleUl",
   CIRCLE: "circle",
   POINT: "point",
   LINE: "line"
@@ -11,6 +12,8 @@ export default class Bounds {
       this.constructFromCircle(params);
     } else if (params.boundsType === TYPE.RECTANGLE) {
       this.constructFromRectangle(params);
+    } else if (params.boundsType === TYPE.RECTANGLE_UL) {
+      this.constructFromRectangleUL(params);
     } else if (params.boundsType === TYPE.LINE) {
       this.constructFromLine(params);
     }
@@ -53,6 +56,23 @@ export default class Bounds {
       top: [this.box.ul, this.box.ur],
       right: [this.box.ur, this.box.lr],
       bottom: [this.box.lr, this.box.ll],
+      left: [this.box.ll, this.box.ul]
+    };
+  }
+
+  constructFromRectangleUL(params) {
+    // TODO: handle line width?
+    this.box = {
+      ul: { x: params.position.x, y: params.position.y },
+      ur: { x: params.position.x + params.dimensions.width, y: params.position.y },
+      lr: { x: params.position.x + params.dimensions.width, y: params.position.y + params.dimensions.height },
+      ll: { x: params.position.x, y: params.position.y + params.dimensions.height }
+    };
+
+    this.lines = {
+      top: [this.box.ul, this.box.ur],
+      bottom: [this.box.lr, this.box.ll],
+      right: [this.box.ur, this.box.lr],
       left: [this.box.ll, this.box.ul]
     };
   }

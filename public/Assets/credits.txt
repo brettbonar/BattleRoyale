@@ -28,6 +28,13 @@ https://opengameart.org/content/5x-special-effects-2d
 https://opengameart.org/content/colored-summoning-circles
 https://opengameart.org/content/explosion-animations
 https://opengameart.org/content/magic-flame
+https://opengameart.org/content/animations-blood-hit-and-both-d
+https://opengameart.org/content/lpc-adobe-town-set
+https://opengameart.org/content/lpc-house-insides
+https://opengameart.org/content/lpc-house-interior-and-decorations
+https://opengameart.org/content/lpc-dungeon-elements
+https://opengameart.org/content/lpc-arabic-elements
+https://opengameart.org/content/200-magic-orbs-psionic-dew
 
 FUTURE:
 
@@ -37,3 +44,10 @@ https://opengameart.org/content/painterly-spell-icons-part-1
 https://opengameart.org/content/25-special-effects-rendered-with-blender
 https://opengameart.org/content/animated-particle-effects-1
 https://opengameart.org/content/64-crosshairs-pack
+https://opengameart.org/content/elemental-absorbtion-animation
+****https://opengameart.org/content/2d-rpg-lpc-compatible-tilessprites
+
+
+USERS:
+https://opengameart.org/users/sharm
+https://opengameart.org/users/williamthompsonj

@@ -66,35 +66,40 @@ export default class PhysicsEngine {
       
       if (target.physics.surfaceType === SURFACE_TYPE.TERRAIN || target.physics.surfaceType === SURFACE_TYPE.GROUND) {
         //let intersections = this.getIntersections(vector, target);
-        if (objBox.intersects(target.boundingBox)) {
-          let targetBox = target.boundingBox.box;
-          //let lastTerrainBox = obj.lastTerrainBoundingBox.box;
-          collisions.push({
-            source: obj,
-            target: target
-          });
-          
-          obj.position.x = obj.lastPosition.x;
-          obj.position.y = obj.lastPosition.y;
+        for (const targetBox of target.getAllBounds()) {
+          if (objBox.intersects(targetBox)) {
+            //let lastTerrainBox = obj.lastTerrainBoundingBox.box;
+            collisions.push({
+              source: obj,
+              target: target
+            });
+            
+            obj.position.x = obj.lastPosition.x;
+            obj.position.y = obj.lastPosition.y;
 
-          // TODO: make this more robust for high speeds
+            // TODO: make this more robust for high speeds
 
-          // if (terrainBox.box.lr.x > targetBox.ul.x && obj.direction.x > 0) {
-          //   // TODO: allow non-centered terrain boxes?
-          //   obj.position.x = targetBox.ul.x - obj.width / 2 - 1;
-          // } else if (terrainBox.box.ul.x < targetBox.lr.x && obj.direction.x < 0) {
-          //   obj.position.x = targetBox.lr.x + obj.width / 2 + 1;
-          // }
-  
-          // if (terrainBox.box.lr.y > targetBox.ul.y && terrainBox.box.ul.y < targetBox.ul.y) {
-          //   // TODO: allow non-centered terrain boxes?
-          //   obj.position.y = targetBox.ul.y - 1;
-          // } else if (terrainBox.box.ul.y < targetBox.lr.y && terrainBox.box.lr.y > targetBox.lr.y) {
-          //   obj.position.y = targetBox.lr.y + 1;
-          // }
+            //let targetBox = target.boundingBox.box;
+            // if (terrainBox.box.lr.x > targetBox.ul.x && obj.direction.x > 0) {
+            //   // TODO: allow non-centered terrain boxes?
+            //   obj.position.x = targetBox.ul.x - obj.width / 2 - 1;
+            // } else if (terrainBox.box.ul.x < targetBox.lr.x && obj.direction.x < 0) {
+            //   obj.position.x = targetBox.lr.x + obj.width / 2 + 1;
+            // }
+    
+            // if (terrainBox.box.lr.y > targetBox.ul.y && terrainBox.box.ul.y < targetBox.ul.y) {
+            //   // TODO: allow non-centered terrain boxes?
+            //   obj.position.y = targetBox.ul.y - 1;
+            // } else if (terrainBox.box.ul.y < targetBox.lr.y && terrainBox.box.lr.y > targetBox.lr.y) {
+            //   obj.position.y = targetBox.lr.y + 1;
+            // }
+          }
+        }
 
-          // TODO: don't return here to allow multiple collisions
-          return collisions;
+        for (const functionBox of target.getAllFunctionBounds()) {
+          if (objBox.intersects(functionBox.box)) {
+            functionBox.cb(obj);
+          }
         }
       }
     }

@@ -12,4 +12,5 @@ export default class Renderer {
   }
 
   render(context, object, elapsedTime) {}
+  update(elapsedTime) {}
 }

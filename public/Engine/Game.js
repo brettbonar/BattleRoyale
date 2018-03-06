@@ -77,10 +77,10 @@ export default class Game {
   
   handleMouseMoveImpl(event) {
     // TRICKY: this awful bug: http://www.html5gamedevs.com/topic/34516-pointer-lock-bug-on-chrome-with-windows-10/
-    if (Math.sign(event.movementX) !== Math.sign(this._lastMovement)) {
-      this._lastMovement = event.movementX;
-      return;
-    }
+    // if (Math.sign(event.movementX) !== Math.sign(this._lastMovement)) {
+    //   this._lastMovement = event.movementX;
+    //   return;
+    // }
 
     this.handleMouseMove(event);
   }
@@ -102,7 +102,13 @@ export default class Game {
     }
 
     // TODO: make into constants
-    let event = this.keyBindings["leftclick"];
+    let eventName;
+    if (inputEvent.button === 0) {
+      eventName = "leftClick";
+    } else if (inputEvent.button === 2) {
+      eventName = "rightClick";
+    }
+    let event = this.keyBindings[eventName];
     if (event) {
       this.inputEvents.push({
         event: event,
