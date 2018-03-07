@@ -3,6 +3,7 @@ const SURFACE_TYPE = {
   REFLECTIVE: "reflective",
   TERRAIN: "terrain",
   CHARACTER: "character",
+  PROJECTILE: "projectile",
   GROUND: "ground",
   NONE: "none"
 };

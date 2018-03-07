@@ -9,6 +9,9 @@ class GameController {
     this.params = params;
     this.game = setup.game;
     this.menus = setup.menus;
+    this.fpsTime = 0;
+    this.frames = 0;
+    this.fps = 0;
 
     if (params.template) {
       let template = $("<div>");
@@ -101,6 +104,15 @@ class GameController {
 
     this.game.render(elapsedTime);
     this.menus.render(elapsedTime);
+    
+    // Count FPS
+    this.fpsTime += elapsedTime;
+    this.frames += 1;
+    while (this.fpsTime >= 1000) {
+      this.fps = this.frames;
+      this.fpsTime -= 1000;
+      this.frames = 0;
+    }
   
     requestAnimationFrame((currentTime) => this.gameLoop(currentTime));
   }

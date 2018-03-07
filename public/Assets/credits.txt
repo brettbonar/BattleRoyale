@@ -15,7 +15,6 @@ https://opengameart.org/content/oga-community-tileset-nature
 https://opengameart.org/content/lpc-medieval-fantasy-character-sprites
 https://opengameart.org/content/extended-lpc-magic-pack
 https://opengameart.org/content/wizard-hat
-
 https://opengameart.org/content/lpc-beetle
 https://opengameart.org/content/grue
 https://opengameart.org/content/lpc-spider
@@ -35,6 +34,12 @@ https://opengameart.org/content/lpc-house-interior-and-decorations
 https://opengameart.org/content/lpc-dungeon-elements
 https://opengameart.org/content/lpc-arabic-elements
 https://opengameart.org/content/200-magic-orbs-psionic-dew
+https://opengameart.org/content/blood-effect-sprite-sheet
+https://opengameart.org/content/water-splash
+https://opengameart.org/content/lightning-shock-spell
+
+https://nestlelion.deviantart.com/art/Some-Effects-107393192
+https://xypter.deviantart.com/art/Ultimate-Beam-Fx-3-150022444
 
 FUTURE:
 

@@ -38,7 +38,7 @@ export default {
       },
       imageSize: 128,
       frames: 16,
-      rate: 16
+      framesPerSec: 16
     },
     effect: {
       renderingDelay: 0,
@@ -83,7 +83,7 @@ export default {
       },
       imageSize: 128,
       frames: 16,
-      rate: 16
+      framesPerSec: 16
     },
     effect: {
       renderingDelay: 0,
@@ -105,7 +105,7 @@ export default {
       },
       imageSize: 128,
       frames: 16,
-      rate: 16
+      framesPerSec: 16
     },
     effect: {
       renderingDelay: 0,
@@ -127,7 +127,7 @@ export default {
       },
       imageSize: 128,
       frames: 16,
-      rate: 16
+      framesPerSec: 16
     },
     effect: {
       renderingDelay: 0,
@@ -149,7 +149,7 @@ export default {
       },
       imageSize: 128,
       frames: 16,
-      rate: 16
+      framesPerSec: 16
     },
     effect: {
       renderingDelay: 0,
@@ -171,7 +171,7 @@ export default {
       },
       imageSize: 128,
       frames: 16,
-      rate: 8
+      framesPerSec: 8
     },
     effect: {
       renderingDelay: 0,

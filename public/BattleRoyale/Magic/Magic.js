@@ -6,6 +6,7 @@ export default class Magic extends GameObject {
   constructor(params) {
     super(params);
     this.magic = magicEffects[params.type];
+    this.effect = this.magic.effect;
     this.position = params.target;
 
     let direction = this.normalize({

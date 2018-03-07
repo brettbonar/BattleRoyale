@@ -53,8 +53,8 @@ hr {
   position: absolute;
   left: 0;
   top: 0;
-  width: 100vmin;
-  height: 100vmin;
+  width: 100vmax;
+  height: 100vmax;
 }
 /* 
 .canvas-width-max {

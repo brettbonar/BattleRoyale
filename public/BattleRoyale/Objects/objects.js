@@ -65,7 +65,8 @@ export default {
       width: 103,
       height: 56
     },
-    losObstacle: true
+    losObstacle: true,
+    losFade: true
   },
   smallPlainTree: {
     biome: "plain",
@@ -125,7 +126,8 @@ export default {
       width: 66,
       height: 34
     },
-    losObstacle: true
+    losObstacle: true,
+    losFade: true
   },
   darkRock1: {
     biome: "darkRock",

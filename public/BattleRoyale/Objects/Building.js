@@ -10,6 +10,8 @@ export default class Building extends GameObject {
     this.bounds = this.building.bounds;
     this.outside = true;
 
+    this.losObstacle = true;
+    this.losFade = false;
     this.exterior = new BuildingPart(params, this.building.exterior);
     this.interior = new BuildingPart(params, this.building.interior);
   }

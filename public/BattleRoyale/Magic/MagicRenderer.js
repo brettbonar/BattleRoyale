@@ -10,9 +10,16 @@ export default class MagicRenderer {
 
   update(elapsedTime) {
     this.currentTime += elapsedTime;
-    while (this.currentTime > 1000 / this.effect.rate) {
-      this.currentTime -= 1000 / this.effect.rate;
+    while (this.currentTime > 1000 / this.effect.framesPerSec) {
+      this.currentTime -= 1000 / this.effect.framesPerSec;
       this.frame++;
+      if (this.frame >= this.effect.frames) {
+        if (this.effect.repeat) {
+          this.frame = this.effect.cycleStart || 0;
+        } else {
+          this.frame = this.effect.frames - 1;
+        }
+      }
       // TODO: something if frame over limit?
     }
   }

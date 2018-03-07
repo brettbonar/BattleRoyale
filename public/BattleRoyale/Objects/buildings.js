@@ -83,7 +83,7 @@ export default {
           },
           dimensions: {
             width: 181,
-            height: 178
+            height: 176
           },
           boundsType: Bounds.TYPE.RECTANGLE_UL
         },

@@ -20,6 +20,10 @@ export default class GameObject {
         width: 0,
         height: 0
       },
+      // direction: {
+      //   x: 0,
+      //   y: 0
+      // },
       position: {
         x: 0,
         y: 0

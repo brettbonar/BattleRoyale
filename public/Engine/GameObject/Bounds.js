@@ -16,6 +16,10 @@ export default class Bounds {
       this.constructFromRectangleUL(params);
     } else if (params.boundsType === TYPE.LINE) {
       this.constructFromLine(params);
+    } else if (params.dimensions.width || params.dimensions.height) {
+      this.constructFromRectangle(params);
+    } else if (params.dimensions.radius) {
+      this.constructFromCircle(params);
     }
   }
 

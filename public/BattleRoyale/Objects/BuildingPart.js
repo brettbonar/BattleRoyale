@@ -7,6 +7,8 @@ export default class BuildingPart extends GameObject {
     this.building = building;
     this.bounds = building.bounds;
     this.renderer = new BuildingRenderer(building);
+    this.losObstacle = true;
+    this.losFade = false;
   }
   
   get perspectivePosition() {

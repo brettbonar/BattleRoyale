@@ -62,42 +62,48 @@ export default class PhysicsEngine {
     let objBox = obj.boundingBox;
     let collisions = [];
     for (const target of objects) {
-      if (target === obj) continue;
+      if (target === obj || target.physics.surfaceType === SURFACE_TYPE.NONE) continue;
+      // Only need to test projectiles against characters, not both
+      if (obj.physics.surfaceType === SURFACE_TYPE.CHARACTER &&
+          target.physics.surfaceType === SURFACE_TYPE.PROJECTILE) {
+        continue;
+      }
       
-      if (target.physics.surfaceType === SURFACE_TYPE.TERRAIN || target.physics.surfaceType === SURFACE_TYPE.GROUND) {
+      //if (target.physics.surfaceType === SURFACE_TYPE.TERRAIN || target.physics.surfaceType === SURFACE_TYPE.GROUND) {
         //let intersections = this.getIntersections(vector, target);
-        for (const targetBox of target.getAllBounds()) {
-          if (objBox.intersects(targetBox)) {
-            //let lastTerrainBox = obj.lastTerrainBoundingBox.box;
-            collisions.push({
-              source: obj,
-              target: target
-            });
-            
-            obj.position.x = obj.lastPosition.x;
-            obj.position.y = obj.lastPosition.y;
+      for (const targetBox of target.getAllBounds()) {
+        if (objBox.intersects(targetBox)) {
+          //let lastTerrainBox = obj.lastTerrainBoundingBox.box;
+          collisions.push({
+            source: obj,
+            target: target
+          });
 
-            // TODO: make this more robust for high speeds
+          obj.position.x = obj.lastPosition.x;
+          obj.position.y = obj.lastPosition.y;
 
-            //let targetBox = target.boundingBox.box;
-            // if (terrainBox.box.lr.x > targetBox.ul.x && obj.direction.x > 0) {
-            //   // TODO: allow non-centered terrain boxes?
-            //   obj.position.x = targetBox.ul.x - obj.width / 2 - 1;
-            // } else if (terrainBox.box.ul.x < targetBox.lr.x && obj.direction.x < 0) {
-            //   obj.position.x = targetBox.lr.x + obj.width / 2 + 1;
-            // }
-    
-            // if (terrainBox.box.lr.y > targetBox.ul.y && terrainBox.box.ul.y < targetBox.ul.y) {
-            //   // TODO: allow non-centered terrain boxes?
-            //   obj.position.y = targetBox.ul.y - 1;
-            // } else if (terrainBox.box.ul.y < targetBox.lr.y && terrainBox.box.lr.y > targetBox.lr.y) {
-            //   obj.position.y = targetBox.lr.y + 1;
-            // }
-          }
+          // TODO: make this more robust for high speeds
+
+          //let targetBox = target.boundingBox.box;
+          // if (terrainBox.box.lr.x > targetBox.ul.x && obj.direction.x > 0) {
+          //   // TODO: allow non-centered terrain boxes?
+          //   obj.position.x = targetBox.ul.x - obj.width / 2 - 1;
+          // } else if (terrainBox.box.ul.x < targetBox.lr.x && obj.direction.x < 0) {
+          //   obj.position.x = targetBox.lr.x + obj.width / 2 + 1;
+          // }
+  
+          // if (terrainBox.box.lr.y > targetBox.ul.y && terrainBox.box.ul.y < targetBox.ul.y) {
+          //   // TODO: allow non-centered terrain boxes?
+          //   obj.position.y = targetBox.ul.y - 1;
+          // } else if (terrainBox.box.ul.y < targetBox.lr.y && terrainBox.box.lr.y > targetBox.lr.y) {
+          //   obj.position.y = targetBox.lr.y + 1;
+          // }
         }
+        //}
 
+        // TODO: do this after all other physics calculations
         for (const functionBox of target.getAllFunctionBounds()) {
-          if (objBox.intersects(functionBox.box)) {
+          if (obj.boundingBox.intersects(functionBox.box)) {
             functionBox.cb(obj);
           }
         }
@@ -113,6 +119,8 @@ export default class PhysicsEngine {
         Object.assign(obj.lastPosition, obj.position);
         obj.position.x += obj.direction.x * obj.speed * (elapsedTime / 1000);
         obj.position.y += obj.direction.y * obj.speed * (elapsedTime / 1000);
+      }
+      if (obj.spin) {
         obj.rotation += (elapsedTime / 50) * obj.spin;
       }
     }
@@ -122,10 +130,11 @@ export default class PhysicsEngine {
       // if (obj.physics.movementType === MOVEMENT_TYPE.NORMAL) {
       //   collisions = collisions.concat(this.detectCollisions(obj, objects));
       // }
-      if (obj.physics.surfaceType === SURFACE_TYPE.CHARACTER) {
+      if (obj.physics.surfaceType === SURFACE_TYPE.CHARACTER || 
+          obj.physics.surfaceType === SURFACE_TYPE.PROJECTILE) {
         collisions = collisions.concat(this.detectCollisions(obj, objects));
       }
-    }   
+    }
 
     return collisions;
   }

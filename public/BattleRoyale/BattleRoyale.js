@@ -12,6 +12,7 @@ import ObjectRenderer from "./Renderers/ObjectRenderer.js"
 import Character from "./Objects/Character.js"
 import Projectile from "./Objects/Projectile.js"
 import objects from "./Objects/objects.js"
+import equipment from "./Objects/equipment.js"
 import objects32 from "./Objects/objects-32.js"
 import Building from "./Objects/Building.js";
 import Magic from "./Magic/Magic.js";
@@ -39,48 +40,90 @@ export default class BattleRoyale extends Game {
     this.menus = params.menus;
     let scale = this.canvas.width / 1000;
 
-    this.fireReady = true;
+    let player = new Character({
+      body: "tanned",
+      gender: "male",
+      isPlayer: true,
+      loadout: {
+        weapon: equipment.spear,
+        torso: equipment.leatherChestMale,
+        legs: equipment.tealPantsMale,
+        head: equipment.clothHoodMale,
+        feet: equipment.brownShoesMale,
+        hands: equipment.leatherBracersMale
+      },
+      fireReady: true,
+      position: {
+        x: 255,
+        y: 255
+      }
+    });
+
+    let target = new Character({
+      body: "darkelf",
+      gender: "female",
+      loadout: {
+        weapon: equipment.spear,
+        torso: equipment.leatherChestMale,
+        legs: equipment.tealPantsMale,
+        head: equipment.clothHoodMale,
+        feet: equipment.brownShoesMale,
+        hands: equipment.leatherBracersMale
+      },
+      isOtherPlayer: true,
+      fireReady: true,
+      position: {
+        x: 550,
+        y: 550
+      }
+    });
+
+    let target2 = new Character({
+      body: "darkelf",
+      gender: "female",
+      loadout: {
+        weapon: equipment.spear,
+        torso: equipment.leatherChestMale,
+        legs: equipment.tealPantsMale,
+        head: equipment.clothHoodMale,
+        feet: equipment.brownShoesMale,
+        hands: equipment.leatherBracersMale
+      },
+      fireReady: true,
+      position: {
+        x: 800,
+        y: 800
+      }
+    });
+
     this.gameState = {
-      player: new Character({
-        body: "tanned",
-        gender: "male",
-        isPlayer: true,
-        loadout: {
-          weapon: "../../Assets/character/weapons/right hand/male/spear_male.png",
-          torso: "../../Assets/character/torso/leather/chest_male.png",
-          pants: "../../Assets/character/legs/pants/male/teal_pants_male.png",
-          head: "../../Assets/character/head/hoods/male/cloth_hood_male.png",
-          feet: "../../Assets/character/feet/shoes/male/brown_shoes_male.png",
-          hands: "../../Assets/character/hands/bracers/male/leather_bracers_male.png"          
-        },
-        position: {
-          x: 255,
-          y: 255
-        }
-      }),
       cursor: {
         position: {
           x: params.canvas.width / 2,
           y: params.canvas.height / 2
         }
       },
+      player: player,
+      characters: [player, target, target2],
+      projectiles: [],
       dynamicObjects: [
-        new Character({
-          body: "darkelf",
-          gender: "female",
-          loadout: {
-            weapon: "../../Assets/character/weapons/right hand/either/axe.png",
-            torso: "../../Assets/character/torso/corset_female/corset_red.png",
-            pants: "../../Assets/character/legs/pants/female/red_pants_female.png",
-            head: "../../Assets/character/head/tiaras_female/silver.png",
-            feet: "../../Assets/character/feet/shoes/female/black_shoes_female.png",
-            hands: "../../Assets/character/hands/gloves/female/golden_gloves_female.png"          
-          },
-          position: {
-            x: 550,
-            y: 550
-          }
-        })],
+        // new Character({
+        //   body: "darkelf",
+        //   gender: "female",
+        //   loadout: {
+        //     weapon: "../../Assets/character/weapons/right hand/either/axe.png",
+        //     torso: "../../Assets/character/torso/corset_female/corset_red.png",
+        //     pants: "../../Assets/character/legs/pants/female/red_pants_female.png",
+        //     head: "../../Assets/character/head/tiaras_female/silver.png",
+        //     feet: "../../Assets/character/feet/shoes/female/black_shoes_female.png",
+        //     hands: "../../Assets/character/hands/gloves/female/golden_gloves_female.png"          
+        //   },
+        //   position: {
+        //     x: 550,
+        //     y: 550
+        //   }
+        // })
+      ],
       staticObjects: []
     };
 
@@ -119,33 +162,33 @@ export default class BattleRoyale extends Game {
     // this.stateFunctions[Game.STATE.INITIALIZING].update = _.noop;//(elapsedTime) => this._update(elapsedTime);
     // this.stateFunctions[Game.STATE.INITIALIZING].render = _.noop;//(elapsedTime) => this._render(elapsedTime);
 
-    // for (let i = 0; i < 10; i++) {
-    //   let type = _.sample(_.filter(objects, { biome: "death" }));
-    //   //let type = _.sample(objects);
-    //   //type = objects.deadTree;
-    //   this.gameState.staticObjects.push(new GameObject(Object.assign({
-    //     position: {
-    //       x: _.random(0, this.canvas.width),
-    //       y: _.random(0, this.canvas.height)
-    //     },
-    //     renderer: new ObjectRenderer(Object.assign({}, type))
-    //   }, type)));
-    // }
+    for (let i = 0; i < 10; i++) {
+      //let type = _.sample(_.filter(objects, { biome: "plain" }));
+      //let type = _.sample(objects);
+      let type = objects.plainTree;
+      this.gameState.staticObjects.push(new GameObject(Object.assign({
+        position: {
+          x: _.random(0, this.canvas.width),
+          y: _.random(0, this.canvas.height)
+        },
+        renderer: new ObjectRenderer(Object.assign({}, type))
+      }, type)));
+    }
 
-    // let x = 250;
-    // let y = 250;
-    // for (let i = 0; i < 10; i++) {
-    //   for (let j = 0; j < 5; j++) {
-    //     let type = _.sample(_.filter(objects, { group: "corn" }));
-    //     this.gameState.staticObjects.push(new GameObject(Object.assign({
-    //       position: {
-    //         x: x + i * (objects.corn1.imageDimensions.width * 3/4) + y,
-    //         y: y + j * (objects.corn1.imageDimensions.height / 3)
-    //       },
-    //       renderer: new ObjectRenderer(Object.assign({}, type))
-    //     }, type)));
-    //   }
-    // }
+    let x = 250;
+    let y = 250;
+    for (let i = 0; i < 10; i++) {
+      for (let j = 0; j < 5; j++) {
+        let type = _.sample(_.filter(objects, { group: "corn" }));
+        this.gameState.staticObjects.push(new GameObject(Object.assign({
+          position: {
+            x: x + i * (objects.corn1.imageDimensions.width * 3/4) + y,
+            y: y + j * (objects.corn1.imageDimensions.height / 3)
+          },
+          renderer: new ObjectRenderer(Object.assign({}, type))
+        }, type)));
+      }
+    }
 
     this.gameState.staticObjects.push(new Building({
       type: "house",
@@ -190,17 +233,18 @@ export default class BattleRoyale extends Game {
 
   primaryFire(event) {
     if (event.release) {
-      this.fireReady = true;
-    } else if (this.fireReady) {
-      this.fireReady = false;
+      this.gameState.player.fireReady = true;
+    } else if (this.gameState.player.fireReady) {
+      this.gameState.player.attack(1000);
+      this.gameState.player.fireReady = false;
       let direction = this.normalize({
         x: this.gameState.cursor.position.x - this.canvas.width / 2,
         y: this.gameState.cursor.position.y - this.canvas.height / 2 + 32
       });
-      this.gameState.dynamicObjects.push(new Projectile({
+      this.gameState.projectiles.push(new Projectile({
         position: {
-          x: this.gameState.player.position.x,
-          y: this.gameState.player.position.y
+          x: this.gameState.player.position.x + (this.gameState.player.width + 5) * direction.x,
+          y: this.gameState.player.position.y + (this.gameState.player.height + 5) * direction.y
         },
         direction: direction
       }));
@@ -209,9 +253,10 @@ export default class BattleRoyale extends Game {
 
   secondaryFire(event) {
     if (event.release) {
-      this.fireReady = true;
-    } else if (this.fireReady) {
-      this.fireReady = false;
+      this.gameState.player.fireReady = true;
+    } else if (this.gameState.player.fireReady) {
+      this.gameState.player.attack(2000);
+      this.gameState.player.fireReady = false;
       let position = {
         x: this.gameState.player.position.x + (this.gameState.cursor.position.x - this.canvas.width / 2),
         y: this.gameState.player.position.y + (this.gameState.cursor.position.y - this.canvas.height / 2)
@@ -251,11 +296,17 @@ export default class BattleRoyale extends Game {
   }
 
   getRenderObjects() {
-    return this.gameState.staticObjects.concat(this.gameState.dynamicObjects).concat([this.gameState.player]);
+    return this.gameState.staticObjects
+      .concat(this.gameState.dynamicObjects)
+      .concat(this.gameState.characters)
+      .concat(this.gameState.projectiles);
   }
 
   getPhysicsObjects() {
-    return this.gameState.staticObjects.concat(this.gameState.dynamicObjects).concat([this.gameState.player]);
+    return this.gameState.staticObjects
+      .concat(this.gameState.dynamicObjects)
+      .concat(this.gameState.characters)
+      .concat(this.gameState.projectiles);
   }
 
   _render(elapsedTime) {
@@ -278,8 +329,6 @@ export default class BattleRoyale extends Game {
   }
 
   _update(elapsedTime) {
-    _.remove(this.gameState.dynamicObjects, "done");
-
     this.gameState.player.setTarget({
       x: this.gameState.cursor.position.x + (this.gameState.player.position.x - this.canvas.width / 2),
       y: this.gameState.cursor.position.y + (this.gameState.player.position.y - this.canvas.height / 2)
@@ -292,10 +341,37 @@ export default class BattleRoyale extends Game {
 
     for (const collision of collisions) {
       if (collision.source instanceof Projectile) {
-        _.remove(this.gameState.dynamicObjects, collision.source);
+        if (collision.target instanceof Character) {
+          collision.target.damage(collision.source);    
+          // if (!character.dead && character.currentHealth <= 0) {
+          //   character.kill();
+          // }
+          if (!collision.source.projectile.punchThrough) {
+            _.remove(this.gameState.projectiles, collision.source);
+          }
+        } else {
+          _.remove(this.gameState.projectiles, collision.source);
+        }
+      } else {
+        // collision.source.position.x = collision.source.lastPosition.x;
+        // collision.source.position.y = collision.source.lastPosition.y;
       }
     }
 
+    for (const projectile of this.gameState.projectiles) {
+      if (projectile.distanceTravelled >= projectile.projectile.effect.range) {
+        _.remove(this.gameState.projectiles, projectile);
+      }
+    }
+
+    for (const character of this.gameState.characters) {
+      if (!character.dead && character.currentHealth <= 0) {
+        character.kill();
+      }
+    }
+
+    _.remove(this.gameState.dynamicObjects, "done");
+    _.remove(this.gameState.projectiles, "done");
     // TODO: remove objects outside of game bounds
   }
 }
