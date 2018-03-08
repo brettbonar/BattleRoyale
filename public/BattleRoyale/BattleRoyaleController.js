@@ -9,7 +9,16 @@ export default class BattleRoyaleController extends GameController {
     super(element, params, {
       game: new BattleRoyale({
         canvas: document.getElementById("canvas-main"),
-        map: new Map(),
+        map: new Map({
+          gameCanvas: document.getElementById("canvas-main"),
+        }),
+        undergroundMap: new Map({
+          gameCanvas: document.getElementById("canvas-main"),
+          seeds: {
+            death: 5,
+            water: 5
+          }
+        }),
         gameSettings: {
           cellSize: 32,
           viewDistance: 32 * 12

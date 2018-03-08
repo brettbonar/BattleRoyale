@@ -22,19 +22,19 @@ function lerp(a0, a1, w) {
   return (1.0 - w)*a0 + w*a1;
 }
 
-// Computes the dot product of the distance and gradient vectors.
-function dotGridGradient(ix, iy, x, y) {
+// // Computes the dot product of the distance and gradient vectors.
+// function dotGridGradient(ix, iy, x, y) {
 
-  // Precomputed (or otherwise) gradient vectors at each grid node
-  extern Gradient[IYMAX][IXMAX][2];
+//   // Precomputed (or otherwise) gradient vectors at each grid node
+//   extern Gradient[IYMAX][IXMAX][2];
 
-  // Compute the distance vector
-  dx = x - ix;
-  dy = y - iy;
+//   // Compute the distance vector
+//   dx = x - ix;
+//   dy = y - iy;
 
-  // Compute the dot-product
-  return (dx*Gradient[iy][ix][0] + dy*Gradient[iy][ix][1]);
-}
+//   // Compute the dot-product
+//   return (dx*Gradient[iy][ix][0] + dy*Gradient[iy][ix][1]);
+// }
 
 // Compute Perlin noise at coordinates x, y
 function perlin(x, y) {

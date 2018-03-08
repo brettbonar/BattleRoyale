@@ -6,6 +6,65 @@ export default {
       width: 194,
       height: 194
     },
+    doors: [
+      {
+        exterior: {
+          imageSource: "../../Assets/Buildings/house1.png",
+          imageDimensions: {
+            x: 0,
+            y: 194,
+            width: 34,
+            height: 50
+          },
+          renderOffset: {
+            x: 80,
+            y: 144
+          },
+          perspectiveOffset: {
+            x: 194 / 2,
+            y: 194
+          }
+        },
+        closed: {
+          losDimensions: [
+            {
+              offset: {
+                x: 96,
+                y: 192
+              },
+              dimensions: {
+                width: 34,
+                height: 16
+              }
+            }
+          ],
+          terrainDimensions: [
+            {
+              offset: {
+                x: 96,
+                y: 192
+              },
+              dimensions: {
+                width: 34,
+                height: 16
+              }
+            }
+          ],
+          hitboxDimensions: [
+            {
+              offset: {
+                x: 96,
+                y: 192
+              },
+              dimensions: {
+                width: 34,
+                height: 16
+              }
+            }
+          ]
+        }
+      }
+    ],
     bounds: [
       {
         offset: {
@@ -71,7 +130,7 @@ export default {
         width: 194,
         height: 194
       },
-      renderOffset: {
+      perspectiveOffset: {
         x: 194 / 2,
         y: 0
       },
@@ -86,18 +145,18 @@ export default {
             height: 176
           },
           boundsType: Bounds.TYPE.RECTANGLE_UL
-        },
-        {
-          offset: {
-            x: 72,
-            y: 190
-          },
-          dimensions: {
-            width: 50,
-            height: 8
-          },
-          boundsType: Bounds.TYPE.RECTANGLE_UL
         }
+        // {
+        //   offset: {
+        //     x: 72,
+        //     y: 190
+        //   },
+        //   dimensions: {
+        //     width: 50,
+        //     height: 8
+        //   },
+        //   boundsType: Bounds.TYPE.RECTANGLE_UL
+        // }
       ]
     },
     exterior: {
@@ -108,7 +167,7 @@ export default {
         width: 194,
         height: 194
       },
-      renderOffset: {
+      perspectiveOffset: {
         x: 194 / 2,
         y: 194
       }

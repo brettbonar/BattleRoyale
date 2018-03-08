@@ -59,53 +59,48 @@ export default class PhysicsEngine {
 
   detectCollisions(obj, objects) {
     //let vector = obj.terrainVector;
-    let objBox = obj.boundingBox;
+    let objTerrainBox = obj.terrainBoundingBox;
+    let objHitbox = obj.hitbox;
     let collisions = [];
     for (const target of objects) {
       if (target === obj || target.physics.surfaceType === SURFACE_TYPE.NONE) continue;
-      // Only need to test projectiles against characters, not both
+      // Only need to test projectiles against characters, not both ways
       if (obj.physics.surfaceType === SURFACE_TYPE.CHARACTER &&
           target.physics.surfaceType === SURFACE_TYPE.PROJECTILE) {
         continue;
       }
+      if (target.position.z !== obj.position.z) continue;
       
       //if (target.physics.surfaceType === SURFACE_TYPE.TERRAIN || target.physics.surfaceType === SURFACE_TYPE.GROUND) {
         //let intersections = this.getIntersections(vector, target);
-      for (const targetBox of target.getAllBounds()) {
-        if (objBox.intersects(targetBox)) {
-          //let lastTerrainBox = obj.lastTerrainBoundingBox.box;
+      if (obj.physics.surfaceType === SURFACE_TYPE.CHARACTER) {
+        for (const targetTerrainBox of target.terrainBoundingBox) {
+          if (objTerrainBox.some((box) => box.intersects(targetTerrainBox))) {
+            collisions.push({
+              source: obj,
+              target: target
+            });
+
+            // TODO: make this more robust for high speeds
+            obj.position.x = obj.lastPosition.x;
+            obj.position.y = obj.lastPosition.y;
+          }
+        }
+      }
+      
+      for (const targetHitbox of target.hitbox) {
+        if (objHitbox.some((box) => box.intersects(targetHitbox))) {
           collisions.push({
             source: obj,
             target: target
           });
-
-          obj.position.x = obj.lastPosition.x;
-          obj.position.y = obj.lastPosition.y;
-
-          // TODO: make this more robust for high speeds
-
-          //let targetBox = target.boundingBox.box;
-          // if (terrainBox.box.lr.x > targetBox.ul.x && obj.direction.x > 0) {
-          //   // TODO: allow non-centered terrain boxes?
-          //   obj.position.x = targetBox.ul.x - obj.width / 2 - 1;
-          // } else if (terrainBox.box.ul.x < targetBox.lr.x && obj.direction.x < 0) {
-          //   obj.position.x = targetBox.lr.x + obj.width / 2 + 1;
-          // }
-  
-          // if (terrainBox.box.lr.y > targetBox.ul.y && terrainBox.box.ul.y < targetBox.ul.y) {
-          //   // TODO: allow non-centered terrain boxes?
-          //   obj.position.y = targetBox.ul.y - 1;
-          // } else if (terrainBox.box.ul.y < targetBox.lr.y && terrainBox.box.lr.y > targetBox.lr.y) {
-          //   obj.position.y = targetBox.lr.y + 1;
-          // }
         }
-        //}
-
-        // TODO: do this after all other physics calculations
-        for (const functionBox of target.getAllFunctionBounds()) {
-          if (obj.boundingBox.intersects(functionBox.box)) {
-            functionBox.cb(obj);
-          }
+      }
+      
+      // TODO: do this after all other physics calculations
+      for (const functionBox of target.getAllFunctionBounds()) {
+        if (objTerrainBox.some((box) => box.intersects(functionBox.box))) {
+          functionBox.cb(obj);
         }
       }
     }

@@ -1,4 +1,41 @@
+import Bounds from "../../Engine/GameObject/Bounds.js";
+
 // TODO: fix sprites that share edges
+const caveEntranceDimensions = [
+  {
+    offset: {
+      x: -32,
+      y: -86,
+    },
+    dimensions: {
+      width: 64,
+      height: 5
+    },
+    boundsType: Bounds.TYPE.RECTANGLE_UL
+  },
+  {
+    offset: {
+      x: -32,
+      y: -86,
+    },
+    dimensions: {
+      width: 5,
+      height: 86
+    },
+    boundsType: Bounds.TYPE.RECTANGLE_UL
+  },
+  {
+    offset: {
+      x: 27,
+      y: -86,
+    },
+    dimensions: {
+      width: 5,
+      height: 86
+    },
+    boundsType: Bounds.TYPE.RECTANGLE_UL
+  }
+];
 
 export default {
   corn1: {
@@ -13,8 +50,7 @@ export default {
     },
     physics: {
       surfaceType: "none"
-    },
-    losObstacle: false
+    }
   },
   corn2: {
     biome: "plain",
@@ -28,8 +64,7 @@ export default {
     },
     physics: {
       surfaceType: "none"
-    },
-    losObstacle: false
+    }
   },
   corn3: {
     biome: "plain",
@@ -43,29 +78,101 @@ export default {
     },
     physics: {
       surfaceType: "none"
-    },
-    losObstacle: false
+    }
   },
   plainTree: {
     biome: "plain",
-    imageSource: "../../Assets/terrain_atlas-64.png",
-    imageDimensions: {
-      x: 928 * 2,
-      y: 897 * 2,
-      width: 192,
-      height: 128 * 2 - 10,
-      offset: {
-        x: 93
+    images: [
+      {
+        // Tree top
+        imageSource: "../../Assets/plants/plant repack-64.png",
+        imageDimensions: {
+          x: 165,
+          y: 1034,
+          width: 190,
+          height: 178,
+          offset: {
+            x: 93,
+            y: 236
+          }
+        }
+      },
+      {
+        // Tree base
+        imageSource: "../../Assets/plants/plant repack-64.png",
+        imageDimensions: {
+          x: 20,
+          y: 1128,
+          width: 104,
+          height: 83,
+          offset: {
+            x: 53
+          }
+        },
+        perspectiveOffset: {
+          x: 0,
+          y: -50
+        }
       }
-    },
+      // {
+      //   // Tree top
+      //   imageSource: "../../Assets/terrain_atlas-64.png",
+      //   imageDimensions: {
+      //     x: 1857,
+      //     y: 1803,
+      //     width: 191,
+      //     height: 180,
+      //     offset: {
+      //       x: 93,
+      //       y: 236
+      //     }
+      //   }
+      // },
+      // {
+      //   // Tree base
+      //   imageSource: "../../Assets/terrain_atlas-64.png",
+      //   imageDimensions: {
+      //     x: 1857,
+      //     y: 1980,
+      //     width: 191,
+      //     height: 59,
+      //     offset: {
+      //       x: 93
+      //     }
+      //   },
+      //   perspectiveOffset: {
+      //     x: 0,
+      //     y: -50
+      //   }
+      // }
+    ],
     physics: {
       surfaceType: "terrain"
     },
     dimensions: {
       width: 103,
-      height: 56
+      height: 50
     },
-    losObstacle: true,
+    hitboxDimensions: {
+      offset: {
+        x: 0,
+        y: -18
+      },
+      dimensions: {
+        width: 64,
+        height: 32
+      }
+    },
+    losDimensions: {
+      offset: {
+        x: 0,
+        y: -18
+      },
+      dimensions: {
+        width: 64,
+        height: 32
+      }
+    },
     losFade: true
   },
   smallPlainTree: {
@@ -87,7 +194,10 @@ export default {
       width: 35,
       height: 20
     },
-    losObstacle: true
+    losDimensions: {
+      width: 35,
+      height: 20
+    }
   },
   stump: {
     biome: "plain",
@@ -104,8 +214,7 @@ export default {
     dimensions: {
       width: 100,
       height: 58
-    },
-    losObstacle: false
+    }
   },
   forestTree: {
     biome: "forest",
@@ -126,7 +235,10 @@ export default {
       width: 66,
       height: 34
     },
-    losObstacle: true,
+    losDimensions: {
+      width: 66,
+      height: 34
+    },
     losFade: true
   },
   darkRock1: {
@@ -144,8 +256,7 @@ export default {
     dimensions: {
       width: 122,
       height: 45
-    },
-    losObstacle: false
+    }
   },
   darkRock2: {
     biome: "darkRock",
@@ -162,8 +273,7 @@ export default {
     dimensions: {
       width: 116,
       height: 48
-    },
-    losObstacle: false
+    }
   },
   darkRock3: {
     biome: "darkRock",
@@ -180,8 +290,7 @@ export default {
     dimensions: {
       width: 58,
       height: 48
-    },
-    losObstacle: false
+    }
   },
   lightRock1: {
     biome: "lightRock",
@@ -198,8 +307,7 @@ export default {
     dimensions: {
       width: 122,
       height: 45
-    },
-    losObstacle: false
+    }
   },
   lightRock2: {
     biome: "lightRock",
@@ -216,8 +324,7 @@ export default {
     dimensions: {
       width: 116,
       height: 48
-    },
-    losObstacle: false
+    }
   },
   lightRock3: {
     biome: "lightRock",
@@ -234,8 +341,7 @@ export default {
     dimensions: {
       width: 58,
       height: 48
-    },
-    losObstacle: false
+    }
   },
   pillar1: {
     // clean
@@ -253,8 +359,7 @@ export default {
     dimensions: {
       width: 64,
       height: 64
-    },
-    losObstacle: false
+    }
   },
   pillar1Small: {
     // clean
@@ -272,8 +377,7 @@ export default {
     dimensions: {
       width: 32,
       height: 32
-    },
-    losObstacle: false
+    }
   },
   pillar2: {
     // ivy, cracked
@@ -291,8 +395,7 @@ export default {
     dimensions: {
       width: 64,
       height: 64
-    },
-    losObstacle: false
+    }
   },
   pillar3: {
     // cracked
@@ -310,8 +413,7 @@ export default {
     dimensions: {
       width: 64,
       height: 64
-    },
-    losObstacle: false
+    }
   },
   pillar4: {
     // cracked, upside down
@@ -329,8 +431,7 @@ export default {
     dimensions: {
       width: 44,
       height: 48
-    },
-    losObstacle: false
+    }
   },
   fountain: {
     biome: "ruins",
@@ -347,8 +448,7 @@ export default {
     dimensions: {
       width: 64,
       height: 56
-    },
-    losObstacle: false
+    }
   },
   head: {
     biome: "ruins",
@@ -365,8 +465,7 @@ export default {
     dimensions: {
       width: 104,
       height: 58
-    },
-    losObstacle: false
+    }
   },
   brokenHead: {
     biome: "ruins",
@@ -383,8 +482,7 @@ export default {
     dimensions: {
       width: 112,
       height: 55
-    },
-    losObstacle: false
+    }
   },
   pillarBase1: {
     // cracked, ivy
@@ -402,8 +500,7 @@ export default {
     dimensions: {
       width: 64,
       height: 48
-    },
-    losObstacle: false
+    }
   },
   pillarBase2: {
     // cracked
@@ -421,8 +518,7 @@ export default {
     dimensions: {
       width: 64,
       height: 48
-    },
-    losObstacle: false
+    }
   },
   pillarBase3: {
     // smooth
@@ -440,8 +536,7 @@ export default {
     dimensions: {
       width: 64,
       height: 48
-    },
-    losObstacle: false
+    }
   },
   whiteRock: {
     biome: "ruins", // Other biomes?
@@ -458,8 +553,7 @@ export default {
     dimensions: {
       width: 64,
       height: 48
-    },
-    losObstacle: false
+    }
   },
   cactusBall: {
     biome: "desert",
@@ -476,8 +570,7 @@ export default {
     dimensions: {
       width: 62,
       height: 48
-    },
-    losObstacle: false
+    }
   },
   cactus: {
     biome: "desert",
@@ -497,8 +590,7 @@ export default {
     dimensions: {
       width: 74,
       height: 24
-    },
-    losObstacle: false
+    }
   },
   brokenHeadstone: {
     biome: "death",
@@ -516,8 +608,7 @@ export default {
     dimensions: {
       width: 30,
       height: 16
-    },
-    losObstacle: false
+    }
   },
   headstone1: {
     biome: "death",
@@ -535,8 +626,7 @@ export default {
     dimensions: {
       width: 45,
       height: 16
-    },
-    losObstacle: false
+    }
   },
   headstone2: {
     biome: "death",
@@ -554,8 +644,7 @@ export default {
     dimensions: {
       width: 31,
       height: 16
-    },
-    losObstacle: false
+    }
   },
   headstone3: {
     biome: "death",
@@ -573,8 +662,7 @@ export default {
     dimensions: {
       width: 28,
       height: 16
-    },
-    losObstacle: false
+    }
   },
   // TODO: split into ground box and terrain box
   grave: {
@@ -593,8 +681,7 @@ export default {
     dimensions: {
       width: 61,
       height: 63
-    },
-    losObstacle: false
+    }
   },
   cross1: {
     biome: "death",
@@ -612,8 +699,7 @@ export default {
     dimensions: {
       width: 30,
       height: 16
-    },
-    losObstacle: false
+    }
   },
   cross2: {
     biome: "death",
@@ -631,8 +717,7 @@ export default {
     dimensions: {
       width: 18,
       height: 8
-    },
-    losObstacle: false
+    }
   },
   cross3: {
     biome: "death",
@@ -650,8 +735,7 @@ export default {
     dimensions: {
       width: 24,
       height: 8
-    },
-    losObstacle: false
+    }
   },
   cross4: {
     biome: "death",
@@ -669,8 +753,7 @@ export default {
     dimensions: {
       width: 31,
       height: 15
-    },
-    losObstacle: false
+    }
   },
   darkFountain: {
     biome: "death",
@@ -687,8 +770,7 @@ export default {
     dimensions: {
       width: 26,
       height: 17
-    },
-    losObstacle: false
+    }
   },
   deadTree: {
     biome: "death",
@@ -709,7 +791,79 @@ export default {
     dimensions: {
       width: 64,
       height: 36
+    }
+  },
+  // TODO: automatically place exit at same location
+  caveEntrance: {
+    biome: "any",
+    imageSource: "../../Assets/terrain_atlas-64.png",
+    imageDimensions: {
+      x: 0,
+      y: 320,
+      width: 64,
+      height: 86
     },
-    losObstacle: false
+    perspectiveOffset: {
+      x: 0,
+      y: -86
+    },
+    physics: {
+      surfaceType: "terrain",
+    },
+    dimensions: {
+      width: 64,
+      height: 86
+    },
+    terrainDimensions: caveEntranceDimensions,
+    hitboxDimensions: caveEntranceDimensions,
+    functions: [
+      {
+        offset: {
+          x: -32,
+          y: -43
+        },
+        dimensions: {
+          width: 60,
+          height: 16
+        },
+        cb: (object) => object.position.z = -1
+      }
+    ]
+  },
+  caveExit: {
+    biome: "any",
+    imageSource: "../../Assets/terrain_atlas-64.png",
+    imageDimensions: {
+      x: 0,
+      y: 320,
+      width: 64,
+      height: 86
+    },
+    perspectiveOffset: {
+      x: 0,
+      y: -86
+    },
+    physics: {
+      surfaceType: "terrain",
+    },
+    dimensions: {
+      width: 64,
+      height: 86
+    },
+    terrainDimensions: caveEntranceDimensions,
+    hitboxDimensions: caveEntranceDimensions,
+    functions: [
+      {
+        offset: {
+          x: -32,
+          y: -43
+        },
+        dimensions: {
+          width: 60,
+          height: 16
+        },
+        cb: (object) => object.position.z = 0
+      }
+    ]
   }
 }

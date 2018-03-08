@@ -1,6 +1,7 @@
-import buildings from "../Objects/buildings.js"
-import buildingObjects from "../Objects/buildingObjects.js"
+import buildings from "./buildings.js"
+import buildingObjects from "./buildingObjects.js"
 
+// TODO: combine this with ObjectRenderer
 export default class BuildingRenderer {
   constructor(building) {
     this.building = building;
@@ -24,21 +25,17 @@ export default class BuildingRenderer {
     //   y: object.position.y - offset.y
     // };
     let position = object.position;
+    if (this.building.renderOffset) {
+      position = {
+        x: position.x + this.building.renderOffset.x,
+        y: position.y + this.building.renderOffset.y
+      };
+    }
 
     if (this.buildingImage.image.complete) {
       context.drawImage(this.buildingImage.image, this.buildingImage.imageDimensions.x, this.buildingImage.imageDimensions.y, this.buildingImage.imageDimensions.width, this.buildingImage.imageDimensions.height,
         position.x, position.y,
         this.buildingImage.imageDimensions.width, this.buildingImage.imageDimensions.height);
     }
-
-    // DEBUG
-    // let box = object.boundingBox.box;
-    // context.strokeStyle = "magenta";
-    // context.strokeRect(box.ul.x, box.ul.y, object.width, object.height);
-      
-    // let terrainBox = object.terrainBoundingBox.box;
-    // context.strokeStyle = "aqua";
-    // context.strokeRect(terrainBox.ul.x, terrainBox.ul.y,
-    //   object.terrainDimensions.width, object.terrainDimensions.height);
   }
 }

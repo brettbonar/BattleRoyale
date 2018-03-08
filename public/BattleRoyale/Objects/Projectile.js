@@ -21,8 +21,8 @@ export default class Projectile extends GameObject {
     };
     this.startPosition = Object.assign({}, this.position);
     this.speed = 256;
-    this.projectile = projectiles.magicBall;
-    this.effect = projectiles.magicBall.effect;
+    this.projectile = projectiles.plasmaBall;
+    this.effect = projectiles.plasmaBall.effect;
     this.renderer = new ProjectileRenderer(this.projectile.rendering);
 
     this.rotation = Math.atan2(this.direction.y, this.direction.x) * 180 / Math.PI;

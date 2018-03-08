@@ -41,7 +41,6 @@ export default class Bounds {
       right: [this.box.ur, this.box.lr],
       left: [this.box.ll, this.box.ul]
     };
-
   }
 
   constructFromLine(params) {
@@ -145,6 +144,26 @@ export default class Bounds {
     }
 
     return false;
+  }
+
+  get ul() {
+    return this.box.ul;
+  }
+  get ur() {
+    return this.box.ur;
+  }
+  get lr() {
+    return this.box.lr;
+  }
+  get ll() {
+    return this.box.ll;
+  }
+
+  get width() {
+    return this.box.ur.x - this.box.ul.x;
+  }
+  get height() {
+    return this.box.ll.y - this.box.ul.y;
   }
 
   get boundingBox() {

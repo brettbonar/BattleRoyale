@@ -79,7 +79,7 @@ export default class Map {
   constructor(params) {
     Object.assign(this, params);
     _.defaults(this, {
-      mapSize: 100,
+      mapSize: 200,
       cellSize: 32,
       tileSize: 32,
       map: [],
@@ -436,7 +436,9 @@ export default class Map {
   }
 
   saveMap() {
-    this.canvas = document.getElementById("canvas-map");
+    this.canvas = jQuery("<canvas>", {
+      class: "game-canvas map-canvas"
+    }).appendTo(document.getElementById("canvas-group"))[0];
     this.canvas.width = this.cellSize * this.mapSize;
     this.canvas.height = this.cellSize * this.mapSize;
     this.context = this.canvas.getContext("2d");

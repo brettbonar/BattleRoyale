@@ -1,6 +1,7 @@
 import GameObject from "../../Engine/GameObject/GameObject.js"
 import magicEffects from "./magicEffects.js"
 import MagicRenderer from "./MagicRenderer.js";
+import { SURFACE_TYPE } from "../../Engine/Physics/PhysicsConstants.js";
 
 export default class Magic extends GameObject {
   constructor(params) {
@@ -8,6 +9,7 @@ export default class Magic extends GameObject {
     this.magic = magicEffects[params.type];
     this.effect = this.magic.effect;
     this.position = params.target;
+    this.physics.surfaceType = SURFACE_TYPE.NONE;
 
     let direction = this.normalize({
       x: params.target.x - params.source.x,

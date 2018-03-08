@@ -25,7 +25,7 @@ export default class Character extends GameObject {
     this.physics.surfaceType = "character";
     this.dimensions = params.dimensions || {
       width: 32,
-      height: 16
+      height: 20
     };
 
     this.modelDimensions = {

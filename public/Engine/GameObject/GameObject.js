@@ -20,6 +20,8 @@ export default class GameObject {
         width: 0,
         height: 0
       },
+      functions: [],
+      visible: true,
       // direction: {
       //   x: 0,
       //   y: 0
@@ -34,6 +36,9 @@ export default class GameObject {
       physics: {
         surfaceType: SURFACE_TYPE.TERRAIN,
         movementType: MOVEMENT_TYPE.NORMAL
+      },
+      position: {
+        z: 0
       }
     });
 
@@ -79,7 +84,18 @@ export default class GameObject {
   }
 
   getAllFunctionBounds() {
-    return [];
+    return this.functions.map((fn) => {
+      return {
+        box: new Bounds({
+          dimensions: fn.dimensions,
+          position: {
+            x: this.position.x + fn.offset.x,
+            y: this.position.y + fn.offset.y
+          }
+        }),
+        cb: fn.cb
+      };
+    });
   }
 
   get perspectivePosition() {
@@ -122,25 +138,13 @@ export default class GameObject {
   update(elapsedTime) {}
 
   render(context, elapsedTime, center) {
-    this.renderer.render(context, this, elapsedTime, center);
+    if (this.visible) {
+      this.renderer.render(context, this, elapsedTime, center);
+    }
   }
 
   getAllRenderObjects() {
     return [this];
-  }
-
-  getAllBounds() {
-    if (this.bounds) {
-      return this.bounds.map((bounds) => {
-        return new Bounds(Object.assign({
-          position: {
-            x: this.position.x + bounds.offset.x,
-            y: this.position.y + bounds.offset.y
-          }
-        }, bounds));
-      });
-    }
-    return [this.boundingBox];
   }
 
   get left() {
@@ -179,23 +183,60 @@ export default class GameObject {
     //   return this.position;
     // } else if ()
   }
+
+  getAllBounds(position, dimensions) {
+    if (dimensions) {
+      return _.castArray(dimensions).map((dimens) => {
+        let pos = position;
+        if (dimens.offset) {
+          pos = {
+            x: position.x + dimens.offset.x,
+            y: position.y + dimens.offset.y
+          };
+        }
+        return new Bounds({
+          position: pos,
+          dimensions: dimens.dimensions || dimens,
+          boundsType: dimens.boundsType || this.boundsType
+        });
+      });
+    }
+
+    // if (this.bounds) {
+    //   return this.bounds.map((bounds) => {
+    //     return new Bounds(Object.assign({
+    //       position: {
+    //         x: this.position.x + bounds.offset.x,
+    //         y: this.position.y + bounds.offset.y
+    //       }
+    //     }, bounds));
+    //   });
+    // }
+    // return [this.boundingBox];
+  }
   
   get lastTerrainBoundingBox() {
-    return this.terrainDimensions && 
-      new Bounds({
-        position: this.lastPosition,
-        dimensions: this.terrainDimensions,
-        boundsType: this.boundsType
-      });
+    return this.getAllBounds(this.lastPosition, this.terrainDimensions) || [this.boundingBox];
   }
   
   get terrainBoundingBox() {
-    return this.terrainDimensions && 
-      new Bounds({
-        position: this.position,
-        dimensions: this.terrainDimensions,
-        boundsType: this.boundsType
-      });
+    return this.getAllBounds(this.position, this.terrainDimensions) || [this.boundingBox];
+  }
+  
+  get lastLosBoundingBox() {
+    return this.getAllBounds(this.lastPosition, this.losDimensions) || [];
+  }
+
+  get losBoundingBox() {
+    return this.getAllBounds(this.position, this.losDimensions) || [];
+  }
+
+  get lastHitbox() {
+    return this.getAllBounds(this.lastPosition, this.hitboxDimensions) || [this.boundingBox];
+  }
+
+  get hitbox() {
+    return this.getAllBounds(this.position, this.hitboxDimensions) || [this.boundingBox];
   }
 
   get boundingBox() {

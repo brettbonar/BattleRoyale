@@ -14,5 +14,19 @@ export default {
       range: 1000,
       punchThrough: false
     }
+  },
+  plasmaBall: {
+    rendering: {
+      imageSource: "../../Assets/magic/plasmaball.png",
+      imageSize: 32,
+      frames: 4,
+      framesPerSec: 4,
+      repeat: true
+    },
+    effect: {
+      damage: 10,
+      range: 1000,
+      punchThrough: false
+    }
   }
 }

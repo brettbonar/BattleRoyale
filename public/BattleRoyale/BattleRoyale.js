@@ -14,8 +14,11 @@ import Projectile from "./Objects/Projectile.js"
 import objects from "./Objects/objects.js"
 import equipment from "./Objects/equipment.js"
 import objects32 from "./Objects/objects-32.js"
-import Building from "./Objects/Building.js";
+import Building from "./Buildings/Building.js";
 import Magic from "./Magic/Magic.js";
+import GenericObject from "./Objects/GenericObject.js";
+
+window.debug = true;
 
 const EVENTS = {
   MOVE_UP: "moveUp",
@@ -30,6 +33,8 @@ export default class BattleRoyale extends Game {
   constructor(params) {
     super(Object.assign(params, { requestPointerLock: true }));
     this.map = params.map;
+    this.undergroundMap = params.undergroundMap;
+
     this.physicsEngine = new PhysicsEngine();
     this.renderingEngine = new PerspectiveRenderingEngine({
       context: this.context
@@ -162,33 +167,45 @@ export default class BattleRoyale extends Game {
     // this.stateFunctions[Game.STATE.INITIALIZING].update = _.noop;//(elapsedTime) => this._update(elapsedTime);
     // this.stateFunctions[Game.STATE.INITIALIZING].render = _.noop;//(elapsedTime) => this._render(elapsedTime);
 
-    for (let i = 0; i < 10; i++) {
-      //let type = _.sample(_.filter(objects, { biome: "plain" }));
-      //let type = _.sample(objects);
-      let type = objects.plainTree;
-      this.gameState.staticObjects.push(new GameObject(Object.assign({
-        position: {
-          x: _.random(0, this.canvas.width),
-          y: _.random(0, this.canvas.height)
-        },
-        renderer: new ObjectRenderer(Object.assign({}, type))
-      }, type)));
-    }
+    // for (let i = 0; i < 10; i++) {
+    //   //let type = _.sample(_.filter(objects, { biome: "plain" }));
+    //   //let type = _.sample(objects);
+    //   let type = objects.plainTree;
+    //   this.gameState.staticObjects.push(new GenericObject({
+    //     position: {
+    //       x: _.random(0, this.canvas.width),
+    //       y: _.random(0, this.canvas.height)
+    //     }
+    //   }, type));
+    // }
 
-    let x = 250;
-    let y = 250;
-    for (let i = 0; i < 10; i++) {
-      for (let j = 0; j < 5; j++) {
-        let type = _.sample(_.filter(objects, { group: "corn" }));
-        this.gameState.staticObjects.push(new GameObject(Object.assign({
-          position: {
-            x: x + i * (objects.corn1.imageDimensions.width * 3/4) + y,
-            y: y + j * (objects.corn1.imageDimensions.height / 3)
-          },
-          renderer: new ObjectRenderer(Object.assign({}, type))
-        }, type)));
-      }
-    }
+    // let x = 250;
+    // let y = 250;
+    // for (let i = 0; i < 10; i++) {
+    //   for (let j = 0; j < 5; j++) {
+    //     let type = _.sample(_.filter(objects, { group: "corn" }));
+    //     this.gameState.staticObjects.push(new GenericObject({
+    //       position: {
+    //         x: x + i * (objects.corn1.imageDimensions.width * 3/4) + y,
+    //         y: y + j * (objects.corn1.imageDimensions.height / 3)
+    //       }
+    //     }, type));
+    //   }
+    // }
+
+    // this.gameState.staticObjects.push(new GenericObject({
+    //   position: {
+    //     x: 100,
+    //     y: 350
+    //   }
+    // }, objects.caveEntrance));
+    // this.gameState.staticObjects.push(new GenericObject({
+    //   position: {
+    //     x: 100,
+    //     y: 450,
+    //     z: -1
+    //   }
+    // }, objects.caveExit));
 
     this.gameState.staticObjects.push(new Building({
       type: "house",
@@ -244,7 +261,8 @@ export default class BattleRoyale extends Game {
       this.gameState.projectiles.push(new Projectile({
         position: {
           x: this.gameState.player.position.x + (this.gameState.player.width + 5) * direction.x,
-          y: this.gameState.player.position.y + (this.gameState.player.height + 5) * direction.y
+          y: this.gameState.player.position.y + (this.gameState.player.height + 5) * direction.y - 10,
+          z: this.gameState.player.position.z
         },
         direction: direction
       }));
@@ -313,7 +331,11 @@ export default class BattleRoyale extends Game {
     this.context.save();
     this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
-    this.map.render(this.context, this.gameState.player.position);
+    if (!this.gameState.player.position.z) {
+      this.map.render(this.context, this.gameState.player.position);
+    } else if (this.gameState.player.position.z === -1) {
+      this.undergroundMap.render(this.context, this.gameState.player.position);
+    }
     this.renderingEngine.render(this.getRenderObjects(), elapsedTime, this.gameState.player.position);
 
     // TODO: put somewhere else
