@@ -15,10 +15,18 @@ export default class EffectsEngine {
     _.remove(this.effects, "done");
   }
 
-  render(elapsedTime) {
+  render(elapsedTime, center) {
+    this.context.save();
+
+    if (center) {
+      this.context.translate(-(center.x - this.context.canvas.width / 2), -(center.y - this.context.canvas.height / 2));
+    }
+
     for (const effect of this.effects) {
       effect.render(this.context, elapsedTime);
     }
+
+    this.context.restore();
   }
 
   addEffect(effect) {

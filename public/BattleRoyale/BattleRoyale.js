@@ -17,6 +17,8 @@ import objects32 from "./Objects/objects-32.js"
 import Building from "./Buildings/Building.js";
 import Magic from "./Magic/Magic.js";
 import GenericObject from "./Objects/GenericObject.js";
+import AnimationEffect from "./Effects.js/AnimationEffect.js";
+import effects from "./Effects.js/effects.js";
 
 window.debug = true;
 
@@ -49,6 +51,7 @@ export default class BattleRoyale extends Game {
       body: "tanned",
       gender: "male",
       isPlayer: true,
+      damagedEffect: effects.blood,
       loadout: {
         weapon: equipment.spear,
         torso: equipment.leatherChestMale,
@@ -64,9 +67,30 @@ export default class BattleRoyale extends Game {
       }
     });
 
+    let target2 = new Character({
+      body: "darkelf",
+      gender: "female",
+      damagedEffect: effects.blood,
+      loadout: {
+        weapon: equipment.spear,
+        torso: equipment.leatherChestMale,
+        legs: equipment.tealPantsMale,
+        head: equipment.clothHoodMale,
+        feet: equipment.brownShoesMale,
+        hands: equipment.leatherBracersMale
+      },
+      characterDirection: "right",
+      fireReady: true,
+      position: {
+        x: 400,
+        y: 255
+      }
+    });
+
     let target = new Character({
       body: "darkelf",
       gender: "female",
+      damagedEffect: effects.blood,
       loadout: {
         weapon: equipment.spear,
         torso: equipment.leatherChestMale,
@@ -80,24 +104,6 @@ export default class BattleRoyale extends Game {
       position: {
         x: 550,
         y: 550
-      }
-    });
-
-    let target2 = new Character({
-      body: "darkelf",
-      gender: "female",
-      loadout: {
-        weapon: equipment.spear,
-        torso: equipment.leatherChestMale,
-        legs: equipment.tealPantsMale,
-        head: equipment.clothHoodMale,
-        feet: equipment.brownShoesMale,
-        hands: equipment.leatherBracersMale
-      },
-      fireReady: true,
-      position: {
-        x: 800,
-        y: 800
       }
     });
 
@@ -337,6 +343,7 @@ export default class BattleRoyale extends Game {
       this.undergroundMap.render(this.context, this.gameState.player.position);
     }
     this.renderingEngine.render(this.getRenderObjects(), elapsedTime, this.gameState.player.position);
+    this.particleEngine.render(elapsedTime, this.gameState.player.position);
 
     // TODO: put somewhere else
     // Render cursor
@@ -364,7 +371,17 @@ export default class BattleRoyale extends Game {
     for (const collision of collisions) {
       if (collision.source instanceof Projectile) {
         if (collision.target instanceof Character) {
-          collision.target.damage(collision.source);    
+          collision.target.damage(collision.source);
+          // TODO: add effect based on character
+          if (collision.target.damagedEffect) {
+            this.particleEngine.addEffect(new AnimationEffect({
+              position: {
+                x: collision.target.center.x,
+                y: collision.target.center.y
+              },
+              duration: 1000
+            }, collision.target.damagedEffect));
+          }
           // if (!character.dead && character.currentHealth <= 0) {
           //   character.kill();
           // }
@@ -391,6 +408,8 @@ export default class BattleRoyale extends Game {
         character.kill();
       }
     }
+
+    this.particleEngine.update(elapsedTime);
 
     _.remove(this.gameState.dynamicObjects, "done");
     _.remove(this.gameState.projectiles, "done");

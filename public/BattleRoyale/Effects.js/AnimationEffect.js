@@ -8,18 +8,19 @@ function getOffset(animation, frame, imageSize) {
   };
 }
 
-export default class BloodEffect extends Effect {
-  constructor(params) {
+export default class AnimationEffect extends Effect {
+  constructor(params, effect) {
     super(params);
+    Object.assign(this, effect);
 
     this.image = new Image();
-    this.image.src = params.imageSource;
+    this.image.src = effect.imageSource;
     this.frame = 0;
     this.currentTime = 0;
     this.totalTime = 0;
   }
 
-  render(context, object, elapsedTime, center) {
+  render(context, elapsedTime) {
     if (!this.image.complete) {
       return;
     }
@@ -29,26 +30,15 @@ export default class BloodEffect extends Effect {
       y: 0,//this.frame * this.projectile.imageSize
     };
     
-    if (object.rotation) {
+    if (this.rotation) {
       context.translate(pos.x + this.imageSize / 2, pos.y + this.imageSize / 2);
-      context.rotate((object.rotation * Math.PI) / 180);
+      context.rotate((this.rotation * Math.PI) / 180);
       context.translate(-(pos.x + this.imageSize / 2), -(pos.y + this.imageSize / 2));        
     }
 
-    //this.frame = 0;
     context.drawImage(this.image, offset.x, offset.y,
       this.imageSize, this.imageSize,
-      object.position.x, object.position.y, this.imageSize, this.imageSize);
-
-    // DEBUG
-    // let box = object.boundingBox.box;
-    // context.strokeStyle = "magenta";
-    // context.strokeRect(box.ul.x, box.ul.y, object.width, object.height);
-
-    // let terrainBox = object.terrainBoundingBox.box;
-    // context.strokeStyle = "aqua";
-    // context.strokeRect(terrainBox.ul.x, terrainBox.ul.y,
-    //   object.terrainDimensions.width, object.terrainDimensions.height);
+      this.position.x - this.imageSize / 2, this.position.y - this.imageSize / 2, this.imageSize, this.imageSize);
   }
 
   update(elapsedTime) {
@@ -61,6 +51,7 @@ export default class BloodEffect extends Effect {
           this.frame = this.cycleStart || 0;
         } else {
           this.frame = this.frames - 1;
+          this.done = true;
         }
       }
     }
