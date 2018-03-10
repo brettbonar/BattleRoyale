@@ -24,7 +24,11 @@ export default class BattleRoyaleController extends GameController {
           viewDistance: 32 * 12
         }
       });
-      this.start();
+
+      $.get("game/objects", (data) => {
+        this.game.updateObjects(data);
+        this.start();
+      });
     });
   }
 }

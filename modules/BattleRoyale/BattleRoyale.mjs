@@ -13,7 +13,6 @@ import Character from "./Objects/Character.mjs"
 import Projectile from "./Objects/Projectile.mjs"
 import objects from "./Objects/objects.mjs"
 import equipment from "./Objects/equipment.mjs"
-import objects32 from "./Objects/objects-32.mjs"
 import Building from "./Buildings/Building.mjs";
 import Magic from "./Magic/Magic.mjs";
 import GenericObject from "./Objects/GenericObject.mjs";
@@ -46,66 +45,6 @@ export default class BattleRoyale extends Game {
     this.menus = params.menus;
     let scale = this.canvas.width / 1000;
 
-    let player = new Character({
-      body: "tanned",
-      gender: "male",
-      isPlayer: true,
-      damagedEffect: effects.blood,
-      loadout: {
-        weapon: equipment.spear,
-        torso: equipment.leatherChestMale,
-        legs: equipment.tealPantsMale,
-        head: equipment.clothHoodMale,
-        feet: equipment.brownShoesMale,
-        hands: equipment.leatherBracersMale
-      },
-      fireReady: true,
-      position: {
-        x: 255,
-        y: 255
-      }
-    });
-
-    let target2 = new Character({
-      body: "darkelf",
-      gender: "female",
-      damagedEffect: effects.blood,
-      loadout: {
-        weapon: equipment.spear,
-        torso: equipment.leatherChestMale,
-        legs: equipment.tealPantsMale,
-        head: equipment.clothHoodMale,
-        feet: equipment.brownShoesMale,
-        hands: equipment.leatherBracersMale
-      },
-      characterDirection: "right",
-      fireReady: true,
-      position: {
-        x: 400,
-        y: 255
-      }
-    });
-
-    let target = new Character({
-      body: "darkelf",
-      gender: "female",
-      damagedEffect: effects.blood,
-      loadout: {
-        weapon: equipment.spear,
-        torso: equipment.leatherChestMale,
-        legs: equipment.tealPantsMale,
-        head: equipment.clothHoodMale,
-        feet: equipment.brownShoesMale,
-        hands: equipment.leatherBracersMale
-      },
-      isOtherPlayer: true,
-      fireReady: true,
-      position: {
-        x: 550,
-        y: 550
-      }
-    });
-
     this.gameState = {
       cursor: {
         position: {
@@ -113,8 +52,7 @@ export default class BattleRoyale extends Game {
           y: params.canvas.height / 2
         }
       },
-      player: player,
-      characters: [player, target, target2],
+      characters: [],
       projectiles: [],
       dynamicObjects: [],
       staticObjects: []
@@ -154,53 +92,10 @@ export default class BattleRoyale extends Game {
     // this.stateFunctions[Game.STATE.INITIALIZING].update = _.noop;//(elapsedTime) => this._update(elapsedTime);
     // this.stateFunctions[Game.STATE.INITIALIZING].render = _.noop;//(elapsedTime) => this._render(elapsedTime);
 
-    // for (let i = 0; i < 10; i++) {
-    //   //let type = _.sample(_.filter(objects, { biome: "plain" }));
-    //   //let type = _.sample(objects);
-    //   let type = objects.plainTree;
-    //   this.gameState.staticObjects.push(new GenericObject({
-    //     position: {
-    //       x: _.random(0, this.canvas.width),
-    //       y: _.random(0, this.canvas.height)
-    //     }
-    //   }, type));
-    // }
+  }
 
-    // let x = 250;
-    // let y = 250;
-    // for (let i = 0; i < 10; i++) {
-    //   for (let j = 0; j < 5; j++) {
-    //     let type = _.sample(_.filter(objects, { group: "corn" }));
-    //     this.gameState.staticObjects.push(new GenericObject({
-    //       position: {
-    //         x: x + i * (objects.corn1.imageDimensions.width * 3/4) + y,
-    //         y: y + j * (objects.corn1.imageDimensions.height / 3)
-    //       }
-    //     }, type));
-    //   }
-    // }
+  updateGameObjects(objects) {
 
-    // this.gameState.staticObjects.push(new GenericObject({
-    //   position: {
-    //     x: 100,
-    //     y: 350
-    //   }
-    // }, objects.caveEntrance));
-    // this.gameState.staticObjects.push(new GenericObject({
-    //   position: {
-    //     x: 100,
-    //     y: 450,
-    //     z: -1
-    //   }
-    // }, objects.caveExit));
-
-    this.gameState.staticObjects.push(new Building({
-      type: "house",
-      position: {
-        x: 500,
-        y: 500
-      }
-    }));
   }
 
   handleMouseMove(event) {

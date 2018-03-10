@@ -2,7 +2,7 @@
   "name": "breakout",
   "version": "1.0.0",
   "description": "",
-  "main": "app.js",
+  "main": "app.mjs",
   "dependencies": {
     "babel-plugin-transform-commonjs-es2015-modules": "^4.0.1",
     "browser-or-node": "^1.0.2",
