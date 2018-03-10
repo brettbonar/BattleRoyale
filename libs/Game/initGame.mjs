@@ -19,6 +19,7 @@ function initGame(map) {
     body: "tanned",
     gender: "male",
     isPlayer: true,
+    simulation: true,
     damagedEffect: effects.blood,
     loadout: {
       weapon: equipment.spear,
@@ -38,6 +39,7 @@ function initGame(map) {
   new Character({
     body: "darkelf",
     gender: "female",
+    simulation: true,
     damagedEffect: effects.blood,
     loadout: {
       weapon: equipment.spear,
@@ -58,6 +60,7 @@ function initGame(map) {
   new Character({
     body: "darkelf",
     gender: "female",
+    simulation: true,
     damagedEffect: effects.blood,
     loadout: {
       weapon: equipment.spear,
@@ -76,7 +79,8 @@ function initGame(map) {
     }
   }),
   new Building({
-    type: "house",
+    buildingType: "house",
+    simulation: true,
     position: {
       x: 500,
       y: 500,

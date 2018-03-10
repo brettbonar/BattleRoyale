@@ -6,7 +6,8 @@ import buildings from "./buildings.mjs"
 export default class Building extends GameObject {
   constructor(params) {
     super(params);
-    this.building = buildings[params.type];
+    this.type = "Building";
+    this.building = buildings[params.buildingType];
     this.bounds = this.building.bounds;
     this.losDimensions = this.bounds;
     this.hitboxDimensions = this.bounds;

@@ -75,17 +75,17 @@ class GameController {
   }
 
   parseElement(element) {
-    // this.menus.parseElement(element);    
-    // element.find("[gui-click]").each((index, clickElement) => {
-    //   let fn = this.parseExpression(clickElement.getAttribute("gui-click"));
-    //   clickElement.onclick = (event) => fn(event);
-    // });
+    this.menus.parseElement(element);    
+    element.find("[gui-click]").each((index, clickElement) => {
+      let fn = this.parseExpression(clickElement.getAttribute("gui-click"));
+      clickElement.onclick = (event) => fn(event);
+    });
     
-    // element.find("[gui-on-show]").each((index, showElement) => {
-    //   let fn = this.parseExpression(showElement.getAttribute("gui-on-show"));
-    //   let state = showElement.getAttribute("id");
-    //   this.menus.onStateChange(state, (state) => fn(state));
-    // });
+    element.find("[gui-on-show]").each((index, showElement) => {
+      let fn = this.parseExpression(showElement.getAttribute("gui-on-show"));
+      let state = showElement.getAttribute("id");
+      this.menus.onStateChange(state, (state) => fn(state));
+    });
   }
 
   start() {

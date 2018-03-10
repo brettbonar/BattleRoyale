@@ -6,9 +6,12 @@ export default class GenericObject extends GameObject {
   constructor(params, object) {
     super(params);
     Object.assign(this, object);
+    this.type = "GenericObject";
 
     if (object.imageSource) {
-      this.renderer = new ObjectRenderer(object);
+      if (!params.simulation) {
+        this.renderer = new ObjectRenderer(object);
+      }
     } else if (object.images) {
       this.parts = _.map(object.images, (part) => {
         let piece = new GenericObject(_.merge({}, object, params), part);

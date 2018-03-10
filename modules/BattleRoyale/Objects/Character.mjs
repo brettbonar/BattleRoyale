@@ -11,6 +11,7 @@ export default class Character extends GameObject {
         x: 0,
         y: 0
       },
+      type: "Character",
       characterDirection: "down",
       attacking: false,
       attackTime: 0,
@@ -33,13 +34,15 @@ export default class Character extends GameObject {
       height: 64
     };
 
-    this.renderer = new CharacterRenderer({
-      gender: params.gender,
-      body: params.body,
-      loadout: params.loadout,
-      isOtherPlayer: this.isOtherPlayer
-    });
-    this.renderer.setAnimation(CharacterRenderer.ANIMATIONS.MOVE_DOWN);
+    if (!params.simulation) {
+      this.renderer = new CharacterRenderer({
+        gender: params.gender,
+        body: params.body,
+        loadout: params.loadout,
+        isOtherPlayer: this.isOtherPlayer
+      });
+      this.renderer.setAnimation(CharacterRenderer.ANIMATIONS.MOVE_DOWN);
+    }
   }
 
   setDirection(direction) {

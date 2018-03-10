@@ -94,8 +94,19 @@ export default class BattleRoyale extends Game {
 
   }
 
-  updateGameObjects(objects) {
-
+  updateObjects(objects) {
+    for (const object of objects) {
+      object.simulation = false;
+      if (object.type === "Character") {
+        let character = new Character(object);
+        if (character.isPlayer) {
+          this.gameState.player = character;
+        }
+        this.gameState.characters.push(character);
+      } else if (object.type === "Building") {
+        this.gameState.staticObjects.push(new Building(object));
+      }
+    }
   }
 
   handleMouseMove(event) {

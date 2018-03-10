@@ -12,7 +12,9 @@ export default class BuildingPart extends GameObject {
     // this.losDimensions = this.bounds;
     // this.hitboxDimensions = this.bounds;
     // this.terrainDimensions = this.bounds;
-    this.renderer = new BuildingRenderer(building);
+    if (!params.simulation) {
+      this.renderer = new BuildingRenderer(building);
+    }
   }
   
   get perspectivePosition() {
