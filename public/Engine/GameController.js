@@ -1,4 +1,5 @@
 import GameUI from "./GameUI.js"
+//import io from "../lib/socket.io-client/dist/socket.io.js";
 
 let controllers = {};
 let activeControllers = [];
@@ -12,6 +13,7 @@ class GameController {
     this.fpsTime = 0;
     this.frames = 0;
     this.fps = 0;
+    this.socket = io(location.protocol + '//' + location.host);
 
     if (params.template) {
       let template = $("<div>");

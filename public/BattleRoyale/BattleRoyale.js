@@ -34,8 +34,7 @@ const EVENTS = {
 export default class BattleRoyale extends Game {
   constructor(params) {
     super(Object.assign(params, { requestPointerLock: true }));
-    this.map = params.map;
-    this.undergroundMap = params.undergroundMap;
+    this.maps = params.maps;
 
     this.physicsEngine = new PhysicsEngine();
     this.renderingEngine = new PerspectiveRenderingEngine({
@@ -117,27 +116,9 @@ export default class BattleRoyale extends Game {
       player: player,
       characters: [player, target, target2],
       projectiles: [],
-      dynamicObjects: [
-        // new Character({
-        //   body: "darkelf",
-        //   gender: "female",
-        //   loadout: {
-        //     weapon: "../../Assets/character/weapons/right hand/either/axe.png",
-        //     torso: "../../Assets/character/torso/corset_female/corset_red.png",
-        //     pants: "../../Assets/character/legs/pants/female/red_pants_female.png",
-        //     head: "../../Assets/character/head/tiaras_female/silver.png",
-        //     feet: "../../Assets/character/feet/shoes/female/black_shoes_female.png",
-        //     hands: "../../Assets/character/hands/gloves/female/golden_gloves_female.png"          
-        //   },
-        //   position: {
-        //     x: 550,
-        //     y: 550
-        //   }
-        // })
-      ],
+      dynamicObjects: [],
       staticObjects: []
     };
-
 
     //this.addEventHandler(Game.EVENT.PAUSE, () => this.pause());
     this.keyBindings[KEY_CODE.W] = EVENTS.MOVE_UP;
@@ -336,11 +317,10 @@ export default class BattleRoyale extends Game {
   _render(elapsedTime) {
     this.context.save();
     this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    this.context.fillRect(0, 0, this.canvas.width, this.canvas.height);
 
-    if (!this.gameState.player.position.z) {
-      this.map.render(this.context, this.gameState.player.position);
-    } else if (this.gameState.player.position.z === -1) {
-      this.undergroundMap.render(this.context, this.gameState.player.position);
+    if (this.maps[this.gameState.player.position.z]) {
+      this.maps[this.gameState.player.position.z].render(this.context, this.gameState.player.position);
     }
     this.renderingEngine.render(this.getRenderObjects(), elapsedTime, this.gameState.player.position);
     this.particleEngine.render(elapsedTime, this.gameState.player.position);

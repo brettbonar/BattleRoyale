@@ -1,34 +1,32 @@
 import { registerController, GameController } from "../Engine/GameController.js"
 import Game from "../Engine/Game.js"
-import Map from "./Map.js"
 import BattleRoyale from "../BattleRoyale/BattleRoyale.js"
 import BreakoutUI from "../Breakout/BreakoutUI.js"
+import Map from "/libs/Map.js"
 
 export default class BattleRoyaleController extends GameController {
   constructor(element, params) {
     super(element, params, {
-      game: new BattleRoyale({
-        canvas: document.getElementById("canvas-main"),
-        map: new Map({
-          gameCanvas: document.getElementById("canvas-main"),
-        }),
-        undergroundMap: new Map({
-          gameCanvas: document.getElementById("canvas-main"),
-          seeds: {
-            death: 5,
-            water: 5
-          }
-        }),
-        gameSettings: {
-          cellSize: 32,
-          viewDistance: 32 * 12
-        }
-      }),
       menus: new BreakoutUI()
     });
-    this.start();
-  }
 
+    $.get("game/maps", (data) => {
+      let maps = {};
+      _.each(data, (map, level) => {
+        maps[level] = new Map(Object.assign({
+          gameCanvas: document.getElementById("canvas-main")
+        }, map));
+      });
+      this.game = new BattleRoyale({
+        canvas: document.getElementById("canvas-main"),
+        maps: maps,
+        gameSettings: {
+          viewDistance: 32 * 12
+        }
+      });
+      this.start();
+    });
+  }
 }
 
 registerController("BattleRoyaleController", BattleRoyaleController);
