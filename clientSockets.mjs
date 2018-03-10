@@ -5,8 +5,8 @@ function create(socket) {
 
   io.on("connection", (socket) => {
     socket.emit("test");
-    console.log("test");
   });
 }
 
-module.exports = create;
+//module.exports = create;
+export default create;

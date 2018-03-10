@@ -1,13 +1,6 @@
 "use strict";
 
-const modulespec = {
-  "clientImports": ["import { getDistance } from '/libs/util.js'"],
-  "serverImports": [
-    "const getDistance = require('./util').getDistance",
-    "const _ = require('lodash')"
-  ],  
-  "default": ["Map"]
-};
+import { getDistance } from './util.mjs';
 
 const BIOMES = {
   FOREST: "forest",
@@ -495,3 +488,5 @@ class Map {
     this.growVoronoi(seeds);
   }
 }
+
+export default Map;

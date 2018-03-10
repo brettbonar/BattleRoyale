@@ -2,7 +2,7 @@ import { registerController, GameController } from "../Engine/GameController.js"
 import Game from "../Engine/Game.js"
 import BattleRoyale from "../BattleRoyale/BattleRoyale.js"
 import BreakoutUI from "../Breakout/BreakoutUI.js"
-import Map from "/libs/Map.js"
+import Map from "/modules/Map.mjs"
 
 export default class BattleRoyaleController extends GameController {
   constructor(element, params) {

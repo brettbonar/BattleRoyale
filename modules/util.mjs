@@ -1,7 +1,3 @@
-const modulespec = {
-  "exports": ["getDistance", "normalize"]
-};
-
 function getDistance(a, b) {
   let dx = a.x - b.x;
   let dy = a.y - b.y;
@@ -21,3 +17,4 @@ function normalize(point) {
   return point;
 }
 
+export { getDistance, normalize }

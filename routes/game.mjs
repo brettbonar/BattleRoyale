@@ -1,7 +1,10 @@
-const express = require("express");
+import express from "express";
+//const Map = require("../libs/Map");
+import Map from "../modules/Map.mjs";
+import _ from "lodash";
+global._ = _;
+
 const router = express.Router();
-const _ = require("lodash");
-const Map = require("../libs/Map");
 
 let maps = {
   "-1": new Map({
@@ -21,4 +24,5 @@ router.get("/maps", (req, res) => {
   res.json(mapsJson);
 });
 
-module.exports = router;
+//module.exports = router;
+export default router;
