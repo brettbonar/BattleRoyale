@@ -1,4 +1,3 @@
-import GameUI from "./GameUI.mjs"
 //import io from "../lib/socket.io-client/dist/socket.io.mjs";
 
 let controllers = {};
@@ -13,8 +12,17 @@ class GameController {
     this.fpsTime = 0;
     this.frames = 0;
     this.fps = 0;
-    this.socket = io(location.protocol + '//' + location.host);
+    //this.socket = io(location.protocol + "//" + location.host);
+    this.player = {};
+    this.socket = io();
+    this.socket.on("id", (id) => {
+      this.player.playerId = id;
+    });
+    this.socket.on("pingpong", () => {
+      this.socket.emit("pingpong");
+    });
 
+    this.menus.controller = this;
     if (params.template) {
       let template = $("<div>");
       template.load(params.template, (el) => {
@@ -86,10 +94,13 @@ class GameController {
       let state = showElement.getAttribute("id");
       this.menus.onStateChange(state, (state) => fn(state));
     });
+
+    this.menus.transition(element.find("[gui-start]").attr("id"));
   }
 
   start() {
     this.previousTime = performance.now();
+    this.menus.hideAll();
     this.game.start();
     requestAnimationFrame((currentTime) => this.gameLoop(currentTime));
   }

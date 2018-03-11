@@ -13,80 +13,90 @@ import GenericObject from "../../modules/BattleRoyale/Objects/GenericObject.mjs"
 import AnimationEffect from "../../modules/BattleRoyale/Effects.js/AnimationEffect.mjs";
 import effects from "../../modules/BattleRoyale/Effects.js/effects.mjs";
 
-function initGame(map) {
+function initGame(players, maps) {
   let objects = [
     new Character({
-    body: "tanned",
-    gender: "male",
-    isPlayer: true,
-    simulation: true,
-    damagedEffect: effects.blood,
-    loadout: {
-      weapon: equipment.spear,
-      torso: equipment.leatherChestMale,
-      legs: equipment.tealPantsMale,
-      head: equipment.clothHoodMale,
-      feet: equipment.brownShoesMale,
-      hands: equipment.leatherBracersMale
-    },
-    fireReady: true,
-    position: {
-      x: 255,
-      y: 255,
-      z: 0
-    }
-  }),
-  new Character({
-    body: "darkelf",
-    gender: "female",
-    simulation: true,
-    damagedEffect: effects.blood,
-    loadout: {
-      weapon: equipment.spear,
-      torso: equipment.leatherChestMale,
-      legs: equipment.tealPantsMale,
-      head: equipment.clothHoodMale,
-      feet: equipment.brownShoesMale,
-      hands: equipment.leatherBracersMale
-    },
-    characterDirection: "right",
-    fireReady: true,
-    position: {
-      x: 400,
-      y: 255,
-      z: 0
-    }
-  }),
-  new Character({
-    body: "darkelf",
-    gender: "female",
-    simulation: true,
-    damagedEffect: effects.blood,
-    loadout: {
-      weapon: equipment.spear,
-      torso: equipment.leatherChestMale,
-      legs: equipment.tealPantsMale,
-      head: equipment.clothHoodMale,
-      feet: equipment.brownShoesMale,
-      hands: equipment.leatherBracersMale
-    },
-    isOtherPlayer: true,
-    fireReady: true,
-    position: {
-      x: 550,
-      y: 550,
-      z: 0
-    }
-  }),
-  new Building({
-    buildingType: "house",
-    simulation: true,
-    position: {
-      x: 500,
-      y: 500,
-      z: 0
-    }
-  })
+      body: "darkelf",
+      gender: "female",
+      simulation: true,
+      damagedEffect: effects.blood,
+      loadout: {
+        weapon: equipment.spear,
+        torso: equipment.leatherChestMale,
+        legs: equipment.tealPantsMale,
+        head: equipment.clothHoodMale,
+        feet: equipment.brownShoesMale,
+        hands: equipment.leatherBracersMale
+      },
+      characterDirection: "right",
+      fireReady: true,
+      position: {
+        x: 400,
+        y: 255,
+        z: 0
+      }
+    }),
+    new Character({
+      body: "darkelf",
+      gender: "female",
+      simulation: true,
+      damagedEffect: effects.blood,
+      loadout: {
+        weapon: equipment.spear,
+        torso: equipment.leatherChestMale,
+        legs: equipment.tealPantsMale,
+        head: equipment.clothHoodMale,
+        feet: equipment.brownShoesMale,
+        hands: equipment.leatherBracersMale
+      },
+      isOtherPlayer: true,
+      fireReady: true,
+      position: {
+        x: 550,
+        y: 550,
+        z: 0
+      }
+    }),
+    new Building({
+      buildingType: "house",
+      simulation: true,
+      position: {
+        x: 500,
+        y: 500,
+        z: 0
+      }
+    })
+  ];
+
+  let pos = 255;
+  for (const player of players) {
+    objects.push(
+      new Character({
+        body: "tanned",
+        gender: "male",
+        isPlayer: true,
+        playerId: player.playerId,
+        simulation: true,
+        damagedEffect: effects.blood,
+        loadout: {
+          weapon: equipment.spear,
+          torso: equipment.leatherChestMale,
+          legs: equipment.tealPantsMale,
+          head: equipment.clothHoodMale,
+          feet: equipment.brownShoesMale,
+          hands: equipment.leatherBracersMale
+        },
+        fireReady: true,
+        position: {
+          x: pos,
+          y: pos,
+          z: 0
+        }
+      })
+    );
+    pos += 100;
+  }
+  
   // for (let i = 0; i < 10; i++) {
   //   //let type = _.sample(_.filter(objects, { biome: "plain" }));
   //   //let type = _.sample(objects);
@@ -126,7 +136,6 @@ function initGame(map) {
   //     z: -1
   //   }
   // }, objects.caveExit));
-  ];
 
   return objects;
 }

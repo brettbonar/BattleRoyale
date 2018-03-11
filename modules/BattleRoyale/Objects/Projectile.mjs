@@ -6,6 +6,7 @@ import { getDistance } from "../../Engine/util.mjs"
 export default class Projectile extends GameObject {
   constructor(params) {
     super(params);
+    this.type = "Projectile";
     this.physics.surfaceType = "projectile";
     this.boundsType = "circle";
     // this.dimensions = {

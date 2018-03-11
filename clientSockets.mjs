@@ -1,12 +1,18 @@
-let io;
+// import * as Games from "./libs/Game/Games.mjs"
 
-function create(socket) {
-  io = socket;
+// let io;
 
-  io.on("connection", (socket) => {
-    socket.emit("test");
-  });
-}
+// function create(socket) {
+//   io = socket;
 
-//module.exports = create;
-export default create;
+//   io.on("connection", (socket) => {
+//     socket.emit("connected");
+//   });
+
+//   io.on("event", (data) => {
+//     let game = Games.
+//   });
+// }
+
+// //module.exports = create;
+// export default create;

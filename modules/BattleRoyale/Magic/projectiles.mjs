@@ -26,6 +26,8 @@ export default {
     effect: {
       damage: 10,
       range: 1000,
+      attackTime: 1000,
+      automatic: false,
       punchThrough: false
     }
   }

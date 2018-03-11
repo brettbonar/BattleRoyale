@@ -15,8 +15,14 @@ const EVENT = {
 
 export default class Game {
   constructor(params) {
-    this.canvas = params.canvas;
-    this.context = this.canvas.getContext("2d");
+    Object.assign(this, params);
+    
+    if (!params.isServer) {
+      this.canvas = params.canvas;
+      this.context = this.canvas.getContext("2d");
+    }
+    this.isServer = params.isServer;
+
     this._settings = {
       requestPointerLock: params.requestPointerLock
     };
@@ -193,20 +199,21 @@ export default class Game {
   }
 
   start() {
-    if (this._settings.requestPointerLock) {
-      document.addEventListener("pointerlockchange", this.pointerLockListener, false);
-      document.addEventListener("mozpointerlockchange", this.pointerLockListener, false);
-      this.canvas.requestPointerLock = this.canvas.requestPointerLock || this.canvas.mozRequestPointerLock;
-      document.exitPointerLock = document.exitPointerLock || document.mozExitPointerLock;
-      this.canvas.requestPointerLock();
-    } else {
-      window.addEventListener("mousemove", this.mouseMoveListener);
+    if (!this.isServer) {
+      if (this._settings.requestPointerLock) {
+        document.addEventListener("pointerlockchange", this.pointerLockListener, false);
+        document.addEventListener("mozpointerlockchange", this.pointerLockListener, false);
+        this.canvas.requestPointerLock = this.canvas.requestPointerLock || this.canvas.mozRequestPointerLock;
+        document.exitPointerLock = document.exitPointerLock || document.mozExitPointerLock;
+        this.canvas.requestPointerLock();
+      } else {
+        window.addEventListener("mousemove", this.mouseMoveListener);
+      }
+      document.addEventListener("keydown", this.keyDownListener);
+      document.addEventListener("keyup", this.keyUpListener);
+      document.addEventListener("mousedown", this.mouseDownListener);
+      document.addEventListener("mouseup", this.mouseUpListener);
     }
-    document.addEventListener("keydown", this.keyDownListener);
-    document.addEventListener("keyup", this.keyUpListener);
-    document.addEventListener("mousedown", this.mouseDownListener);
-    document.addEventListener("mouseup", this.mouseUpListener);
-
 
     this.previousTime = performance.now();
     this.transitionState(STATE.PLAYING);
@@ -236,5 +243,9 @@ export default class Game {
     for (const cb of this.transitionStateCbs[state]) {
       cb(this);
     }
+  }
+
+  addObject(params) {
+    
   }
 }

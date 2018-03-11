@@ -19,7 +19,7 @@ import GenericObject from "./Objects/GenericObject.mjs";
 import AnimationEffect from "./Effects.js/AnimationEffect.mjs";
 import effects from "./Effects.js/effects.mjs";
 
-window.debug = true;
+//window.debug = true;
 
 const EVENTS = {
   MOVE_UP: "moveUp",
@@ -33,9 +33,10 @@ const EVENTS = {
 export default class BattleRoyale extends Game {
   constructor(params) {
     super(Object.assign(params, { requestPointerLock: true }));
+    
     this.maps = params.maps;
-
     this.physicsEngine = new PhysicsEngine();
+
     this.renderingEngine = new PerspectiveRenderingEngine({
       context: this.context
     });
@@ -43,7 +44,6 @@ export default class BattleRoyale extends Game {
       context: this.context
     });
     this.menus = params.menus;
-    let scale = this.canvas.width / 1000;
 
     this.gameState = {
       cursor: {
@@ -52,6 +52,7 @@ export default class BattleRoyale extends Game {
           y: params.canvas.height / 2
         }
       },
+      objects: params.objects || [],
       characters: [],
       projectiles: [],
       dynamicObjects: [],
@@ -75,8 +76,8 @@ export default class BattleRoyale extends Game {
     this.addEventHandler(EVENTS.MOVE_DOWN, (event) => this.move(event));
     this.addEventHandler(EVENTS.MOVE_LEFT, (event) => this.move(event));
     this.addEventHandler(EVENTS.MOVE_RIGHT, (event) => this.move(event));
-    this.addEventHandler(EVENTS.PRIMARY_FIRE, (event) => this.primaryFire(event));
-    this.addEventHandler(EVENTS.SECONDARY_FIRE, (event) => this.secondaryFire(event));
+    this.addEventHandler(EVENTS.PRIMARY_FIRE, (event) => this.attack(event, 1));
+    this.addEventHandler(EVENTS.SECONDARY_FIRE, (event) => this.attack(event, 2));
 
     this.stateFunctions[Game.STATE.PLAYING].update = (elapsedTime) => this._update(elapsedTime);
     this.stateFunctions[Game.STATE.PLAYING].render = (elapsedTime) => this._render(elapsedTime);
@@ -94,17 +95,37 @@ export default class BattleRoyale extends Game {
 
   }
 
+  createObject(object) {
+    if (object.type === "Character") {
+      let character = new Character(object);
+      if (character.playerId === this.player.playerId) {
+        this.gameState.player = character;
+      }
+      return character;
+    } else if (object.type === "Building") {
+      return new Building(object);
+    } else if (object.type === "Magic") {
+      return new Magic(object);
+    } else if (object.type === "GenericObject") {
+      return new GenericObject(object);
+    } else if (object.type === "Projectile") {
+      return new Projectile(object);
+    }
+  }
+
   updateObjects(objects) {
     for (const object of objects) {
       object.simulation = false;
-      if (object.type === "Character") {
-        let character = new Character(object);
-        if (character.isPlayer) {
-          this.gameState.player = character;
+      let existing = _.find(this.gameState.objects, {
+        objectId: object.objectId,
+        playerId: object.playerId
+      });
+      if (existing) {
+        if (existing.revision <= object.revision) {
+          existing.updateState(object);
         }
-        this.gameState.characters.push(character);
-      } else if (object.type === "Building") {
-        this.gameState.staticObjects.push(new Building(object));
+      } else {
+        this.gameState.objects.push(this.createObject(object));
       }
     }
   }
@@ -125,6 +146,7 @@ export default class BattleRoyale extends Game {
     } else if (this.gameState.cursor.position.y < 0) {
       this.gameState.cursor.position.y = 0;
     }
+
     //this.gameState.cursor.position.x =  Math.min(Math.max(x, 0), this.gameSettings.playArea.width - this.gameState.cursor.width);
   }
   
@@ -141,44 +163,95 @@ export default class BattleRoyale extends Game {
     return point;
   }
 
-  primaryFire(event) {
-    if (event.release) {
-      this.gameState.player.fireReady = true;
-    } else if (this.gameState.player.fireReady) {
-      this.gameState.player.attack(1000);
-      this.gameState.player.fireReady = false;
-      let direction = this.normalize({
-        x: this.gameState.cursor.position.x - this.canvas.width / 2,
-        y: this.gameState.cursor.position.y - this.canvas.height / 2 + 32
-      });
-      this.gameState.projectiles.push(new Projectile({
-        position: {
-          x: this.gameState.player.position.x + (this.gameState.player.width + 5) * direction.x,
-          y: this.gameState.player.position.y + (this.gameState.player.height + 5) * direction.y - 10,
-          z: this.gameState.player.position.z
-        },
-        direction: direction
-      }));
+  doAttack(character, params, elapsedTime) {
+    if (params.release) {
+      character.fireReady = true;
+    } else if (character.fireReady) {
+      let attack = character.loadout.weapon.attacks[params.attackType];
+      character.attack(attack.attackTime, elapsedTime);
+      if (!attack.automatic) {
+        // TODO: something else here
+        character.fireReady = false;
+      }
+
+      if (attack.type === "projectile") {
+        this.gameState.objects.push(new Projectile({
+          position: {
+            x: character.position.x + (character.width + 5) * direction.x,
+            y: character.position.y + (character.height + 5) * direction.y - 10,
+            z: character.position.z
+          },
+          direction: direction,
+          playerId: params.source.playerId,
+          ownerId: params.source.objectId,
+          elapsedTime: elapsedTime
+        }));
+      }
     }
   }
 
-  secondaryFire(event) {
-    if (event.release) {
-      this.gameState.player.fireReady = true;
-    } else if (this.gameState.player.fireReady) {
-      this.gameState.player.attack(2000);
-      this.gameState.player.fireReady = false;
-      let position = {
-        x: this.gameState.player.position.x + (this.gameState.cursor.position.x - this.canvas.width / 2),
-        y: this.gameState.player.position.y + (this.gameState.cursor.position.y - this.canvas.height / 2)
-      };
-      this.gameState.dynamicObjects.push(new Magic({
-        target: position,
-        source: this.gameState.player.center,
-        type: "snake"
-      }));
-    }
+  attack(event, attackType) {
+    let target = {
+      x: this.gameState.cursor.position.x - this.gameState.player.position.x,
+      y: this.gameState.cursor.position.y - this.gameState.player.position.y
+    };
+    // let target = {
+    //   // x: this.gameState.cursor.position.x - this.gameState.player.position.x,
+    //   // y: this.gameState.cursor.position.y - this.gameState.player.position.y
+    //   x: this.gameState.player.position.x + (this.gameState.cursor.position.x - this.canvas.width / 2),
+    //   y: this.gameState.player.position.y + (this.gameState.cursor.position.y - this.canvas.height / 2)
+    // };
+    let direction = this.normalize({
+      x: this.gameState.cursor.position.x - this.canvas.width / 2,
+      y: this.gameState.cursor.position.y - this.canvas.height / 2 + 32
+    });
+
+    let source = {
+      playerId: this.player.playerId,
+      objectId: this.gameState.player.objectId
+    };
+
+    this.doAttack(this.gameState.player, {
+      source: source,
+      attackType: attackType,
+      target: target,
+      direction: direction,
+      release: event.release
+    });
+
+    this.sendEvent({
+      type: "attack",
+      source: source,
+      attackType: attackType,
+      target: target,
+      direction: direction,
+      release: event.release
+    });
   }
+
+  // secondaryFire(event) {
+  //   if (event.release) {
+  //     this.gameState.player.fireReady = true;
+  //   } else if (this.gameState.player.fireReady) {
+  //     this.gameState.player.attack(2000);
+  //     this.gameState.player.fireReady = false;
+  //     this.gameState.objects.push(new Magic({
+  //       target: target,
+  //       source: this.gameState.player.center,
+  //       type: "snake"
+  //     }));
+
+  //     this.sendEvent({
+  //       type: "attack",
+  //       source: {
+  //         playerId: this.player.playerId,
+  //         objectId: this.gameState.player.objectId
+  //       },
+  //       mode: 2,
+  //       target: target
+  //     });
+  //   }
+  // }
 
   move(event) {
     let direction = {
@@ -203,21 +276,37 @@ export default class BattleRoyale extends Game {
     if (this.activeEvents.includes(EVENTS.MOVE_RIGHT)) {
       direction.x += 1;
     }
-    this.gameState.player.setDirection(direction);
+
+    if (this.gameState.player.direction.x !== direction.x ||
+        this.gameState.player.direction.y !== direction.y) {
+      this.gameState.player.setDirection(direction);
+
+      this.sendEvent({
+        type: "changeDirection",
+        source: {
+          playerId: this.player.playerId,
+          objectId: this.gameState.player.objectId,
+          revision: ++this.gameState.player.revision
+        },
+        direction: direction
+      });
+    }
   }
 
   getRenderObjects() {
-    return this.gameState.staticObjects
-      .concat(this.gameState.dynamicObjects)
-      .concat(this.gameState.characters)
-      .concat(this.gameState.projectiles);
+    return this.gameState.objects;
+    // return this.gameState.staticObjects
+    //   .concat(this.gameState.dynamicObjects)
+    //   .concat(this.gameState.characters)
+    //   .concat(this.gameState.projectiles);
   }
 
   getPhysicsObjects() {
-    return this.gameState.staticObjects
-      .concat(this.gameState.dynamicObjects)
-      .concat(this.gameState.characters)
-      .concat(this.gameState.projectiles);
+    return this.gameState.objects;
+    // return this.gameState.staticObjects
+    //   .concat(this.gameState.dynamicObjects)
+    //   .concat(this.gameState.characters)
+    //   .concat(this.gameState.projectiles);
   }
 
   _render(elapsedTime) {
@@ -243,12 +332,30 @@ export default class BattleRoyale extends Game {
     this.context.restore();
   }
 
+  sendEvent(params) {
+    this.socket.emit("update", params);
+  }
+
   _update(elapsedTime) {
-    this.gameState.player.setTarget({
-      x: this.gameState.cursor.position.x + (this.gameState.player.position.x - this.canvas.width / 2),
-      y: this.gameState.cursor.position.y + (this.gameState.player.position.y - this.canvas.height / 2)
-    });
-    this.gameState.player.update(elapsedTime);
+    if (!this.isServer) {
+      let target = {
+        x: this.gameState.cursor.position.x + (this.gameState.player.position.x - this.canvas.width / 2),
+        y: this.gameState.cursor.position.y + (this.gameState.player.position.y - this.canvas.height / 2)
+      };
+      this.gameState.player.setTarget(target);
+      this.gameState.player.update(elapsedTime);
+
+      this.sendEvent({
+        type: "changeTarget",
+        source: {
+          playerId: this.player.playerId,
+          objectId: this.gameState.player.objectId,
+          revision: ++this.gameState.player.revision
+        },
+        target: target
+      });
+    }
+
     for (const obj of this.getPhysicsObjects()) {
       obj.update(elapsedTime);
     }
@@ -272,10 +379,10 @@ export default class BattleRoyale extends Game {
           //   character.kill();
           // }
           if (!collision.source.projectile.punchThrough) {
-            _.remove(this.gameState.projectiles, collision.source);
+            _.remove(this.gameState.objects, collision.source);
           }
         } else {
-          _.remove(this.gameState.projectiles, collision.source);
+          _.remove(this.gameState.objects, collision.source);
         }
       } else {
         // collision.source.position.x = collision.source.lastPosition.x;
@@ -283,22 +390,24 @@ export default class BattleRoyale extends Game {
       }
     }
 
-    for (const projectile of this.gameState.projectiles) {
-      if (projectile.distanceTravelled >= projectile.projectile.effect.range) {
-        _.remove(this.gameState.projectiles, projectile);
+    for (const projectile of this.gameState.objects) {
+      if (projectile instanceof Projectile &&
+          projectile.distanceTravelled >= projectile.projectile.effect.range) {
+        _.remove(this.gameState.objects, projectile);
       }
     }
 
-    for (const character of this.gameState.characters) {
-      if (!character.dead && character.currentHealth <= 0) {
+    for (const character of this.gameState.objects) {
+      if (character instanceof Character && !character.dead && character.currentHealth <= 0) {
         character.kill();
       }
     }
 
     this.particleEngine.update(elapsedTime);
 
-    _.remove(this.gameState.dynamicObjects, "done");
-    _.remove(this.gameState.projectiles, "done");
+    _.remove(this.gameState.objects, "done");
+    // _.remove(this.gameState.dynamicObjects, "done");
+    // _.remove(this.gameState.projectiles, "done");
     // TODO: remove objects outside of game bounds
   }
 }

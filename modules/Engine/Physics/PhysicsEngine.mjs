@@ -110,13 +110,18 @@ export default class PhysicsEngine {
 
   update(elapsedTime, objects) {
     for (const obj of objects) {
-      if (obj.direction) {
+      let time = elapsedTime;
+      if (obj.elapsedTime) {
+        time += obj.elapsedTime;
+        obj.elapsedTime = 0;
+      }
+      if (obj.direction.x || obj.direction.y) {
         Object.assign(obj.lastPosition, obj.position);
-        obj.position.x += obj.direction.x * obj.speed * (elapsedTime / 1000);
-        obj.position.y += obj.direction.y * obj.speed * (elapsedTime / 1000);
+        obj.position.x += obj.direction.x * obj.speed * (time / 1000);
+        obj.position.y += obj.direction.y * obj.speed * (time / 1000);
       }
       if (obj.spin) {
-        obj.rotation += (elapsedTime / 50) * obj.spin;
+        obj.rotation += (time / 50) * obj.spin;
       }
     }
 

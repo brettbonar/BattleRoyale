@@ -11,6 +11,8 @@ import { SURFACE_TYPE, MOVEMENT_TYPE } from "../../Engine/Physics/PhysicsConstan
 // direction: Vector
 // speed: distance / time
 // acceleration: +/- speed / time
+let objectId = 1;
+
 export default class GameObject {
   constructor(params) {
     Object.assign(this, params);
@@ -22,15 +24,19 @@ export default class GameObject {
       },
       functions: [],
       visible: true,
-      // direction: {
-      //   x: 0,
-      //   y: 0
-      // },
+      direction: {
+        x: 0,
+        y: 0
+      },
       position: {
         x: 0,
         y: 0
       },
-      renderer: new Renderer()
+      revision: 0,
+      renderer: new Renderer(),
+      objectId: objectId++,
+      ownerId: objectId,
+      playerId: 0
     });
     _.defaultsDeep(this, {
       physics: {
@@ -138,7 +144,7 @@ export default class GameObject {
   update(elapsedTime) {}
 
   render(context, elapsedTime, center) {
-    if (this.visible) {
+    if (this.visible && this.renderer) {
       this.renderer.render(context, this, elapsedTime, center);
     }
   }
@@ -308,6 +314,10 @@ export default class GameObject {
     } else if (type === Bounds.TYPE.LINE) {
       // TODO: some calculation
     }
+  }
+
+  updateState(object) {
+    _.merge(this, object);
   }
 
   static get BOUNDS_TYPE() { return BOUNDS_TYPE; }

@@ -88,11 +88,11 @@ export default class Character extends GameObject {
     this.renderer.setAnimation(CharacterRenderer.ANIMATIONS.DEATH);
   }
 
-  attack(duration) {
+  attack(duration, attackTime) {
     this.renderer.setAnimation(CharacterRenderer.WEAPON_ANIMATIONS[this.loadout.weapon.attackType][this.characterDirection], duration);
     this.renderer.animating = true;
     this.attacking = true;
-    this.attackTime = 0;
+    this.attackTime = attackTime || 0;
     this.attackDuration = duration;
   }
 
@@ -139,6 +139,16 @@ export default class Character extends GameObject {
         }
         this.renderer.setAnimation(CharacterRenderer.MOVE_ANIMATIONS[this.characterDirection]);
       }
+    }
+  }
+
+  updateState(state) {
+    _.merge(this, state);
+    if (state.target) {
+      this.setTarget(state.target);
+    }
+    if (state.direction) {
+      this.setDirection(state.direction);
     }
   }
 }

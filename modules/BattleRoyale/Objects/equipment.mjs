@@ -1,4 +1,5 @@
 // TODO: fix sprites that share edges
+import magicEffects from "../Magic/magicEffects.mjs"
 
 export default {
   dragonspear: {
@@ -31,7 +32,11 @@ export default {
     type: "weapon",
     attackType: "thrust",
     hands: 2,
-    gender: "either"
+    gender: "either",
+    attacks: {
+      1: "plasmaBall",
+      2: "lightningclaw"
+    }
   },
   leatherChestMale: {
     imageSource: "/Assets/character/torso/leather/chest_male.png",

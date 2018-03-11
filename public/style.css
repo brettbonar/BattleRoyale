@@ -7,6 +7,14 @@ hr {
   width: 100%;
 }
 
+.form-input {
+  height: 30px;
+}
+
+.bottom-menu {
+  margin-right: 20px;
+}
+
 .title {
   text-align: center;
   text-transform: uppercase;
@@ -21,7 +29,7 @@ hr {
   color: white;
 }
 
-.clear {
+.float-right {
   float: right;
 }
 
@@ -87,6 +95,7 @@ hr {
 }
 
 .menu {
+  background-color: black;
   z-index: 9999;
   position: absolute;
   left: 0;
@@ -128,7 +137,12 @@ hr {
   font-size: calc(5px + 1vw);
 }
 
-.high-scores-list {
+.list-table {
+  width: 100%;
+  height: 300px;
+}
+
+/* .high-scores-list {
   list-style-type: none;
   padding: 0;
   margin-top: 0;
@@ -143,7 +157,7 @@ hr {
 .high-scores-list td {
   text-align: center;
   font-size: calc(10px + 1vw);
-}
+} */
 
 .control {
   font-family: "Trebuchet MS";
@@ -195,3 +209,15 @@ hr {
   background-image: -ms-linear-gradient(top, #ca2fa3 0%, #cc28a3 100%);
   color: #fff;
   }
+
+.control[disabled] {
+  cursor: default;
+  background-image: none;
+  opacity: 0.65;
+  filter: alpha(opacity=65);
+  -webkit-box-shadow: none;
+  -moz-box-shadow: none;
+  box-shadow: none;
+  color: #333;
+  background-color: #E6E6E6;
+}

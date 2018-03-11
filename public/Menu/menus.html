@@ -1,16 +1,59 @@
-<gui-menu gui-start class="menu" id="MAIN" gui-on-show="returnToMain()">
+<gui-menu gui-start class="menu" id="CREATE_PLAYER" gui-on-show="showCharacterCreation()">
+    <h1 class="title">Create Character</h1>
+    <div class="sub-menu controls">
+      <label for="character-name">Name</label>
+      <input id="character-name" class="form-input" />
+    </div>
+    <hr />
+    <div class="bottom-menu">
+      <button class="control float-right" gui-click="createCharacter()">Done</button>
+    </div>
+  </gui-menu>
+
+<gui-menu class="menu" id="MAIN" gui-on-show="returnToMain()">
   <h1 class="title">Battle Royale</h1>
   <div class="sub-menu controls">
-    <button class="control" gui-click="newGame()">New Game</button>
+    <button class="control" gui-click="menus.transition('JOIN_GAME')">Join Game</button>
+    <button class="control" gui-click="menus.transition('CREATE_GAME')">Create Game</button>
     <button class="control" gui-click="menus.transition('HIGH_SCORES')">High Scores</button>
     <button class="control" gui-click="menus.transition('CREDITS')">Credits</button>
   </div>
 </gui-menu>
 
+<gui-menu class="menu" id="JOIN_GAME" gui-on-show="menus.listGames()">
+  <h1 class="title">Battle Royale</h1>
+  <div class="sub-menu">
+    <div id="games-list" class="ag-theme-balham-dark list-table"></div>
+    <hr />
+    <button class="control" gui-click="menus.transition('MAIN')">Back</button>
+    <button id="join-game" class="control float-right" disabled gui-click="menus.joinGame()">Join</button>
+    <button class="control float-right" gui-click="menus.listGames()">Refresh</button>
+  </div>
+</gui-menu>
+
+<gui-menu class="menu" id="CREATE_GAME">
+  <h1 class="title">Battle Royale</h1>
+  
+  <div class="sub-menu">
+    <hr />
+    <button class="control" gui-click="menus.transition('MAIN')">Back</button>
+  </div>
+</gui-menu>
+
+<gui-menu class="menu" id="LOBBY" gui-on-show="menus.showLobby()">
+    <h1 class="title">Battle Royale</h1>
+    <div class="sub-menu">
+        <div id="lobby-list" class="ag-theme-balham-dark list-table"></div>
+      <hr />
+      <button class="control" gui-click="leaveGame()">Leave</button>
+      <button class="control float-right" gui-click="menus.showLobby()">Refresh</button>
+    </div>
+  </gui-menu>
+
 <gui-menu class="menu" id="HIGH_SCORES" gui-on-show="menus.showScores(getHighScores())">
   <h1 class="title">Battle Royale</h1>
   <div class="sub-menu">
-    <table class="high-scores-list" id="high-scores-list">
+    <table class="list-table" id="high-scores-list">
       <tr>
         <th>Score</th>
         <th>Bricks Destroyed</th>
@@ -19,7 +62,7 @@
     </table>
     <hr />
     <button class="control" gui-click="menus.transition('MAIN')">Back</button>
-    <button class="control clear" gui-click="clearScores()">Clear Scores</button>
+    <button class="control float-right" gui-click="clearScores()">Clear Scores</button>
   </div>
 </gui-menu>
 

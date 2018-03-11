@@ -1,4 +1,6 @@
-export default class GameUI {
+"use strict";
+
+class GameUI {
   constructor(element) {
     this.menus = {};
     this.showMenuCbs = {};
@@ -37,3 +39,5 @@ export default class GameUI {
   render(elapsedTime) {}
   processInput(elapsedTime) {}
 }
+
+export default GameUI;
