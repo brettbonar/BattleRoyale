@@ -34,7 +34,7 @@ export default class BattleRoyaleController extends GameController {
   joinGame(game) {
     this.gameInfo = game;
     this.socket.on("update", (data) => {
-      console.log("Got update");
+      //console.log("Got update");
       this.game.updateObjects(data);
     });
     this.socket.on("initialize", (data) => {

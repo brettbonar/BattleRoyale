@@ -1,6 +1,6 @@
 import GameObject from "../../Engine/GameObject/GameObject.mjs"
 import ProjectileRenderer from "../Renderers/ProjectileRenderer.mjs"
-import projectiles from "../Magic/projectiles.mjs";
+import attacks from "../Magic/attacks.mjs";
 import { getDistance } from "../../Engine/util.mjs"
 
 export default class Projectile extends GameObject {
@@ -17,14 +17,14 @@ export default class Projectile extends GameObject {
     //   width: 32,
     //   height: 8
     // };
-    this.dimensions = {
-      radius: 5
-    };
+    this.dimensions = params.attack.effect.dimensions;
+    this.speed = params.attack.effect.speed;
     this.startPosition = Object.assign({}, this.position);
-    this.speed = 256;
-    this.projectile = projectiles.plasmaBall;
-    this.effect = projectiles.plasmaBall.effect;
-    this.renderer = new ProjectileRenderer(this.projectile.rendering);
+    this.effect = params.attack.effect;
+
+    if (!params.simulation) {
+      this.renderer = new ProjectileRenderer(params.attack.rendering);
+    }
 
     this.rotation = Math.atan2(this.direction.y, this.direction.x) * 180 / Math.PI;
   }

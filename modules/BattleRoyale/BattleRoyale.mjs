@@ -13,11 +13,12 @@ import Character from "./Objects/Character.mjs"
 import Projectile from "./Objects/Projectile.mjs"
 import objects from "./Objects/objects.mjs"
 import equipment from "./Objects/equipment.mjs"
-import Building from "./Buildings/Building.mjs";
-import Magic from "./Magic/Magic.mjs";
-import GenericObject from "./Objects/GenericObject.mjs";
-import AnimationEffect from "./Effects.js/AnimationEffect.mjs";
-import effects from "./Effects.js/effects.mjs";
+import Building from "./Buildings/Building.mjs"
+import Magic from "./Magic/Magic.mjs"
+import GenericObject from "./Objects/GenericObject.mjs"
+import AnimationEffect from "./Effects.js/AnimationEffect.mjs"
+import effects from "./Effects.js/effects.mjs"
+import attacks from "./Magic/attacks.mjs"
 
 //window.debug = true;
 
@@ -115,7 +116,7 @@ export default class BattleRoyale extends Game {
 
   updateObjects(objects) {
     for (const object of objects) {
-      object.simulation = false;
+      object.simulation = this.simulation;
       let existing = _.find(this.gameState.objects, {
         objectId: object.objectId,
         playerId: object.playerId
@@ -167,9 +168,9 @@ export default class BattleRoyale extends Game {
     if (params.release) {
       character.fireReady = true;
     } else if (character.fireReady) {
-      let attack = character.loadout.weapon.attacks[params.attackType];
-      character.attack(attack.attackTime, elapsedTime);
-      if (!attack.automatic) {
+      let attack = attacks[character.loadout.weapon.attacks[params.attackType]];
+      character.attack(attack.effect.attackTime, elapsedTime);
+      if (!attack.effect.automatic) {
         // TODO: something else here
         character.fireReady = false;
       }
@@ -177,11 +178,13 @@ export default class BattleRoyale extends Game {
       if (attack.type === "projectile") {
         this.gameState.objects.push(new Projectile({
           position: {
-            x: character.position.x + (character.width + 5) * direction.x,
-            y: character.position.y + (character.height + 5) * direction.y - 10,
+            x: character.position.x + (character.width + 5) * params.direction.x,
+            y: character.position.y + (character.height + 5) * params.direction.y - 10,
             z: character.position.z
           },
-          direction: direction,
+          simulation: this.simulation,
+          attack: attack,
+          direction: params.direction,
           playerId: params.source.playerId,
           ownerId: params.source.objectId,
           elapsedTime: elapsedTime
@@ -285,8 +288,7 @@ export default class BattleRoyale extends Game {
         type: "changeDirection",
         source: {
           playerId: this.player.playerId,
-          objectId: this.gameState.player.objectId,
-          revision: ++this.gameState.player.revision
+          objectId: this.gameState.player.objectId
         },
         direction: direction
       });
@@ -333,6 +335,9 @@ export default class BattleRoyale extends Game {
   }
 
   sendEvent(params) {
+    if (params.source) {
+      params.source.revision = ++this.gameState.player.revision;
+    }
     this.socket.emit("update", params);
   }
 
@@ -349,8 +354,7 @@ export default class BattleRoyale extends Game {
         type: "changeTarget",
         source: {
           playerId: this.player.playerId,
-          objectId: this.gameState.player.objectId,
-          revision: ++this.gameState.player.revision
+          objectId: this.gameState.player.objectId
         },
         target: target
       });
@@ -366,7 +370,7 @@ export default class BattleRoyale extends Game {
         if (collision.target instanceof Character) {
           collision.target.damage(collision.source);
           // TODO: add effect based on character
-          if (collision.target.damagedEffect) {
+          if (collision.target.damagedEffect && !this.simulation) {
             this.particleEngine.addEffect(new AnimationEffect({
               position: {
                 x: collision.target.center.x,
@@ -378,7 +382,7 @@ export default class BattleRoyale extends Game {
           // if (!character.dead && character.currentHealth <= 0) {
           //   character.kill();
           // }
-          if (!collision.source.projectile.punchThrough) {
+          if (!collision.source.attack.effect.punchThrough) {
             _.remove(this.gameState.objects, collision.source);
           }
         } else {
@@ -392,7 +396,7 @@ export default class BattleRoyale extends Game {
 
     for (const projectile of this.gameState.objects) {
       if (projectile instanceof Projectile &&
-          projectile.distanceTravelled >= projectile.projectile.effect.range) {
+          projectile.distanceTravelled >= projectile.attack.effect.range) {
         _.remove(this.gameState.objects, projectile);
       }
     }

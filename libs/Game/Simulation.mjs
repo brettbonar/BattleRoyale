@@ -22,6 +22,7 @@ export default class Simulation {
     };
     this.game = new BattleRoyale({
       isServer: true,
+      simulation: true,
       canvas: {
         width: 2048,
         height: 2048
@@ -75,7 +76,8 @@ export default class Simulation {
   updateState(data, elapsedTime) {
     let handler = this.eventHandlers[data.type];
     if (handler) {
-      handler(data, elapsedTime);
+      //handler(data, elapsedTime);
+      handler(data);
     } else {
       console.log("Unknown update: ", data.type);
       console.log(data);

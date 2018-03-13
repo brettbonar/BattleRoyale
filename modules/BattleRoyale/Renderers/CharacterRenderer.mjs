@@ -1,5 +1,11 @@
 const imageSize = 64;
 
+export const STATE = {
+  IDLE: "idle",
+  MOVING: "moving",
+  ATTACKING: "attacking",
+};
+
 const ANIMATIONS = {
   MOVE_UP: "movingUp",
   MOVE_LEFT: "movingLeft",
@@ -259,6 +265,7 @@ export default class CharacterRenderer {
       this.currentTime += elapsedTime;
       while (this.currentTime > 1000 / this.framesPerSec) {
         this.currentTime -= 1000 / this.framesPerSec;
+        console.log(this.frame);
         this.frame++;
         if (this.frame >= animationSettings.frames) {
           if (animationSettings.repeat) {

@@ -12,10 +12,12 @@ export default {
     effect: {
       damage: 10,
       range: 1000,
-      punchThrough: false
+      punchThrough: false,
+      speed: 512
     }
   },
   plasmaBall: {
+    type: "projectile",
     rendering: {
       imageSource: "../../Assets/magic/plasmaball.png",
       imageSize: 32,
@@ -25,10 +27,15 @@ export default {
     },
     effect: {
       damage: 10,
+      // TODO: more shapes
+      dimensions: {
+        radius: 5
+      },
       range: 1000,
       attackTime: 1000,
       automatic: false,
-      punchThrough: false
+      punchThrough: false,
+      speed: 512
     }
   }
 }

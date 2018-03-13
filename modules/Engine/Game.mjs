@@ -22,6 +22,7 @@ export default class Game {
       this.context = this.canvas.getContext("2d");
     }
     this.isServer = params.isServer;
+    this.simulation = params.simulation;
 
     this._settings = {
       requestPointerLock: params.requestPointerLock

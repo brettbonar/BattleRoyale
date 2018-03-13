@@ -1,5 +1,5 @@
 import GameObject from "../../Engine/GameObject/GameObject.mjs"
-import CharacterRenderer from "../Renderers/CharacterRenderer.mjs"
+import CharacterRenderer, { STATE } from "../Renderers/CharacterRenderer.mjs"
 import { SURFACE_TYPE } from "../../Engine/Physics/PhysicsConstants.mjs";
 
 export default class Character extends GameObject {
@@ -13,6 +13,7 @@ export default class Character extends GameObject {
       },
       type: "Character",
       characterDirection: "down",
+      state: STATE.IDLE,
       attacking: false,
       attackTime: 0,
       maxHealth: 100,
@@ -49,7 +50,7 @@ export default class Character extends GameObject {
     Object.assign(this.direction, direction);
     this.direction = this.normalize(this.direction);
     if (this.direction.x !== 0 || this.direction.y !== 0) {
-      this.renderer.animating = true;
+      this.state = STATE.MOVING;
     } else if (!this.attacking) {
       this.renderer.animating = false;
       this.renderer.frame = 0;
@@ -88,11 +89,11 @@ export default class Character extends GameObject {
     this.renderer.setAnimation(CharacterRenderer.ANIMATIONS.DEATH);
   }
 
-  attack(duration, attackTime) {
+  attack(duration, elapsedTime) {
     this.renderer.setAnimation(CharacterRenderer.WEAPON_ANIMATIONS[this.loadout.weapon.attackType][this.characterDirection], duration);
     this.renderer.animating = true;
     this.attacking = true;
-    this.attackTime = attackTime || 0;
+    this.attackTime = elapsedTime || 0;
     this.attackDuration = duration;
   }
 
