@@ -13,7 +13,6 @@ export default class Character extends GameObject {
       },
       type: "Character",
       characterDirection: "down",
-      state: STATE.IDLE,
       attacking: false,
       attackTime: 0,
       maxHealth: 100,
@@ -21,7 +20,8 @@ export default class Character extends GameObject {
       currentHealth: 100,
       currentMana: 100,
       hasHealth: true,
-      hasMana: true
+      hasMana: true,
+      attackDuration: 1000
     });
     
     this.physics.surfaceType = "character";
@@ -42,19 +42,12 @@ export default class Character extends GameObject {
         loadout: params.loadout,
         isOtherPlayer: this.isOtherPlayer
       });
-      this.renderer.setAnimation(CharacterRenderer.ANIMATIONS.MOVE_DOWN);
     }
   }
 
   setDirection(direction) {
     Object.assign(this.direction, direction);
     this.direction = this.normalize(this.direction);
-    if (this.direction.x !== 0 || this.direction.y !== 0) {
-      this.state = STATE.MOVING;
-    } else if (!this.attacking) {
-      this.renderer.animating = false;
-      this.renderer.frame = 0;
-    }
   }
 
   get center() {
@@ -84,17 +77,12 @@ export default class Character extends GameObject {
   kill(source) {
     this.dead = true;
     this.physics.surfaceType = SURFACE_TYPE.NONE;
-    this.renderer.dead = true;
-    this.renderer.animating = true;
-    this.renderer.setAnimation(CharacterRenderer.ANIMATIONS.DEATH);
   }
 
   attack(duration, elapsedTime) {
-    this.renderer.setAnimation(CharacterRenderer.WEAPON_ANIMATIONS[this.loadout.weapon.attackType][this.characterDirection], duration);
-    this.renderer.animating = true;
     this.attacking = true;
     this.attackTime = elapsedTime || 0;
-    this.attackDuration = duration;
+    //this.attackDuration = duration;
   }
 
   setTarget(target) {
@@ -105,51 +93,52 @@ export default class Character extends GameObject {
     });
 
     if (target.x < center.x && Math.abs(direction.x) >= Math.abs(direction.y)) {
-      if (!this.attacking) {
-        this.renderer.setAnimation(CharacterRenderer.ANIMATIONS.MOVE_LEFT);
-      }
       this.characterDirection = "left";
     } else if (target.x > center.x && Math.abs(direction.x) >= Math.abs(direction.y)) {
-      if (!this.attacking) {
-        this.renderer.setAnimation(CharacterRenderer.ANIMATIONS.MOVE_RIGHT);
-      }
       this.characterDirection = "right";
     } else if (target.y > center.y && Math.abs(direction.y) >= Math.abs(direction.x)) {
-      if (!this.attacking) {
-        this.renderer.setAnimation(CharacterRenderer.ANIMATIONS.MOVE_DOWN);
-      }
       this.characterDirection = "down";
     } else if (target.y < center.y && Math.abs(direction.y) >= Math.abs(direction.x)) {
-      if (!this.attacking) {
-        this.renderer.setAnimation(CharacterRenderer.ANIMATIONS.MOVE_UP);
-      }
       this.characterDirection = "up";
     }
   }
 
   update(elapsedTime) {
-    this.renderer.update(elapsedTime);
+    this.renderer.update(elapsedTime + this.elapsedTime, this);
     if (this.attacking) {
-      this.attackTime += elapsedTime;
+      this.attackTime += elapsedTime + this.elapsedTime;
       if (this.attackTime >= this.attackDuration) {
         this.attackTime = 0;
         this.attacking = false;
-        this.renderer.frame = 0;
-        if (this.direction.x == 0 && this.direction.y == 0) {
-          this.renderer.animating = false;
-        }
-        this.renderer.setAnimation(CharacterRenderer.MOVE_ANIMATIONS[this.characterDirection]);
       }
     }
+
+    this.elapsedTime = 0;
   }
 
   updateState(state) {
-    _.merge(this, state);
+    _.merge(this, _.omit(state, "renderer"));
     if (state.target) {
       this.setTarget(state.target);
     }
     if (state.direction) {
       this.setDirection(state.direction);
     }
+  }
+
+  getUpdateState() {
+    return Object.assign(super.getUpdateState(), _.pick(this, [
+      "attacking",
+      //"attackTime",
+      "characterDirection",
+      "maxHealth",
+      "maxMana",
+      "currentHealth",
+      "currentMana",
+      "hasHealth",
+      "hasMana",
+      "attackDuration",
+      "dead"
+    ]));
   }
 }

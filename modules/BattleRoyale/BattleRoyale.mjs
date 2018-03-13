@@ -16,8 +16,8 @@ import equipment from "./Objects/equipment.mjs"
 import Building from "./Buildings/Building.mjs"
 import Magic from "./Magic/Magic.mjs"
 import GenericObject from "./Objects/GenericObject.mjs"
-import AnimationEffect from "./Effects.js/AnimationEffect.mjs"
-import effects from "./Effects.js/effects.mjs"
+import AnimationEffect from "./Effects/AnimationEffect.mjs"
+import effects from "./Effects/effects.mjs"
 import attacks from "./Magic/attacks.mjs"
 
 //window.debug = true;
@@ -101,6 +101,8 @@ export default class BattleRoyale extends Game {
       let character = new Character(object);
       if (character.playerId === this.player.playerId) {
         this.gameState.player = character;
+      } else if (character.isPlayer) {
+        character.isOtherPlayer = true;
       }
       return character;
     } else if (object.type === "Building") {
@@ -175,20 +177,22 @@ export default class BattleRoyale extends Game {
         character.fireReady = false;
       }
 
-      if (attack.type === "projectile") {
-        this.gameState.objects.push(new Projectile({
-          position: {
-            x: character.position.x + (character.width + 5) * params.direction.x,
-            y: character.position.y + (character.height + 5) * params.direction.y - 10,
-            z: character.position.z
-          },
-          simulation: this.simulation,
-          attack: attack,
-          direction: params.direction,
-          playerId: params.source.playerId,
-          ownerId: params.source.objectId,
-          elapsedTime: elapsedTime
-        }));
+      if (this.simulation) {
+        if (attack.type === "projectile") {
+          this.gameState.objects.push(new Projectile({
+            position: {
+              x: character.position.x + (character.width + 5) * params.direction.x,
+              y: character.position.y + (character.height + 5) * params.direction.y - 10,
+              z: character.position.z
+            },
+            simulation: this.simulation,
+            attack: attack,
+            direction: params.direction,
+            playerId: params.source.playerId,
+            ownerId: params.source.objectId,
+            elapsedTime: elapsedTime
+          }));
+        }
       }
     }
   }
@@ -348,7 +352,6 @@ export default class BattleRoyale extends Game {
         y: this.gameState.cursor.position.y + (this.gameState.player.position.y - this.canvas.height / 2)
       };
       this.gameState.player.setTarget(target);
-      this.gameState.player.update(elapsedTime);
 
       this.sendEvent({
         type: "changeTarget",

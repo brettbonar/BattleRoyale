@@ -34,9 +34,10 @@ export default class GameObject {
       },
       revision: 0,
       renderer: new Renderer(),
-      objectId: objectId++,
+      objectId: objectId,
       ownerId: objectId,
-      playerId: 0
+      playerId: 0,
+      elapsedTime: 0
     });
     _.defaultsDeep(this, {
       physics: {
@@ -58,6 +59,7 @@ export default class GameObject {
     }
 
     this.normalizeDirection();
+    objectId++;
   }
 
   getDimensionsType(dimensions) {
@@ -314,6 +316,22 @@ export default class GameObject {
     } else if (type === Bounds.TYPE.LINE) {
       // TODO: some calculation
     }
+  }
+  
+  getUpdateState() {
+    return _.pick(this, [
+      "type",
+      "dimensions",
+      "visible",
+      "direction",
+      "position",
+      "revision",
+      "objectId",
+      "ownerId",
+      "playerId",
+      "elapsedTime",
+      "physics"
+    ]);
   }
 
   updateState(object) {

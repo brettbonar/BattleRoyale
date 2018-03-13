@@ -43,4 +43,10 @@ export default class Projectile extends GameObject {
   update(elapsedTime) {
     this.renderer.update(elapsedTime);
   }
+
+  getUpdateState() {
+    return Object.assign(super.getUpdateState(), _.pick(this, [
+      "attack"
+    ]));
+  }
 }

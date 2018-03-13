@@ -5,7 +5,7 @@ import Map from "../../modules/Map.mjs"
 import Projectile from "../../modules/BattleRoyale/Objects/Projectile.mjs"
 import now from "performance-now"
 
-const TICK_RATE = 65;
+const TICK_RATE = 10;
 const SIMULATION_TIME = 1000 / 65;
 
 export default class Simulation {
@@ -46,7 +46,7 @@ export default class Simulation {
     if (object) {
       object.target = data.target;
       object.revision = data.source.revision;
-      object.elapsedTime = elapsedTime;
+      object.elapsedTime = elapsedTime || 0;
     }
   }
 
@@ -58,7 +58,7 @@ export default class Simulation {
     if (object) {
       object.direction = data.direction;
       object.revision = data.source.revision;
-      object.elapsedTime = elapsedTime;
+      object.elapsedTime = elapsedTime || 0;
     }
   }
 
@@ -95,7 +95,7 @@ export default class Simulation {
     this.game._update(elapsedTime);
     
     for (const player of this.players) {
-      player.socket.emit("update", this.game.gameState.objects);
+      player.socket.emit("update", this.game.gameState.objects.map((obj) => obj.getUpdateState()));
     }
   }
 

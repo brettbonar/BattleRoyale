@@ -10,8 +10,8 @@ import equipment from "../../modules/BattleRoyale/Objects/equipment.mjs"
 import Building from "../../modules/BattleRoyale/Buildings/Building.mjs";
 import Magic from "../../modules/BattleRoyale/Magic/Magic.mjs";
 import GenericObject from "../../modules/BattleRoyale/Objects/GenericObject.mjs";
-import AnimationEffect from "../../modules/BattleRoyale/Effects.js/AnimationEffect.mjs";
-import effects from "../../modules/BattleRoyale/Effects.js/effects.mjs";
+import AnimationEffect from "../../modules/BattleRoyale/Effects/AnimationEffect.mjs";
+import effects from "../../modules/BattleRoyale/Effects/effects.mjs";
 
 function initGame(players, maps) {
   let objects = [
@@ -49,7 +49,6 @@ function initGame(players, maps) {
         feet: equipment.brownShoesMale,
         hands: equipment.leatherBracersMale
       },
-      isOtherPlayer: true,
       fireReady: true,
       position: {
         x: 550,

@@ -4,6 +4,7 @@ export const STATE = {
   IDLE: "idle",
   MOVING: "moving",
   ATTACKING: "attacking",
+  DEAD: "dead"
 };
 
 const ANIMATIONS = {
@@ -91,8 +92,8 @@ const ANIMATION_SETTINGS = {
     },
     frames: 8,
     cycleStart: 0,
-    framesPerSec: 4,
-    repeat: true
+    framesPerSec: 8,
+    repeat: false
   },
   [ANIMATIONS.ATTACK_THRUST_LEFT]: {
     offset: {
@@ -101,8 +102,8 @@ const ANIMATION_SETTINGS = {
     },
     frames: 8,
     cycleStart: 0,
-    framesPerSec: 4,
-    repeat: true
+    framesPerSec: 8,
+    repeat: false
   },
   [ANIMATIONS.ATTACK_THRUST_DOWN]: {
     offset: {
@@ -111,8 +112,8 @@ const ANIMATION_SETTINGS = {
     },
     frames: 8,
     cycleStart: 0,
-    framesPerSec: 4,
-    repeat: true
+    framesPerSec: 8,
+    repeat: false
   },
   [ANIMATIONS.ATTACK_THRUST_RIGHT]: {
     offset: {
@@ -121,8 +122,8 @@ const ANIMATION_SETTINGS = {
     },
     frames: 8,
     cycleStart: 0,
-    framesPerSec: 4,
-    repeat: true
+    framesPerSec: 8,
+    repeat: false
   }
 };
 
@@ -148,6 +149,7 @@ export default class CharacterRenderer {
     Object.assign(this, params);
 
     this.animation = ANIMATIONS.MOVE_DOWN;
+    this.prevAnimation = ANIMATIONS.MOVE_DOWN;
     this.frame = 0;
     this.currentTime = 0;
     this.framesPerSec = 0;
@@ -196,19 +198,6 @@ export default class CharacterRenderer {
     }
   }
 
-  setAnimation(animation, time) {
-    if (this.animation !== animation) {
-      this.animation = animation;
-      this.frame = 0;
-      this.currentTime = 0;
-      if (time) {
-        this.framesPerSec = ANIMATION_SETTINGS[animation].frames / (time / 1000);
-      } else {
-        this.framesPerSec = ANIMATION_SETTINGS[animation].framesPerSec;
-      }
-    }
-  }
-
   drawLoadout(context, object) {
     let loadout = _.sortBy(this.loadout, (item) => {
       let order = LOADOUT_ORDER[item.type];
@@ -242,7 +231,7 @@ export default class CharacterRenderer {
       pos.x, pos.y, imageSize, imageSize);
     this.drawLoadout(context, object);
 
-    if (!this.dead && !this.isOtherPlayer) {
+    if (this.state !== STATE.DEAD && !object.isOtherPlayer) {
       CharacterRenderer.drawStatusBars(context, object);
     }
 
@@ -259,13 +248,44 @@ export default class CharacterRenderer {
 
   render() {}
 
-  update(elapsedTime) {
-    if (this.animating) {
+  setAnimation(object) {
+    let animationTime = 0;
+    this.prevAnimation = this.animation;
+    this.prevState = this.state;
+    if (object.dead) {
+      this.state = STATE.DEAD;
+      this.animation = ANIMATIONS.DEATH;
+    } else if (object.attacking) {
+      this.state = STATE.ATTACKING;
+      this.animation = WEAPON_ANIMATIONS[object.loadout.weapon.attackType][object.characterDirection];
+      animationTime = object.attackDuration;
+    } else if (object.direction.x || object.direction.y) {
+      this.state = STATE.MOVING;
+      this.animation = MOVE_ANIMATIONS[object.characterDirection];
+    } else {
+      this.state = STATE.IDLE;
+      this.animation = MOVE_ANIMATIONS[object.characterDirection];
+    }    
+
+    if (this.state !== this.prevState) {
+      this.frame = 0;
+      this.currentTime = 0;
+      this.framesPerSec = ANIMATION_SETTINGS[this.animation].framesPerSec;
+      // if (time) {
+      //   this.framesPerSec = ANIMATION_SETTINGS[animation].frames / (time / 1000);
+      // } else {
+      //   this.framesPerSec = ANIMATION_SETTINGS[animation].framesPerSec;
+      // }
+    }
+  }
+
+  update(elapsedTime, object) {
+    this.setAnimation(object);
+    if (this.state !== STATE.IDLE) {
       let animationSettings = ANIMATION_SETTINGS[this.animation];
       this.currentTime += elapsedTime;
-      while (this.currentTime > 1000 / this.framesPerSec) {
+      while (this.currentTime >= 1000 / this.framesPerSec) {
         this.currentTime -= 1000 / this.framesPerSec;
-        console.log(this.frame);
         this.frame++;
         if (this.frame >= animationSettings.frames) {
           if (animationSettings.repeat) {
