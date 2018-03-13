@@ -7,6 +7,7 @@ import PhysicsEngine from "../Engine/Physics/PhysicsEngine.mjs"
 import PerspectiveRenderingEngine from "../Engine/Rendering/PerspectiveRenderingEngine.mjs"
 import ParticleEngine from "../Engine/Effects/ParticleEngine.mjs"
 import { MOVEMENT_TYPE } from "../Engine/Physics/PhysicsConstants.mjs"
+import { getDistance } from "../util.mjs"
 
 import ObjectRenderer from "./Renderers/ObjectRenderer.mjs"
 import Character from "./Objects/Character.mjs"
@@ -315,6 +316,17 @@ export default class BattleRoyale extends Game {
     //   .concat(this.gameState.projectiles);
   }
 
+  renderInteractions() {
+    if (this.interaction) {
+      this.context.save();
+      this.context.fillStyle = "green";
+      this.context.fillRect(this.interaction.center.x - 8,
+        this.interaction.position.y - this.interaction.height - 20, 
+        16, 16);
+      this.context.restore();
+    }
+  }
+
   _render(elapsedTime) {
     this.context.save();
     this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
@@ -323,8 +335,16 @@ export default class BattleRoyale extends Game {
     if (this.maps[this.gameState.player.position.z]) {
       this.maps[this.gameState.player.position.z].render(this.context, this.gameState.player.position);
     }
+
+    this.context.save();
+    // Translate to player position
+    this.context.translate(-(this.gameState.player.position.x - this.context.canvas.width / 2),
+    -(this.gameState.player.position.y - this.context.canvas.height / 2));
+
     this.renderingEngine.render(this.getRenderObjects(), elapsedTime, this.gameState.player.position);
     this.particleEngine.render(elapsedTime, this.gameState.player.position);
+    this.renderInteractions();
+    this.context.restore();
 
     // TODO: put somewhere else
     // Render cursor
@@ -345,7 +365,20 @@ export default class BattleRoyale extends Game {
     this.socket.emit("update", params);
   }
 
+  showInteractions() {
+    // TODO: put this in GameObject? Some other Interface?
+    let interactions = _.filter(this.gameState.objects, (obj) => {
+      return obj.interactionsBoundingBox.some((box) => box.intersects(this.gameState.player.boundingBox));
+    });
+    this.interaction = _.minBy(interactions, (interaction) => {
+      // TODO: may want to consider interaction dimensions offset
+      return getDistance(this.gameState.player.position, interaction.position);
+    });
+  }
+
   _update(elapsedTime) {
+    // TODO: do this at end -- for some reason setTarget has to be up here
+    // CLIENT ONLY
     if (!this.isServer) {
       let target = {
         x: this.gameState.cursor.position.x + (this.gameState.player.position.x - this.canvas.width / 2),
@@ -361,6 +394,7 @@ export default class BattleRoyale extends Game {
         },
         target: target
       });
+      this.showInteractions();
     }
 
     for (const obj of this.getPhysicsObjects()) {

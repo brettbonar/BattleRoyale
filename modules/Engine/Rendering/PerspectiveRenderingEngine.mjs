@@ -10,9 +10,9 @@ export default class PerspectiveRenderingEngine extends RenderingEngine{
   // Render highest to lowest y
   render(objects, elapsedTime, center) {
     this.context.save();
-    if (center) {
-      this.context.translate(-(center.x - this.context.canvas.width / 2), -(center.y - this.context.canvas.height / 2));
-    }
+    // if (center) {
+    //   this.context.translate(-(center.x - this.context.canvas.width / 2), -(center.y - this.context.canvas.height / 2));
+    // }
 
     let renderObjects = this.getRenderObjects(objects, center);
     for (const object of renderObjects) {
@@ -94,7 +94,7 @@ export default class PerspectiveRenderingEngine extends RenderingEngine{
             lines.push([point, centerPoint]);
 
             if (window.debug) {
-            // DEBUG
+              // DEBUG
               this.context.beginPath();
               this.context.moveTo(point.x, point.y);
               this.context.lineTo(centerPoint.x, centerPoint.y);

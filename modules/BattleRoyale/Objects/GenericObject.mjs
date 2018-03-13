@@ -1,10 +1,12 @@
-import GameObject from "../../Engine/GameObject/GameObject.mjs";
+import GameObject from "../../Engine/GameObject/GameObject.mjs"
 import ObjectRenderer from "../Renderers/ObjectRenderer.mjs"
-import { SURFACE_TYPE } from "../../Engine/Physics/PhysicsConstants.mjs";
+import objects from "./objects.mjs"
+import { SURFACE_TYPE } from "../../Engine/Physics/PhysicsConstants.mjs"
 
 export default class GenericObject extends GameObject {
-  constructor(params, object) {
+  constructor(params) {
     super(params);
+    let object = objects[params.objectType];
     Object.assign(this, object);
     this.type = "GenericObject";
 
@@ -33,5 +35,11 @@ export default class GenericObject extends GameObject {
 
   getAllRenderObjects() {
     return this.parts || this;
+  }
+
+  getUpdateState() {
+    return Object.assign(super.getUpdateState(), _.pick(this, [
+      "objectType"
+    ]));
   }
 }

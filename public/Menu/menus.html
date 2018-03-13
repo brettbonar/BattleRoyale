@@ -1,16 +1,16 @@
-<gui-menu gui-start class="menu" id="CREATE_PLAYER" gui-on-show="showCharacterCreation()">
-    <h1 class="title">Create Character</h1>
-    <div class="sub-menu controls">
-      <label for="character-name">Name</label>
-      <input id="character-name" class="form-input" />
-    </div>
-    <hr />
-    <div class="bottom-menu">
-      <button class="control float-right" gui-click="createCharacter()">Done</button>
-    </div>
-  </gui-menu>
+<!-- <gui-menu gui-start class="menu" id="CREATE_PLAYER" gui-on-show="showCharacterCreation()">
+  <h1 class="title">Create Character</h1>
+  <div class="sub-menu controls">
+    <label for="character-name">Name</label>
+    <input id="character-name" class="form-input" />
+  </div>
+  <hr />
+  <div class="bottom-menu">
+    <button class="control float-right" gui-click="createCharacter()">Done</button>
+  </div>
+</gui-menu> -->
 
-<gui-menu class="menu" id="MAIN" gui-on-show="returnToMain()">
+<gui-menu class="menu" gui-start id="MAIN" gui-on-show="returnToMain()">
   <h1 class="title">Battle Royale</h1>
   <div class="sub-menu controls">
     <button class="control" gui-click="menus.transition('JOIN_GAME')">Join Game</button>

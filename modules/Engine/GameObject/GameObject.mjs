@@ -209,6 +209,7 @@ export default class GameObject {
         });
       });
     }
+    return [];
 
     // if (this.bounds) {
     //   return this.bounds.map((bounds) => {
@@ -222,6 +223,13 @@ export default class GameObject {
     // }
     // return [this.boundingBox];
   }
+  get getLastInteractionsBoundingBox() {
+    return this.getAllBounds(this.lastPosition, this.interactionDimensions);
+  }
+
+  get interactionsBoundingBox() {
+    return this.getAllBounds(this.position, this.interactionDimensions);
+  }
   
   get lastTerrainBoundingBox() {
     return this.getAllBounds(this.lastPosition, this.terrainDimensions) || [this.boundingBox];
@@ -232,11 +240,11 @@ export default class GameObject {
   }
   
   get lastLosBoundingBox() {
-    return this.getAllBounds(this.lastPosition, this.losDimensions) || [];
+    return this.getAllBounds(this.lastPosition, this.losDimensions);
   }
 
   get losBoundingBox() {
-    return this.getAllBounds(this.position, this.losDimensions) || [];
+    return this.getAllBounds(this.position, this.losDimensions);
   }
 
   get lastHitbox() {

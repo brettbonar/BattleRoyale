@@ -95,6 +95,31 @@ function initGame(players, maps) {
     );
     pos += 100;
   }
+
+  objects.push(new GenericObject({
+    position: {
+      x: 255,
+      y: 500
+    },
+    objectType: "healthPotion",
+    simulation: true
+  }));
+  objects.push(new GenericObject({
+    position: {
+      x: 255,
+      y: 510
+    },
+    objectType: "healthPotion",
+    simulation: true
+  }));
+  objects.push(new GenericObject({
+    position: {
+      x: 265,
+      y: 505
+    },
+    objectType: "healthPotion",
+    simulation: true
+  }));
   
   // for (let i = 0; i < 10; i++) {
   //   //let type = _.sample(_.filter(objects, { biome: "plain" }));

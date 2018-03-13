@@ -17,6 +17,7 @@ class GameController {
     this.socket = io();
     this.socket.on("id", (id) => {
       this.player.playerId = id;
+      this.player.playerName = id;
     });
     this.socket.on("pingpong", () => {
       this.socket.emit("pingpong");
