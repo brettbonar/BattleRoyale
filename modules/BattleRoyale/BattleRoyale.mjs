@@ -29,8 +29,11 @@ const EVENTS = {
   MOVE_LEFT: "moveLeft",
   MOVE_RIGHT: "moveRight",
   PRIMARY_FIRE: "primaryFire",
-  SECONDARY_FIRE: "secondaryFire"
+  SECONDARY_FIRE: "secondaryFire",
+  USE: "use"
 }
+
+let sequenceNumber = 1;
 
 export default class BattleRoyale extends Game {
   constructor(params) {
@@ -66,6 +69,7 @@ export default class BattleRoyale extends Game {
     this.keyBindings[KEY_CODE.S] = EVENTS.MOVE_DOWN;
     this.keyBindings[KEY_CODE.A] = EVENTS.MOVE_LEFT;
     this.keyBindings[KEY_CODE.D] = EVENTS.MOVE_RIGHT;
+    this.keyBindings[KEY_CODE.E] = EVENTS.USE;
     this.keyBindings["leftClick"] = EVENTS.PRIMARY_FIRE;
     this.keyBindings["rightClick"] = EVENTS.SECONDARY_FIRE;
     this.activeEvents = [];
@@ -80,6 +84,7 @@ export default class BattleRoyale extends Game {
     this.addEventHandler(EVENTS.MOVE_RIGHT, (event) => this.move(event));
     this.addEventHandler(EVENTS.PRIMARY_FIRE, (event) => this.attack(event, 1));
     this.addEventHandler(EVENTS.SECONDARY_FIRE, (event) => this.attack(event, 2));
+    this.addEventHandler(EVENTS.USE, (event) => this.use(event));
 
     this.stateFunctions[Game.STATE.PLAYING].update = (elapsedTime) => this._update(elapsedTime);
     this.stateFunctions[Game.STATE.PLAYING].render = (elapsedTime) => this._render(elapsedTime);
@@ -196,6 +201,16 @@ export default class BattleRoyale extends Game {
         }
       }
     }
+  }
+
+  use(event) {
+    this.sendEvent({
+      type: "use",
+      source = {
+        playerId: this.player.playerId,
+        objectId: this.gameState.player.objectId
+      }
+    });
   }
 
   attack(event, attackType) {
@@ -356,6 +371,16 @@ export default class BattleRoyale extends Game {
     this.context.stroke();
 
     this.context.restore();
+  }
+
+  getInteraction(target) {
+    let interactions = _.filter(this.gameState.objects, (obj) => {
+      return obj.interactionsBoundingBox.some((box) => box.intersects(target.boundingBox));
+    });
+    return _.minBy(interactions, (interaction) => {
+      // TODO: may want to consider interaction dimensions offset
+      return getDistance(target.position, interaction.position);
+    });
   }
 
   sendEvent(params) {

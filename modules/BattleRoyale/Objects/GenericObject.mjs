@@ -1,6 +1,7 @@
 import GameObject from "../../Engine/GameObject/GameObject.mjs"
 import ObjectRenderer from "../Renderers/ObjectRenderer.mjs"
 import objects from "./objects.mjs"
+import items from "./items.mjs"
 import { SURFACE_TYPE } from "../../Engine/Physics/PhysicsConstants.mjs"
 
 export default class GenericObject extends GameObject {
@@ -20,6 +21,19 @@ export default class GenericObject extends GameObject {
         piece.physics.surfaceType = SURFACE_TYPE.NONE;
         return piece;
       });
+    }
+
+    if (object.type === "item") {
+      this.interact = (target) => {
+        if (!target.items) {
+          target.items = {};
+        }
+        if (!target.items[object.itemType]) {
+          target.items[object.itemType] = 0;
+        }
+        target.items[object.itemType]++;
+        this.done = true;
+      };
     }
   }
 

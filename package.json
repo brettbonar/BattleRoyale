@@ -1,5 +1,5 @@
 {
-  "name": "breakout",
+  "name": "battleRoyale",
   "version": "1.0.0",
   "description": "",
   "main": "app.mjs",
@@ -22,6 +22,7 @@
     "babel-register": "^6.26.0"
   },
   "scripts": {
+    "start": "node --experimental-modules ./app.mjs",
     "build-modules": "node buildModules.js",
     "build": "babel node_modules -d lib",
     "test": "echo \"Error: no test specified\" && exit 1"

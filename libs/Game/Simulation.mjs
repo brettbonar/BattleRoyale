@@ -34,8 +34,22 @@ export default class Simulation {
     this.eventHandlers = {
       changeDirection: (data, elapsedTime) => this.changeDirection(data, elapsedTime),
       changeTarget: (data, elapsedTime) => this.changeTarget(data, elapsedTime),
-      attack: (data, elapsedTime) => this.attack(data, elapsedTime)
+      attack: (data, elapsedTime) => this.attack(data, elapsedTime),
+      use: (data, elapsedTime) => this.use(data, elapsedTime)
     };
+  }
+
+  use(data, elapsedTime) {
+    let object = _.find(this.game.gameState.objects, {
+      playerId: data.source.playerId,
+      objectId: data.source.objectId
+    });
+    if (object) {
+      let target = this.game.getInteraction(object);
+      if (target) {
+        target.interact(object);
+      }
+    }
   }
 
   changeTarget(data, elapsedTime) {

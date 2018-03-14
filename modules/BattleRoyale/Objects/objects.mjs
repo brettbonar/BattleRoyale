@@ -867,6 +867,8 @@ export default {
     ]
   },
   healthPotion: {
+    type: "item",
+    itemType: "healthPotion",
     biome: "any",
     imageSource: "../../Assets/items/items.png",
     imageDimensions: {
