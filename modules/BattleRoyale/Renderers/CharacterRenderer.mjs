@@ -16,6 +16,10 @@ const ANIMATIONS = {
   ATTACK_THRUST_LEFT: "attackThrustLeft",
   ATTACK_THRUST_DOWN: "attackThrustDown",
   ATTACK_THRUST_RIGHT: "attackThrustRight",
+  ATTACK_SLASH_UP: "attackSLASHUp",
+  ATTACK_SLASH_LEFT: "attackSLASHLeft",
+  ATTACK_SLASH_DOWN: "attackSLASHDown",
+  ATTACK_SLASH_RIGHT: "attackSLASHRight",
   DEATH: "death"
 };
 
@@ -25,6 +29,12 @@ const WEAPON_ANIMATIONS = {
     left: ANIMATIONS.ATTACK_THRUST_LEFT,
     down: ANIMATIONS.ATTACK_THRUST_DOWN,
     right: ANIMATIONS.ATTACK_THRUST_RIGHT
+  },
+  slash: {
+    up: ANIMATIONS.ATTACK_SLASH_UP,
+    left: ANIMATIONS.ATTACK_SLASH_LEFT,
+    down: ANIMATIONS.ATTACK_SLASH_DOWN,
+    right: ANIMATIONS.ATTACK_SLASH_RIGHT
   }
 };
 
@@ -121,6 +131,46 @@ const ANIMATION_SETTINGS = {
       y: 7
     },
     frames: 8,
+    cycleStart: 0,
+    framesPerSec: 16,
+    repeat: false
+  },
+  [ANIMATIONS.ATTACK_SLASH_UP]: {
+    offset: {
+      x: 0,
+      y: 12
+    },
+    frames: 6,
+    cycleStart: 0,
+    framesPerSec: 16,
+    repeat: false
+  },
+  [ANIMATIONS.ATTACK_SLASH_LEFT]: {
+    offset: {
+      x: 0,
+      y: 13
+    },
+    frames: 6,
+    cycleStart: 0,
+    framesPerSec: 16,
+    repeat: false
+  },
+  [ANIMATIONS.ATTACK_SLASH_DOWN]: {
+    offset: {
+      x: 0,
+      y: 14
+    },
+    frames: 6,
+    cycleStart: 0,
+    framesPerSec: 16,
+    repeat: false
+  },
+  [ANIMATIONS.ATTACK_SLASH_RIGHT]: {
+    offset: {
+      x: 0,
+      y: 15
+    },
+    frames: 6,
     cycleStart: 0,
     framesPerSec: 16,
     repeat: false

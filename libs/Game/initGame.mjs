@@ -22,7 +22,7 @@ function initGame(players, maps) {
       simulation: true,
       damagedEffect: effects.blood,
       loadout: {
-        weapon: equipment.spear,
+        weapon: equipment.axe,
         torso: equipment.leatherChestMale,
         legs: equipment.tealPantsMale,
         head: equipment.clothHoodMale,
@@ -43,7 +43,7 @@ function initGame(players, maps) {
       simulation: true,
       damagedEffect: effects.blood,
       loadout: {
-        weapon: equipment.spear,
+        weapon: equipment.axe,
         torso: equipment.leatherChestMale,
         legs: equipment.tealPantsMale,
         head: equipment.clothHoodMale,
@@ -79,7 +79,7 @@ function initGame(players, maps) {
         simulation: true,
         damagedEffect: effects.blood,
         loadout: {
-          weapon: equipment.spear,
+          weapon: equipment.spearMale,
           torso: equipment.leatherChestMale,
           legs: equipment.tealPantsMale,
           head: equipment.clothHoodMale,

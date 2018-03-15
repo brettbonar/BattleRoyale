@@ -26,18 +26,54 @@ export default {
     hands: 2,
     gender: "either"
   },
-  spear: {
-    imageSource: "/Assets/character/weapons/both hand/spear.png",
+  spearFemale: {
+    imageSource: "/Assets/character/weapons/right hand/female/spear_female.png",
     imageSize: 64,
     type: "weapon",
     attackType: "thrust",
-    hands: 2,
+    hands: 1,
+    gender: "female",
+    attacks: {
+      1: "plasmaBall",
+      2: "lightningclaw"
+    }
+  },
+  spearMale: {
+    imageSource: "/Assets/character/weapons/right hand/male/spear_male.png",
+    imageSize: 64,
+    type: "weapon",
+    attackType: "thrust",
+    hands: 1,
+    gender: "male",
+    attacks: {
+      1: "plasmaBall",
+      2: "lightningclaw"
+    }
+  },
+  axe: {
+    imageSource: "/Assets/character/weapons/right hand/either/axe.png",
+    imageSize: 64,
+    type: "weapon",
+    attackType: "slash",
+    hands: 1,
     gender: "either",
     attacks: {
       1: "plasmaBall",
       2: "lightningclaw"
     }
   },
+  // spear: {
+  //   imageSource: "/Assets/character/weapons/both hand/spear.png",
+  //   imageSize: 64,
+  //   type: "weapon",
+  //   attackType: "thrust",
+  //   hands: 2,
+  //   gender: "either",
+  //   attacks: {
+  //     1: "plasmaBall",
+  //     2: "lightningclaw"
+  //   }
+  // },
   leatherChestMale: {
     imageSource: "/Assets/character/torso/leather/chest_male.png",
     imageSize: 64,
