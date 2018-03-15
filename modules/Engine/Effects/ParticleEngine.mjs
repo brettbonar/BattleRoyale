@@ -1,6 +1,6 @@
 export default class EffectsEngine {
   constructor(params) {
-    Object.assign(this, params);
+    _.merge(this, params);
     this.effects = [];
   }
 

@@ -64,7 +64,7 @@ const STATUS = {
 
 class Game {
   constructor(params) {
-    Object.assign(this, params);
+    _.merge(this, params);
 
     this.gameId = gameId++;
     this.players = [];
@@ -72,6 +72,7 @@ class Game {
 
     _.defaults(this, {
       maxPlayers: 96,
+      startPlayers: 2,
       status: STATUS.LOBBY
     });
   }
@@ -105,13 +106,13 @@ class Game {
 
       player.socket.on("initialized", () => {
         player.initialized = true;
-        if (_.sumBy(this.players, "initialized") > 0) {
+        if (_.sumBy(this.players, "initialized") >= this.startPlayers) {
           console.log("Starting");
           this.start();
         }
       });
 
-      if (_.sumBy(this.players, "ready") > 0) {
+      if (_.sumBy(this.players, "ready") >= this.startPlayers) {
         console.log("Initializing");
         this.initialize();
       }

@@ -12,15 +12,19 @@ export default class Character extends GameObject {
         y: 0
       },
       type: "Character",
-      characterDirection: "down",
-      attacking: false,
-      attackTime: 0,
-      maxHealth: 100,
-      maxMana: 100,
-      currentHealth: 100,
-      currentMana: 100,
-      hasHealth: true,
-      hasMana: true,
+      state: {
+        inventory: [],
+        loadout: params.loadout,
+        characterDirection: "down",
+        attacking: false,
+        attackTime: 0,
+        maxHealth: 100,
+        maxMana: 100,
+        currentHealth: 100,
+        currentMana: 100,
+        hasHealth: true,
+        hasMana: true
+      },
       attackDuration: 1000
     });
     
@@ -68,20 +72,20 @@ export default class Character extends GameObject {
   }
 
   damage(source) {
-    this.currentHealth -= source.effect.damage;
-    if (!this.dead && this.currentHealth <= 0) {
+    this.state.currentHealth -= source.effect.damage;
+    if (!this.state.dead && this.state.currentHealth <= 0) {
       this.kill(source);
     }
   }
 
   kill(source) {
-    this.dead = true;
+    this.state.dead = true;
     this.physics.surfaceType = SURFACE_TYPE.NONE;
   }
 
   attack(duration, elapsedTime) {
-    this.attacking = true;
-    this.attackTime = elapsedTime || 0;
+    this.state.attacking = true;
+    this.state.attackTime = elapsedTime || 0;
     //this.attackDuration = duration;
   }
 
@@ -93,23 +97,23 @@ export default class Character extends GameObject {
     });
 
     if (target.x < center.x && Math.abs(direction.x) >= Math.abs(direction.y)) {
-      this.characterDirection = "left";
+      this.state.characterDirection = "left";
     } else if (target.x > center.x && Math.abs(direction.x) >= Math.abs(direction.y)) {
-      this.characterDirection = "right";
+      this.state.characterDirection = "right";
     } else if (target.y > center.y && Math.abs(direction.y) >= Math.abs(direction.x)) {
-      this.characterDirection = "down";
+      this.state.characterDirection = "down";
     } else if (target.y < center.y && Math.abs(direction.y) >= Math.abs(direction.x)) {
-      this.characterDirection = "up";
+      this.state.characterDirection = "up";
     }
   }
 
   update(elapsedTime) {
     this.renderer.update(elapsedTime + this.elapsedTime, this);
-    if (this.attacking) {
-      this.attackTime += elapsedTime + this.elapsedTime;
-      if (this.attackTime >= this.attackDuration) {
-        this.attackTime = 0;
-        this.attacking = false;
+    if (this.state.attacking) {
+      this.state.attackTime += elapsedTime + this.elapsedTime;
+      if (this.state.attackTime >= this.attackDuration) {
+        this.state.attackTime = 0;
+        this.state.attacking = false;
       }
     }
 
@@ -128,17 +132,7 @@ export default class Character extends GameObject {
 
   getUpdateState() {
     return Object.assign(super.getUpdateState(), _.pick(this, [
-      "attacking",
-      //"attackTime",
-      "characterDirection",
-      "maxHealth",
-      "maxMana",
-      "currentHealth",
-      "currentMana",
-      "hasHealth",
-      "hasMana",
-      "attackDuration",
-      "dead"
+      "state"
     ]));
   }
 }

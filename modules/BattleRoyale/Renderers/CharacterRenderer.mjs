@@ -92,7 +92,7 @@ const ANIMATION_SETTINGS = {
     },
     frames: 8,
     cycleStart: 0,
-    framesPerSec: 8,
+    framesPerSec: 16,
     repeat: false
   },
   [ANIMATIONS.ATTACK_THRUST_LEFT]: {
@@ -102,7 +102,7 @@ const ANIMATION_SETTINGS = {
     },
     frames: 8,
     cycleStart: 0,
-    framesPerSec: 8,
+    framesPerSec: 16,
     repeat: false
   },
   [ANIMATIONS.ATTACK_THRUST_DOWN]: {
@@ -112,7 +112,7 @@ const ANIMATION_SETTINGS = {
     },
     frames: 8,
     cycleStart: 0,
-    framesPerSec: 8,
+    framesPerSec: 16,
     repeat: false
   },
   [ANIMATIONS.ATTACK_THRUST_RIGHT]: {
@@ -122,7 +122,7 @@ const ANIMATION_SETTINGS = {
     },
     frames: 8,
     cycleStart: 0,
-    framesPerSec: 8,
+    framesPerSec: 16,
     repeat: false
   }
 };
@@ -146,7 +146,7 @@ function getOffset(animation, frame, imageSize) {
 
 export default class CharacterRenderer {
   constructor(params) {
-    Object.assign(this, params);
+    _.merge(this, params);
 
     this.animation = ANIMATIONS.MOVE_DOWN;
     this.prevAnimation = ANIMATIONS.MOVE_DOWN;
@@ -180,20 +180,20 @@ export default class CharacterRenderer {
       y: object.position.y - object.modelDimensions.height
     };
 
-    if (object.hasMana) {
+    if (object.state.hasMana) {
       context.fillStyle = "blue";
       context.strokeStyle = "black";
       context.fillRect(offset.x, offset.y,
-        Math.max(0, object.width * (object.currentMana / object.maxMana)), barHeight);
+        Math.max(0, object.width * (object.state.currentMana / object.state.maxMana)), barHeight);
       context.strokeRect(offset.x, offset.y, object.width, barHeight);
       offset.y -= (barHeight + 4);
     }
 
-    if (object.hasHealth) {
+    if (object.state.hasHealth) {
       context.fillStyle = "red";
       context.strokeStyle = "black";
       context.fillRect(offset.x, offset.y,
-        Math.max(0, object.width * (object.currentHealth / object.maxHealth)), barHeight);
+        Math.max(0, object.width * (object.state.currentHealth / object.state.maxHealth)), barHeight);
       context.strokeRect(offset.x, offset.y, object.width, barHeight);
     }
   }
@@ -252,19 +252,19 @@ export default class CharacterRenderer {
     let animationTime = 0;
     this.prevAnimation = this.animation;
     this.prevState = this.state;
-    if (object.dead) {
+    if (object.state.dead) {
       this.state = STATE.DEAD;
       this.animation = ANIMATIONS.DEATH;
-    } else if (object.attacking) {
+    } else if (object.state.attacking) {
       this.state = STATE.ATTACKING;
-      this.animation = WEAPON_ANIMATIONS[object.loadout.weapon.attackType][object.characterDirection];
-      animationTime = object.attackDuration;
+      this.animation = WEAPON_ANIMATIONS[object.state.loadout.weapon.attackType][object.state.characterDirection];
+      animationTime = object.state.attackDuration;
     } else if (object.direction.x || object.direction.y) {
       this.state = STATE.MOVING;
-      this.animation = MOVE_ANIMATIONS[object.characterDirection];
+      this.animation = MOVE_ANIMATIONS[object.state.characterDirection];
     } else {
       this.state = STATE.IDLE;
-      this.animation = MOVE_ANIMATIONS[object.characterDirection];
+      this.animation = MOVE_ANIMATIONS[object.state.characterDirection];
     }    
 
     if (this.state !== this.prevState) {

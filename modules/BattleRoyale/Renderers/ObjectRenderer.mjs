@@ -2,7 +2,7 @@
 
 export default class ObjectRenderer {
   constructor(params) {
-    Object.assign(this, params);
+    _.merge(this, params);
     this.image = new Image();
     this.image.src = params.imageSource;
     this.image.onload = () => this.render = this._render;

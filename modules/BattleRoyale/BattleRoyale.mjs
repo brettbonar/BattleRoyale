@@ -16,12 +16,11 @@ import objects from "./Objects/objects.mjs"
 import equipment from "./Objects/equipment.mjs"
 import Building from "./Buildings/Building.mjs"
 import Magic from "./Magic/Magic.mjs"
-import GenericObject from "./Objects/GenericObject.mjs"
+import StaticObject from "./Objects/StaticObject.mjs"
+import Item from "./Objects/Item.mjs"
 import AnimationEffect from "./Effects/AnimationEffect.mjs"
 import effects from "./Effects/effects.mjs"
 import attacks from "./Magic/attacks.mjs"
-
-//window.debug = true;
 
 const EVENTS = {
   MOVE_UP: "moveUp",
@@ -107,6 +106,7 @@ export default class BattleRoyale extends Game {
       let character = new Character(object);
       if (character.playerId === this.player.playerId) {
         this.gameState.player = character;
+        character.isThisPlayer = true;
       } else if (character.isPlayer) {
         character.isOtherPlayer = true;
       }
@@ -115,10 +115,14 @@ export default class BattleRoyale extends Game {
       return new Building(object);
     } else if (object.type === "Magic") {
       return new Magic(object);
-    } else if (object.type === "GenericObject") {
-      return new GenericObject(object);
+    } else if (object.type === "StaticObject") {
+      return new StaticObject(object);
     } else if (object.type === "Projectile") {
       return new Projectile(object);
+    } else if (object.type === "Item") {
+      return new Item(object);
+    } else {
+      console.log("Unsupported object type in createObject: " + object.type);
     }
   }
 
@@ -137,6 +141,11 @@ export default class BattleRoyale extends Game {
         this.gameState.objects.push(this.createObject(object));
       }
     }
+  }
+
+  removeObjects(objects) {
+    // TODO: optimize
+    _.remove(this.gameState.objects, (obj) => objects.includes(obj.objectId));
   }
 
   handleMouseMove(event) {
@@ -204,13 +213,15 @@ export default class BattleRoyale extends Game {
   }
 
   use(event) {
-    this.sendEvent({
-      type: "use",
-      source = {
-        playerId: this.player.playerId,
-        objectId: this.gameState.player.objectId
-      }
-    });
+    if (event.release) {
+      this.sendEvent({
+        type: "use",
+        source: {
+          playerId: this.player.playerId,
+          objectId: this.gameState.player.objectId
+        }
+      });
+    }
   }
 
   attack(event, attackType) {
@@ -392,13 +403,7 @@ export default class BattleRoyale extends Game {
 
   showInteractions() {
     // TODO: put this in GameObject? Some other Interface?
-    let interactions = _.filter(this.gameState.objects, (obj) => {
-      return obj.interactionsBoundingBox.some((box) => box.intersects(this.gameState.player.boundingBox));
-    });
-    this.interaction = _.minBy(interactions, (interaction) => {
-      // TODO: may want to consider interaction dimensions offset
-      return getDistance(this.gameState.player.position, interaction.position);
-    });
+    this.interaction = this.getInteraction(this.gameState.player);
   }
 
   _update(elapsedTime) {
@@ -471,7 +476,9 @@ export default class BattleRoyale extends Game {
 
     this.particleEngine.update(elapsedTime);
 
-    _.remove(this.gameState.objects, "done");
+    if (this.isServer) {
+      _.remove(this.gameState.objects, (obj) => obj.done);
+    }
     // _.remove(this.gameState.dynamicObjects, "done");
     // _.remove(this.gameState.projectiles, "done");
     // TODO: remove objects outside of game bounds

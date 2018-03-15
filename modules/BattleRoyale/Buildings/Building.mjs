@@ -2,16 +2,18 @@ import Bounds from "../../Engine/GameObject/Bounds.mjs"
 import GameObject from "../../Engine/GameObject/GameObject.mjs"
 import BuildingPart from "./BuildingPart.mjs"
 import buildings from "./buildings.mjs"
+import { SURFACE_TYPE } from "../../Engine/Physics/PhysicsConstants.mjs";
 
 export default class Building extends GameObject {
   constructor(params) {
-    super(params);
+    super(Object.assign({
+      static: true
+    }, params));
     this.type = "Building";
     this.building = buildings[params.buildingType];
-    this.bounds = this.building.bounds;
-    this.losDimensions = this.bounds;
-    this.hitboxDimensions = this.bounds;
-    this.terrainDimensions = this.bounds;
+    this.losDimensions = this.building.bounds;
+    this.hitboxDimensions = this.building.bounds;
+    this.terrainDimensions = this.building.bounds;
     this.outside = true;
 
     this.losFade = false;
@@ -33,7 +35,7 @@ export default class Building extends GameObject {
   }
 
   insideCb(target) {
-    if (target.isPlayer) {
+    if (target.isThisPlayer) {
       this.outside = false;
     }
   }
@@ -92,5 +94,11 @@ export default class Building extends GameObject {
       return [this.exterior, this.interior].concat(this.exteriorDoors);
     }
     return [this.interior].concat(this.interiorDoors);
+  }
+
+  getUpdateState() {
+    return Object.assign(super.getUpdateState(), _.pick(this, [
+      "buildingType"
+    ]));
   }
 }

@@ -18,7 +18,7 @@ const GROWTH_TYPE = {
 
 class Tile {
   constructor(params) {
-    Object.assign(this, params);
+    _.merge(this, params);
     this.neighbors = {
       left: null,
       right: null,
@@ -66,7 +66,7 @@ const TERRAIN_OFFSETS = {
 
 class Map {
   constructor(params) {
-    Object.assign(this, params);
+    _.merge(this, params);
     _.defaults(this, {
       mapSize: 200,
       tileSize: 32,

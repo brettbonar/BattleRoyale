@@ -865,32 +865,5 @@ export default {
         cb: (object) => object.position.z = 0
       }
     ]
-  },
-  healthPotion: {
-    type: "item",
-    itemType: "healthPotion",
-    biome: "any",
-    imageSource: "../../Assets/items/items.png",
-    imageDimensions: {
-      x: 39,
-      y: 98,
-      width: 19,
-      height: 29
-    },
-    physics: {
-      surfaceType: "none",
-    },
-    dimensions: {
-      width: 19,
-      height: 29
-    },
-    interactionDimensions: [
-      {
-        dimensions: {
-          radius: 15
-        },
-        boundsType: Bounds.TYPE.CIRCLE
-      }
-    ]
   }
 }

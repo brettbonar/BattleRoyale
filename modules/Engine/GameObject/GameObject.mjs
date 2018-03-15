@@ -13,9 +13,25 @@ import { SURFACE_TYPE, MOVEMENT_TYPE } from "../../Engine/Physics/PhysicsConstan
 // acceleration: +/- speed / time
 let objectId = 1;
 
-export default class GameObject {
+class GameObjectProxy {
   constructor(params) {
-    Object.assign(this, params);
+    if (!params.static) {
+      return new Proxy(this, {
+        set: (object, key, value) => {
+          object[key] = value;
+          object._modified = true;
+          return true;
+        }
+      });
+    }
+    // else do nothing
+  }
+}
+
+export default class GameObject extends GameObjectProxy {
+  constructor(params) {
+    super(params);
+    _.merge(this, params);
     _.defaults(this, {
       boundsType: Bounds.TYPE.RECTANGLE,
       dimensions: {
@@ -209,6 +225,7 @@ export default class GameObject {
         });
       });
     }
+    
     return [];
 
     // if (this.bounds) {
@@ -223,6 +240,7 @@ export default class GameObject {
     // }
     // return [this.boundingBox];
   }
+
   get getLastInteractionsBoundingBox() {
     return this.getAllBounds(this.lastPosition, this.interactionDimensions);
   }
@@ -232,11 +250,19 @@ export default class GameObject {
   }
   
   get lastTerrainBoundingBox() {
-    return this.getAllBounds(this.lastPosition, this.terrainDimensions) || [this.boundingBox];
+    let box = this.getAllBounds(this.lastPosition, this.terrainDimensions);
+    if (box.length === 0) {
+      return [this.prevBounds];
+    }
+    return box;
   }
   
   get terrainBoundingBox() {
-    return this.getAllBounds(this.position, this.terrainDimensions) || [this.boundingBox];
+    let box = this.getAllBounds(this.position, this.terrainDimensions);
+    if (box.length === 0) {
+      return [this.boundingBox];
+    }
+    return box;
   }
   
   get lastLosBoundingBox() {
@@ -248,11 +274,19 @@ export default class GameObject {
   }
 
   get lastHitbox() {
-    return this.getAllBounds(this.lastPosition, this.hitboxDimensions) || [this.boundingBox];
+    let box = this.getAllBounds(this.lastPosition, this.hitboxDimensions);
+    if (box.length === 0) {
+      return [this.prevBounds];
+    }
+    return box;
   }
 
   get hitbox() {
-    return this.getAllBounds(this.position, this.hitboxDimensions) || [this.boundingBox];
+    let box = this.getAllBounds(this.position, this.hitboxDimensions);
+    if (box.length === 0) {
+      return [this.boundingBox];
+    }
+    return box;
   }
 
   get boundingBox() {
@@ -327,6 +361,7 @@ export default class GameObject {
   }
   
   getUpdateState() {
+    // TODO: probably don't want to do this here
     return _.pick(this, [
       "type",
       "dimensions",

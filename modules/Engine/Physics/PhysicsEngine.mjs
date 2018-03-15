@@ -3,7 +3,7 @@ import { MOVEMENT_TYPE, SURFACE_TYPE } from "./PhysicsConstants.mjs";
 
 export default class PhysicsEngine {
   constructor(params) {
-    Object.assign(this, params);
+    _.merge(this, params);
   }
 
   getIntersections(vector, target) {

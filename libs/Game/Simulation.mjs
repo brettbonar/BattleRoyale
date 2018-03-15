@@ -4,13 +4,14 @@ import { initGame } from "./initGame.mjs"
 import Map from "../../modules/Map.mjs"
 import Projectile from "../../modules/BattleRoyale/Objects/Projectile.mjs"
 import now from "performance-now"
+import StaticObject from "../../modules/BattleRoyale/Objects/StaticObject.mjs";
 
 const TICK_RATE = 10;
 const SIMULATION_TIME = 1000 / 65;
 
 export default class Simulation {
   constructor(params) {
-    Object.assign(this, params);
+    _.merge(this, params);
     let maps = {
       "-1": new Map({
         seeds: {
@@ -30,6 +31,7 @@ export default class Simulation {
       maps: maps,
       objects: initGame(params.players, maps)
     });
+    this.lastState = [];
 
     this.eventHandlers = {
       changeDirection: (data, elapsedTime) => this.changeDirection(data, elapsedTime),
@@ -44,9 +46,11 @@ export default class Simulation {
       playerId: data.source.playerId,
       objectId: data.source.objectId
     });
+    console.log(object);
     if (object) {
       let target = this.game.getInteraction(object);
       if (target) {
+        console.log(target);
         target.interact(object);
       }
     }
@@ -58,7 +62,8 @@ export default class Simulation {
       objectId: data.source.objectId
     });
     if (object) {
-      object.target = data.target;
+      //object.target = data.target;
+      object.setTarget(data.target);
       object.revision = data.source.revision;
       object.elapsedTime = elapsedTime || 0;
     }
@@ -108,9 +113,24 @@ export default class Simulation {
 
     this.game._update(elapsedTime);
     
+    // TODO: do for each player
+    let state = this.game.gameState.objects
+      .filter((obj) => obj._modified)
+      .map(obj => {
+        obj._modified = false;
+        return obj.getUpdateState();
+      });
+
     for (const player of this.players) {
-      player.socket.emit("update", this.game.gameState.objects.map((obj) => obj.getUpdateState()));
+      player.socket.emit("update", state);
     }
+
+    let removedObjects = _.difference(this.lastState, this.game.gameState.objects);
+    for (const player of this.players) {
+      player.socket.emit("remove", _.map(removedObjects, "objectId"));
+    }
+
+    this.lastState = this.game.gameState.objects.slice();
   }
 
   start() {

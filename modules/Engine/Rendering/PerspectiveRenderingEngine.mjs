@@ -61,7 +61,7 @@ export default class PerspectiveRenderingEngine extends RenderingEngine{
   getRenderObjects(objects, center) {
     let renderObjects = [];
     for (const object of objects) {
-      if (object.physics.surfaceType !== SURFACE_TYPE.CHARACTER || object.isPlayer) {
+      if (object.physics.surfaceType !== SURFACE_TYPE.CHARACTER || object.isThisPlayer) {
         renderObjects = renderObjects.concat(object.getAllRenderObjects());
       }
     }
@@ -85,7 +85,7 @@ export default class PerspectiveRenderingEngine extends RenderingEngine{
     });
     let losBoxes = _.reduce(objects, (boxes, obj) => boxes.concat(obj.losBoundingBox), []);
     for (const obj of objects) {
-      if (obj.physics.surfaceType === SURFACE_TYPE.CHARACTER && !obj.isPlayer) {
+      if (obj.physics.surfaceType === SURFACE_TYPE.CHARACTER && !obj.isThisPlayer) {
         let lines = [];
 
         this.context.strokeStyle = "magenta";

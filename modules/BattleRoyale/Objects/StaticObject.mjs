@@ -4,12 +4,14 @@ import objects from "./objects.mjs"
 import items from "./items.mjs"
 import { SURFACE_TYPE } from "../../Engine/Physics/PhysicsConstants.mjs"
 
-export default class GenericObject extends GameObject {
+export default class StaticObject extends GameObject {
   constructor(params) {
-    super(params);
+    super(Object.assign({
+      static: true
+    }, params));
     let object = objects[params.objectType];
     Object.assign(this, object);
-    this.type = "GenericObject";
+    this.type = "StaticObject";
 
     if (object.imageSource) {
       if (!params.simulation) {
@@ -17,23 +19,10 @@ export default class GenericObject extends GameObject {
       }
     } else if (object.images) {
       this.parts = _.map(object.images, (part) => {
-        let piece = new GenericObject(_.merge({}, object, params), part);
+        let piece = new StaticObject(_.merge({}, object, params), part);
         piece.physics.surfaceType = SURFACE_TYPE.NONE;
         return piece;
       });
-    }
-
-    if (object.type === "item") {
-      this.interact = (target) => {
-        if (!target.items) {
-          target.items = {};
-        }
-        if (!target.items[object.itemType]) {
-          target.items[object.itemType] = 0;
-        }
-        target.items[object.itemType]++;
-        this.done = true;
-      };
     }
   }
 

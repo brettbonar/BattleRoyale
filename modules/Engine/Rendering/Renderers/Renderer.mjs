@@ -8,7 +8,7 @@ export default class Renderer {
    * @param {string} params.lineWidth
    */
   constructor(params) {
-    Object.assign(this, params);
+    _.merge(this, params);
   }
 
   render(context, object, elapsedTime) {}

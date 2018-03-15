@@ -2,7 +2,7 @@
 
 export default class RenderingEngine {
   constructor(params) {
-    Object.assign(this, params);
+    _.merge(this, params);
   }
 
   render(objects, elapsedTime) {}

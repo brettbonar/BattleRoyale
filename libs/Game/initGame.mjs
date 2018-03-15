@@ -9,9 +9,10 @@ import objects from "../../modules/BattleRoyale/Objects/objects.mjs"
 import equipment from "../../modules/BattleRoyale/Objects/equipment.mjs"
 import Building from "../../modules/BattleRoyale/Buildings/Building.mjs";
 import Magic from "../../modules/BattleRoyale/Magic/Magic.mjs";
-import GenericObject from "../../modules/BattleRoyale/Objects/GenericObject.mjs";
+import StaticObject from "../../modules/BattleRoyale/Objects/StaticObject.mjs";
 import AnimationEffect from "../../modules/BattleRoyale/Effects/AnimationEffect.mjs";
 import effects from "../../modules/BattleRoyale/Effects/effects.mjs";
+import Item from "../../modules/BattleRoyale/Objects/Item.mjs";
 
 function initGame(players, maps) {
   let objects = [
@@ -96,28 +97,28 @@ function initGame(players, maps) {
     pos += 100;
   }
 
-  objects.push(new GenericObject({
+  objects.push(new Item({
     position: {
       x: 255,
       y: 500
     },
-    objectType: "healthPotion",
+    itemType: "healthPotion",
     simulation: true
   }));
-  objects.push(new GenericObject({
+  objects.push(new Item({
     position: {
       x: 255,
       y: 510
     },
-    objectType: "healthPotion",
+    itemType: "healthPotion",
     simulation: true
   }));
-  objects.push(new GenericObject({
+  objects.push(new Item({
     position: {
       x: 265,
       y: 505
     },
-    objectType: "healthPotion",
+    itemType: "healthPotion",
     simulation: true
   }));
   
@@ -125,7 +126,7 @@ function initGame(players, maps) {
   //   //let type = _.sample(_.filter(objects, { biome: "plain" }));
   //   //let type = _.sample(objects);
   //   let type = objects.plainTree;
-  //   this.gameState.staticObjects.push(new GenericObject({
+  //   this.gameState.staticObjects.push(new StaticObject({
   //     position: {
   //       x: _.random(0, this.canvas.width),
   //       y: _.random(0, this.canvas.height)
@@ -138,7 +139,7 @@ function initGame(players, maps) {
   // for (let i = 0; i < 10; i++) {
   //   for (let j = 0; j < 5; j++) {
   //     let type = _.sample(_.filter(objects, { group: "corn" }));
-  //     this.gameState.staticObjects.push(new GenericObject({
+  //     this.gameState.staticObjects.push(new StaticObject({
   //       position: {
   //         x: x + i * (objects.corn1.imageDimensions.width * 3/4) + y,
   //         y: y + j * (objects.corn1.imageDimensions.height / 3)
@@ -147,13 +148,13 @@ function initGame(players, maps) {
   //   }
   // }
 
-  // this.gameState.staticObjects.push(new GenericObject({
+  // this.gameState.staticObjects.push(new StaticObject({
   //   position: {
   //     x: 100,
   //     y: 350
   //   }
   // }, objects.caveEntrance));
-  // this.gameState.staticObjects.push(new GenericObject({
+  // this.gameState.staticObjects.push(new StaticObject({
   //   position: {
   //     x: 100,
   //     y: 450,

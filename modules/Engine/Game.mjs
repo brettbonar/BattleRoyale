@@ -15,7 +15,7 @@ const EVENT = {
 
 export default class Game {
   constructor(params) {
-    Object.assign(this, params);
+    _.merge(this, params);
     
     if (!params.isServer) {
       this.canvas = params.canvas;
