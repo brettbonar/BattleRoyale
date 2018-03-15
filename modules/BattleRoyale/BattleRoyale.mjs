@@ -185,7 +185,7 @@ export default class BattleRoyale extends Game {
     if (params.release) {
       character.fireReady = true;
     } else if (character.fireReady) {
-      let attack = attacks[character.loadout.weapon.attacks[params.attackType]];
+      let attack = attacks[character.state.loadout.weapon.attacks[params.attackType]];
       character.attack(attack.effect.attackTime, elapsedTime);
       if (!attack.effect.automatic) {
         // TODO: something else here

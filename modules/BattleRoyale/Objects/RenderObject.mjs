@@ -3,26 +3,17 @@ import ObjectRenderer from "../Renderers/ObjectRenderer.mjs"
 import objects from "./objects.mjs"
 import items from "./items.mjs"
 import { SURFACE_TYPE } from "../../Engine/Physics/PhysicsConstants.mjs"
-import RenderObject from "./RenderObject.mjs";
 
-export default class StaticObject extends GameObject {
-  constructor(params) {
+export default class RenderObject extends GameObject {
+  constructor(params, rendering) {
     super(Object.assign({
-      static: true
-    }, params));
-    let object = objects[params.objectType];
-    Object.assign(this, object);
-    this.type = "StaticObject";
-
-    if (!params.simulation) {
-      if (object.imageSource) {
-        this.renderer = new ObjectRenderer(object);
-      } else if (object.images) {
-        this.parts = _.map(object.images, (part) => {
-          return new RenderObject(params, part);
-        });
+      static: true,
+      physics: {
+        surfaceType: SURFACE_TYPE.NONE
       }
-    }
+    }, params));
+    this.type = "RenderObject";
+    this.renderer = new ObjectRenderer(rendering);
   }
 
   get perspectivePosition() {

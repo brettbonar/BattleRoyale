@@ -39,6 +39,7 @@ const caveEntranceDimensions = [
 
 export default {
   corn1: {
+    objectType: "corn1",
     biome: "plain",
     group: "corn",
     imageSource: "../../Assets/terrain_atlas.png",
@@ -53,6 +54,7 @@ export default {
     }
   },
   corn2: {
+    objectType: "corn2",
     biome: "plain",
     group: "corn",
     imageSource: "../../Assets/terrain_atlas.png",
@@ -67,6 +69,7 @@ export default {
     }
   },
   corn3: {
+    objectType: "corn3",
     biome: "plain",
     group: "corn",
     imageSource: "../../Assets/terrain_atlas.png",

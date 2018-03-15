@@ -43,7 +43,7 @@ export default class Character extends GameObject {
       this.renderer = new CharacterRenderer({
         gender: params.gender,
         body: params.body,
-        loadout: params.loadout,
+        loadout: params.state.loadout,
         isOtherPlayer: this.isOtherPlayer
       });
     }
@@ -132,7 +132,12 @@ export default class Character extends GameObject {
 
   getUpdateState() {
     return Object.assign(super.getUpdateState(), _.pick(this, [
-      "state"
+      "state",
+      "body",
+      "gender",
+      "isPlayer",
+      // TODO: make this part of character type, or just part of weapon
+      "damagedEffect"
     ]));
   }
 }

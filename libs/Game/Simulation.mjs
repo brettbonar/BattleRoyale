@@ -104,7 +104,7 @@ export default class Simulation {
   }
 
   getMaps() { return this.game.maps }
-  getObjects() { return this.game.gameState.objects }
+  getObjects() { return this.game.gameState.objects.map((obj) => obj.getUpdateState()) }
 
   update() {
     let currentTime = now();

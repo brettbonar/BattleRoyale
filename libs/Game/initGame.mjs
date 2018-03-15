@@ -15,7 +15,7 @@ import effects from "../../modules/BattleRoyale/Effects/effects.mjs";
 import Item from "../../modules/BattleRoyale/Objects/Item.mjs";
 
 function initGame(players, maps) {
-  let objects = [
+  let gameObjects = [
     new Character({
       body: "darkelf",
       gender: "female",
@@ -70,7 +70,7 @@ function initGame(players, maps) {
 
   let pos = 255;
   for (const player of players) {
-    objects.push(
+    gameObjects.push(
       new Character({
         body: "tanned",
         gender: "male",
@@ -97,7 +97,7 @@ function initGame(players, maps) {
     pos += 100;
   }
 
-  objects.push(new Item({
+  gameObjects.push(new Item({
     position: {
       x: 255,
       y: 500
@@ -105,7 +105,7 @@ function initGame(players, maps) {
     itemType: "healthPotion",
     simulation: true
   }));
-  objects.push(new Item({
+  gameObjects.push(new Item({
     position: {
       x: 255,
       y: 510
@@ -113,7 +113,7 @@ function initGame(players, maps) {
     itemType: "healthPotion",
     simulation: true
   }));
-  objects.push(new Item({
+  gameObjects.push(new Item({
     position: {
       x: 265,
       y: 505
@@ -122,39 +122,43 @@ function initGame(players, maps) {
     simulation: true
   }));
   
-  // for (let i = 0; i < 10; i++) {
-  //   //let type = _.sample(_.filter(objects, { biome: "plain" }));
-  //   //let type = _.sample(objects);
-  //   let type = objects.plainTree;
-  //   this.gameState.staticObjects.push(new StaticObject({
-  //     position: {
-  //       x: _.random(0, this.canvas.width),
-  //       y: _.random(0, this.canvas.height)
-  //     }
-  //   }, type));
-  // }
+  for (let i = 0; i < 10; i++) {
+    //let type = _.sample(_.filter(objects, { biome: "plain" }));
+    //let type = _.sample(objects);
+    //let type = objects.plainTree;
+    gameObjects.push(new StaticObject({
+      objectType: "plainTree",
+      position: {
+        x: _.random(0, 2000),
+        y: _.random(0, 2000)
+      },
+      simulation: true
+    }));
+  }
 
-  // let x = 250;
-  // let y = 250;
-  // for (let i = 0; i < 10; i++) {
-  //   for (let j = 0; j < 5; j++) {
-  //     let type = _.sample(_.filter(objects, { group: "corn" }));
-  //     this.gameState.staticObjects.push(new StaticObject({
-  //       position: {
-  //         x: x + i * (objects.corn1.imageDimensions.width * 3/4) + y,
-  //         y: y + j * (objects.corn1.imageDimensions.height / 3)
-  //       }
-  //     }, type));
-  //   }
-  // }
+  let x = 250;
+  let y = 250;
+  for (let i = 0; i < 10; i++) {
+    for (let j = 0; j < 5; j++) {
+      let type = _.sample(_.filter(objects, { group: "corn" })).objectType;
+      gameObjects.push(new StaticObject({
+        objectType: type,
+        position: {
+          x: x + i * (objects.corn1.imageDimensions.width * 3/4) + y,
+          y: y + j * (objects.corn1.imageDimensions.height / 3)
+        },
+        simulation: true
+      }));
+    }
+  }
 
-  // this.gameState.staticObjects.push(new StaticObject({
+  // gameObjects.push(new StaticObject({
   //   position: {
   //     x: 100,
   //     y: 350
   //   }
   // }, objects.caveEntrance));
-  // this.gameState.staticObjects.push(new StaticObject({
+  // gameObjects.push(new StaticObject({
   //   position: {
   //     x: 100,
   //     y: 450,
@@ -162,7 +166,7 @@ function initGame(players, maps) {
   //   }
   // }, objects.caveExit));
 
-  return objects;
+  return gameObjects;
 }
 
 export { initGame }
