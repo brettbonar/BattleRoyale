@@ -1,4 +1,5 @@
 import GameObject from "../../Engine/GameObject/GameObject.mjs"
+import Point from "../../Engine/GameObject/Point.mjs"
 import CharacterRenderer, { STATE } from "../Renderers/CharacterRenderer.mjs"
 import { SURFACE_TYPE } from "../../Engine/Physics/PhysicsConstants.mjs";
 
@@ -7,10 +8,6 @@ export default class Character extends GameObject {
     super(params);
     _.defaults(this, {
       speed: 96,
-      direction: {
-        x: 0,
-        y: 0
-      },
       type: "Character",
       state: {
         inventory: [],
@@ -25,13 +22,23 @@ export default class Character extends GameObject {
         hasHealth: true,
         hasMana: true
       },
+      // Dimensions of the actual model within the image
+      modelDimensions: {
+        offset: {
+          x: 16,
+          y: 16
+        },
+        dimensions: {
+          width: 32,
+          height: 44
+        }
+      },
       attackDuration: 1000
     });
-    
-    this.physics.surfaceType = "character";
-    this.dimensions = params.dimensions || [{
+
+    this.collisionDimensions = params.collisionDimensions || [{
       offset: {
-        x: 0,
+        x: 16,
         y: 44, // 64 - 20,
         z: [0, 1]
       },
@@ -40,11 +47,14 @@ export default class Character extends GameObject {
         height: 20
       }
     }];
+    this.renderHeight = 1;
 
-    this.modelDimensions = {
-      width: 32,
+    this.dimensions = params.dimensions || {
+      width: 64,
       height: 64
     };
+    
+    this.physics.surfaceType = "character";
 
     if (!params.simulation) {
       this.renderer = new CharacterRenderer({
@@ -61,22 +71,22 @@ export default class Character extends GameObject {
     this.direction = this.normalize(this.direction);
   }
 
-  get center() {
-    return {
-      x: this.position.x,
-      y: this.position.y - 32
-    }
-  }
+  // get center() {
+  //   return {
+  //     x: this.position.x,
+  //     y: this.position.y - 32
+  //   }
+  // }
 
-  get perspectivePosition() {
-    if (this.dead) {
-      return {
-        x: this.position.x,
-        y: this.position.y - this.modelDimensions.height / 2
-      };
-    }
-    return this.position;
-  }
+  // get perspectivePosition() {
+  //   if (this.dead) {
+  //     return {
+  //       x: this.position.x,
+  //       y: this.position.y - this.modelDimensions.height / 2
+  //     };
+  //   }
+  //   return this.position;
+  // }
 
   damage(source) {
     this.state.currentHealth -= source.effect.damage;
@@ -98,10 +108,7 @@ export default class Character extends GameObject {
 
   setTarget(target) {
     let center = this.center;
-    let direction = this.normalize({
-      x: target.x - center.x,
-      y: target.y - center.y
-    });
+    let direction = new Point(target).minus(center).normalize();
 
     if (target.x < center.x && Math.abs(direction.x) >= Math.abs(direction.y)) {
       this.state.characterDirection = "left";

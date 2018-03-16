@@ -24,14 +24,7 @@ export default class BuildingRenderer {
     //   x: object.position.x - offset.x,
     //   y: object.position.y - offset.y
     // };
-    let position = object.position;
-    if (this.building.renderOffset) {
-      position = {
-        x: position.x + this.building.renderOffset.x,
-        y: position.y + this.building.renderOffset.y
-      };
-    }
-
+    let position = object.position.plus(this.building.renderOffset);
     if (this.buildingImage.image.complete) {
       context.drawImage(this.buildingImage.image, this.buildingImage.imageDimensions.x, this.buildingImage.imageDimensions.y, this.buildingImage.imageDimensions.width, this.buildingImage.imageDimensions.height,
         position.x, position.y,

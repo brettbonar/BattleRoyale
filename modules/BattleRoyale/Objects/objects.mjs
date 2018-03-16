@@ -49,6 +49,10 @@ export default {
       width: 30,
       height: 64
     },
+    dimensions: {
+      width: 30,
+      height: 64
+    },
     physics: {
       surfaceType: "none"
     }
@@ -64,6 +68,10 @@ export default {
       width: 30,
       height: 64
     },
+    dimensions: {
+      width: 30,
+      height: 64
+    },
     physics: {
       surfaceType: "none"
     }
@@ -76,6 +84,10 @@ export default {
     imageDimensions: {
       x: 481,
       y: 832,
+      width: 30,
+      height: 64
+    },
+    dimensions: {
       width: 30,
       height: 64
     },
@@ -96,7 +108,8 @@ export default {
           height: 178,
           offset: {
             x: 93,
-            y: 236
+            y: 236,
+            z: 5
           }
         }
       },
@@ -111,10 +124,6 @@ export default {
           offset: {
             x: 53
           }
-        },
-        perspectiveOffset: {
-          x: 0,
-          y: -50
         }
       }
       // {
@@ -152,10 +161,16 @@ export default {
     physics: {
       surfaceType: "terrain"
     },
+    // TODO: fix
     dimensions: {
       width: 103,
       height: 50
     },
+    collisionDimensions: [
+      {
+
+      }
+    ],
     hitboxDimensions: {
       offset: {
         x: 0,

@@ -65,61 +65,78 @@ export default {
         }
       }
     ],
-    bounds: [
+    renderHeight: 3,
+    collisionDimensions: [
       {
         offset: {
           x: 3,
-          y: 12
+          y: 64
         },
         dimensions: {
           width: 188,
           height: 14
         },
-        boundsType: Bounds.TYPE.RECTANGLE_UL
+        opaque: true
       },
       {
         offset: {
           x: 3,
-          y: 12
+          y: 64,
+          z: [1,2,3]
+        },
+        dimensions: {
+          width: 188,
+          height: 32
+        },
+        opaque: true
+      },
+      {
+        offset: {
+          x: 3,
+          y: 64,
+          z: [0,1,2,3]
         },
         dimensions: {
           width: 7,
-          height: 181
+          height: 129
         },
-        boundsType: Bounds.TYPE.RECTANGLE_UL
+        opaque: true
       },
       {
         offset: {
           x: 185,
-          y: 12
+          y: 64,
+          z: [0,1,2,3]
         },
         dimensions: {
           width: 7,
-          height: 181
+          height: 129
         },
-        boundsType: Bounds.TYPE.RECTANGLE_UL
+        opaque: true
       },
       {
         offset: {
           x: 3,
-          y: 180
+          y: 180,
+          z: [0,1,2,3]
         },
         dimensions: {
           width: 70,
           height: 13
         },
-        boundsType: Bounds.TYPE.RECTANGLE_UL
+        opaque: true
       },
       {
         offset: {
           x: 121,
-          y: 180
+          y: 180,
+          z: [0,1,2,3]
         },
         dimensions: {
           width: 70,
           height: 13
         },
-        boundsType: Bounds.TYPE.RECTANGLE_UL
+        opaque: true
       }
     ],
     interior: {
@@ -130,21 +147,17 @@ export default {
         width: 194,
         height: 194
       },
-      perspectiveOffset: {
-        x: 194 / 2,
-        y: 0
-      },
       bounds: [
         {
           offset: {
             x: 6,
-            y: 15
+            y: 15,
+            z: -1
           },
           dimensions: {
             width: 181,
             height: 176
-          },
-          boundsType: Bounds.TYPE.RECTANGLE_UL
+          }
         }
         // {
         //   offset: {
@@ -166,10 +179,6 @@ export default {
         y: 0,
         width: 194,
         height: 194
-      },
-      perspectiveOffset: {
-        x: 194 / 2,
-        y: 194
       }
     }
   }

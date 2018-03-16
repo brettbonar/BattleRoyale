@@ -14,10 +14,7 @@ export default class ObjectRenderer {
       y: 0
     };
     
-    let position = {
-      x: object.position.x + offset.x,
-      y: object.position.y + offset.y
-    };
+    let position = object.position.plus(offset);
     context.drawImage(this.image, this.imageDimensions.x, this.imageDimensions.y, this.imageDimensions.width, this.imageDimensions.height,
       position.x, position.y, this.imageDimensions.width, this.imageDimensions.height);
 

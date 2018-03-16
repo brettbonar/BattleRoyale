@@ -26,15 +26,7 @@ export default class MagicRenderer {
 
   render(context, object, elapsedTime, center) {
     if (this.image.complete) {
-      let position = {
-        x: object.position.x - this.effect.imageSize / 2,
-        y: object.position.y - this.effect.imageSize
-      }
-
-      if (this.imageOffset) {
-        position.x += this.imageOffset.x;
-        position.y += this.imageOffset.y;
-      }
+      let position = object.position.plus(this.imageOffset);
 
       let framesPerRow = this.image.width / this.effect.imageSize;
       let offset = {

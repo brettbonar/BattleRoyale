@@ -17,13 +17,13 @@ export default class BuildingPart extends GameObject {
     }
   }
   
-  get perspectivePosition() {
-    if (this.building.perspectiveOffset) {
-      return {
-        x: this.position.x + this.building.perspectiveOffset.x,
-        y: this.position.y + this.building.perspectiveOffset.y
-      };
-    }
-    return this.position;
-  }
+  // get perspectivePosition() {
+  //   if (this.building.perspectiveOffset) {
+  //     return {
+  //       x: this.position.x + this.building.perspectiveOffset.x,
+  //       y: this.position.y + this.building.perspectiveOffset.y
+  //     };
+  //   }
+  //   return this.position;
+  // }
 }

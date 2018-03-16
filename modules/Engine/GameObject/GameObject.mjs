@@ -1,5 +1,6 @@
 import Bounds from "./Bounds.mjs"
 import Vector from "./Vector.mjs"
+import Point from "./Point.mjs"
 import Renderer from "../Rendering/Renderers/Renderer.mjs"
 import { SURFACE_TYPE, MOVEMENT_TYPE } from "../../Engine/Physics/PhysicsConstants.mjs"
 
@@ -34,10 +35,12 @@ export default class GameObject extends GameObjectProxy {
     _.merge(this, params);
     _.defaults(this, {
       boundsType: Bounds.TYPE.RECTANGLE,
+      // Dimensions are render dimensions
       dimensions: {
         width: 0,
         height: 0
       },
+      collisionDimensions: [],
       functions: [],
       visible: true,
       direction: {
@@ -49,6 +52,7 @@ export default class GameObject extends GameObjectProxy {
         y: 0,
         z: 0
       },
+      level: 0,
       revision: 0,
       renderer: new Renderer(),
       objectId: objectId,
@@ -66,7 +70,9 @@ export default class GameObject extends GameObjectProxy {
       }
     });
 
-    this.lastPosition = Object.assign({}, this.position);
+    this.position = new Point(this.position);    
+    this.lastPosition = new Point(this.position);
+
     if (this.static) {
       this.staticBox = new Bounds({
         position: this.position,
@@ -113,10 +119,7 @@ export default class GameObject extends GameObjectProxy {
       return {
         box: new Bounds({
           dimensions: fn.dimensions,
-          position: {
-            x: this.position.x + fn.offset.x,
-            y: this.position.y + fn.offset.y
-          }
+          position: this.position.minus(fn.offset)
         }),
         cb: fn.cb
       };
@@ -124,16 +127,10 @@ export default class GameObject extends GameObjectProxy {
   }
 
   get perspectivePosition() {
-    if (this.renderOffset) {
-      return {
-        x: this.position.x + this.renderOffset.x,
-        y: this.position.y + this.renderOffset.y
-      };
+    if (this.perspectiveOffset) {
+      return this.position.plus(this.perspectiveOffset);
     }
-    return {
-      x: this.position.x,
-      y: this.position.y + this.height
-    };
+    return this.position.plus({ y: this.height });
   }
 
   normalizeDirection() {
@@ -204,7 +201,7 @@ export default class GameObject extends GameObjectProxy {
   }
 
   get center() {
-    return this.getCenterPoint(this.dimensions);
+    return this.bounds.center;
 
     // if (this.dimensions.width || this.dimensions.height) {
     // } else if (_.isArray(this.dimensions.radius) {
@@ -215,17 +212,9 @@ export default class GameObject extends GameObjectProxy {
   getAllBounds(position, dimensions) {
     if (dimensions) {
       return _.castArray(dimensions).map((dimens) => {
-        let pos = position;
-        if (dimens.offset) {
-          pos = {
-            x: position.x + dimens.offset.x,
-            y: position.y + dimens.offset.y
-          };
-        }
         return new Bounds({
-          position: pos,
-          dimensions: dimens.dimensions || dimens,
-          boundsType: dimens.boundsType || this.boundsType
+          position: position.plus(dimens.offset),
+          dimensions: dimens.dimensions || dimens
         });
       });
     }
@@ -245,6 +234,44 @@ export default class GameObject extends GameObjectProxy {
     // return [this.boundingBox];
   }
 
+  getBoundsFromDimens(position, dimens) {
+    let bounds = [];
+    for (const dimensions of dimens) {
+      if (dimensions.offset) {
+        bounds = bounds.concat(_.castArray(dimensions.offset.z).map((z) => {
+          let offset = { x: dimensions.offset.x, y: dimensions.offset.y, z: z };
+          return new Bounds({
+            position: position.plus(offset),
+            dimensions: dimensions.dimensions || this.dimensions
+          });
+        }));
+      } else {
+        bounds.push(new Bounds({
+          position: position,
+          dimensions: dimensions.dimensions || this.dimensions
+        }));
+      }
+    }
+
+    return bounds;
+  }
+
+  get lastCollisionBounds() {
+    return this.getBoundsFromDimens(this.lastPosition, this.collisionDimensions);
+  }
+
+  get collisionBounds() {
+    return this.getBoundsFromDimens(this.position, this.collisionDimensions);
+  }
+  
+  get lastLosBounds() {
+    return this.getBoundsFromDimens(this.lastPosition, _.filter(this.collisionDimensions, "opaque"));
+  }
+
+  get losBounds() {
+    return this.getBoundsFromDimens(this.position, _.filter(this.collisionDimensions, "opaque"));
+  }
+
   get getLastInteractionsBoundingBox() {
     return this.getAllBounds(this.lastPosition, this.interactionDimensions);
   }
@@ -252,45 +279,9 @@ export default class GameObject extends GameObjectProxy {
   get interactionsBoundingBox() {
     return this.getAllBounds(this.position, this.interactionDimensions);
   }
-  
-  get lastTerrainBoundingBox() {
-    let box = this.getAllBounds(this.lastPosition, this.terrainDimensions);
-    if (box.length === 0) {
-      return [this.prevBounds];
-    }
-    return box;
-  }
-  
-  get terrainBoundingBox() {
-    let box = this.getAllBounds(this.position, this.terrainDimensions);
-    if (box.length === 0) {
-      return [this.boundingBox];
-    }
-    return box;
-  }
-  
-  get lastLosBoundingBox() {
-    return this.getAllBounds(this.lastPosition, this.losDimensions);
-  }
 
-  get losBoundingBox() {
-    return this.getAllBounds(this.position, this.losDimensions);
-  }
-
-  get lastHitbox() {
-    let box = this.getAllBounds(this.lastPosition, this.hitboxDimensions);
-    if (box.length === 0) {
-      return [this.prevBounds];
-    }
-    return box;
-  }
-
-  get hitbox() {
-    let box = this.getAllBounds(this.position, this.hitboxDimensions);
-    if (box.length === 0) {
-      return [this.boundingBox];
-    }
-    return box;
+  get bounds() {
+    return this.boundingBox;
   }
 
   get boundingBox() {
@@ -312,56 +303,37 @@ export default class GameObject extends GameObjectProxy {
   }
 
   get radius() {
-    return this.dimensions.radius ||
-      Math.sqrt(this.dimensions.height * this.dimensions.height + this.dimensions.width * this.dimensions.width) / 2;
+    return this.bounds.radius;
   }
 
-  get terrainVector() {
-    let mid = new Vector([this.lastPosition, this.position]);
-    let radius = Math.sqrt(this.terrainDimensions.height * this.terrainDimensions.height + this.terrainDimensions.width * this.terrainDimensions.width) / 2;
-    mid.extend(radius);
-    let left = mid.getParallelLine(radius);
-    let right = mid.getParallelLine(-radius);
-    return [mid, left, right];    
-  }
+  // get terrainVector() {
+  //   let mid = new Vector([this.lastPosition, this.position]);
+  //   let radius = Math.sqrt(this.terrainDimensions.height * this.terrainDimensions.height + this.terrainDimensions.width * this.terrainDimensions.width) / 2;
+  //   mid.extend(radius);
+  //   let left = mid.getParallelLine(radius);
+  //   let right = mid.getParallelLine(-radius);
+  //   return [mid, left, right];    
+  // }
 
-  get vector() {
-    let mid = new Vector([this.lastPosition, this.position]);
-    let radius = this.radius;
-    mid.extend(radius);
-    let left = mid.getParallelLine(radius);
-    let right = mid.getParallelLine(-radius);
-    return [mid, left, right];
-  }
+  // get vector() {
+  //   let mid = new Vector([this.lastPosition, this.position]);
+  //   let radius = this.radius;
+  //   mid.extend(radius);
+  //   let left = mid.getParallelLine(radius);
+  //   let right = mid.getParallelLine(-radius);
+  //   return [mid, left, right];
+  // }
 
   get sweepBox() {
     return this.Bounds().extend(this.prevBounds());
   }
 
   get height() {
-    let type = this.dimensionsType;
-    if (type === Bounds.TYPE.RECTANGLE) {
-      return this.dimensions.height;
-    } else if (type === Bounds.TYPE.CIRCLE) {
-      return this.dimensions.radius * 2;
-    } else if (type === Bounds.TYPE.POINT) {
-      return 1;
-    } else if (type === Bounds.TYPE.LINE) {
-      // TODO: some calculation
-    }
+    return this.bounds.height;
   }
 
   get width() {
-    let type = this.dimensionsType;
-    if (type === Bounds.TYPE.RECTANGLE) {
-      return this.dimensions.width;
-    } else if (type === Bounds.TYPE.CIRCLE) {
-      return this.dimensions.radius * 2;
-    } else if (type === Bounds.TYPE.POINT) {
-      return 1;
-    } else if (type === Bounds.TYPE.LINE) {
-      // TODO: some calculation
-    }
+    return this.bounds.width;
   }
   
   getUpdateState() {

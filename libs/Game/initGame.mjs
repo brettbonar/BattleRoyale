@@ -16,47 +16,47 @@ import Item from "../../modules/BattleRoyale/Objects/Item.mjs";
 
 function initGame(players, maps) {
   let gameObjects = [
-    new Character({
-      body: "darkelf",
-      gender: "female",
-      simulation: true,
-      damagedEffect: effects.blood,
-      loadout: {
-        weapon: equipment.axe,
-        torso: equipment.leatherChestMale,
-        legs: equipment.tealPantsMale,
-        head: equipment.clothHoodMale,
-        feet: equipment.brownShoesMale,
-        hands: equipment.leatherBracersMale
-      },
-      characterDirection: "right",
-      fireReady: true,
-      position: {
-        x: 400,
-        y: 255,
-        z: 0
-      }
-    }),
-    new Character({
-      body: "darkelf",
-      gender: "female",
-      simulation: true,
-      damagedEffect: effects.blood,
-      loadout: {
-        weapon: equipment.axe,
-        torso: equipment.leatherChestMale,
-        legs: equipment.tealPantsMale,
-        head: equipment.clothHoodMale,
-        feet: equipment.brownShoesMale,
-        hands: equipment.leatherBracersMale
-      },
-      fireReady: true,
-      position: {
-        x: 550,
-        y: 550,
-        z: 0
-      }
-    }),
+    // new Character({
+    //   body: "darkelf",
+    //   gender: "female",
+    //   simulation: true,
+    //   damagedEffect: effects.blood,
+    //   loadout: {
+    //     weapon: equipment.axe,
+    //     torso: equipment.leatherChestMale,
+    //     legs: equipment.tealPantsMale,
+    //     head: equipment.clothHoodMale,
+    //     feet: equipment.brownShoesMale,
+    //     hands: equipment.leatherBracersMale
+    //   },
+    //   characterDirection: "right",
+    //   fireReady: true,
+    //   position: {
+    //     x: 400,
+    //     y: 255,
+    //     z: 0
+    //   }
+    // }),
+    // new Character({
+    //   body: "darkelf",
+    //   gender: "female",
+    //   simulation: true,
+    //   damagedEffect: effects.blood,
+    //   loadout: {
+    //     weapon: equipment.axe,
+    //     torso: equipment.leatherChestMale,
+    //     legs: equipment.tealPantsMale,
+    //     head: equipment.clothHoodMale,
+    //     feet: equipment.brownShoesMale,
+    //     hands: equipment.leatherBracersMale
+    //   },
+    //   fireReady: true,
+    //   position: {
+    //     x: 550,
+    //     y: 650,
+    //     z: 0
+    //   }
+    // }),
     new Building({
       buildingType: "house",
       simulation: true,
@@ -97,60 +97,60 @@ function initGame(players, maps) {
     pos += 100;
   }
 
-  gameObjects.push(new Item({
-    position: {
-      x: 255,
-      y: 500
-    },
-    itemType: "healthPotion",
-    simulation: true
-  }));
-  gameObjects.push(new Item({
-    position: {
-      x: 255,
-      y: 510
-    },
-    itemType: "healthPotion",
-    simulation: true
-  }));
-  gameObjects.push(new Item({
-    position: {
-      x: 265,
-      y: 505
-    },
-    itemType: "healthPotion",
-    simulation: true
-  }));
+  // gameObjects.push(new Item({
+  //   position: {
+  //     x: 255,
+  //     y: 500
+  //   },
+  //   itemType: "healthPotion",
+  //   simulation: true
+  // }));
+  // gameObjects.push(new Item({
+  //   position: {
+  //     x: 255,
+  //     y: 510
+  //   },
+  //   itemType: "healthPotion",
+  //   simulation: true
+  // }));
+  // gameObjects.push(new Item({
+  //   position: {
+  //     x: 265,
+  //     y: 505
+  //   },
+  //   itemType: "healthPotion",
+  //   simulation: true
+  // }));
   
-  for (let i = 0; i < 10; i++) {
-    //let type = _.sample(_.filter(objects, { biome: "plain" }));
-    //let type = _.sample(objects);
-    //let type = objects.plainTree;
-    gameObjects.push(new StaticObject({
-      objectType: "plainTree",
-      position: {
-        x: _.random(0, 2000),
-        y: _.random(0, 2000)
-      },
-      simulation: true
-    }));
-  }
+  // for (let i = 0; i < 10; i++) {
+  //   //let type = _.sample(_.filter(objects, { biome: "plain" }));
+  //   //let type = _.sample(objects);
+  //   //let type = objects.plainTree;
+  //   gameObjects.push(new StaticObject({
+  //     objectType: "plainTree",
+  //     position: {
+  //       x: _.random(0, 2000),
+  //       y: _.random(0, 2000)
+  //     },
+  //     simulation: true
+  //   }));
+  // }
 
-  let x = 250;
-  let y = 250;
-  for (let i = 0; i < 10; i++) {
-    for (let j = 0; j < 5; j++) {
-      let type = _.sample(_.filter(objects, { group: "corn" })).objectType;
-      gameObjects.push(new StaticObject({
-        objectType: type,
-        position: {
-          x: x + i * (objects.corn1.imageDimensions.width * 3/4) + y,
-          y: y + j * (objects.corn1.imageDimensions.height / 3)
-        },
-        simulation: true
-      }));
-    }
-  }
+  // let x = 250;
+  // let y = 250;
+  // for (let i = 0; i < 10; i++) {
+  //   for (let j = 0; j < 5; j++) {
+  //     let type = _.sample(_.filter(objects, { group: "corn" })).objectType;
+  //     gameObjects.push(new StaticObject({
+  //       objectType: type,
+  //       position: {
+  //         x: x + i * (objects.corn1.imageDimensions.width * 3/4) + y,
+  //         y: y + j * (objects.corn1.imageDimensions.height / 3)
+  //       },
+  //       simulation: true
+  //     }));
+  //   }
+  // }
 
   // gameObjects.push(new StaticObject({
   //   position: {

@@ -1,3 +1,5 @@
+import { drawShadow } from "../../Engine/Rendering/renderUtils.mjs";
+
 const imageSize = 64;
 
 export const STATE = {
@@ -226,16 +228,16 @@ export default class CharacterRenderer {
     let barHeight = 4;
 
     let offset = {
-      x: object.position.x,
-      y: object.position.y
+      x: object.position.x + object.width / 4,
+      y: object.position.y - object.position.z * 32
     };
 
     if (object.state.hasMana) {
       context.fillStyle = "blue";
       context.strokeStyle = "black";
       context.fillRect(offset.x, offset.y,
-        Math.max(0, object.width * (object.state.currentMana / object.state.maxMana)), barHeight);
-      context.strokeRect(offset.x, offset.y, object.width, barHeight);
+        Math.max(0, (object.width / 2) * (object.state.currentMana / object.state.maxMana)), barHeight);
+      context.strokeRect(offset.x, offset.y, object.width / 2, barHeight);
       offset.y -= (barHeight + 4);
     }
 
@@ -243,8 +245,8 @@ export default class CharacterRenderer {
       context.fillStyle = "red";
       context.strokeStyle = "black";
       context.fillRect(offset.x, offset.y,
-        Math.max(0, object.width * (object.state.currentHealth / object.state.maxHealth)), barHeight);
-      context.strokeRect(offset.x, offset.y, object.width, barHeight);
+        Math.max(0, (object.width / 2) * (object.state.currentHealth / object.state.maxHealth)), barHeight);
+      context.strokeRect(offset.x, offset.y, object.width / 2, barHeight);
     }
   }
 
@@ -261,7 +263,7 @@ export default class CharacterRenderer {
       if (item.image.complete) {
         let offset = getOffset(this.animation, this.frame, item.imageSize);
         context.drawImage(item.image, offset.x, offset.y, item.imageSize, item.imageSize,
-          object.position.x, object.position.y, item.imageSize, item.imageSize);
+          object.position.x, object.position.y - object.position.z * 32, item.imageSize, item.imageSize);
       }
     }
   }
@@ -269,8 +271,12 @@ export default class CharacterRenderer {
   _render(context, object, elapsedTime, center) {
     let offset = getOffset(this.animation, this.frame, imageSize);
 
+    if (object.position.z > 0) {
+      drawShadow(context, object);
+    }
+
     context.drawImage(this.body, offset.x, offset.y, imageSize, imageSize,
-      object.position.x, object.position.y, imageSize, imageSize);
+      object.position.x, object.position.y - object.position.z * 32, imageSize, imageSize);
     this.drawLoadout(context, object);
 
     if (this.state !== STATE.DEAD && !object.isOtherPlayer) {

@@ -1,21 +1,18 @@
 import GameObject from "../../Engine/GameObject/GameObject.mjs"
 import magicEffects from "./magicEffects.mjs"
-import MagicRenderer from "./MagicRenderer.mjs";
-import { SURFACE_TYPE } from "../../Engine/Physics/PhysicsConstants.mjs";
+import MagicRenderer from "./MagicRenderer.mjs"
+import Point from "../../Engine/GameObject/Point.mjs"
+import { SURFACE_TYPE } from "../../Engine/Physics/PhysicsConstants.mjs"
 
 export default class Magic extends GameObject {
   constructor(params) {
     super(params);
     this.magic = magicEffects[params.type];
     this.effect = this.magic.effect;
-    this.position = params.target;
+    this.position = new Point(params.target);
     this.physics.surfaceType = SURFACE_TYPE.NONE;
 
-    let direction = this.normalize({
-      x: params.target.x - params.source.x,
-      y: params.target.y - params.source.y
-    });
-
+    let direction = params.target.minus(params.source).normalize();
     let image = this.magic.rendering.image;
     if (!image) {
       let imageDirection;
@@ -44,13 +41,13 @@ export default class Magic extends GameObject {
     this.renderer.update(elapsedTime);
   }
   
-  get perspectivePosition() {
-    if (this.image.perspectiveOffset) {
-      return {
-        x: this.position.x + this.image.perspectiveOffset.x,// - (this.magic.rendering.imageSize / 2 - this.imageOffset.x),
-        y: this.position.y + this.image.perspectiveOffset.y// + (this.magic.rendering.imageSize - this.imageOffset.y)
-      };
-    }
-    return this.position;
-  }
+  // get perspectivePosition() {
+  //   if (this.image.perspectiveOffset) {
+  //     return {
+  //       x: this.position.x + this.image.perspectiveOffset.x,// - (this.magic.rendering.imageSize / 2 - this.imageOffset.x),
+  //       y: this.position.y + this.image.perspectiveOffset.y// + (this.magic.rendering.imageSize - this.imageOffset.y)
+  //     };
+  //   }
+  //   return this.position;
+  // }
 }

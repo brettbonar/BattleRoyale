@@ -1,6 +1,7 @@
 import GameObject from "../../Engine/GameObject/GameObject.mjs"
 import ProjectileRenderer from "../Renderers/ProjectileRenderer.mjs"
-import attacks from "../Magic/attacks.mjs";
+import attacks from "../Magic/attacks.mjs"
+import Point from "../../Engine/GameObject/Point.mjs"
 import { getDistance } from "../../Engine/util.mjs"
 
 export default class Projectile extends GameObject {
@@ -17,10 +18,26 @@ export default class Projectile extends GameObject {
     //   width: 32,
     //   height: 8
     // };
-    this.dimensions = params.attack.effect.dimensions;
+    this.dimensions = {
+      width: params.attack.rendering.imageSize,
+      height: params.attack.rendering.imageSize
+    };
+    this.collisionDimensions = params.attack.effect.collisionDimensions;
     this.speed = params.attack.effect.speed;
-    this.startPosition = Object.assign({}, this.position);
+    //this.renderheight = _.get(params.attack.effect, "offset.z", 0);
+    this.position.add(params.attack.effect.offset);
+    this.startPosition = new Point(this.position);
     this.effect = params.attack.effect;
+    this.modelDimensions = params.modelDimensions || {
+      offset: {
+        x: 8,
+        y: 8
+      },
+      dimensions: {
+        width: 16,
+        height: 16
+      }
+    };
 
     if (!params.simulation) {
       this.renderer = new ProjectileRenderer(params.attack.rendering);
@@ -31,13 +48,6 @@ export default class Projectile extends GameObject {
 
   get distanceTravelled() {
     return getDistance(this.position, this.startPosition);
-  }
-
-  get renderPosition() {
-    return {
-      x: this.position.x,
-      y: this.position.y - 32
-    };
   }
 
   update(elapsedTime) {

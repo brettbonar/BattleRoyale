@@ -1,6 +1,7 @@
 import KEY_CODE from "../util/keyCodes.mjs"
 import Game from "../Engine/Game.mjs"
 import GameObject from "../Engine/GameObject/GameObject.mjs"
+import Point from "../Engine/GameObject/Point.mjs"
 import Bounds from "../Engine/GameObject/Bounds.mjs"
 import FloatingText from "../Graphics/FloatingText.mjs"
 import PhysicsEngine from "../Engine/Physics/PhysicsEngine.mjs"
@@ -192,12 +193,13 @@ export default class BattleRoyale extends Game {
         character.fireReady = false;
       }
 
+      // TODO: make this fire onto cursor
       if (this.simulation) {
         if (attack.type === "projectile") {
           this.gameState.objects.push(new Projectile({
             position: {
-              x: character.position.x + (character.width + 5) * params.direction.x,
-              y: character.position.y + (character.height + 5) * params.direction.y - 10,
+              x: character.center.x + (character.width / 2 + 10) * params.direction.x,
+              y: character.center.y + (character.width / 2 + 10) * params.direction.y,
               z: character.position.z
             },
             simulation: this.simulation,
@@ -224,21 +226,27 @@ export default class BattleRoyale extends Game {
     }
   }
 
+  getAbsoluteCursorPosition() {
+    return new Point({
+      x: this.gameState.player.center.x + (this.gameState.cursor.position.x - this.canvas.width / 2),
+      y: this.gameState.player.center.y + (this.gameState.cursor.position.y - this.canvas.height / 2),
+    });
+  }
+
   attack(event, attackType) {
-    let target = {
-      x: this.gameState.cursor.position.x - this.gameState.player.position.x,
-      y: this.gameState.cursor.position.y - this.gameState.player.position.y
-    };
+    let target = this.getAbsoluteCursorPosition();
     // let target = {
     //   // x: this.gameState.cursor.position.x - this.gameState.player.position.x,
     //   // y: this.gameState.cursor.position.y - this.gameState.player.position.y
     //   x: this.gameState.player.position.x + (this.gameState.cursor.position.x - this.canvas.width / 2),
     //   y: this.gameState.player.position.y + (this.gameState.cursor.position.y - this.canvas.height / 2)
     // };
-    let direction = this.normalize({
-      x: this.gameState.cursor.position.x - this.canvas.width / 2,
-      y: this.gameState.cursor.position.y - this.canvas.height / 2 + 32
-    });
+    // let direction = this.normalize({
+    //   x: this.gameState.cursor.position.x - this.canvas.width / 2,
+    //   y: this.gameState.cursor.position.y - this.canvas.height / 2 + 32
+    // });
+    let direction = target.minus(this.gameState.player.center).normalize();
+    direction.z = 0;
 
     let source = {
       playerId: this.player.playerId,
@@ -288,10 +296,11 @@ export default class BattleRoyale extends Game {
   // }
 
   move(event) {
-    let direction = {
+    let direction = new Point({
       x: 0,
-      y: 0
-    };
+      y: 0,
+      z: this.gameState.player.direction.z || 0
+    });
     if (event.release) {
       _.pull(this.activeEvents, event.event);
     } else {
@@ -358,17 +367,18 @@ export default class BattleRoyale extends Game {
     this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
     this.context.fillRect(0, 0, this.canvas.width, this.canvas.height);
 
-    if (this.maps[this.gameState.player.position.z]) {
-      this.maps[this.gameState.player.position.z].render(this.context, this.gameState.player.position);
+    if (this.maps[this.gameState.player.level]) {
+      this.maps[this.gameState.player.level].render(this.context, this.gameState.player.center);
     }
 
     this.context.save();
     // Translate to player position
-    this.context.translate(-(this.gameState.player.position.x - this.context.canvas.width / 2),
-    -(this.gameState.player.position.y - this.context.canvas.height / 2));
+    // TODO: translate to player center?
+    this.context.translate(-(this.gameState.player.center.x - this.context.canvas.width / 2),
+    -(this.gameState.player.center.y - this.context.canvas.height / 2));
 
-    this.renderingEngine.render(this.getRenderObjects(), elapsedTime, this.gameState.player.position);
-    this.particleEngine.render(elapsedTime, this.gameState.player.position);
+    this.renderingEngine.render(this.getRenderObjects(), elapsedTime, this.gameState.player.center);
+    this.particleEngine.render(elapsedTime, this.gameState.player.center);
     this.renderInteractions();
     this.context.restore();
 
@@ -410,10 +420,7 @@ export default class BattleRoyale extends Game {
     // TODO: do this at end -- for some reason setTarget has to be up here
     // CLIENT ONLY
     if (!this.isServer) {
-      let target = {
-        x: this.gameState.cursor.position.x + (this.gameState.player.position.x - this.canvas.width / 2),
-        y: this.gameState.cursor.position.y + (this.gameState.player.position.y - this.canvas.height / 2)
-      };
+      let target = this.getAbsoluteCursorPosition();
       this.gameState.player.setTarget(target);
 
       this.sendEvent({

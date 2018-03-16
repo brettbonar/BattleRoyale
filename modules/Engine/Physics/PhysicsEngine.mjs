@@ -57,49 +57,40 @@ export default class PhysicsEngine {
   //   return collisions;
   // }
 
+  intersects(bounds1, bounds2) {
+    return bounds1
+      .some((bounds) => bounds2
+        .some((targetBounds) => targetBounds.intersects(bounds)));
+  }
+
   detectCollisions(obj, objects) {
-    //let vector = obj.terrainVector;
-    let objTerrainBox = obj.terrainBoundingBox;
-    let objHitbox = obj.hitbox;
+    let objCollisionBounds = obj.collisionBounds;
     let collisions = [];
     for (const target of objects) {
       if (target === obj || target.physics.surfaceType === SURFACE_TYPE.NONE) continue;
       // Only need to test projectiles against characters, not both ways
+      // TODO: do all tests, but exclude ones already found
       if (obj.physics.surfaceType === SURFACE_TYPE.CHARACTER &&
           target.physics.surfaceType === SURFACE_TYPE.PROJECTILE) {
         continue;
       }
-      if (target.position.z !== obj.position.z) continue;
       
-      //if (target.physics.surfaceType === SURFACE_TYPE.TERRAIN || target.physics.surfaceType === SURFACE_TYPE.GROUND) {
-        //let intersections = this.getIntersections(vector, target);
-      if (obj.physics.surfaceType === SURFACE_TYPE.CHARACTER) {
-        for (const targetTerrainBox of target.terrainBoundingBox) {
-          if (objTerrainBox.some((box) => box.intersects(targetTerrainBox))) {
-            collisions.push({
-              source: obj,
-              target: target
-            });
+      let targetCollisionBounds = target.collisionBounds;
+      if (this.intersects(objCollisionBounds, targetCollisionBounds)) {
+        collisions.push({
+          source: obj,
+          target: target
+        });
 
-            // TODO: make this more robust for high speeds
-            obj.position.x = obj.lastPosition.x;
-            obj.position.y = obj.lastPosition.y;
-          }
-        }
-      }
-      
-      for (const targetHitbox of target.hitbox) {
-        if (objHitbox.some((box) => box.intersects(targetHitbox))) {
-          collisions.push({
-            source: obj,
-            target: target
-          });
-        }
+        // TODO: make this more robust for high speeds
+        // TODO: don't always do this (e.g. piercing projectiles)
+        obj.position.x = obj.lastPosition.x;
+        obj.position.y = obj.lastPosition.y;
       }
       
       // TODO: do this after all other physics calculations
       for (const functionBox of target.getAllFunctionBounds()) {
-        if (objTerrainBox.some((box) => box.intersects(functionBox.box))) {
+        if (objCollisionBounds.some((bounds) => bounds.intersects(functionBox.box))) {
           functionBox.cb(obj);
         }
       }
@@ -119,9 +110,12 @@ export default class PhysicsEngine {
         Object.assign(obj.lastPosition, obj.position);
         obj.position.x += obj.direction.x * obj.speed * (time / 1000);
         obj.position.y += obj.direction.y * obj.speed * (time / 1000);
+        if (obj.direction.z) {
+          obj.position.z += obj.direction.z * obj.speed * (time / 1000);
+        }
       }
       if (obj.spin) {
-        obj.rotation += (time / 50) * obj.spin;
+        obj.rotation += obj.spin * (time / 1000);
       }
     }
 

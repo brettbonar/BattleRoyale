@@ -1,6 +1,6 @@
 import Bounds from "../../Engine/GameObject/Bounds.mjs"
 import GameObject from "../../Engine/GameObject/GameObject.mjs"
-import BuildingPart from "./BuildingPart.mjs"
+import RenderObject from "../Objects/RenderObject.mjs"
 import buildings from "./buildings.mjs"
 import { SURFACE_TYPE } from "../../Engine/Physics/PhysicsConstants.mjs";
 
@@ -11,14 +11,21 @@ export default class Building extends GameObject {
     }, params));
     this.type = "Building";
     this.building = buildings[params.buildingType];
-    this.losDimensions = this.building.bounds;
-    this.hitboxDimensions = this.building.bounds;
-    this.terrainDimensions = this.building.bounds;
+    //this.losDimensions = this.building.bounds;
+    this.collisionDimensions = this.building.collisionDimensions;
     this.outside = true;
 
     this.losFade = false;
-    this.exterior = new BuildingPart(params, this.building.exterior);
-    this.interior = new BuildingPart(params, this.building.interior);
+
+    if (!params.simulation) {
+      this.exterior = new RenderObject(Object.assign({}, params, this.building), this.building.exterior);
+      this.interior = new RenderObject(Object.assign({
+        perspectiveOffset: {
+          y: 0
+        }
+      }, params, this.building), this.building.interior);
+      this.interior.position.z -= 1;
+    }
 
     this.exteriorDoors = [];
     this.interiorDoors = [];
@@ -45,10 +52,7 @@ export default class Building extends GameObject {
     return this.functionBounds = this.building.interior.bounds.map((bounds) => {
       return {
         box: new Bounds(Object.assign({
-          position: {
-            x: this.position.x + bounds.offset.x,
-            y: this.position.y + bounds.offset.y
-          }
+          position: this.position.plus(bounds.offset)
         }, bounds)),
         cb: (target) => this.insideCb(target)
       };

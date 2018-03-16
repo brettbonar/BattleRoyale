@@ -28,8 +28,18 @@ export default {
     effect: {
       damage: 10,
       // TODO: more shapes
-      dimensions: {
-        radius: 5
+      collisionDimensions: [{
+        offset: {
+          x: 8,
+          y: 8
+        },
+        dimensions: {
+          width: 16,
+          height: 16
+        }
+      }],
+      offset: {
+        z: 1
       },
       range: 1000,
       attackTime: 1000,

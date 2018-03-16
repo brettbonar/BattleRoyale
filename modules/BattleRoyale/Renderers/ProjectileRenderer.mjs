@@ -1,3 +1,5 @@
+import { drawShadow } from "../../Engine/Rendering/renderUtils.mjs";
+
 function getOffset(animation, frame, imageSize) {
   let offset = ANIMATION_SETTINGS[animation].offset;
   return {
@@ -15,32 +17,34 @@ export default class ProjectileRenderer {
     this.currentTime = 0;
   }
 
-  render(context, object, elapsedTime, center) {
+  render(context, object, elapsedTime) {
     if (!this.image.complete) {
       return;
     }
 
-    let pos = {
-      x: object.position.x - this.projectile.imageSize / 2,
-      // TODO: why 16?
-      y: object.position.y - this.projectile.imageSize - 16
-    }
+    let center = object.center;
     let offset = {
       x: this.frame * this.projectile.imageSize,
       y: 0,//this.frame * this.projectile.imageSize
     };
-    
-    if (object.rotation) {
-      context.translate(pos.x + this.projectile.imageSize / 2, pos.y + this.projectile.imageSize / 2);
-      context.rotate((object.rotation * Math.PI) / 180);
-      context.translate(-(pos.x + this.projectile.imageSize / 2), -(pos.y + this.projectile.imageSize / 2));        
+
+    if (object.position.z > 0) {
+      drawShadow(context, object);
     }
 
+    context.save();
+    // TODO: figure this out
+    // if (object.rotation) {
+    //   context.translate(center.x, center.y);
+    //   context.rotate((object.rotation * Math.PI) / 180);
+    //   context.translate(-center.x, -center.y);        
+    // }
     //this.frame = 0;
     context.drawImage(this.image, offset.x, offset.y,
       this.projectile.imageSize, this.projectile.imageSize,
-      pos.x, pos.y, this.projectile.imageSize, this.projectile.imageSize);
-
+      object.position.x, (object.position.y - object.position.z * 32) + this.projectile.imageSize / 2,
+      this.projectile.imageSize, this.projectile.imageSize);
+    context.restore();
     // DEBUG
     // let box = object.boundingBox.box;
     // context.strokeStyle = "magenta";

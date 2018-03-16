@@ -3,7 +3,7 @@ function getDistance(a, b) {
   let dy = a.y - b.y;
   return Math.sqrt(dx * dx + dy * dy);
 };
-    
+
 function normalize(point) {
   if (point) {
     let norm = Math.sqrt(point.x * point.x + point.y * point.y);

@@ -25,15 +25,15 @@ export default class StaticObject extends GameObject {
     }
   }
 
-  get perspectivePosition() {
-    if (this.perspectiveOffset) {
-      return {
-        x: this.position.x + this.perspectiveOffset.x,
-        y: this.position.y + this.perspectiveOffset.y
-      };
-    }
-    return this.position;
-  }
+  // get perspectivePosition() {
+  //   if (this.perspectiveOffset) {
+  //     return {
+  //       x: this.position.x + this.perspectiveOffset.x,
+  //       y: this.position.y + this.perspectiveOffset.y
+  //     };
+  //   }
+  //   return this.position;
+  // }
 
   getAllRenderObjects() {
     return this.parts || this;
