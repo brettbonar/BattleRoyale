@@ -100,13 +100,16 @@ export default class PhysicsEngine {
   }
 
   update(elapsedTime, objects) {
+    // TRICKY: Not sure why this happens at the beginning
+    if (!elapsedTime) return [];
+
     for (const obj of objects) {
       let time = elapsedTime;
       if (obj.elapsedTime) {
         time += obj.elapsedTime;
         obj.elapsedTime = 0;
       }
-      if (obj.direction.x || obj.direction.y) {
+      if (obj.direction.x || obj.direction.y || obj.direction.z) {
         Object.assign(obj.lastPosition, obj.position);
         obj.position.x += obj.direction.x * obj.speed * (time / 1000);
         obj.position.y += obj.direction.y * obj.speed * (time / 1000);

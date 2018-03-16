@@ -39,7 +39,7 @@ export default {
         }
       }],
       offset: {
-        z: 1
+        z: 0.6
       },
       range: 1000,
       attackTime: 1000,

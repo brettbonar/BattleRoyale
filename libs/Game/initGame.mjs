@@ -69,6 +69,7 @@ function initGame(players, maps) {
   ];
 
   let pos = 255;
+  //players.push({ playerId: 1, socket: { emit: _.noop } });
   for (const player of players) {
     gameObjects.push(
       new Character({
@@ -90,6 +91,11 @@ function initGame(players, maps) {
         position: {
           x: pos,
           y: pos,
+          z: 1
+        },
+        direction: {
+          x: 0,
+          y: 0,
           z: 0
         }
       })

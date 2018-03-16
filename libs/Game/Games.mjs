@@ -75,6 +75,10 @@ class Game {
       startPlayers: 1,
       status: STATUS.LOBBY
     });
+
+    // TESTING
+    // this.initialize();
+    // this.start();
   }
 
   getObjects() {
@@ -104,6 +108,11 @@ class Game {
       console.log("Got ready");
       player.ready = true;
 
+      if (_.sumBy(this.players, "ready") >= this.startPlayers) {
+        console.log("Initializing");
+        this.initialize();
+      }
+
       player.socket.on("initialized", () => {
         player.initialized = true;
         if (_.sumBy(this.players, "initialized") >= this.startPlayers) {
@@ -111,11 +120,6 @@ class Game {
           this.start();
         }
       });
-
-      if (_.sumBy(this.players, "ready") >= this.startPlayers) {
-        console.log("Initializing");
-        this.initialize();
-      }
     });
   }
 

@@ -36,6 +36,10 @@ export default class PerspectiveRenderingEngine extends RenderingEngine{
   sortByY(obj) {
     return obj.perspectivePosition.y;
   }
+  sortByLos(obj) {
+    let pos = obj.perspectivePosition;
+    return pos.y + pos.z * 32;
+  }
 
   debugBoxes(objects) {
     if (window.debug) {
@@ -75,7 +79,8 @@ export default class PerspectiveRenderingEngine extends RenderingEngine{
     
     renderObjects = renderObjects.concat(this.getCharactersInFov(objects, center));
 
-    return _.sortBy(renderObjects, this.sortByY, this.sortByZ);
+    //return _.sortBy(renderObjects, this.sortByY, this.sortByZ);
+    return _.sortBy(renderObjects, this.sortByLos);
   }
 
   getCharactersInFov(objects, center) {

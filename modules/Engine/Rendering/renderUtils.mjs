@@ -1,3 +1,7 @@
+const SHADOW_START = { z: 0, value: 0.5 };
+const SHADOW_END = { z: 5, value: 1 };
+const SHADOW_INC = (SHADOW_END.value - SHADOW_START.value) / (SHADOW_END.z - SHADOW_START.z);
+
 function drawShadow(context, object) {
   let shadowPos = object.position.plus(object.modelDimensions.offset).plus({
     y: object.modelDimensions.dimensions.height - object.modelDimensions.dimensions.width / 2
@@ -10,7 +14,10 @@ function drawShadow(context, object) {
     shadowPos.y + object.modelDimensions.dimensions.width / 2,
     0);
   gradient.addColorStop(0, "transparent");
-  gradient.addColorStop(0.75, "black");
+
+  let z = object.position.z || 0;
+  let shadow = Math.min(1, SHADOW_START.value + z * SHADOW_INC);
+  gradient.addColorStop(shadow, "black");
   context.fillStyle = gradient;
   context.fillRect(shadowPos.x, shadowPos.y,
     object.modelDimensions.dimensions.width, object.modelDimensions.dimensions.width);
