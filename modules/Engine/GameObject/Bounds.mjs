@@ -81,7 +81,7 @@ export default class Bounds {
   }
 
   intersectsLine(first, second) {
-    if (_.isNumber(first.z) && _.isNumber(second.z) && first.z !== second.z) return;
+    if (_.isNumber(first.z) && _.isNumber(second.z) && Math.floor(first.z) !== Math.floor(second.z)) return;
     // https://stackoverflow.com/questions/9043805/test-if-two-lines-intersect-javascript-function
     var det, gamma, lambda;
     det = (first[1].x - first[0].x) * (second[1].y - second[0].y) - (second[1].x - second[0].x) * (first[1].y - first[0].y);
@@ -109,7 +109,7 @@ export default class Bounds {
     // TODO: add circle intersection tests
     if (target instanceof Bounds) {
       let box = target.box;
-      return (!_.isNumber(this.box.ul.z) || !_.isNumber(box.ul.z) || this.box.ul.z === box.ul.z) &&
+      return (!_.isNumber(this.box.ul.z) || !_.isNumber(box.ul.z) || Math.floor(this.box.ul.z) === Math.floor(box.ul.z)) &&
         this.box.ul.x < box.lr.x &&
         this.box.lr.x > box.ul.x &&
         this.box.ul.y < box.lr.y &&
@@ -117,7 +117,7 @@ export default class Bounds {
     } else if (_.isArray(target)) { // Line [{ x, y }, { x, y }]
       return _.some(this.lines, (line) => this.intersectsLine(line, target));
     } else if (!_.isUndefined(target.x) && !_.isUndefined(target.y)) { // Point { x, y }
-      return (!_.isNumber(this.box.ul.z) || !_.isNumber(target.z) || target.z === this.box.ul.z) &&
+      return (!_.isNumber(this.box.ul.z) || !_.isNumber(target.z) || Math.floor(target.z) === Math.floor(this.box.ul.z)) &&
         target.x >= this.box.ul.x && target.x <= this.box.lr.x &&
         target.y >= this.box.ul.y && target.y <= this.box.lr.y;
     }
