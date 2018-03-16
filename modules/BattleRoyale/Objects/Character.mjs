@@ -29,10 +29,17 @@ export default class Character extends GameObject {
     });
     
     this.physics.surfaceType = "character";
-    this.dimensions = params.dimensions || {
-      width: 32,
-      height: 20
-    };
+    this.dimensions = params.dimensions || [{
+      offset: {
+        x: 0,
+        y: 44, // 64 - 20,
+        z: [0, 1]
+      },
+      dimensions: {
+        width: 32,
+        height: 20
+      }
+    }];
 
     this.modelDimensions = {
       width: 32,

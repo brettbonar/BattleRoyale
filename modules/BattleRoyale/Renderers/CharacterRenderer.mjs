@@ -226,8 +226,8 @@ export default class CharacterRenderer {
     let barHeight = 4;
 
     let offset = {
-      x: object.position.x - object.modelDimensions.width / 2,
-      y: object.position.y - object.modelDimensions.height
+      x: object.position.x,
+      y: object.position.y
     };
 
     if (object.state.hasMana) {
@@ -259,26 +259,18 @@ export default class CharacterRenderer {
 
     for (const item of loadout) {
       if (item.image.complete) {
-        let pos = {
-          x: object.position.x - item.imageSize / 2,
-          y: object.position.y - imageSize / 2 - item.imageSize / 2
-        }
         let offset = getOffset(this.animation, this.frame, item.imageSize);
         context.drawImage(item.image, offset.x, offset.y, item.imageSize, item.imageSize,
-          pos.x, pos.y, item.imageSize, item.imageSize);
+          object.position.x, object.position.y, item.imageSize, item.imageSize);
       }
     }
   }
 
   _render(context, object, elapsedTime, center) {
-    let pos = {
-      x: object.position.x - imageSize / 2,
-      y: object.position.y - imageSize
-    }
     let offset = getOffset(this.animation, this.frame, imageSize);
 
     context.drawImage(this.body, offset.x, offset.y, imageSize, imageSize,
-      pos.x, pos.y, imageSize, imageSize);
+      object.position.x, object.position.y, imageSize, imageSize);
     this.drawLoadout(context, object);
 
     if (this.state !== STATE.DEAD && !object.isOtherPlayer) {

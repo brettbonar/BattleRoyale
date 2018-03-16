@@ -9,16 +9,14 @@ export default class ObjectRenderer {
   }
 
   _render(context, object, elapsedTime, center) {
-    let offset = {
-      x: (this.imageDimensions.width) / 2,
-      y: this.imageDimensions.height
+    let offset = this.imageDimensions.offset || {
+      x: 0,
+      y: 0
     };
-    if (this.imageDimensions.offset) {
-      Object.assign(offset, this.imageDimensions.offset);
-    }
+    
     let position = {
-      x: object.position.x - offset.x,
-      y: object.position.y - offset.y
+      x: object.position.x + offset.x,
+      y: object.position.y + offset.y
     };
     context.drawImage(this.image, this.imageDimensions.x, this.imageDimensions.y, this.imageDimensions.width, this.imageDimensions.height,
       position.x, position.y, this.imageDimensions.width, this.imageDimensions.height);

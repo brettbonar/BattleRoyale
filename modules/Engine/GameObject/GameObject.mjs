@@ -46,7 +46,8 @@ export default class GameObject extends GameObjectProxy {
       },
       position: {
         x: 0,
-        y: 0
+        y: 0,
+        z: 0
       },
       revision: 0,
       renderer: new Renderer(),
@@ -79,13 +80,13 @@ export default class GameObject extends GameObjectProxy {
   }
 
   getDimensionsType(dimensions) {
-    if (_.isUndefined(this.dimensions)) {
-      return Bounds.TYPE.POINT;
-    } else if (_.isArray(this.dimensions)) { // line
-      return Bounds.TYPE.LINE;
-    } else if (this.dimensions.width || this.dimensions.height) {
+    if (!_.isUndefined(this.dimensions.width) || !_.isUndefined(this.dimensions.height)) {
       return Bounds.TYPE.RECTANGLE;
-    } else if (this.dimensions.radius) {
+    } else if (_.isUndefined(this.dimensions)) {
+      return Bounds.TYPE.POINT;
+    } else if (_.isArray(this.dimensions)) {
+      return Bounds.TYPE.LINE;
+    } else if (!_.isUndefined(this.dimensions.radius)) {
       return Bounds.TYPE.CIRCLE;
     }
   }
@@ -129,7 +130,10 @@ export default class GameObject extends GameObjectProxy {
         y: this.position.y + this.renderOffset.y
       };
     }
-    return this.position;
+    return {
+      x: this.position.x,
+      y: this.position.y + this.height
+    };
   }
 
   normalizeDirection() {
@@ -147,8 +151,8 @@ export default class GameObject extends GameObjectProxy {
       return this.getCenterOfPoints(points);
     } else if (type === Bounds.TYPE.RECTANGLE) {
       return {
-        x: this.position.x,
-        y: this.position.y - dimensions.height / 2
+        x: this.position.x + dimensions.width / 2,
+        y: this.position.y + dimensions.height / 2
       };
     } else if (type === Bounds.TYPE.POINT) { // point or circle
       return dimensions;

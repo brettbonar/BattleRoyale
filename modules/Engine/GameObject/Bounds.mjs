@@ -8,18 +8,14 @@ const TYPE = {
 
 export default class Bounds {
   constructor(params) {
-    if (params.boundsType === TYPE.CIRCLE) {
-      this.constructFromCircle(params);
-    } else if (params.boundsType === TYPE.RECTANGLE) {
+    if (!_.isUndefined(params.dimensions.width) && !_.isUndefined(params.dimensions.height)) {
       this.constructFromRectangle(params);
-    } else if (params.boundsType === TYPE.RECTANGLE_UL) {
-      this.constructFromRectangleUL(params);
-    } else if (params.boundsType === TYPE.LINE) {
+    } else if (_.isArray(params)) {
       this.constructFromLine(params);
-    } else if (params.dimensions.width || params.dimensions.height) {
-      this.constructFromRectangle(params);
-    } else if (params.dimensions.radius) {
+    } else if (!_.isUndefined(params.dimensions.radius)) {
       this.constructFromCircle(params);
+    } else {
+      console.log("Bad Bounds constructor");
     }
   }
 
@@ -63,8 +59,7 @@ export default class Bounds {
     };
   }
 
-  constructFromRectangleUL(params) {
-    // TODO: handle line width?
+  constructFromRectangle(params) {
     this.box = {
       ul: { x: params.position.x, y: params.position.y },
       ur: { x: params.position.x + params.dimensions.width, y: params.position.y },
@@ -80,29 +75,29 @@ export default class Bounds {
     };
   }
 
-  constructFromRectangle(params) {
-    // TODO: handle line width?
-    // this.box = {
-    //   ul: { x: params.position.x, y: params.position.y },
-    //   ur: { x: params.position.x + params.dimensions.width, y: params.position.y },
-    //   lr: { x: params.position.x + params.dimensions.width, y: params.position.y + params.dimensions.height },
-    //   ll: { x: params.position.x, y: params.position.y + params.dimensions.height }
-    // };
+  // constructFromRectangle(params) {
+  //   // TODO: handle line width?
+  //   // this.box = {
+  //   //   ul: { x: params.position.x, y: params.position.y },
+  //   //   ur: { x: params.position.x + params.dimensions.width, y: params.position.y },
+  //   //   lr: { x: params.position.x + params.dimensions.width, y: params.position.y + params.dimensions.height },
+  //   //   ll: { x: params.position.x, y: params.position.y + params.dimensions.height }
+  //   // };
 
-    this.box = {
-      ul: { x: params.position.x - params.dimensions.width / 2, y: params.position.y - params.dimensions.height },
-      ur: { x: params.position.x + params.dimensions.width / 2, y: params.position.y - params.dimensions.height },
-      lr: { x: params.position.x + params.dimensions.width / 2, y: params.position.y },
-      ll: { x: params.position.x - params.dimensions.width / 2, y: params.position.y }
-    };
+  //   this.box = {
+  //     ul: { x: params.position.x - params.dimensions.width / 2, y: params.position.y - params.dimensions.height },
+  //     ur: { x: params.position.x + params.dimensions.width / 2, y: params.position.y - params.dimensions.height },
+  //     lr: { x: params.position.x + params.dimensions.width / 2, y: params.position.y },
+  //     ll: { x: params.position.x - params.dimensions.width / 2, y: params.position.y }
+  //   };
 
-    this.lines = {
-      top: [this.box.ul, this.box.ur],
-      bottom: [this.box.lr, this.box.ll],
-      right: [this.box.ur, this.box.lr],
-      left: [this.box.ll, this.box.ul]
-    };
-  }
+  //   this.lines = {
+  //     top: [this.box.ul, this.box.ur],
+  //     bottom: [this.box.lr, this.box.ll],
+  //     right: [this.box.ur, this.box.lr],
+  //     left: [this.box.ll, this.box.ul]
+  //   };
+  // }
 
   intersectsLine(first, second) {
     // https://stackoverflow.com/questions/9043805/test-if-two-lines-intersect-javascript-function
@@ -157,6 +152,19 @@ export default class Bounds {
   }
   get ll() {
     return this.box.ll;
+  }
+
+  get top() {
+    return this.box.ul;
+  }
+  get bottom() {
+    return this.box.lr;
+  }
+  get left() {
+    return this.box.ul;
+  }
+  get right() {
+    return this.box.lr;
   }
 
   get width() {
