@@ -35,11 +35,12 @@ export default {
         },
         dimensions: {
           width: 16,
-          height: 16
+          height: 16,
+          zheight: 16
         }
       }],
       offset: {
-        z: 0.6
+        z: 20
       },
       range: 1000,
       attackTime: 1000,

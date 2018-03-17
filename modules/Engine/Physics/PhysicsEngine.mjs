@@ -4,6 +4,7 @@ import { MOVEMENT_TYPE, SURFACE_TYPE } from "./PhysicsConstants.mjs";
 export default class PhysicsEngine {
   constructor(params) {
     _.merge(this, params);
+    this.test = 1;
   }
 
   getIntersections(vector, target) {
@@ -109,6 +110,18 @@ export default class PhysicsEngine {
         time += obj.elapsedTime;
         obj.elapsedTime = 0;
       }
+
+      // if (obj.physics.surfaceType === SURFACE_TYPE.CHARACTER) {
+      //   obj.position.z += (elapsedTime / 10) * this.test;
+      //   if (obj.position.z > 500) {
+      //     this.test = -1;
+      //   }
+      //   if (obj.position.z < 0) {
+      //     obj.position.z = 0;
+      //     this.test = 1;
+      //   }
+      // }
+
       if (obj.direction.x || obj.direction.y || obj.direction.z) {
         Object.assign(obj.lastPosition, obj.position);
         obj.position.x += obj.direction.x * obj.speed * (time / 1000);

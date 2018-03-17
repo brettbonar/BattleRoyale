@@ -1,6 +1,7 @@
 import Bounds from "./Bounds.mjs"
 import Vector from "./Vector.mjs"
 import Point from "./Point.mjs"
+import Dimensions from "./Dimensions.mjs"
 import Renderer from "../Rendering/Renderers/Renderer.mjs"
 import { SURFACE_TYPE, MOVEMENT_TYPE } from "../../Engine/Physics/PhysicsConstants.mjs"
 
@@ -36,10 +37,11 @@ export default class GameObject extends GameObjectProxy {
     _.defaults(this, {
       boundsType: Bounds.TYPE.RECTANGLE,
       // Dimensions are render dimensions
-      dimensions: {
+      dimensions: new Dimensions({
         width: 0,
-        height: 0
-      },
+        height: 0,
+        zheight: 0
+      }),
       collisionDimensions: [],
       functions: [],
       visible: true,
@@ -127,10 +129,15 @@ export default class GameObject extends GameObjectProxy {
   }
 
   get perspectivePosition() {
+    let zheight = this.perspectiveDimensions ? 
+      this.perspectiveDimensions.zheight : this.dimensions.zheight;
+    let position = this.position;
     if (this.perspectiveOffset) {
-      return this.position.plus(this.perspectiveOffset);
+      position = position.plus(this.perspectiveOffset);
+    } else {
+      position = position.plus({ y: this.height });
     }
-    return this.position.plus({ y: this.height });
+    return position.plus({ y: this.position.z });
   }
 
   normalizeDirection() {
@@ -236,19 +243,21 @@ export default class GameObject extends GameObjectProxy {
 
   getBoundsFromDimens(position, dimens) {
     let bounds = [];
-    for (const dimensions of dimens) {
+    for (const dimensions of _.castArray(dimens)) {
       if (dimensions.offset) {
         bounds = bounds.concat(_.castArray(dimensions.offset.z).map((z) => {
           let offset = { x: dimensions.offset.x, y: dimensions.offset.y, z: z };
           return new Bounds({
             position: position.plus(offset),
-            dimensions: dimensions.dimensions || this.dimensions
+            dimensions: dimensions.dimensions || this.dimensions,
+            opacity: dimensions.opacity
           });
         }));
       } else {
         bounds.push(new Bounds({
           position: position,
-          dimensions: dimensions.dimensions || this.dimensions
+          dimensions: dimensions.dimensions || this.dimensions,
+          opacity: dimensions.opacity
         }));
       }
     }
@@ -265,11 +274,13 @@ export default class GameObject extends GameObjectProxy {
   }
   
   get lastLosBounds() {
-    return this.getBoundsFromDimens(this.lastPosition, _.filter(this.collisionDimensions, "opaque"));
+    return this.getBoundsFromDimens(this.lastPosition,
+      _.castArray(this.collisionDimensions).filter((dimens) => dimens.opacity > 0));
   }
 
   get losBounds() {
-    return this.getBoundsFromDimens(this.position, _.filter(this.collisionDimensions, "opaque"));
+    return this.getBoundsFromDimens(this.position,
+      _.castArray(this.collisionDimensions).filter((dimens) => dimens.opacity > 0));
   }
 
   get getLastInteractionsBoundingBox() {
@@ -306,6 +317,12 @@ export default class GameObject extends GameObjectProxy {
     return this.bounds.radius;
   }
 
+  parseDimensions(dimensions) {
+    return dimensions.map((dimens) => {
+      return Object.assign({}, dimens, { dimensions: new Dimensions(dimens.dimensions) })
+    });
+  }
+
   // get terrainVector() {
   //   let mid = new Vector([this.lastPosition, this.position]);
   //   let radius = Math.sqrt(this.terrainDimensions.height * this.terrainDimensions.height + this.terrainDimensions.width * this.terrainDimensions.width) / 2;
@@ -326,6 +343,10 @@ export default class GameObject extends GameObjectProxy {
 
   get sweepBox() {
     return this.Bounds().extend(this.prevBounds());
+  }
+
+  get zheight() {
+    return this.bounds.zheight;
   }
 
   get height() {

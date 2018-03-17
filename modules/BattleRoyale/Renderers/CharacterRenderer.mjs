@@ -229,7 +229,7 @@ export default class CharacterRenderer {
 
     let offset = {
       x: object.position.x + object.width / 4,
-      y: object.position.y - object.position.z * 32
+      y: object.position.y - object.position.z
     };
 
     if (object.state.hasMana) {
@@ -263,7 +263,7 @@ export default class CharacterRenderer {
       if (item.image.complete) {
         let offset = getOffset(this.animation, this.frame, item.imageSize);
         context.drawImage(item.image, offset.x, offset.y, item.imageSize, item.imageSize,
-          object.position.x, object.position.y - object.position.z * 32, item.imageSize, item.imageSize);
+          object.position.x, object.position.y - object.position.z, item.imageSize, item.imageSize);
       }
     }
   }
@@ -276,7 +276,7 @@ export default class CharacterRenderer {
     }
 
     context.drawImage(this.body, offset.x, offset.y, imageSize, imageSize,
-      object.position.x, object.position.y - object.position.z * 32, imageSize, imageSize);
+      object.position.x, object.position.y - object.position.z, imageSize, imageSize);
     this.drawLoadout(context, object);
 
     if (this.state !== STATE.DEAD && !object.isOtherPlayer) {

@@ -2,6 +2,7 @@ import GameObject from "../../Engine/GameObject/GameObject.mjs"
 import ProjectileRenderer from "../Renderers/ProjectileRenderer.mjs"
 import attacks from "../Magic/attacks.mjs"
 import Point from "../../Engine/GameObject/Point.mjs"
+import Dimensions from "../../Engine/GameObject/Dimensions.mjs"
 import { getDistance } from "../../Engine/util.mjs"
 
 export default class Projectile extends GameObject {
@@ -18,10 +19,10 @@ export default class Projectile extends GameObject {
     //   width: 32,
     //   height: 8
     // };
-    this.dimensions = {
+    this.dimensions = new Dimensions({
       width: params.attack.rendering.imageSize,
       height: params.attack.rendering.imageSize
-    };
+    });
     this.collisionDimensions = params.attack.effect.collisionDimensions;
     this.speed = params.attack.effect.speed;
     //this.renderheight = _.get(params.attack.effect, "offset.z", 0);
@@ -33,10 +34,10 @@ export default class Projectile extends GameObject {
         x: 8,
         y: 8
       },
-      dimensions: {
+      dimensions: new Dimensions({
         width: 16,
         height: 16
-      }
+      })
     };
 
     if (!params.simulation) {

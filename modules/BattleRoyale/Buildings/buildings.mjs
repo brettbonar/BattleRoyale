@@ -4,7 +4,7 @@ export default {
   house: {
     dimensions: {
       width: 194,
-      height: 194
+      height: 290
     },
     doors: [
       {
@@ -65,79 +65,78 @@ export default {
         }
       }
     ],
-    renderHeight: 3,
     collisionDimensions: [
-      {
+      { // Left side
         offset: {
           x: 3,
-          y: 64
-        },
-        dimensions: {
-          width: 188,
-          height: 14
-        },
-        opaque: true
-      },
-      {
-        offset: {
-          x: 3,
-          y: 64,
-          z: [1,2,3]
-        },
-        dimensions: {
-          width: 188,
-          height: 32
-        },
-        opaque: true
-      },
-      {
-        offset: {
-          x: 3,
-          y: 64,
-          z: [0,1,2,3]
+          y: 128
         },
         dimensions: {
           width: 7,
-          height: 129
+          height: 161,
+          zheight: 128
         },
-        opaque: true
+        opacity: 1.0
       },
-      {
+      { // Top
         offset: {
-          x: 185,
-          y: 64,
-          z: [0,1,2,3]
+          x: 3,
+          y: 128
+        },
+        dimensions: {
+          width: 188,
+          height: 14,
+          zheight: 128
+        },
+        opacity: 1.0
+      },
+      { // Right side
+        offset: {
+          x: 184,
+          y: 128
         },
         dimensions: {
           width: 7,
-          height: 129
+          height: 161,
+          zheight: 128
         },
-        opaque: true
+        opacity: 1.0
       },
-      {
+      { // Front left
         offset: {
           x: 3,
-          y: 180,
-          z: [0,1,2,3]
+          y: 276
         },
         dimensions: {
-          width: 70,
-          height: 13
+          width: 72,
+          height: 13,
+          zheight: 128
         },
-        opaque: true
+        opacity: 1.0
       },
-      {
+      { // Front right
         offset: {
-          x: 121,
-          y: 180,
-          z: [0,1,2,3]
+          x: 119,
+          y: 276
         },
         dimensions: {
-          width: 70,
-          height: 13
+          width: 72,
+          height: 13,
+          zheight: 128
         },
-        opaque: true
-      }
+        opacity: 1.0
+      },
+      // { // Above door
+      //   offset: {
+      //     x: 76,
+      //     y: 161
+      //   },
+      //   dimensions: {
+      //     width: 42,
+      //     height: 6,
+      //     zheight: 80
+      //   }
+      // }
     ],
     interior: {
       imageSource: "../../Assets/Buildings/house1.png",
@@ -145,18 +144,19 @@ export default {
         x: 196,
         y: 0,
         width: 194,
-        height: 194
+        height: 290
       },
       bounds: [
         {
           offset: {
-            x: 6,
-            y: 15,
-            z: -1
+            x: 7,
+            y: 134,
+            z: 0
           },
           dimensions: {
-            width: 181,
-            height: 176
+            width: 180,
+            height: 153,
+            zheight: 128
           }
         }
         // {
@@ -178,7 +178,10 @@ export default {
         x: 0,
         y: 0,
         width: 194,
-        height: 194
+        height: 290
+      },
+      perspectiveDimensions: {
+        zheight: 128
       }
     }
   }

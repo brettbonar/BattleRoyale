@@ -10,6 +10,8 @@ const TYPE = {
 
 export default class Bounds {
   constructor(params) {
+    this.zheight = 0;
+    this.opacity = params.opacity || 0;
     if (!_.isUndefined(params.dimensions.width) && !_.isUndefined(params.dimensions.height)) {
       this.constructFromRectangle(params);
     } else if (_.isArray(params)) {
@@ -24,6 +26,11 @@ export default class Bounds {
   }
 
   static get TYPE() { return TYPE; }
+
+  checkZ(z1, zheight1, z2, zheight2) {
+    return !_.isNumber(z1) || !_.isNumber(z2) ||
+      (z1 <= z2 && z1 + zheight1 >= z2) || (z2 <= z1 && z2 + zheight2 >= z1);
+  }
 
   extend(box) {
     // TODO: if box instanceof BoundingBox
@@ -71,6 +78,7 @@ export default class Bounds {
       lr: params.position.plus({ x: params.dimensions.width, y: params.dimensions.height }),
       ll: params.position.plus({ y: params.dimensions.height })
     };
+    this.zheight = params.dimensions.zheight;
 
     this.lines = {
       top: [this.box.ul, this.box.ur],
@@ -81,7 +89,13 @@ export default class Bounds {
   }
 
   intersectsLine(first, second) {
-    if (_.isNumber(first.z) && _.isNumber(second.z) && Math.floor(first.z) !== Math.floor(second.z)) return;
+    //if (_.isNumber(first.z) && _.isNumber(second.z) && Math.floor(first.z) !== Math.floor(second.z)) return;
+    let firstZMin = Math.min(first[0].z, first[1].z);
+    let firstZMax = Math.max(first[0].z, first[1].z);
+    let secondZMin = Math.min(second[0].z, second[1].z);
+    let secondZMax = Math.max(second[0].z, second[1].z);
+    // Simple inaccurate check to see if Z axis of lines every intersect
+    if (!this.checkZ(firstZMin, firstZMax - firstZMin, secondZMin, secondZMax - secondZMin)) return;
     // https://stackoverflow.com/questions/9043805/test-if-two-lines-intersect-javascript-function
     var det, gamma, lambda;
     det = (first[1].x - first[0].x) * (second[1].y - second[0].y) - (second[1].x - second[0].x) * (first[1].y - first[0].y);
@@ -109,7 +123,7 @@ export default class Bounds {
     // TODO: add circle intersection tests
     if (target instanceof Bounds) {
       let box = target.box;
-      return (!_.isNumber(this.box.ul.z) || !_.isNumber(box.ul.z) || Math.floor(this.box.ul.z) === Math.floor(box.ul.z)) &&
+      return this.checkZ(this.box.ul.z, this.zheight, box.ul.z, target.zheight) &&
         this.box.ul.x < box.lr.x &&
         this.box.lr.x > box.ul.x &&
         this.box.ul.y < box.lr.y &&

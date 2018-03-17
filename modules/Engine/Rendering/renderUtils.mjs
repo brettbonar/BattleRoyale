@@ -1,5 +1,5 @@
 const SHADOW_START = { z: 0, value: 0.5 };
-const SHADOW_END = { z: 5, value: 1 };
+const SHADOW_END = { z: 160, value: 1 };
 const SHADOW_INC = (SHADOW_END.value - SHADOW_START.value) / (SHADOW_END.z - SHADOW_START.z);
 
 function drawShadow(context, object) {

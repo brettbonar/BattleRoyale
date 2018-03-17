@@ -1,5 +1,6 @@
 import GameObject from "../../Engine/GameObject/GameObject.mjs"
 import Point from "../../Engine/GameObject/Point.mjs"
+import Dimensions from "../../Engine/GameObject/Dimensions.mjs"
 import CharacterRenderer, { STATE } from "../Renderers/CharacterRenderer.mjs"
 import { SURFACE_TYPE } from "../../Engine/Physics/PhysicsConstants.mjs";
 
@@ -28,31 +29,39 @@ export default class Character extends GameObject {
           x: 16,
           y: 16
         },
-        dimensions: {
+        dimensions: new Dimensions({
           width: 32,
-          height: 44
-        }
+          height: 44,
+          zheight: 44
+        })
       },
       attackDuration: 1000
     });
 
-    this.collisionDimensions = params.collisionDimensions || [{
-      offset: {
-        x: 16,
-        y: 44, // 64 - 20,
-        z: [0, 1]
-      },
-      dimensions: {
-        width: 32,
-        height: 20
-      }
-    }];
-    this.renderHeight = 1;
+    if (params.collisionDimensions) {
+      this.collisionDimensions = this.parseDimensions(params.collisionDimensions);
+    } else {
+      this.collisionDimensions = [
+        {
+          offset: {
+            x: 16,
+            y: 44, // 64 - 20,
+            z: 0
+          },
+          dimensions: new Dimensions({
+            width: 32,
+            height: 20,
+            zheight: 44
+          })
+        }
+      ];
+    }
 
-    this.dimensions = params.dimensions || {
+    this.dimensions = params.dimensions || new Dimensions({
       width: 64,
-      height: 64
-    };
+      height: 64,
+      zheight: 64
+    });
     
     this.physics.surfaceType = "character";
 
@@ -70,23 +79,6 @@ export default class Character extends GameObject {
     Object.assign(this.direction, direction);
     this.direction = this.normalize(this.direction);
   }
-
-  // get center() {
-  //   return {
-  //     x: this.position.x,
-  //     y: this.position.y - 32
-  //   }
-  // }
-
-  // get perspectivePosition() {
-  //   if (this.dead) {
-  //     return {
-  //       x: this.position.x,
-  //       y: this.position.y - this.modelDimensions.height / 2
-  //     };
-  //   }
-  //   return this.position;
-  // }
 
   damage(source) {
     this.state.currentHealth -= source.effect.damage;

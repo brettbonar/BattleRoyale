@@ -42,7 +42,7 @@ export default class ProjectileRenderer {
     //this.frame = 0;
     context.drawImage(this.image, offset.x, offset.y,
       this.projectile.imageSize, this.projectile.imageSize,
-      object.position.x, object.position.y - object.position.z * 32,
+      object.position.x, object.position.y - object.position.z,
       this.projectile.imageSize, this.projectile.imageSize);
     context.restore();
     // DEBUG

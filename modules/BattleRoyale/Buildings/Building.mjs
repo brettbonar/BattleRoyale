@@ -31,14 +31,6 @@ export default class Building extends GameObject {
     this.interiorDoors = [];
     // this.openDoors = [];
     // this.closedDoors = [];
-    // for (const door of this.building.doors) {
-    //   if (door.exterior) {
-    //     this.exteriorDoors.push(new BuildingPart(params, door.exterior));
-    //   }
-    //   if (door.interior) {
-    //     this.interiorDoors.push(new BuildingPart(params, door.exterior));
-    //   }
-    // }
   }
 
   insideCb(target) {

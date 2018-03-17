@@ -14,17 +14,8 @@ export default class RenderObject extends GameObject {
     }, params));
     this.type = "RenderObject";
     this.renderer = new ObjectRenderer(rendering);
+    this.perspectiveDimensions = this.perspectiveDimensions || rendering.perspectiveDimensions;
   }
-
-  // get perspectivePosition() {
-  //   if (this.perspectiveOffset) {
-  //     return {
-  //       x: this.position.x + this.perspectiveOffset.x,
-  //       y: this.position.y + this.perspectiveOffset.y
-  //     };
-  //   }
-  //   return this.position;
-  // }
 
   getAllRenderObjects() {
     return this.parts || this;

@@ -37,8 +37,21 @@ export default class Simulation {
       changeDirection: (data, elapsedTime) => this.changeDirection(data, elapsedTime),
       changeTarget: (data, elapsedTime) => this.changeTarget(data, elapsedTime),
       attack: (data, elapsedTime) => this.attack(data, elapsedTime),
-      use: (data, elapsedTime) => this.use(data, elapsedTime)
+      use: (data, elapsedTime) => this.use(data, elapsedTime),
+      changeAltitude: (data, elapsedTime) => this.changeAltitude(data, elapsedTime)
     };
+  }
+
+  // For testing
+  changeAltitude(data, elapsedTime) {
+    let object = _.find(this.game.gameState.objects, {
+      playerId: data.source.playerId,
+      objectId: data.source.objectId
+    });
+    if (object) {
+      object.position.z += data.z;
+      object.position.z = Math.max(0, object.position.z);
+    }
   }
 
   use(data, elapsedTime) {

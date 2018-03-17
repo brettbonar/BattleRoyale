@@ -9,6 +9,7 @@ import PerspectiveRenderingEngine from "../Engine/Rendering/PerspectiveRendering
 import ParticleEngine from "../Engine/Effects/ParticleEngine.mjs"
 import { MOVEMENT_TYPE } from "../Engine/Physics/PhysicsConstants.mjs"
 import { getDistance } from "../util.mjs"
+import GameSettings from "../Engine/GameSettings.mjs"
 
 import ObjectRenderer from "./Renderers/ObjectRenderer.mjs"
 import Character from "./Objects/Character.mjs"
@@ -30,7 +31,9 @@ const EVENTS = {
   MOVE_RIGHT: "moveRight",
   PRIMARY_FIRE: "primaryFire",
   SECONDARY_FIRE: "secondaryFire",
-  USE: "use"
+  USE: "use",
+  RAISE_ALTITUDE: "raiseAltitude",
+  LOWER_ALTITUDE: "lowerAltitude"
 }
 
 let sequenceNumber = 1;
@@ -39,6 +42,8 @@ export default class BattleRoyale extends Game {
   constructor(params) {
     super(Object.assign(params, { requestPointerLock: true }));
     
+    GameSettings.zScale = 1.0;
+
     this.maps = params.maps;
     this.physicsEngine = new PhysicsEngine();
 
@@ -70,6 +75,8 @@ export default class BattleRoyale extends Game {
     this.keyBindings[KEY_CODE.A] = EVENTS.MOVE_LEFT;
     this.keyBindings[KEY_CODE.D] = EVENTS.MOVE_RIGHT;
     this.keyBindings[KEY_CODE.E] = EVENTS.USE;
+    this.keyBindings[KEY_CODE.UP] = EVENTS.RAISE_ALTITUDE;
+    this.keyBindings[KEY_CODE.DOWN] = EVENTS.LOWER_ALTITUDE;
     this.keyBindings["leftClick"] = EVENTS.PRIMARY_FIRE;
     this.keyBindings["rightClick"] = EVENTS.SECONDARY_FIRE;
     this.activeEvents = [];
@@ -85,6 +92,8 @@ export default class BattleRoyale extends Game {
     this.addEventHandler(EVENTS.PRIMARY_FIRE, (event) => this.attack(event, 1));
     this.addEventHandler(EVENTS.SECONDARY_FIRE, (event) => this.attack(event, 2));
     this.addEventHandler(EVENTS.USE, (event) => this.use(event));
+    this.addEventHandler(EVENTS.RAISE_ALTITUDE, (event) => this.changeAltitude(event, 10));
+    this.addEventHandler(EVENTS.LOWER_ALTITUDE, (event) => this.changeAltitude(event, -10));
 
     this.stateFunctions[Game.STATE.PLAYING].update = (elapsedTime) => this._update(elapsedTime);
     this.stateFunctions[Game.STATE.PLAYING].render = (elapsedTime) => this._render(elapsedTime);
@@ -100,6 +109,17 @@ export default class BattleRoyale extends Game {
     // this.stateFunctions[Game.STATE.INITIALIZING].update = _.noop;//(elapsedTime) => this._update(elapsedTime);
     // this.stateFunctions[Game.STATE.INITIALIZING].render = _.noop;//(elapsedTime) => this._render(elapsedTime);
 
+  }
+
+  changeAltitude(event, amount) {
+    this.sendEvent({
+      type: "changeAltitude",
+      source: {
+        playerId: this.player.playerId,
+        objectId: this.gameState.player.objectId
+      },
+      z: amount
+    });
   }
 
   createObject(object) {

@@ -49,6 +49,18 @@ export default {
       width: 30,
       height: 64
     },
+    collisionDimensions: {
+      offset: {
+        x: 1,
+        y: 55
+      },
+      dimensions: {
+        width: 28,
+        height: 4,
+        zheight: 64
+      },
+      opacity: 0.35
+    },
     dimensions: {
       width: 30,
       height: 64
@@ -68,6 +80,18 @@ export default {
       width: 30,
       height: 64
     },
+    collisionDimensions: {
+      offset: {
+        x: 1,
+        y: 55
+      },
+      dimensions: {
+        width: 28,
+        height: 4,
+        zheight: 64
+      },
+      opacity: 0.35
+    },
     dimensions: {
       width: 30,
       height: 64
@@ -86,6 +110,18 @@ export default {
       y: 832,
       width: 30,
       height: 64
+    },
+    collisionDimensions: {
+      offset: {
+        x: 1,
+        y: 55
+      },
+      dimensions: {
+        width: 28,
+        height: 4,
+        zheight: 64
+      },
+      opacity: 0.35
     },
     dimensions: {
       width: 30,
@@ -844,7 +880,7 @@ export default {
           width: 60,
           height: 16
         },
-        cb: (object) => object.position.z = -1
+        cb: (object) => object.level = -1
       }
     ]
   },
