@@ -1,4 +1,5 @@
 import { drawShadow } from "../../Engine/Rendering/renderUtils.mjs";
+import Dimensions from "../../Engine/GameObject/Dimensions.mjs"
 
 const imageSize = 64;
 
@@ -206,6 +207,21 @@ export default class CharacterRenderer {
     this.currentTime = 0;
     this.framesPerSec = 0;
     this.initBody(params);
+
+    // Dimensions of the actual model within the image
+    _.defaults(this, {
+      modelDimensions: {
+        offset: {
+          x: 16,
+          y: 16
+        },
+        dimensions: new Dimensions({
+          width: 32,
+          height: 44,
+          zheight: 44
+        })
+      }
+    });
   }
 
   initBody(params) {
@@ -272,7 +288,7 @@ export default class CharacterRenderer {
     let offset = getOffset(this.animation, this.frame, imageSize);
 
     if (object.position.z > 0) {
-      drawShadow(context, object);
+      drawShadow(context, object, this.modelDimensions);
     }
 
     context.drawImage(this.body, offset.x, offset.y, imageSize, imageSize,

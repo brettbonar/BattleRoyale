@@ -37,9 +37,9 @@ export default class PerspectiveRenderingEngine extends RenderingEngine{
   debugBoxes(objects) {
     if (window.debug) {
       for (const object of objects) {
-        // let box = object.boundingBox;
-        // this.context.strokeStyle = "magenta";
-        // this.context.strokeRect(box.ul.x, box.ul.y, box.width, box.height);
+        let box = object.boundingBox;
+        this.context.strokeStyle = "magenta";
+        this.context.strokeRect(box.ul.x, box.ul.y, box.width, box.height);
           
         for (const bounds of object.collisionBounds) {
           this.context.strokeStyle = "crimson";

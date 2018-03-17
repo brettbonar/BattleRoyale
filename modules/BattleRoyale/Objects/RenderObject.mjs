@@ -15,6 +15,9 @@ export default class RenderObject extends GameObject {
     this.type = "RenderObject";
     this.renderer = new ObjectRenderer(rendering);
     this.perspectiveDimensions = this.perspectiveDimensions || rendering.perspectiveDimensions;
+    if (rendering.offset) {
+      this.position.add(rendering.offset);
+    }
   }
 
   getAllRenderObjects() {

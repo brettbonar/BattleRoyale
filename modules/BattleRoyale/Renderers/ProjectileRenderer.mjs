@@ -21,39 +21,35 @@ export default class ProjectileRenderer {
     if (!this.image.complete) {
       return;
     }
-
-    let center = object.center;
+    
+    let framesPerRow = this.image.width / this.projectile.imageSize;
     let offset = {
-      x: this.frame * this.projectile.imageSize,
-      y: 0,//this.frame * this.projectile.imageSize
-    };
-
-    if (object.position.z > 0) {
-      drawShadow(context, object);
+      x: (this.frame % framesPerRow) * this.projectile.imageSize,
+      y: this.projectile.imageSize * Math.floor(this.frame / framesPerRow)
     }
 
+    if (object.effect.shadow && object.position.z > 0) {
+      drawShadow(context, object, this.projectile.modelDimensions);
+    }
+
+    let position = object.position.minus({ y: object.position.z });
+    let center = position.plus({ x: this.projectile.imageSize / 2, y: this.projectile.imageSize / 2});
+    position.add(this.projectile.renderOffset)
+
     context.save();
-    // TODO: figure this out
-    // if (object.rotation) {
-    //   context.translate(center.x, center.y);
-    //   context.rotate((object.rotation * Math.PI) / 180);
-    //   context.translate(-center.x, -center.y);        
-    // }
-    //this.frame = 0;
+    
+    if (object.rotation) {
+      context.translate(center.x, center.y);
+      context.rotate((object.rotation * Math.PI) / 180);
+      context.translate(-center.x, -center.y);        
+    }
+    
     context.drawImage(this.image, offset.x, offset.y,
       this.projectile.imageSize, this.projectile.imageSize,
-      object.position.x, object.position.y - object.position.z,
+      position.x, position.y,
       this.projectile.imageSize, this.projectile.imageSize);
-    context.restore();
-    // DEBUG
-    // let box = object.boundingBox.box;
-    // context.strokeStyle = "magenta";
-    // context.strokeRect(box.ul.x, box.ul.y, object.width, object.height);
 
-    // let terrainBox = object.terrainBoundingBox.box;
-    // context.strokeStyle = "aqua";
-    // context.strokeRect(terrainBox.ul.x, terrainBox.ul.y,
-    //   object.terrainDimensions.width, object.terrainDimensions.height);
+    context.restore();
   }
 
   update(elapsedTime) {

@@ -52,11 +52,11 @@ export default {
     collisionDimensions: {
       offset: {
         x: 1,
-        y: 55
+        y: 47
       },
       dimensions: {
         width: 28,
-        height: 4,
+        height: 12,
         zheight: 64
       },
       opacity: 0.35
@@ -83,11 +83,11 @@ export default {
     collisionDimensions: {
       offset: {
         x: 1,
-        y: 55
+        y: 47
       },
       dimensions: {
         width: 28,
-        height: 4,
+        height: 12,
         zheight: 64
       },
       opacity: 0.35
@@ -114,11 +114,11 @@ export default {
     collisionDimensions: {
       offset: {
         x: 1,
-        y: 55
+        y: 47
       },
       dimensions: {
         width: 28,
-        height: 4,
+        height: 12,
         zheight: 64
       },
       opacity: 0.35
@@ -142,11 +142,9 @@ export default {
           y: 1034,
           width: 190,
           height: 178,
-          offset: {
-            x: 93,
-            y: 236,
-            z: 5
-          }
+        },
+        offset: {
+          z: 196
         }
       },
       {
@@ -156,43 +154,13 @@ export default {
           x: 20,
           y: 1128,
           width: 104,
-          height: 83,
-          offset: {
-            x: 53
-          }
+          height: 83
+        },
+        offset: {
+          x: 41,
+          y: 156
         }
       }
-      // {
-      //   // Tree top
-      //   imageSource: "../../Assets/terrain_atlas-64.png",
-      //   imageDimensions: {
-      //     x: 1857,
-      //     y: 1803,
-      //     width: 191,
-      //     height: 180,
-      //     offset: {
-      //       x: 93,
-      //       y: 236
-      //     }
-      //   }
-      // },
-      // {
-      //   // Tree base
-      //   imageSource: "../../Assets/terrain_atlas-64.png",
-      //   imageDimensions: {
-      //     x: 1857,
-      //     y: 1980,
-      //     width: 191,
-      //     height: 59,
-      //     offset: {
-      //       x: 93
-      //     }
-      //   },
-      //   perspectiveOffset: {
-      //     x: 0,
-      //     y: -50
-      //   }
-      // }
     ],
     physics: {
       surfaceType: "terrain"
@@ -204,29 +172,31 @@ export default {
     },
     collisionDimensions: [
       {
-
+        offset: {
+          x: 45,
+          y: 188
+        },
+        dimensions: {
+          width: 96,
+          height: 44,
+          zheight: 0
+        },
+        opacity: 1.0
+      },
+      {
+        offset: {
+          x: 71,
+          y: 188,
+          z: 32
+        },
+        dimensions: {
+          width: 46,
+          height: 32,
+          zheight: 96
+        },
+        opacity: 1.0
       }
     ],
-    hitboxDimensions: {
-      offset: {
-        x: 0,
-        y: -18
-      },
-      dimensions: {
-        width: 64,
-        height: 32
-      }
-    },
-    losDimensions: {
-      offset: {
-        x: 0,
-        y: -18
-      },
-      dimensions: {
-        width: 64,
-        height: 32
-      }
-    },
     losFade: true
   },
   smallPlainTree: {

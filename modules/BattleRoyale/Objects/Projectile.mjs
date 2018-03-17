@@ -25,20 +25,17 @@ export default class Projectile extends GameObject {
     });
     this.collisionDimensions = params.attack.effect.collisionDimensions;
     this.speed = params.attack.effect.speed;
-    //this.renderheight = _.get(params.attack.effect, "offset.z", 0);
-    this.position.add(params.attack.effect.offset);
+
+    if (_.isUndefined(params.objectId)) {
+      // Only adjust position on first creating projectile
+      //this.renderheight = _.get(params.attack.effect, "offset.z", 0);
+      this.position.add(params.attack.effect.offset);
+      // TRICKY: given position will be relative to center, shift so its centered
+      this.position.subtract({ x: this.dimensions.width / 2, y: this.dimensions.height / 2});
+    }
+
     this.startPosition = new Point(this.position);
     this.effect = params.attack.effect;
-    this.modelDimensions = params.modelDimensions || {
-      offset: {
-        x: 8,
-        y: 8
-      },
-      dimensions: new Dimensions({
-        width: 16,
-        height: 16
-      })
-    };
 
     if (!params.simulation) {
       this.renderer = new ProjectileRenderer(params.attack.rendering);

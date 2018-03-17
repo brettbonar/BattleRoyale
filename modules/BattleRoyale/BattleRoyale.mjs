@@ -218,8 +218,11 @@ export default class BattleRoyale extends Game {
         if (attack.type === "projectile") {
           this.gameState.objects.push(new Projectile({
             position: {
-              x: character.center.x + (character.width / 2 + 10) * params.direction.x,
-              y: character.center.y + (character.width / 2 + 10) * params.direction.y,
+              // TODO: remove magic numbers
+              // TODO: interpolate position based on direction, character bounds, and
+              // projectile bounds (like sweep test)
+              x: character.center.x + (params.direction.x * 32),
+              y: character.bottom.y + (params.direction.y * 20) - 10,
               z: character.position.z
             },
             simulation: this.simulation,
@@ -230,7 +233,7 @@ export default class BattleRoyale extends Game {
             elapsedTime: elapsedTime
           }));
         }
-      }
+     }
     }
   }
 
@@ -265,7 +268,11 @@ export default class BattleRoyale extends Game {
     //   x: this.gameState.cursor.position.x - this.canvas.width / 2,
     //   y: this.gameState.cursor.position.y - this.canvas.height / 2 + 32
     // });
-    let direction = target.minus(this.gameState.player.center).normalize();
+    //let direction = target.minus(this.gameState.player.center).normalize();
+    let direction = new Point({
+      x: this.gameState.cursor.position.x - this.canvas.width / 2,
+      y: this.gameState.cursor.position.y - this.canvas.height / 2
+    }).normalize();
     direction.z = 0;
 
     let source = {

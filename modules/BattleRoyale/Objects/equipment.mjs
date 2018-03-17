@@ -47,7 +47,7 @@ export default {
     gender: "male",
     attacks: {
       1: "plasmaBall",
-      2: "lightningclaw"
+      2: "flamethrower"
     }
   },
   axe: {

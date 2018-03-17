@@ -23,18 +23,6 @@ export default class Character extends GameObject {
         hasHealth: true,
         hasMana: true
       },
-      // Dimensions of the actual model within the image
-      modelDimensions: {
-        offset: {
-          x: 16,
-          y: 16
-        },
-        dimensions: new Dimensions({
-          width: 32,
-          height: 44,
-          zheight: 44
-        })
-      },
       attackDuration: 1000
     });
 
