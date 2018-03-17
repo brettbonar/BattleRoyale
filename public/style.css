@@ -33,7 +33,11 @@ hr {
   float: right;
 }
 
-.map-canvas {
+.game-canvas.map-canvas {
+  /* display: none; */
+  z-index: -2;
+}
+.map-save-canvas {
   display: none;
 }
 

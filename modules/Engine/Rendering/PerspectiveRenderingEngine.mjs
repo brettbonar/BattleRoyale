@@ -11,6 +11,7 @@ export default class PerspectiveRenderingEngine extends RenderingEngine{
   render(objects, elapsedTime, center) {
     //window.debug = true;
     this.context.save();
+
     // if (center) {
     //   this.context.translate(-(center.x - this.context.canvas.width / 2), -(center.y - this.context.canvas.height / 2));
     // }
@@ -18,7 +19,7 @@ export default class PerspectiveRenderingEngine extends RenderingEngine{
     let renderObjects = this.getRenderObjects(objects, center);
     for (const object of renderObjects) {
       this.context.save();
-      if (object.losFade && object.losBounds.some((box) => box.ul.y > center.y - 20)) {
+      if (object.losFade && object.fadePosition.y > center.y - 20) {
         this.context.globalAlpha = 0.5;
       }
       object.render(this.context, elapsedTime, center);
@@ -26,6 +27,25 @@ export default class PerspectiveRenderingEngine extends RenderingEngine{
     }
     
     this.debugBoxes(objects);
+
+    
+    // let pos = {
+    //   x: 600,
+    //   y: 600
+    // };
+    // let radius = 1000;
+    // //this.context.globalCompositeOperation='difference';
+
+    // this.context.globalCompositeOperation='saturation';
+    // this.context.fillStyle = "hsl(0, 100%, 1%)";
+    // // let gradient2 = this.context.createRadialGradient(pos.x, pos.x, radius,
+    // //   pos.x, pos.y, 0);
+    // // this.context.globalAlpha = 1;
+    // // gradient2.addColorStop(0.5, "transparent");
+    // // gradient2.addColorStop(0.25, "white");
+    // // this.context.fillStyle = gradient2;
+    // this.context.fillRect(pos.x - radius, pos.y - radius,
+    //   radius * 2, radius * 2);
 
     this.context.restore();
   }

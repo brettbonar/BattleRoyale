@@ -44,6 +44,11 @@ export default class BattleRoyale extends Game {
     
     GameSettings.zScale = 1.0;
 
+    if (params.mapCanvas) {
+      this.mapCanvas = params.mapCanvas;
+      this.mapContext = params.mapCanvas.getContext("2d");
+    }
+
     this.maps = params.maps;
     this.physicsEngine = new PhysicsEngine();
 
@@ -392,7 +397,7 @@ export default class BattleRoyale extends Game {
   _render(elapsedTime) {
     this.context.save();
     this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
-    this.context.fillRect(0, 0, this.canvas.width, this.canvas.height);
+    //this.context.fillRect(0, 0, this.canvas.width, this.canvas.height);
 
     if (this.maps[this.gameState.player.level]) {
       this.maps[this.gameState.player.level].render(this.context, this.gameState.player.center);

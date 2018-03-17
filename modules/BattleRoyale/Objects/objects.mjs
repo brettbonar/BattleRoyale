@@ -143,9 +143,13 @@ export default {
           width: 190,
           height: 178,
         },
+        fadeOffset: {
+          y: 196
+        },
         offset: {
           z: 196
-        }
+        },
+        losFade: true
       },
       {
         // Tree base
@@ -180,24 +184,22 @@ export default {
           width: 96,
           height: 44,
           zheight: 0
-        },
-        opacity: 1.0
+        }
       },
       {
         offset: {
           x: 71,
           y: 188,
-          z: 32
+          z: 0
         },
         dimensions: {
           width: 46,
           height: 32,
-          zheight: 96
+          zheight: 128
         },
         opacity: 1.0
       }
-    ],
-    losFade: true
+    ]
   },
   smallPlainTree: {
     biome: "plain",

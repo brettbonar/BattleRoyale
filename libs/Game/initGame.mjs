@@ -57,15 +57,15 @@ function initGame(players, maps) {
         z: 0
       }
     }),
-    new Building({
-      buildingType: "house",
-      simulation: true,
-      position: {
-        x: 500,
-        y: 500,
-        z: 0
-      }
-    })
+    // new Building({
+    //   buildingType: "house",
+    //   simulation: true,
+    //   position: {
+    //     x: 500,
+    //     y: 500,
+    //     z: 0
+    //   }
+    // })
   ];
 
   let pos = 255;
@@ -142,21 +142,21 @@ function initGame(players, maps) {
     }));
   }
 
-  let x = 250;
-  let y = 250;
-  for (let i = 0; i < 10; i++) {
-    for (let j = 0; j < 5; j++) {
-      let type = _.sample(_.filter(objects, { group: "corn" })).objectType;
-      gameObjects.push(new StaticObject({
-        objectType: type,
-        position: {
-          x: x + i * (objects.corn1.imageDimensions.width * 3/4) + y,
-          y: y + j * (objects.corn1.imageDimensions.height / 3)
-        },
-        simulation: true
-      }));
-    }
-  }
+  // let x = 250;
+  // let y = 250;
+  // for (let i = 0; i < 10; i++) {
+  //   for (let j = 0; j < 5; j++) {
+  //     let type = _.sample(_.filter(objects, { group: "corn" })).objectType;
+  //     gameObjects.push(new StaticObject({
+  //       objectType: type,
+  //       position: {
+  //         x: x + i * (objects.corn1.imageDimensions.width * 3/4) + y,
+  //         y: y + j * (objects.corn1.imageDimensions.height / 3)
+  //       },
+  //       simulation: true
+  //     }));
+  //   }
+  // }
 
   // gameObjects.push(new StaticObject({
   //   position: {

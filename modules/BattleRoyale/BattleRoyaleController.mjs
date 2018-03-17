@@ -52,8 +52,10 @@ export default class BattleRoyaleController extends GameController {
             gameCanvas: document.getElementById("canvas-main")
           }, map));
         });
+        let mapCanvas = document.getElementById("canvas-map");
         this.game = new BattleRoyale({
           canvas: document.getElementById("canvas-main"),
+          mapCanvas: mapCanvas,
           maps: maps,
           player: this.player,
           gameSettings: {

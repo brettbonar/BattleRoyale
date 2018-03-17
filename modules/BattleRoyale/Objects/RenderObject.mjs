@@ -3,6 +3,7 @@ import ObjectRenderer from "../Renderers/ObjectRenderer.mjs"
 import objects from "./objects.mjs"
 import items from "./items.mjs"
 import { SURFACE_TYPE } from "../../Engine/Physics/PhysicsConstants.mjs"
+import Dimensions from "../../Engine/GameObject/Dimensions.mjs";
 
 export default class RenderObject extends GameObject {
   constructor(params, rendering) {
@@ -15,6 +16,13 @@ export default class RenderObject extends GameObject {
     this.type = "RenderObject";
     this.renderer = new ObjectRenderer(rendering);
     this.perspectiveDimensions = this.perspectiveDimensions || rendering.perspectiveDimensions;
+    this.losFade = params.losFade || rendering.losFade;
+    this.fadeOffset = rendering.fadeOffset;
+
+    if (rendering.collisionDimensions) {
+      this.collisionDimensions = this.parseDimensions(rendering.collisionDimensions);
+    }
+
     if (rendering.offset) {
       this.position.add(rendering.offset);
     }

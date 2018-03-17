@@ -419,7 +419,7 @@ class Map {
     this.terrain.src = "/Assets/terrain.png";
     this.terrain.onload = () => {
       this.canvas = $("<canvas>", {
-        class: "game-canvas map-canvas"
+        class: "game-canvas map-save-canvas"
       }).appendTo(document.getElementById("canvas-group"))[0];
       this.canvas.width = this.tileSize * this.mapSize;
       this.canvas.height = this.tileSize * this.mapSize;

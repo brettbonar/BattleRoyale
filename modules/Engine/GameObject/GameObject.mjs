@@ -265,6 +265,10 @@ export default class GameObject extends GameObjectProxy {
     return bounds;
   }
 
+  get fadePosition() {
+    return this.position.plus(this.fadeOffset);
+  }
+
   get lastCollisionBounds() {
     return this.getBoundsFromDimens(this.lastPosition, this.collisionDimensions);
   }
@@ -318,7 +322,7 @@ export default class GameObject extends GameObjectProxy {
   }
 
   parseDimensions(dimensions) {
-    return dimensions.map((dimens) => {
+    return _.castArray(dimensions).map((dimens) => {
       return Object.assign({}, dimens, { dimensions: new Dimensions(dimens.dimensions) })
     });
   }
