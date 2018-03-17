@@ -24,15 +24,8 @@ export default class Projectile extends GameObject {
       height: params.attack.rendering.imageSize
     });
     this.collisionDimensions = params.attack.effect.collisionDimensions;
-    this.speed = params.attack.effect.speed;
-
-    if (_.isUndefined(params.objectId)) {
-      // Only adjust position on first creating projectile
-      //this.renderheight = _.get(params.attack.effect, "offset.z", 0);
-      this.position.add(params.attack.effect.offset);
-      // TRICKY: given position will be relative to center, shift so its centered
-      this.position.subtract({ x: this.dimensions.width / 2, y: this.dimensions.height / 2});
-    }
+    this.speed = params.speed || params.attack.effect.speed;
+    this.zspeed = params.zspeed || params.attack.effect.zspeed || this.speed;
 
     this.startPosition = new Point(this.position);
     this.effect = params.attack.effect;
@@ -40,6 +33,8 @@ export default class Projectile extends GameObject {
     if (!params.simulation) {
       this.renderer = new ProjectileRenderer(params.attack.rendering);
     }
+    this.currentTime = 0;
+    this.maxTime = (params.attack.effect.range / params.attack.effect.speed) * 1000;
 
     this.rotation = Math.atan2(this.direction.y, this.direction.x) * 180 / Math.PI;
   }
@@ -49,6 +44,10 @@ export default class Projectile extends GameObject {
   }
 
   update(elapsedTime) {
+    this.currentTime += elapsedTime;
+    if (this.currentTime >= this.maxTime) {
+      this.done = true;
+    }
     this.renderer.update(elapsedTime);
   }
 
@@ -56,5 +55,93 @@ export default class Projectile extends GameObject {
     return Object.assign(super.getUpdateState(), _.pick(this, [
       "attack"
     ]));
+  }
+
+  // Thank you https://gamedev.stackexchange.com/questions/17467/calculating-velocity-needed-to-hit-target-in-parabolic-arc
+  // static getArcAngle(speed, direction, acceleration, target) {
+  //   let s = (speed * speed * speed * speed) -
+  //     acceleration.z * (acceleration.z * (target.x * target.x) + 2 * target.y * (speed * speed));
+  //   return -Math.atan(((speed * speed) + Math.sqrt(s)) / (acceleration.z * target.x));
+  // }
+
+  // https://physics.tutorvista.com/motion/initial-velocity.html
+  // http://www.dummies.com/education/science/physics/how-to-calculate-the-maximum-height-of-a-projectile/
+  // https://gamedev.stackexchange.com/questions/61301/how-to-implement-throw-curve-with-virtual-height-in-a-2d-side-view-game
+  static getInitialArcSpeed(speed, zspeed, acceleration, origin, target, height) {
+    let time = getDistance(origin, target) / speed;
+    // return (-origin.z / time) - ((acceleration.z * time) / 2);
+    //return Math.sqrt(height * 2 * -acceleration.z);
+    return -acceleration.z * time / 2;
+  }
+
+  static create(params) {
+    // TODO: do this better
+    let sourceOrigin = params.source.position.plus(params.source.attackOrigin.offset);
+    let sourceDimensions = params.source.attackOrigin.dimensions;
+    let origin = sourceOrigin.copy();
+    let attackDimensions = params.attack.effect.attackDimensions ||
+      params.attack.effect.collisionDimensions[0];
+
+    // Create projectile, center it within the attacking character, then move it along direction
+    // until the projectile's bounds are outside of the character's collision dimensions
+    // Center projectile within character's attack origin bounds
+    origin.add({
+      x: sourceDimensions.width / 2 - attackDimensions.dimensions.width / 2,
+      y: sourceDimensions.height / 2 - attackDimensions.dimensions.height / 2,
+    });
+    // Offset by where the projectile's collision dimensions are located
+    origin.subtract(attackDimensions.offset);
+    // Offset projectile by any custom amount (usually a zheight)
+    // TODO: subtract?
+    origin.add(params.attack.effect.offset);
+    // Move projectile bounds along direction until they no longer collide with character bounds
+    let directionXOffset = Number.MAX_VALUE;
+    if (params.direction.x) {
+      directionXOffset = Math.sign(params.direction.x) * 
+        ((((sourceOrigin.x + sourceDimensions.width) - (origin.x - attackDimensions.dimensions.width)) /
+          params.direction.x) + 1);
+    }
+    let directionYOffset = Number.MAX_VALUE;
+    if (params.direction.y) {
+      directionYOffset = Math.sign(params.direction.y) * 
+      ((((sourceOrigin.y + sourceDimensions.height) - (origin.y - attackDimensions.dimensions.height)) /
+        params.direction.y) + 1);
+    }
+    let directionOffset = Math.min(directionXOffset, directionYOffset);
+    origin.add({
+      x: directionOffset * params.direction.x,
+      y: directionOffset * params.direction.y
+    });
+
+    // TRICKY: given position will be relative to center, shift so its centered
+    // this.position.subtract({ x: this.dimensions.width / 2, y: this.dimensions.height / 2});
+    let acceleration = new Point();
+    let direction = new Point(params.direction);
+    let zspeed = params.attack.effect.zspeed;
+    if (params.attack.effect.path === "arc") {
+      // TODO: may need an offset to make this more accurate
+      // // TODO: put default gravity in settings somewhere
+      acceleration = new Point(params.attack.effect.arcGravity || { z: -1 });
+      // direction.add({
+      //   z: Projectile.getArcAngle(params.attack.effect.speed, params.direction,
+      //     acceleration, params.target.minus(origin))
+      // });
+      //direction.z = 1;
+      direction.z = Projectile.getInitialArcSpeed(params.attack.effect.speed,
+        params.attack.effect.zspeed || params.attack.effect.speed,
+        acceleration, origin, params.target, params.attack.effect.arcHeight);
+    }
+
+    return new Projectile({
+      position: origin,
+      simulation: params.simulation,
+      attack: params.attack,
+      //zspeed: zspeed,
+      acceleration: acceleration,
+      direction: direction,
+      playerId: params.source.playerId,
+      ownerId: params.source.objectId,
+      elapsedTime: params.elapsedTime
+    });
   }
 }

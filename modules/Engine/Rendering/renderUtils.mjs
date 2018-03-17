@@ -22,7 +22,7 @@ function drawShadow(context, object, modelDimensions) {
 
   let z = object.position.z || 0;
   let shadow = Math.min(1, SHADOW_START.value + z * SHADOW_INC);
-  gradient.addColorStop(shadow, "black");
+  gradient.addColorStop(shadow, object.shadowColor || "black");
   context.fillStyle = gradient;
   context.fillRect(shadowPos.x, shadowPos.y,
     modelDimensions.dimensions.width, modelDimensions.dimensions.width);

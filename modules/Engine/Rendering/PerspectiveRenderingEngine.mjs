@@ -7,6 +7,33 @@ export default class PerspectiveRenderingEngine extends RenderingEngine{
     super(params);
   }
 
+  renderFaded(object, elapsedTime) {
+    let fadeBounds = object.fadeBounds;
+    if (fadeBounds) {
+      this.context.globalAlpha = 0.5;
+      object.render(this.context, elapsedTime);
+
+      // TODO: figure out why the following doesn't work
+      // Render faded region
+      // this.context.save();
+      // this.context.rect(fadeBounds.ul.x, fadeBounds.ul.y, fadeBounds.width, fadeBounds.height);
+      // this.context.clip();
+      // this.context.globalAlpha = 0.5;
+      // object.render(this.context, elapsedTime);
+      // this.context.restore();
+
+      // // Render the rest of the image
+      // this.context.save();
+      // this.context.rect(fadeBounds.ll.x, fadeBounds.ll.y, object.width, object.height);
+      // this.context.clip();
+      // object.render(this.context, 0);
+      // this.context.restore();
+    } else {
+      this.context.globalAlpha = 0.5;
+      object.render(this.context, elapsedTime);
+    }
+  }
+
   // Render highest to lowest y
   render(objects, elapsedTime, center) {
     //window.debug = true;
@@ -20,9 +47,10 @@ export default class PerspectiveRenderingEngine extends RenderingEngine{
     for (const object of renderObjects) {
       this.context.save();
       if (object.losFade && object.fadePosition.y > center.y - 20) {
-        this.context.globalAlpha = 0.5;
+        this.renderFaded(object, elapsedTime);
+      } else {
+        object.render(this.context, elapsedTime);
       }
-      object.render(this.context, elapsedTime, center);
       this.context.restore();
     }
     
@@ -57,8 +85,14 @@ export default class PerspectiveRenderingEngine extends RenderingEngine{
   debugBoxes(objects) {
     if (window.debug) {
       for (const object of objects) {
+        this.context.strokeStyle = "blue";
+        this.context.beginPath();
+        this.context.arc(object.position.x, object.position.y, 2, 0, 2 * Math.PI);
+        this.context.closePath();
+        this.context.fill();
+
         let box = object.boundingBox;
-        this.context.strokeStyle = "magenta";
+        this.context.strokeStyle = "yellow";
         this.context.strokeRect(box.ul.x, box.ul.y, box.width, box.height);
           
         for (const bounds of object.collisionBounds) {

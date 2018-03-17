@@ -39,12 +39,14 @@ export default class Point {
     this.x += (point && point.x || 0);
     this.y += (point && point.y || 0);
     this.z += (point && point.z || 0);
+    return this;
   }
   
   subtract(point) {
     this.x -= (point && point.x || 0);
     this.y -= (point && point.y || 0);
     this.z -= (point && point.z || 0);
+    return this;
   }
   
   plus(point) {

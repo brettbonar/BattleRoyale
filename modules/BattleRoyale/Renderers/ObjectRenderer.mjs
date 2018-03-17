@@ -8,7 +8,7 @@ export default class ObjectRenderer {
     this.image.onload = () => this.render = this._render;
   }
 
-  _render(context, object, elapsedTime, center) {
+  _render(context, object, elapsedTime) {
     let offset = this.imageDimensions.offset || {
       x: 0,
       y: 0

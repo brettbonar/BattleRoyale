@@ -17,7 +17,8 @@ export default class RenderObject extends GameObject {
     this.renderer = new ObjectRenderer(rendering);
     this.perspectiveDimensions = this.perspectiveDimensions || rendering.perspectiveDimensions;
     this.losFade = params.losFade || rendering.losFade;
-    this.fadeOffset = rendering.fadeOffset;
+    this.fadeEndOffset = rendering.fadeEndOffset;
+    this.fadeDimensions = rendering.fadeDimensions;
 
     if (rendering.collisionDimensions) {
       this.collisionDimensions = this.parseDimensions(rendering.collisionDimensions);

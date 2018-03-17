@@ -8,7 +8,6 @@ export default class Character extends GameObject {
   constructor(params) {
     super(params);
     _.defaults(this, {
-      speed: 96,
       type: "Character",
       state: {
         inventory: [],
@@ -25,6 +24,7 @@ export default class Character extends GameObject {
       },
       attackDuration: 1000
     });
+    this.speed = params.speed || 96;
 
     if (params.collisionDimensions) {
       this.collisionDimensions = this.parseDimensions(params.collisionDimensions);
@@ -43,6 +43,16 @@ export default class Character extends GameObject {
           })
         }
       ];
+    }
+
+    if (!params.attackOrigin) {
+      this.attackOrigin = {
+        offset: new Point(this.collisionDimensions[0].offset).plus({ z: 20 }),
+        dimensions: new Dimensions({
+          width: this.collisionDimensions[0].dimensions.width,
+          height: this.collisionDimensions[0].dimensions.height
+        })
+      };
     }
 
     this.dimensions = params.dimensions || new Dimensions({
@@ -65,7 +75,7 @@ export default class Character extends GameObject {
 
   setDirection(direction) {
     Object.assign(this.direction, direction);
-    this.direction = this.normalize(this.direction);
+    this.direction = this.direction.normalize();
   }
 
   damage(source) {

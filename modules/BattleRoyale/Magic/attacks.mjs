@@ -49,9 +49,6 @@ export default {
           zheight: 16
         }
       }],
-      offset: {
-        z: 20
-      },
       shadow: true,
       range: 1000,
       attackTime: 1000,
@@ -88,14 +85,55 @@ export default {
         }
       }],
       shadow: false,
-      offset: {
-        z: 20
-      },
       range: 100,
       attackTime: 1000,
       automatic: true,
       punchThrough: true,
       speed: 200
+    }
+  },
+  flare: {
+    type: "projectile",
+    rendering: {
+      imageSource: "../../Assets/magic/flare.png",
+      imageSize: 32,
+      frames: 4,
+      framesPerSec: 4,
+      repeat: true,
+      modelDimensions: {
+        offset: {
+          x: 8,
+          y: 8
+        },
+        dimensions: {
+          width: 16,
+          height: 16
+        }
+      }
+    },
+    effect: {
+      path: "arc",
+      arcHeight: 512,
+      damage: 10,
+      collisionDimensions: [{
+        offset: {
+          x: 8,
+          y: 8
+        },
+        dimensions: {
+          width: 16,
+          height: 16,
+          zheight: 16
+        }
+      }],
+      shadowColor: "orange",
+      shadow: true,
+      range: 1000,
+      attackTime: 1000,
+      automatic: false,
+      punchThrough: false,
+      speed: 200
+      //zspeed: 5000
     }
   }
 }

@@ -1,5 +1,6 @@
 import GameObject from "../GameObject/GameObject.mjs"
 import { MOVEMENT_TYPE, SURFACE_TYPE } from "./PhysicsConstants.mjs";
+import Point from "../GameObject/Point.mjs";
 
 export default class PhysicsEngine {
   constructor(params) {
@@ -127,11 +128,18 @@ export default class PhysicsEngine {
         obj.position.x += obj.direction.x * obj.speed * (time / 1000);
         obj.position.y += obj.direction.y * obj.speed * (time / 1000);
         if (obj.direction.z) {
-          obj.position.z += obj.direction.z * obj.speed * (time / 1000);
+          obj.position.z += obj.direction.z * (obj.zspeed || obj.speed) * (time / 1000);
         }
       }
       if (obj.spin) {
         obj.rotation += obj.spin * (time / 1000);
+      }
+      if (obj.acceleration) {
+        obj.direction = new Point(obj.direction).add({
+          x: obj.acceleration.x * (time / 1000),
+          y: obj.acceleration.y * (time / 1000),
+          z: obj.acceleration.z * (time / 1000)
+        });
       }
     }
 
@@ -143,6 +151,13 @@ export default class PhysicsEngine {
       if (obj.physics.surfaceType === SURFACE_TYPE.CHARACTER || 
           obj.physics.surfaceType === SURFACE_TYPE.PROJECTILE) {
         collisions = collisions.concat(this.detectCollisions(obj, objects));
+      }
+
+      if (obj.position.z < 0) {
+        collisions.push({
+          source: obj,
+          target: "ground"
+        });
       }
     }
 

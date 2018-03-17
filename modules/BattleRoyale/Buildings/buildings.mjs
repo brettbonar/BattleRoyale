@@ -180,6 +180,16 @@ export default {
         width: 194,
         height: 290
       },
+      fadeEndOffset: {
+        y: 142
+      },
+      fadeDimensions: {
+        dimensions: {
+          width: 194,
+          height: 135
+        }
+      },
+      losFade: true,
       perspectiveDimensions: {
         zheight: 128
       }

@@ -218,27 +218,20 @@ export default class BattleRoyale extends Game {
         character.fireReady = false;
       }
 
-      // TODO: make this fire onto cursor
       if (this.simulation) {
         if (attack.type === "projectile") {
-          this.gameState.objects.push(new Projectile({
-            position: {
-              // TODO: remove magic numbers
-              // TODO: interpolate position based on direction, character bounds, and
-              // projectile bounds (like sweep test)
-              x: character.center.x + (params.direction.x * 32),
-              y: character.bottom.y + (params.direction.y * 20) - 10,
-              z: character.position.z
-            },
+          this.gameState.objects.push(Projectile.create({
+            source: character,
             simulation: this.simulation,
             attack: attack,
+            target: new Point(params.target),
             direction: params.direction,
             playerId: params.source.playerId,
             ownerId: params.source.objectId,
             elapsedTime: elapsedTime
           }));
         }
-     }
+      }
     }
   }
 
@@ -448,6 +441,35 @@ export default class BattleRoyale extends Game {
     this.interaction = this.getInteraction(this.gameState.player);
   }
 
+  handleCollision(collision) {
+    if (collision.source instanceof Projectile) {
+      if (collision.target instanceof Character) {
+        collision.target.damage(collision.source);
+        // TODO: add effect based on character
+        if (collision.target.damagedEffect && !this.simulation) {
+          this.particleEngine.addEffect(new AnimationEffect({
+            position: {
+              x: collision.target.center.x,
+              y: collision.target.center.y
+            },
+            duration: 1000
+          }, collision.target.damagedEffect));
+        }
+        // if (!character.dead && character.currentHealth <= 0) {
+        //   character.kill();
+        // }
+        if (!collision.source.attack.effect.punchThrough) {
+          _.remove(this.gameState.objects, collision.source);
+        }
+      } else {
+        _.remove(this.gameState.objects, collision.source);
+      }
+    } else {
+      // collision.source.position.x = collision.source.lastPosition.x;
+      // collision.source.position.y = collision.source.lastPosition.y;
+    }
+  }
+
   _update(elapsedTime) {
     // TODO: do this at end -- for some reason setTarget has to be up here
     // CLIENT ONLY
@@ -472,39 +494,7 @@ export default class BattleRoyale extends Game {
     let collisions = this.physicsEngine.update(elapsedTime, this.getPhysicsObjects());
 
     for (const collision of collisions) {
-      if (collision.source instanceof Projectile) {
-        if (collision.target instanceof Character) {
-          collision.target.damage(collision.source);
-          // TODO: add effect based on character
-          if (collision.target.damagedEffect && !this.simulation) {
-            this.particleEngine.addEffect(new AnimationEffect({
-              position: {
-                x: collision.target.center.x,
-                y: collision.target.center.y
-              },
-              duration: 1000
-            }, collision.target.damagedEffect));
-          }
-          // if (!character.dead && character.currentHealth <= 0) {
-          //   character.kill();
-          // }
-          if (!collision.source.attack.effect.punchThrough) {
-            _.remove(this.gameState.objects, collision.source);
-          }
-        } else {
-          _.remove(this.gameState.objects, collision.source);
-        }
-      } else {
-        // collision.source.position.x = collision.source.lastPosition.x;
-        // collision.source.position.y = collision.source.lastPosition.y;
-      }
-    }
-
-    for (const projectile of this.gameState.objects) {
-      if (projectile instanceof Projectile &&
-          projectile.distanceTravelled >= projectile.attack.effect.range) {
-        _.remove(this.gameState.objects, projectile);
-      }
+      this.handleCollision(collision);
     }
 
     for (const character of this.gameState.objects) {

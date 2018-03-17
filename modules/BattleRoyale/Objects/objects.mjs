@@ -143,7 +143,7 @@ export default {
           width: 190,
           height: 178,
         },
-        fadeOffset: {
+        fadeEndOffset: {
           y: 196
         },
         offset: {

@@ -42,6 +42,8 @@ export default class GameObject extends GameObjectProxy {
         height: 0,
         zheight: 0
       }),
+      speed: 0,
+      zspeed: 0,
       collisionDimensions: [],
       functions: [],
       visible: true,
@@ -83,7 +85,7 @@ export default class GameObject extends GameObjectProxy {
       });
     }
 
-    this.normalizeDirection();
+    this.direction = new Point(this.direction).normalize();
     objectId++;
   }
 
@@ -101,19 +103,6 @@ export default class GameObject extends GameObjectProxy {
 
   get dimensionsType() {
     return this.getDimensionsType(this.dimensions);
-  }
-
-  normalize(point) {
-    if (point) {
-      let norm = Math.sqrt(point.x * point.x + point.y * point.y);
-      if (norm !== 0) {
-        return {
-          x: point.x / norm,
-          y: point.y / norm
-        }
-      }
-    }
-    return point;
   }
 
   getAllFunctionBounds() {
@@ -138,10 +127,6 @@ export default class GameObject extends GameObjectProxy {
       position = position.plus({ y: this.height });
     }
     return position.plus({ y: this.position.z });
-  }
-
-  normalizeDirection() {
-    this.normalize(this.direction);
   }
 
   getCenterOfPoints(points) {
@@ -266,7 +251,15 @@ export default class GameObject extends GameObjectProxy {
   }
 
   get fadePosition() {
-    return this.position.plus(this.fadeOffset);
+    return this.position.plus(this.fadeEndOffset);
+  }
+  get fadeBounds() {
+    if (this.fadeDimensions) {
+      return new Bounds({
+        position: this.position.plus(this.fadeDimensions.offset),
+        dimensions: new Dimensions(this.fadeDimensions.dimensions)
+      });
+    }
   }
 
   get lastCollisionBounds() {
@@ -369,6 +362,7 @@ export default class GameObject extends GameObjectProxy {
       "visible",
       "direction",
       "position",
+      "acceleration",
       "revision",
       "objectId",
       "ownerId",

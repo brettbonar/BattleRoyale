@@ -11,7 +11,8 @@ function normalize(point) {
     if (norm !== 0) {
       return {
         x: point.x / norm,
-        y: point.y / norm
+        y: point.y / norm,
+        z: point.z
       }
     }
   }
