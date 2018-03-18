@@ -7,7 +7,7 @@ import FloatingText from "../Graphics/FloatingText.mjs"
 import PhysicsEngine from "../Engine/Physics/PhysicsEngine.mjs"
 import PerspectiveRenderingEngine from "../Engine/Rendering/PerspectiveRenderingEngine.mjs"
 import ParticleEngine from "../Engine/Effects/ParticleEngine.mjs"
-import { MOVEMENT_TYPE } from "../Engine/Physics/PhysicsConstants.mjs"
+import { SURFACE_TYPE, MOVEMENT_TYPE } from "../Engine/Physics/PhysicsConstants.mjs"
 import { getDistance } from "../util.mjs"
 import GameSettings from "../Engine/GameSettings.mjs"
 
@@ -453,33 +453,37 @@ export default class BattleRoyale extends Game {
   }
 
   handleCollision(collision) {
-    if (collision.source instanceof Projectile) {
-      if (collision.target instanceof Character) {
+    if (collision.source.physics.surfaceType === SURFACE_TYPE.PROJECTILE ||
+        collision.source.physics.surfaceType === SURFACE_TYPE.GAS) {
+      if (collision.target.physics.surfaceType === SURFACE_TYPE.CHARACTER) {
         // TODO: something else
         if (!collision.source.damagedTargets.includes(collision.target)) {
           collision.target.damage(collision.source);
-        }
-        // TODO: add effect based on character
-        if (collision.target.damagedEffect && !this.simulation) {
-          this.particleEngine.addEffect(new AnimationEffect({
-            position: {
-              x: collision.target.center.x,
-              y: collision.target.center.y
-            },
-            duration: 1000
-          }, collision.target.damagedEffect));
+          collision.source.damagedTargets.push(collision.target);
+          // TODO: add effect based on character
+          if (collision.target.damagedEffect && !this.simulation) {
+            this.particleEngine.addEffect(new AnimationEffect({
+              position: {
+                x: collision.target.center.x,
+                y: collision.target.center.y
+              },
+              duration: 1000
+            }, collision.target.damagedEffect));
+          }
         }
         // if (!character.dead && character.currentHealth <= 0) {
         //   character.kill();
         // }
-        if (!collision.source.attack.effect.punchThrough) {
-          _.remove(this.gameState.objects, collision.source);
+        if (!collision.source.effect.punchThrough) {
+          _.pull(this.gameState.objects, collision.source);
         }
       } else {
-        _.remove(this.gameState.objects, collision.source);
+        if (collision.source.physics.surfaceType === SURFACE_TYPE.PROJECTILE) {
+          _.pull(this.gameState.objects, collision.source);
+        }
       }
 
-      if (!this.simulation && collision.source.projectile.rendering.hitEffect) {
+      if (!this.simulation && collision.source.rendering.hitEffect) {
         this.gameState.objects.push(new RenderObject({
           position: collision.position,
           dimensions: collision.source.dimensions
@@ -527,6 +531,7 @@ export default class BattleRoyale extends Game {
 
     this.particleEngine.update(elapsedTime);
 
+    // TODO: move above physics?
     let updates = [];
     for (const obj of this.getPhysicsObjects()) {
       let update = obj.update(elapsedTime);
@@ -538,11 +543,9 @@ export default class BattleRoyale extends Game {
       this.onCollision(update);
     }
 
-    //if (this.isServer) {
-      _.remove(this.gameState.objects, (obj) => obj.done);
-    //}
-    // _.remove(this.gameState.dynamicObjects, "done");
-    // _.remove(this.gameState.projectiles, "done");
+    // TODO: fix this hack
+    _.remove(this.gameState.objects, (obj) =>
+      obj.done && (this.simulation || obj.type === "RenderObject"));
     // TODO: remove objects outside of game bounds
   }
 }

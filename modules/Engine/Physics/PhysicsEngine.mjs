@@ -73,7 +73,8 @@ export default class PhysicsEngine {
       // Only need to test projectiles against characters, not both ways
       // TODO: do all tests, but exclude ones already found
       if (obj.physics.surfaceType === SURFACE_TYPE.CHARACTER &&
-          target.physics.surfaceType === SURFACE_TYPE.PROJECTILE) {
+          (target.physics.surfaceType === SURFACE_TYPE.PROJECTILE ||
+           target.physics.surfaceType === SURFACE_TYPE.GAS)) {
         continue;
       }
       
@@ -88,8 +89,12 @@ export default class PhysicsEngine {
 
         // TODO: make this more robust for high speeds
         // TODO: don't always do this (e.g. piercing projectiles)
-        obj.position.x = obj.lastPosition.x;
-        obj.position.y = obj.lastPosition.y;
+        // TODO: create "bounce" or "elasticity" parameter - bounce objects back by
+        // this much. If 0 then no bounce.
+        if (obj.physics.surfaceType !== SURFACE_TYPE.GAS) {
+          obj.position.x = obj.lastPosition.x;
+          obj.position.y = obj.lastPosition.y;
+        }
       }
       
       // TODO: do this after all other physics calculations
@@ -151,7 +156,8 @@ export default class PhysicsEngine {
       //   collisions = collisions.concat(this.detectCollisions(obj, objects));
       // }
       if (obj.physics.surfaceType === SURFACE_TYPE.CHARACTER || 
-          obj.physics.surfaceType === SURFACE_TYPE.PROJECTILE) {
+          obj.physics.surfaceType === SURFACE_TYPE.PROJECTILE ||
+          obj.physics.surfaceType === SURFACE_TYPE.GAS) {
         collisions = collisions.concat(this.detectCollisions(obj, objects));
       }
 

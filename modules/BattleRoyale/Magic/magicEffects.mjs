@@ -11,35 +11,18 @@ export default {
       images: {
         up: {
           imageSource: "../../Assets/magic/firelion_up.png",
-          offset: {
-            x: 0,
-            y: 80
-          },
           perspectiveOffset: {
-            x: 0,
-            y: 48
+            y: 80
           }
         },
         down: {
-          imageSource: "../../Assets/magic/firelion_down.png",
-          offset: {
-            x: 0,
-            y: 16
-          }
+          imageSource: "../../Assets/magic/firelion_down.png"
         },
         left: {
-          imageSource: "../../Assets/magic/firelion_left.png",
-          offset: {
-            x: 16,
-            y: 16
-          }
+          imageSource: "../../Assets/magic/firelion_left.png"
         },
         right: {
-          imageSource: "../../Assets/magic/firelion_right.png",
-          offset: {
-            x: -16,
-            y: 16
-          }
+          imageSource: "../../Assets/magic/firelion_right.png"
         }
       },
       imageSize: 128,
@@ -50,14 +33,19 @@ export default {
     effect: {
       renderingDelay: 0,
       damageDelay: 0,
-      duration: 2000,
+      duration: 1000,
+      punchThrough: true,
       //aoe: 64,
-      damage: 20,
+      damage: 15,
       collisionDimensions: [{
+        offset: {
+          x: 32,
+          y: 32
+        },
         dimensions: {
-          width: 128,
-          height: 128,
-          zheight: 128
+          width: 96,
+          height: 96,
+          zheight: 96
         }
       }]
     }

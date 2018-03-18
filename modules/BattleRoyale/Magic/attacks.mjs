@@ -143,20 +143,24 @@ export default {
       punchThrough: false,
       speed: 200,
       doTriggerCollision: function (object) {
-        return object.direction.z < 0 && object.position.z <= 64;
+        return object.direction.z < 0 && object.position.z <= 32;
       },
       onCollision: function (collision) {
         // TODO: change collisionDimensions to attackDimensions
+        let position = collision.position
+          .plus(collision.source.effect.collisionDimensions[0].offset)
+          .minus({ x: 64, y: 96, z: 32 })
+          .plus({
+            x: collision.source.effect.collisionDimensions[0].dimensions.width / 2,
+            y: collision.source.effect.collisionDimensions[0].dimensions.height / 2
+          });
+        position.z = Math.max(0, position.z);
+        collision.source.done = true;
         return {
           create: {
             type: "Magic",
             attackType: "fireLion",
-            position: collision.position
-              .plus(collision.source.effect.collisionDimensions[0].offset)
-              .plus({
-                x: collision.source.effect.collisionDimensions[0].dimensions.width / 2,
-                y: collision.source.effect.collisionDimensions[0].dimensions.height / 2
-              }),
+            position: position,
             direction: collision.source.direction
           }
         };

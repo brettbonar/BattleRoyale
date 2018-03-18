@@ -4,7 +4,7 @@ import { initGame } from "./initGame.mjs"
 import Map from "../../modules/Map.mjs"
 import Projectile from "../../modules/BattleRoyale/Objects/Projectile.mjs"
 import now from "performance-now"
-import StaticObject from "../../modules/BattleRoyale/Objects/StaticObject.mjs";
+import StaticObject from "../../modules/BattleRoyale/Objects/StaticObject.mjs"
 
 const TICK_RATE = 10;
 const SIMULATION_TIME = 1000 / 65;

@@ -32,9 +32,10 @@ export default class Projectile extends GameObject {
     this.speed = params.speed || this.attack.effect.speed;
     this.zspeed = params.zspeed || this.attack.effect.zspeed || this.speed;
     this.projectile = this.attack;
+    this.rendering = this.attack.rendering;
+    this.effect = this.attack.effect;
 
     this.startPosition = new Point(this.position);
-    this.effect = this.attack.effect;
     this.onCollision = this.attack.effect.onCollision;
 
     if (!params.simulation) {

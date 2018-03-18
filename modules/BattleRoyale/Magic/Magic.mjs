@@ -14,8 +14,9 @@ export default class Magic extends GameObject {
     this.dimensions = new Dimensions(this.magic.dimensions);
     this.collisionDimensions = this.magic.effect.collisionDimensions;
     this.effect = this.magic.effect;
+    this.rendering = this.magic.rendering;
     this.position = new Point(params.position);
-    this.physics.surfaceType = SURFACE_TYPE.PROJECTILE;
+    this.physics.surfaceType = SURFACE_TYPE.GAS;
     this.damagedTargets = [];
 
     if (!params.simulation) {
@@ -38,6 +39,7 @@ export default class Magic extends GameObject {
         //   imageDirection = "up";
         // }
         image = this.magic.rendering.images[imageDirection];
+        this.perspectiveOffset = image.perspectiveOffset;
       }
       this.renderer = new ObjectRenderer(Object.assign({}, image, this.magic.rendering));
     }

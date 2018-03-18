@@ -42,7 +42,7 @@ export default class ObjectRenderer {
   }
 
   renderAnimation(context, object, elapsedTime) {
-    if (!this.image.complete) return;
+    if (!this.image.complete || this.done) return;
 
     let frameOffset = getAnimationOffset(this.image, this.imageSize, this.frame)
       
