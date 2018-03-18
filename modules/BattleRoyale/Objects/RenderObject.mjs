@@ -38,4 +38,12 @@ export default class RenderObject extends GameObject {
       "objectType"
     ]));
   }
+
+  update(elapsedTime) {
+    // TODO: get rid of this hack
+    this.renderer.update(elapsedTime);
+    if (this.renderer.done) {
+      this.done = true;
+    }
+  }
 }

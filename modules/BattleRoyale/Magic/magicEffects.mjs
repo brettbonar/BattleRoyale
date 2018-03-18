@@ -1,6 +1,12 @@
 
 export default {
   fireLion: {
+    type: "magic",
+    name: "fireLion",
+    dimensions: {
+      width: 128,
+      height: 128
+    },
     rendering: {
       images: {
         up: {
@@ -38,15 +44,22 @@ export default {
       },
       imageSize: 128,
       frames: 16,
-      framesPerSec: 16
+      framesPerSec: 16,
+      repeat: false
     },
     effect: {
       renderingDelay: 0,
-      damageDelay: 1000,
-      duration: 1000,
-      aoe: 32,
-      damage: 20
-      // additional status effects
+      damageDelay: 0,
+      duration: 2000,
+      //aoe: 64,
+      damage: 20,
+      collisionDimensions: [{
+        dimensions: {
+          width: 128,
+          height: 128,
+          zheight: 128
+        }
+      }]
     }
   },
   snake: {

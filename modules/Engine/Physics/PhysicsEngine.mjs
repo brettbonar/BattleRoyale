@@ -81,7 +81,9 @@ export default class PhysicsEngine {
       if (this.intersects(objCollisionBounds, targetCollisionBounds)) {
         collisions.push({
           source: obj,
-          target: target
+          target: target,
+          // TODO: use position of collision from sweep test
+          position: obj.position.copy()
         });
 
         // TODO: make this more robust for high speeds
@@ -156,7 +158,8 @@ export default class PhysicsEngine {
       if (obj.position.z < 0) {
         collisions.push({
           source: obj,
-          target: "ground"
+          target: "ground",
+          position: obj.position.copy()
         });
       }
     }

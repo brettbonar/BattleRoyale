@@ -11,6 +11,11 @@ export default class Projectile extends GameObject {
     this.type = "Projectile";
     this.physics.surfaceType = "projectile";
     this.boundsType = "circle";
+    this.damagedTargets = [];
+
+    if (params.attackType) {
+      this.attack = attacks[params.attackType];
+    }
     // this.dimensions = {
     //   width: 32,
     //   height: 52
@@ -20,21 +25,23 @@ export default class Projectile extends GameObject {
     //   height: 8
     // };
     this.dimensions = new Dimensions({
-      width: params.attack.rendering.imageSize,
-      height: params.attack.rendering.imageSize
+      width: this.attack.rendering.imageSize,
+      height: this.attack.rendering.imageSize
     });
-    this.collisionDimensions = params.attack.effect.collisionDimensions;
-    this.speed = params.speed || params.attack.effect.speed;
-    this.zspeed = params.zspeed || params.attack.effect.zspeed || this.speed;
+    this.collisionDimensions = this.attack.effect.collisionDimensions;
+    this.speed = params.speed || this.attack.effect.speed;
+    this.zspeed = params.zspeed || this.attack.effect.zspeed || this.speed;
+    this.projectile = this.attack;
 
     this.startPosition = new Point(this.position);
-    this.effect = params.attack.effect;
+    this.effect = this.attack.effect;
+    this.onCollision = this.attack.effect.onCollision;
 
     if (!params.simulation) {
-      this.renderer = new ProjectileRenderer(params.attack.rendering);
+      this.renderer = new ProjectileRenderer(this.attack.rendering);
     }
     this.currentTime = 0;
-    this.maxTime = (params.attack.effect.range / params.attack.effect.speed) * 1000;
+    this.maxTime = (this.attack.effect.range / this.attack.effect.speed) * 1000;
 
     this.rotation = Math.atan2(this.direction.y, this.direction.x) * 180 / Math.PI;
   }
@@ -49,12 +56,21 @@ export default class Projectile extends GameObject {
       this.done = true;
     }
     this.renderer.update(elapsedTime);
+
+    if (!this.done && this.effect.doTriggerCollision && this.effect.doTriggerCollision(this)) {
+      this.done = true;
+      return this.effect.onCollision({
+        position: this.position,
+        source: this,
+        target: "ground"
+      });
+    }
   }
 
   getUpdateState() {
-    return Object.assign(super.getUpdateState(), _.pick(this, [
-      "attack"
-    ]));
+    return Object.assign(super.getUpdateState(), {
+      attackType: this.attack.name
+    });
   }
 
   // Thank you https://gamedev.stackexchange.com/questions/17467/calculating-velocity-needed-to-hit-target-in-parabolic-arc

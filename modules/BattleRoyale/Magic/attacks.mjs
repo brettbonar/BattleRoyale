@@ -18,6 +18,7 @@ export default {
   },
   plasmaBall: {
     type: "projectile",
+    name: "plasmaBall",
     rendering: {
       imageSource: "../../Assets/magic/plasmaball.png",
       imageSize: 32,
@@ -33,10 +34,18 @@ export default {
           width: 16,
           height: 16
         }
-      }
+      },
+      hitEffect: {
+        imageSource: "../../Assets/magic/plasmaBallHit.png",
+        imageSize: 32,
+        frames: 4,
+        framesPerSec: 16,
+        repeat: false
+      },
+      shadow: false
     },
     effect: {
-      damage: 10,
+      damage: 5,
       // TODO: more shapes
       collisionDimensions: [{
         offset: {
@@ -49,7 +58,6 @@ export default {
           zheight: 16
         }
       }],
-      shadow: true,
       range: 1000,
       attackTime: 1000,
       automatic: false,
@@ -59,6 +67,7 @@ export default {
   },
   flamethrower: {
     type: "projectile",
+    name: "flamethrower",
     rendering: {
       imageSource: "../../Assets/magic/flamethrower.png",
       imageSize: 128,
@@ -68,10 +77,11 @@ export default {
       renderOffset: {
         x: 48,
         y: 16
-      }
+      },
+      shadow: false
     },
     effect: {
-      damage: 10,
+      damage: 5,
       // TODO: more shapes
       collisionDimensions: [{
         offset: {
@@ -84,7 +94,6 @@ export default {
           zheight: 16
         }
       }],
-      shadow: false,
       range: 100,
       attackTime: 1000,
       automatic: true,
@@ -94,11 +103,12 @@ export default {
   },
   flare: {
     type: "projectile",
+    name: "flare",
     rendering: {
       imageSource: "../../Assets/magic/flare.png",
       imageSize: 32,
       frames: 4,
-      framesPerSec: 4,
+      framesPerSec: 8,
       repeat: true,
       modelDimensions: {
         offset: {
@@ -109,12 +119,13 @@ export default {
           width: 16,
           height: 16
         }
-      }
+      },
+      shadowColor: "rgba(230, 140, 100, 1)",
+      shadow: true
     },
     effect: {
       path: "arc",
-      arcHeight: 512,
-      damage: 10,
+      damage: 5,
       collisionDimensions: [{
         offset: {
           x: 8,
@@ -126,13 +137,30 @@ export default {
           zheight: 16
         }
       }],
-      shadowColor: "orange",
-      shadow: true,
       range: 1000,
       attackTime: 1000,
       automatic: false,
       punchThrough: false,
-      speed: 200
+      speed: 200,
+      doTriggerCollision: function (object) {
+        return object.direction.z < 0 && object.position.z <= 64;
+      },
+      onCollision: function (collision) {
+        // TODO: change collisionDimensions to attackDimensions
+        return {
+          create: {
+            type: "Magic",
+            attackType: "fireLion",
+            position: collision.position
+              .plus(collision.source.effect.collisionDimensions[0].offset)
+              .plus({
+                x: collision.source.effect.collisionDimensions[0].dimensions.width / 2,
+                y: collision.source.effect.collisionDimensions[0].dimensions.height / 2
+              }),
+            direction: collision.source.direction
+          }
+        };
+      }
       //zspeed: 5000
     }
   }

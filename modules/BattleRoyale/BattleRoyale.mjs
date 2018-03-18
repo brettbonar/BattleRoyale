@@ -23,6 +23,7 @@ import Item from "./Objects/Item.mjs"
 import AnimationEffect from "./Effects/AnimationEffect.mjs"
 import effects from "./Effects/effects.mjs"
 import attacks from "./Magic/attacks.mjs"
+import RenderObject from "./Objects/RenderObject.mjs";
 
 const EVENTS = {
   MOVE_UP: "moveUp",
@@ -128,6 +129,7 @@ export default class BattleRoyale extends Game {
   }
 
   createObject(object) {
+    object.simulation = this.simulation;
     if (object.type === "Character") {
       let character = new Character(object);
       if (character.playerId === this.player.playerId) {
@@ -441,10 +443,22 @@ export default class BattleRoyale extends Game {
     this.interaction = this.getInteraction(this.gameState.player);
   }
 
+  onCollision(result) {
+    if (result.create && this.simulation) {
+      result.create.simulation = this.simulation;
+      if (result.create.type === "Magic") {
+        this.gameState.objects.push(Magic.create(result.create));
+      }
+    }
+  }
+
   handleCollision(collision) {
     if (collision.source instanceof Projectile) {
       if (collision.target instanceof Character) {
-        collision.target.damage(collision.source);
+        // TODO: something else
+        if (!collision.source.damagedTargets.includes(collision.target)) {
+          collision.target.damage(collision.source);
+        }
         // TODO: add effect based on character
         if (collision.target.damagedEffect && !this.simulation) {
           this.particleEngine.addEffect(new AnimationEffect({
@@ -464,9 +478,20 @@ export default class BattleRoyale extends Game {
       } else {
         _.remove(this.gameState.objects, collision.source);
       }
+
+      if (!this.simulation && collision.source.projectile.rendering.hitEffect) {
+        this.gameState.objects.push(new RenderObject({
+          position: collision.position,
+          dimensions: collision.source.dimensions
+        }, collision.source.projectile.rendering.hitEffect));
+      }
     } else {
       // collision.source.position.x = collision.source.lastPosition.x;
       // collision.source.position.y = collision.source.lastPosition.y;
+    }
+
+    if (collision.source.onCollision) {
+      this.onCollision(collision.source.onCollision(collision));
     }
   }
 
@@ -488,9 +513,6 @@ export default class BattleRoyale extends Game {
       this.showInteractions();
     }
 
-    for (const obj of this.getPhysicsObjects()) {
-      obj.update(elapsedTime);
-    }
     let collisions = this.physicsEngine.update(elapsedTime, this.getPhysicsObjects());
 
     for (const collision of collisions) {
@@ -505,9 +527,20 @@ export default class BattleRoyale extends Game {
 
     this.particleEngine.update(elapsedTime);
 
-    if (this.isServer) {
-      _.remove(this.gameState.objects, (obj) => obj.done);
+    let updates = [];
+    for (const obj of this.getPhysicsObjects()) {
+      let update = obj.update(elapsedTime);
+      if (update) {
+        updates.push(update);
+      }
     }
+    for (const update of updates) {
+      this.onCollision(update);
+    }
+
+    //if (this.isServer) {
+      _.remove(this.gameState.objects, (obj) => obj.done);
+    //}
     // _.remove(this.gameState.dynamicObjects, "done");
     // _.remove(this.gameState.projectiles, "done");
     // TODO: remove objects outside of game bounds

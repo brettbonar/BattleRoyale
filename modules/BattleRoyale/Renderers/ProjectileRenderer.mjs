@@ -1,4 +1,4 @@
-import { drawShadow } from "../../Engine/Rendering/renderUtils.mjs";
+import { drawShadow, getAnimationOffset } from "../../Engine/Rendering/renderUtils.mjs";
 
 function getOffset(animation, frame, imageSize) {
   let offset = ANIMATION_SETTINGS[animation].offset;
@@ -21,15 +21,10 @@ export default class ProjectileRenderer {
     if (!this.image.complete) {
       return;
     }
-    
-    let framesPerRow = this.image.width / this.projectile.imageSize;
-    let offset = {
-      x: (this.frame % framesPerRow) * this.projectile.imageSize,
-      y: this.projectile.imageSize * Math.floor(this.frame / framesPerRow)
-    }
+    let offset = getAnimationOffset(this.image, this.projectile.imageSize, this.frame);
 
-    if (object.effect.shadow && object.position.z > 0) {
-      drawShadow(context, object, this.projectile.modelDimensions);
+    if (this.projectile.shadow && object.position.z > 0) {
+      drawShadow(context, object, this.projectile.modelDimensions, this.projectile.shadowColor);
     }
 
     let position = object.position.minus({ y: object.position.z });

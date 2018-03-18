@@ -1,8 +1,10 @@
+import Point from "../GameObject/Point.mjs"
+
 const SHADOW_START = { z: 0, value: 0.5 };
 const SHADOW_END = { z: 160, value: 1 };
 const SHADOW_INC = (SHADOW_END.value - SHADOW_START.value) / (SHADOW_END.z - SHADOW_START.z);
 
-function drawShadow(context, object, modelDimensions) {
+function drawShadow(context, object, modelDimensions, shadowColor) {
   if (!modelDimensions) {
     console.log("Need modelDimensions to render shadow");
     return;
@@ -22,10 +24,18 @@ function drawShadow(context, object, modelDimensions) {
 
   let z = object.position.z || 0;
   let shadow = Math.min(1, SHADOW_START.value + z * SHADOW_INC);
-  gradient.addColorStop(shadow, object.shadowColor || "black");
+  gradient.addColorStop(shadow, shadowColor || "black");
   context.fillStyle = gradient;
   context.fillRect(shadowPos.x, shadowPos.y,
     modelDimensions.dimensions.width, modelDimensions.dimensions.width);
 }
 
-export { drawShadow }
+function getAnimationOffset(image, imageSize, frame) {
+  let framesPerRow = image.width / imageSize;
+  return new Point({
+    x: (frame % framesPerRow) * imageSize,
+    y: imageSize * Math.floor(frame / framesPerRow)
+  });
+}
+
+export { drawShadow, getAnimationOffset }

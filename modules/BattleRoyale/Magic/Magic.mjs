@@ -2,34 +2,46 @@ import GameObject from "../../Engine/GameObject/GameObject.mjs"
 import magicEffects from "./magicEffects.mjs"
 import MagicRenderer from "./MagicRenderer.mjs"
 import Point from "../../Engine/GameObject/Point.mjs"
+import Dimensions from "../../Engine/GameObject/Dimensions.mjs"
 import { SURFACE_TYPE } from "../../Engine/Physics/PhysicsConstants.mjs"
+import ObjectRenderer from "../Renderers/ObjectRenderer.mjs";
 
 export default class Magic extends GameObject {
   constructor(params) {
     super(params);
-    this.magic = magicEffects[params.type];
+    this.type = "Magic";
+    this.magic = magicEffects[params.attackType];
+    this.dimensions = new Dimensions(this.magic.dimensions);
+    this.collisionDimensions = this.magic.effect.collisionDimensions;
     this.effect = this.magic.effect;
-    this.position = new Point(params.target);
-    this.physics.surfaceType = SURFACE_TYPE.NONE;
+    this.position = new Point(params.position);
+    this.physics.surfaceType = SURFACE_TYPE.PROJECTILE;
+    this.damagedTargets = [];
 
-    let direction = params.target.minus(params.source).normalize();
-    let image = this.magic.rendering.image;
-    if (!image) {
-      let imageDirection;
-      if (params.target.x < params.source.x && Math.abs(direction.x) >= Math.abs(direction.y)) {
-        imageDirection = "left";
-      } else if (params.target.x > params.source.x && Math.abs(direction.x) >= Math.abs(direction.y)) {
-        imageDirection = "right";
-      } else if (params.target.y > params.source.y && Math.abs(direction.y) >= Math.abs(direction.x)) {
-        imageDirection = "down";
-      } else if (params.target.y < params.source.y && Math.abs(direction.y) >= Math.abs(direction.x)) {
-        imageDirection = "up";
+    if (!params.simulation) {
+      let image = this.magic.rendering.image;
+      if (!image) {
+        let direction = params.direction; //  || params.target.minus(params.source).normalize();
+        let imageDirection;
+        if (Math.abs(direction.x) >= Math.abs(direction.y)) {
+          imageDirection = direction.x >= 0 ? "right" : "left";
+        } else {
+          imageDirection = direction.y >= 0 ? "down" : "up";
+        }
+        // if (params.target.x < params.source.x && Math.abs(direction.x) >= Math.abs(direction.y)) {
+        //   imageDirection = "left";
+        // } else if (params.target.x > params.source.x && Math.abs(direction.x) >= Math.abs(direction.y)) {
+        //   imageDirection = "right";
+        // } else if (params.target.y > params.source.y && Math.abs(direction.y) >= Math.abs(direction.x)) {
+        //   imageDirection = "down";
+        // } else if (params.target.y < params.source.y && Math.abs(direction.y) >= Math.abs(direction.x)) {
+        //   imageDirection = "up";
+        // }
+        image = this.magic.rendering.images[imageDirection];
       }
-      image = this.magic.rendering.images[imageDirection];
+      this.renderer = new ObjectRenderer(Object.assign({}, image, this.magic.rendering));
     }
-    this.image = image;
-    this.imageOffset = image.offset;
-    this.renderer = new MagicRenderer(this.magic.rendering, image);
+    
     this.currentTime = 0;
   }
 
@@ -50,4 +62,29 @@ export default class Magic extends GameObject {
   //   }
   //   return this.position;
   // }
+
+  getUpdateState() {
+    return Object.assign(super.getUpdateState(), {
+      attackType: this.magic.name
+    });
+  }
+  
+  static create(params) {
+    let magic = magicEffects[params.attackType];
+    let position = new Point(params.position).minus({
+      //x: magic.rendering.imageSize / 2,
+      //y: magic.rendering.imageSize / 2
+    });
+
+    return new Magic({
+      position: position,
+      simulation: params.simulation,
+      attackType: params.attackType,
+      direction: params.direction,
+      simulation: params.simulation
+      // playerId: params.source.playerId,
+      // ownerId: params.source.objectId,
+      // elapsedTime: params.elapsedTime
+    });
+  }
 }
