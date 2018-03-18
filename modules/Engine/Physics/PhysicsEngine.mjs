@@ -116,7 +116,6 @@ export default class PhysicsEngine {
       let time = elapsedTime;
       if (obj.elapsedTime) {
         time += obj.elapsedTime;
-        obj.elapsedTime = 0;
       }
 
       // if (obj.physics.surfaceType === SURFACE_TYPE.CHARACTER) {

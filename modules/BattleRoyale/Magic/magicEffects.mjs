@@ -11,9 +11,6 @@ export default {
       images: {
         up: {
           imageSource: "../../Assets/magic/firelion_up.png",
-          perspectiveOffset: {
-            y: 80
-          }
         },
         down: {
           imageSource: "../../Assets/magic/firelion_down.png"

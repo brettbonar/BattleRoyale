@@ -19,6 +19,14 @@ export default {
   plasmaBall: {
     type: "projectile",
     name: "plasmaBall",
+    action: {
+      name: "plasmaBall",
+      actionDuration: 0,
+      actionRate: 5,
+      actionType: "exclusive",
+      automatic: true,
+      manaCost: 5
+    },
     rendering: {
       imageSource: "../../Assets/magic/plasmaball.png",
       imageSize: 32,
@@ -59,8 +67,6 @@ export default {
         }
       }],
       range: 1000,
-      attackTime: 1000,
-      automatic: false,
       punchThrough: false,
       speed: 512
     }
@@ -104,6 +110,14 @@ export default {
   flare: {
     type: "projectile",
     name: "flare",
+    action: {
+      name: "flare",
+      actionDuration: 0,
+      actionRate: 1,
+      actionType: "blocking",
+      automatic: false,
+      manaCost: 15
+    },
     rendering: {
       imageSource: "../../Assets/magic/flare.png",
       imageSize: 32,

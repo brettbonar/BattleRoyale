@@ -6,8 +6,8 @@ import Projectile from "../../modules/BattleRoyale/Objects/Projectile.mjs"
 import now from "performance-now"
 import StaticObject from "../../modules/BattleRoyale/Objects/StaticObject.mjs"
 
-const TICK_RATE = 10;
-const SIMULATION_TIME = 1000 / 65;
+const TICK_RATE = 20;
+const SIMULATION_TIME = 1000 / TICK_RATE;
 
 export default class Simulation {
   constructor(params) {
@@ -32,6 +32,7 @@ export default class Simulation {
       objects: initGame(params.players, maps)
     });
     this.lastState = [];
+    this.updates = [];
 
     this.eventHandlers = {
       changeDirection: (data, elapsedTime) => this.changeDirection(data, elapsedTime),
@@ -106,14 +107,26 @@ export default class Simulation {
   }
 
   updateState(data, elapsedTime) {
-    let handler = this.eventHandlers[data.type];
-    if (handler) {
+    if (this.eventHandlers[data.type]) {
       //handler(data, elapsedTime);
-      handler(data);
+      this.updates.push({
+        update: data,
+        elapsedTime: elapsedTime,
+        eventTime: now()
+      });
     } else {
       console.log("Unknown update: ", data.type);
       console.log(data);
     }
+  }
+
+  processUpdates(currentTime) {
+    for (const update of this.updates) {
+      let handler = this.eventHandlers[update.update.type];
+      let elapsedTime = update.elapsedTime + (currentTime - update.eventTime);
+      handler(update.update, elapsedTime);
+    }
+    this.updates.length = 0;
   }
 
   getMaps() { return this.game.maps }
@@ -123,7 +136,8 @@ export default class Simulation {
     let currentTime = now();
     let elapsedTime = currentTime - this.previousTime;
     this.previousTime = currentTime;
-
+    
+    this.processUpdates(currentTime);
     this.game._update(elapsedTime);
     
     // TODO: do for each player

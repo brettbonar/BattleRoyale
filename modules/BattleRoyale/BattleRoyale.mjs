@@ -64,8 +64,8 @@ export default class BattleRoyale extends Game {
     this.gameState = {
       cursor: {
         position: {
-          x: params.canvas.width / 2,
-          y: params.canvas.height / 2
+          x: params.canvas.width / 2 + 64,
+          y: params.canvas.height / 2 + 64
         }
       },
       objects: params.objects || [],
@@ -210,31 +210,23 @@ export default class BattleRoyale extends Game {
   }
 
   doAttack(character, params, elapsedTime) {
-    if (params.release) {
-      character.fireReady = true;
-    } else if (character.fireReady) {
-      let attack = attacks[character.state.loadout.weapon.attacks[params.attackType]];
-      character.attack(attack.effect.attackTime, elapsedTime);
-      if (!attack.effect.automatic) {
-        // TODO: something else here
-        character.fireReady = false;
+    let attack = attacks[character.state.loadout.weapon.attacks[params.attackType]];
+    character.doAction("attack", params.release, attack.action, elapsedTime, () => {
+      if (attack.type === "projectile") {
+        let direction = character.state.target.minus(character.center).normalize();
+        direction.z = 0;
+        this.gameState.objects.push(Projectile.create({
+          source: character,
+          simulation: this.simulation,
+          attack: attack,
+          direction: direction,
+          target: character.state.target,
+          playerId: params.source.playerId,
+          ownerId: params.source.objectId,
+          elapsedTime: elapsedTime
+        }));
       }
-
-      if (this.simulation) {
-        if (attack.type === "projectile") {
-          this.gameState.objects.push(Projectile.create({
-            source: character,
-            simulation: this.simulation,
-            attack: attack,
-            target: new Point(params.target),
-            direction: params.direction,
-            playerId: params.source.playerId,
-            ownerId: params.source.objectId,
-            elapsedTime: elapsedTime
-          }));
-        }
-      }
-    }
+    });
   }
 
   use(event) {
@@ -257,43 +249,24 @@ export default class BattleRoyale extends Game {
   }
 
   attack(event, attackType) {
-    let target = this.getAbsoluteCursorPosition();
-    // let target = {
-    //   // x: this.gameState.cursor.position.x - this.gameState.player.position.x,
-    //   // y: this.gameState.cursor.position.y - this.gameState.player.position.y
-    //   x: this.gameState.player.position.x + (this.gameState.cursor.position.x - this.canvas.width / 2),
-    //   y: this.gameState.player.position.y + (this.gameState.cursor.position.y - this.canvas.height / 2)
-    // };
-    // let direction = this.normalize({
-    //   x: this.gameState.cursor.position.x - this.canvas.width / 2,
-    //   y: this.gameState.cursor.position.y - this.canvas.height / 2 + 32
-    // });
-    //let direction = target.minus(this.gameState.player.center).normalize();
-    let direction = new Point({
-      x: this.gameState.cursor.position.x - this.canvas.width / 2,
-      y: this.gameState.cursor.position.y - this.canvas.height / 2
-    }).normalize();
-    direction.z = 0;
-
     let source = {
       playerId: this.player.playerId,
       objectId: this.gameState.player.objectId
     };
 
-    this.doAttack(this.gameState.player, {
-      source: source,
-      attackType: attackType,
-      target: target,
-      direction: direction,
-      release: event.release
-    });
+    // TODO: start animation immediately
+    if (this.simulation) {
+      this.doAttack(this.gameState.player, {
+        source: source,
+        attackType: attackType,
+        release: event.release
+      });
+    }
 
     this.sendEvent({
       type: "attack",
       source: source,
       attackType: attackType,
-      target: target,
-      direction: direction,
       release: event.release
     });
   }
@@ -455,7 +428,7 @@ export default class BattleRoyale extends Game {
   handleCollision(collision) {
     if (collision.source.physics.surfaceType === SURFACE_TYPE.PROJECTILE ||
         collision.source.physics.surfaceType === SURFACE_TYPE.GAS) {
-      if (collision.target.physics.surfaceType === SURFACE_TYPE.CHARACTER) {
+      if (_.get(collision.target, "physics.surfaceType") === SURFACE_TYPE.CHARACTER) {
         // TODO: something else
         if (!collision.source.damagedTargets.includes(collision.target)) {
           collision.target.damage(collision.source);
@@ -544,8 +517,10 @@ export default class BattleRoyale extends Game {
     }
 
     // TODO: fix this hack
-    _.remove(this.gameState.objects, (obj) =>
-      obj.done && (this.simulation || obj.type === "RenderObject"));
+    _.remove(this.gameState.objects, (obj) => {
+      obj.elapsedTime = 0;
+      return obj.done && (this.simulation || obj.type === "RenderObject");
+    });
     // TODO: remove objects outside of game bounds
   }
 }
