@@ -83,13 +83,11 @@ export default class PhysicsEngine {
         .some((targetBounds) => targetBounds.intersects(bounds)));
   }
 
-  detectCollisions(obj, objects) {
-    let collisions = [];
+  getIntersections(obj, targets) {
+    let intersections = [];
     let objCollisionBounds = obj.collisionBounds;
     let objLastCollisionBounds = obj.lastCollisionBounds;
-
-    let intersections = [];
-    for (const target of objects) {
+    for (const target of targets) {
       if (target === obj || target.physics.surfaceType === SURFACE_TYPE.NONE) continue;
       // Only need to test projectiles against characters, not both ways
       // TODO: do all tests, but exclude ones already found
@@ -125,9 +123,16 @@ export default class PhysicsEngine {
       }
     }
 
+    return intersections;
+  }
+
+  detectCollisions(obj, objects) {
+    let collisions = [];
+    let intersections = this.getIntersections(obj, objects);
     // TODO: order by collision time?
-    //let firstIntersection = _.minBy(intersections, (intersection) => intersection.collision.time);
-    for (const intersection of intersections) {
+    let intersection = _.minBy(intersections, (intersection) => intersection.collision.time);
+    //for (const intersection of intersections) {
+    if (intersection) {
       let target = intersection.target;
       let collision = intersection.collision;
 
@@ -153,6 +158,32 @@ export default class PhysicsEngine {
         // TODO: use position of collision from sweep test
         position: obj.position.copy()
       });
+    }
+
+    return collisions;
+  }
+
+  getCollisions(objects) {
+    let collisions = [];
+    for (const obj of objects) {
+      // if (obj.physics.movementType === MOVEMENT_TYPE.NORMAL) {
+      //   collisions = collisions.concat(this.detectCollisions(obj, objects));
+      // }
+      if (obj.physics.surfaceType === SURFACE_TYPE.CHARACTER || 
+          obj.physics.surfaceType === SURFACE_TYPE.PROJECTILE ||
+          obj.physics.surfaceType === SURFACE_TYPE.GAS) {
+        collisions = collisions.concat(this.detectCollisions(obj, objects));
+        // Do twice to capture additional collisions after movement
+        //collisions = collisions.concat(this.detectCollisions(obj, objects));
+      }
+
+      if (obj.position.z < 0) {
+        collisions.push({
+          source: obj,
+          target: "ground",
+          position: obj.position.copy()
+        });
+      }
     }
 
     return collisions;
@@ -198,29 +229,5 @@ export default class PhysicsEngine {
         });
       }
     }
-
-    let collisions = [];
-    for (const obj of objects) {
-      // if (obj.physics.movementType === MOVEMENT_TYPE.NORMAL) {
-      //   collisions = collisions.concat(this.detectCollisions(obj, objects));
-      // }
-      if (obj.physics.surfaceType === SURFACE_TYPE.CHARACTER || 
-          obj.physics.surfaceType === SURFACE_TYPE.PROJECTILE ||
-          obj.physics.surfaceType === SURFACE_TYPE.GAS) {
-        collisions = collisions.concat(this.detectCollisions(obj, objects));
-        // Do twice to capture additional collisions after movement
-        //collisions = collisions.concat(this.detectCollisions(obj, objects));
-      }
-
-      if (obj.position.z < 0) {
-        collisions.push({
-          source: obj,
-          target: "ground",
-          position: obj.position.copy()
-        });
-      }
-    }
-
-    return collisions;
   }
 }

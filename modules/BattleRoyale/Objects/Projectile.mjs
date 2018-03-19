@@ -107,13 +107,13 @@ export default class Projectile extends GameObject {
     if (params.direction.x) {
       directionXOffset = Math.sign(params.direction.x) * 
         ((((sourceOrigin.x + sourceDimensions.width) - (origin.x - attackDimensions.dimensions.width)) /
-          params.direction.x) + 1);
+          params.direction.x) + 2);
     }
     let directionYOffset = Number.MAX_VALUE;
     if (params.direction.y) {
       directionYOffset = Math.sign(params.direction.y) * 
       ((((sourceOrigin.y + sourceDimensions.height) - (origin.y - attackDimensions.dimensions.height)) /
-        params.direction.y) + 1);
+        params.direction.y) + 2);
     }
     let directionOffset = Math.min(directionXOffset, directionYOffset);
     origin.add({

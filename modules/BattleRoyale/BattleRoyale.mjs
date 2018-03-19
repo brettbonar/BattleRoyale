@@ -214,7 +214,7 @@ export default class BattleRoyale extends Game {
 
   doAttack(character, params, elapsedTime) {
     let attack = attacks[character.state.loadout.weapon.attacks[params.attackType]];
-    character.doAction("attack", params.release, attack.action, elapsedTime, () => {
+    character.doAction("attack", params.release, attack.action, elapsedTime, (timeDiff) => {
       if (attack.type === "projectile") {
         let direction = character.state.target.minus(character.center).normalize();
         direction.z = 0;
@@ -226,7 +226,7 @@ export default class BattleRoyale extends Game {
           target: character.state.target,
           playerId: params.source.playerId,
           ownerId: params.source.objectId,
-          elapsedTime: elapsedTime
+          elapsedTime: timeDiff
         }));
       }
     });
@@ -517,8 +517,9 @@ export default class BattleRoyale extends Game {
       this.onCollision(update);
     }
 
-    let collisions = this.physicsEngine.update(elapsedTime, this.getPhysicsObjects());
+    this.physicsEngine.update(elapsedTime, this.getPhysicsObjects());
 
+    let collisions = this.physicsEngine.getCollisions(this.getPhysicsObjects());
     for (const collision of collisions) {
       this.handleCollision(collision);
     }

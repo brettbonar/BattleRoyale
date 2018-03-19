@@ -113,7 +113,7 @@ export default {
     action: {
       name: "flare",
       actionDuration: 0,
-      actionRate: 1,
+      actionRate: .75,
       actionType: "blocking",
       automatic: false,
       manaCost: 0
