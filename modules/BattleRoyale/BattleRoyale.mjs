@@ -42,8 +42,6 @@ let sequenceNumber = 1;
 export default class BattleRoyale extends Game {
   constructor(params) {
     super(Object.assign(params, { requestPointerLock: true }));
-    
-    GameSettings.zScale = 1.0;
 
     if (params.mapCanvas) {
       this.mapCanvas = params.mapCanvas;
@@ -74,6 +72,11 @@ export default class BattleRoyale extends Game {
       dynamicObjects: [],
       staticObjects: []
     };
+
+    if (!this.simulation) {
+      this.ui = new Image();
+      this.ui.src = "/Assets/UI/png/bars.png";
+    }
 
     //this.addEventHandler(Game.EVENT.PAUSE, () => this.pause());
     this.keyBindings[KEY_CODE.W] = EVENTS.MOVE_UP;
@@ -392,6 +395,11 @@ export default class BattleRoyale extends Game {
     this.context.stroke();
 
     this.context.restore();
+
+    // if (this.ui.complete) {
+    //   this.context.drawImage(this.ui, this.context.canvas.width / 2 - 512,
+    //     this.context.canvas.height - 104, 1024, 104);
+    // }
   }
 
   getInteraction(target) {
@@ -473,6 +481,13 @@ export default class BattleRoyale extends Game {
   }
 
   _update(elapsedTime) {
+    // TODO: fix this hack
+    // TODO: remove objects outside of game bounds
+    _.remove(this.gameState.objects, (obj) => {
+      obj.elapsedTime = 0;
+      return obj.done && (this.simulation || obj.type === "RenderObject");
+    });
+
     // TODO: do this at end -- for some reason setTarget has to be up here
     // CLIENT ONLY
     if (!this.isServer) {
@@ -490,6 +505,18 @@ export default class BattleRoyale extends Game {
       this.showInteractions();
     }
 
+    // TODO: move above physics?
+    let updates = [];
+    for (const obj of this.getPhysicsObjects()) {
+      let update = obj.update(elapsedTime);
+      if (update) {
+        updates.push(update);
+      }
+    }
+    for (const update of updates) {
+      this.onCollision(update);
+    }
+
     let collisions = this.physicsEngine.update(elapsedTime, this.getPhysicsObjects());
 
     for (const collision of collisions) {
@@ -503,24 +530,5 @@ export default class BattleRoyale extends Game {
     }
 
     this.particleEngine.update(elapsedTime);
-
-    // TODO: move above physics?
-    let updates = [];
-    for (const obj of this.getPhysicsObjects()) {
-      let update = obj.update(elapsedTime);
-      if (update) {
-        updates.push(update);
-      }
-    }
-    for (const update of updates) {
-      this.onCollision(update);
-    }
-
-    // TODO: fix this hack
-    _.remove(this.gameState.objects, (obj) => {
-      obj.elapsedTime = 0;
-      return obj.done && (this.simulation || obj.type === "RenderObject");
-    });
-    // TODO: remove objects outside of game bounds
   }
 }

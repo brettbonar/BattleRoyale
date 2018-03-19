@@ -73,16 +73,7 @@ export default class Projectile extends GameObject {
       attackType: this.attack.name
     });
   }
-
-  // Thank you https://gamedev.stackexchange.com/questions/17467/calculating-velocity-needed-to-hit-target-in-parabolic-arc
-  // static getArcAngle(speed, direction, acceleration, target) {
-  //   let s = (speed * speed * speed * speed) -
-  //     acceleration.z * (acceleration.z * (target.x * target.x) + 2 * target.y * (speed * speed));
-  //   return -Math.atan(((speed * speed) + Math.sqrt(s)) / (acceleration.z * target.x));
-  // }
-
-  // https://physics.tutorvista.com/motion/initial-velocity.html
-  // http://www.dummies.com/education/science/physics/how-to-calculate-the-maximum-height-of-a-projectile/
+  
   // https://gamedev.stackexchange.com/questions/61301/how-to-implement-throw-curve-with-virtual-height-in-a-2d-side-view-game
   static getInitialArcSpeed(speed, zspeed, acceleration, origin, target, height) {
     let time = getDistance(origin, target) / speed;
@@ -107,7 +98,7 @@ export default class Projectile extends GameObject {
       y: sourceDimensions.height / 2 - attackDimensions.dimensions.height / 2,
     });
     // Offset by where the projectile's collision dimensions are located
-    origin.subtract(attackDimensions.offset);
+    //origin.subtract(attackDimensions.offset);
     // Offset projectile by any custom amount (usually a zheight)
     // TODO: subtract?
     origin.add(params.attack.effect.offset);
@@ -137,7 +128,7 @@ export default class Projectile extends GameObject {
     let zspeed = params.attack.effect.zspeed;
     if (params.attack.effect.path === "arc") {
       // TODO: may need an offset to make this more accurate
-      // // TODO: put default gravity in settings somewhere
+      // TODO: put default gravity in settings somewhere
       acceleration = new Point(params.attack.effect.arcGravity || { z: -1 });
       // direction.add({
       //   z: Projectile.getArcAngle(params.attack.effect.speed, params.direction,

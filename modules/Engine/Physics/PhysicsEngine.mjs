@@ -5,59 +5,77 @@ import Point from "../GameObject/Point.mjs";
 export default class PhysicsEngine {
   constructor(params) {
     _.merge(this, params);
-    this.test = 1;
   }
 
-  getIntersections(vector, target) {
-    return _.filter(target.boundingBox.lines, (line) => vector.some((vec) => vec.intersects(line)));
+  sweepTest(A1, A2, B1, B2) {
+    if (A2.intersects(B2)) {
+      return {
+        time: 0,
+        axis: "x"
+      };
+    }
+
+    // if (!A1.plus(A2).intersects(B1.plus(B2))) {
+    //   return false;
+    // }
+
+    let vAx = A2.ul.x - A1.ul.x;
+    let vAy = A2.ul.y - A1.ul.y;
+    let vBx = B2.ul.x - B1.ul.x;
+    let vBy = B2.ul.y - B1.ul.y;
+
+    let v = {
+      x: vBx - vAx,
+      y: vBy - vAy
+    }
+    let first = {
+      x: 0,
+      y: 0
+    };
+    let last = {
+      x: Infinity,
+      y: Infinity
+    };
+    let touched = {
+      x: false,
+      y: false
+    };
+
+    _.each(v, (velocity, axis) => {
+      if (A1.max[axis] < B1.min[axis] && velocity < 0)
+      {
+        touched[axis] = true;
+        first[axis] = (A1.max[axis] - B1.min[axis]) / velocity;
+      }
+      else if (B1.max[axis] < A1.min[axis] && velocity > 0)
+      {
+        touched[axis] = true;
+        first[axis] = (A1.min[axis] - B1.max[axis]) / velocity;
+      }
+      if (B1.max[axis] > A1.min[axis] && velocity < 0)
+      {
+        touched[axis] = true;
+        last[axis] = (A1.min[axis] - B1.max[axis]) / velocity;
+      }
+      else if (A1.max[axis] > B1.min[axis] && velocity > 0)
+      {
+        touched[axis] = true;
+        last[axis] = (A1.max[axis] - B1.min[axis]) / velocity;
+      }
+    });
+
+    let firstTouch = _.max(_.toArray(first));
+    let lastTouch = _.min(_.toArray(last));
+
+    if (touched.x && touched.y && firstTouch <= lastTouch && firstTouch > 0 && firstTouch <= 1) {
+      return {
+        time: firstTouch,
+        axis: first.x > first.y ? "x" : "y"
+      };
+    }
+
+    return false;
   }
-
-  // detectCollisions(obj, objects) {    
-  //   // Handle paddle collision
-  //   let vector = obj.vector;
-  //   let collisions = [];
-  //   for (const target of objects) {
-  //     if (target === obj) continue;
-      
-  //     let intersections = this.getIntersections(vector, target);
-  //     if (intersections.length > 0) {
-  //       // TODO: if target movement is also normal then move target
-  //       if (target.physics.surfaceType === SURFACE_TYPE.REFLECTIVE) {
-  //         // TODO: handle reflection in directions other than Y
-  //         obj.direction.y = -obj.direction.y;
-  //         obj.position.y = target.position.y - target.height - obj.gameSettings.brickLineWidth;
-  //         target.color = obj.color;
-    
-  //         obj.direction.x = (obj.position.x - (target.position.x + target.width / 2)) / (target.width / 2);
-  //       } else if (target.physics.surfaceType === SURFACE_TYPE.NORMAL) {
-  //         // TODO: figure out which of intersections is best match
-  //         let targetSurface = intersections[0];
-  //         if (targetSurface[0].y === targetSurface[1].y) { // horizontal surface
-  //           obj.position.y = targetSurface[0].y + (obj.direction.y > 0 ? -obj.height / 2 : obj.height / 2);
-  //           obj.direction.y = -obj.direction.y;
-  //         } else if (targetSurface[0].x === targetSurface[1].x) { // vertical surface
-  //           obj.position.x = targetSurface[0].x + (obj.direction.x > 0 ? -obj.width / 2 : obj.width / 2);
-  //           obj.direction.x = -obj.direction.x;
-  //         } 
-  //         // TODO: diagonal surface
-  //       } else if (target.physics.surfaceType === SURFACE_TYPE.IMMOVABLE) {
-
-  //       }
-
-  //       collisions.push({
-  //         source: obj,
-  //         target: target
-  //       });
-
-  //       obj.normalizeDirection();
-
-  //       // TODO: don't return here to allow multiple collisions
-  //       return collisions;
-  //     }
-  //   }
-
-  //   return collisions;
-  // }
 
   intersects(bounds1, bounds2) {
     return bounds1
@@ -66,8 +84,11 @@ export default class PhysicsEngine {
   }
 
   detectCollisions(obj, objects) {
-    let objCollisionBounds = obj.collisionBounds;
     let collisions = [];
+    let objCollisionBounds = obj.collisionBounds;
+    let objLastCollisionBounds = obj.lastCollisionBounds;
+
+    let intersections = [];
     for (const target of objects) {
       if (target === obj || target.physics.surfaceType === SURFACE_TYPE.NONE) continue;
       // Only need to test projectiles against characters, not both ways
@@ -77,32 +98,61 @@ export default class PhysicsEngine {
            target.physics.surfaceType === SURFACE_TYPE.GAS)) {
         continue;
       }
-      
       let targetCollisionBounds = target.collisionBounds;
-      if (this.intersects(objCollisionBounds, targetCollisionBounds)) {
-        collisions.push({
-          source: obj,
-          target: target,
-          // TODO: use position of collision from sweep test
-          position: obj.position.copy()
-        });
+      let targetLastCollisionBounds = target.lastCollisionBounds;
 
-        // TODO: make this more robust for high speeds
-        // TODO: don't always do this (e.g. piercing projectiles)
-        // TODO: create "bounce" or "elasticity" parameter - bounce objects back by
-        // this much. If 0 then no bounce.
-        if (obj.physics.surfaceType !== SURFACE_TYPE.GAS) {
-          obj.position.x = obj.lastPosition.x;
-          obj.position.y = obj.lastPosition.y;
+      for (let objBoundIdx = 0; objBoundIdx < objCollisionBounds.length; objBoundIdx++) {
+        for (let targetBoundIdx = 0; targetBoundIdx < targetCollisionBounds.length; targetBoundIdx++) {
+          let collision = this.sweepTest(objLastCollisionBounds[objBoundIdx], objCollisionBounds[objBoundIdx],
+            targetLastCollisionBounds[targetBoundIdx], targetCollisionBounds[targetBoundIdx]);
+          if (collision) {
+            intersections.push({
+              source: obj,
+              sourceBounds: objCollisionBounds[objBoundIdx],
+              target: target,
+              targetBounds: targetCollisionBounds[targetBoundIdx],
+              collision: collision
+            });
+          }
         }
       }
-      
-      // TODO: do this after all other physics calculations
+
+      // TODO: do this after all other physics calculations?
       for (const functionBox of target.getAllFunctionBounds()) {
         if (objCollisionBounds.some((bounds) => bounds.intersects(functionBox.box))) {
           functionBox.cb(obj);
         }
       }
+    }
+
+    // TODO: order by collision time?
+    //let firstIntersection = _.minBy(intersections, (intersection) => intersection.collision.time);
+    for (const intersection of intersections) {
+      let target = intersection.target;
+      let collision = intersection.collision;
+
+      // TODO: make this more robust for high speeds
+      // TODO: don't always do this (e.g. piercing projectiles)
+      // TODO: create "bounce" or "elasticity" parameter - bounce objects back by
+      // this much. If 0 then no bounce.
+      // TODO: only bounce off first collision
+      if (obj.physics.surfaceType !== SURFACE_TYPE.GAS) {
+        if (collision.time !== 0) {
+          obj.position[collision.axis] = (obj.lastPosition[collision.axis] +
+            (obj.position[collision.axis] - obj.lastPosition[collision.axis]) * collision.time) -
+            Math.sign(obj.position[collision.axis] - obj.lastPosition[collision.axis]);
+        } else {
+          obj.position.x = obj.lastPosition.x;
+          obj.position.y = obj.lastPosition.y;
+        }
+      }
+      
+      collisions.push({
+        source: obj,
+        target: target,
+        // TODO: use position of collision from sweep test
+        position: obj.position.copy()
+      });
     }
 
     return collisions;
@@ -158,6 +208,8 @@ export default class PhysicsEngine {
           obj.physics.surfaceType === SURFACE_TYPE.PROJECTILE ||
           obj.physics.surfaceType === SURFACE_TYPE.GAS) {
         collisions = collisions.concat(this.detectCollisions(obj, objects));
+        // Do twice to capture additional collisions after movement
+        //collisions = collisions.concat(this.detectCollisions(obj, objects));
       }
 
       if (obj.position.z < 0) {

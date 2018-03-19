@@ -1,0 +1,613 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="210mm"
+   height="297mm"
+   viewBox="0 0 210 297"
+   version="1.1"
+   id="svg12006"
+   inkscape:version="0.92.2 (5c3e80d, 2017-08-06)"
+   sodipodi:docname="UI.svg"
+   inkscape:export-filename="C:\Dev\GameDevelopment\BattleRoyale\public\Assets\UI\UI.png"
+   inkscape:export-xdpi="118.05361"
+   inkscape:export-ydpi="118.05361">
+  <defs
+     id="defs12000">
+    <filter
+       style="color-interpolation-filters:sRGB"
+       id="filter10329-9"
+       inkscape:collect="always">
+      <feGaussianBlur
+         id="feGaussianBlur10331-7"
+         stdDeviation="1.0063305"
+         inkscape:collect="always" />
+    </filter>
+    <filter
+       style="color-interpolation-filters:sRGB"
+       id="filter3794-1-0-2"
+       inkscape:collect="always">
+      <feGaussianBlur
+         id="feGaussianBlur3796-3-0-4"
+         stdDeviation="0.79185836"
+         inkscape:collect="always" />
+    </filter>
+    <linearGradient
+       id="linearGradient3774">
+      <stop
+         style="stop-color:#777540;stop-opacity:1;"
+         offset="0"
+         id="stop3776" />
+      <stop
+         style="stop-color:#a29549;stop-opacity:0;"
+         offset="1"
+         id="stop3778" />
+    </linearGradient>
+    <filter
+       inkscape:collect="always"
+       id="filter7032">
+      <feGaussianBlur
+         inkscape:collect="always"
+         stdDeviation="0.96019037"
+         id="feGaussianBlur7034" />
+    </filter>
+    <filter
+       inkscape:collect="always"
+       id="filter7032-8">
+      <feGaussianBlur
+         inkscape:collect="always"
+         stdDeviation="0.96019037"
+         id="feGaussianBlur7034-3" />
+    </filter>
+    <filter
+       style="color-interpolation-filters:sRGB"
+       id="filter3794-6-6"
+       inkscape:collect="always">
+      <feGaussianBlur
+         id="feGaussianBlur3796-6-0"
+         stdDeviation="0.79185836"
+         inkscape:collect="always" />
+    </filter>
+    <filter
+       style="color-interpolation-filters:sRGB"
+       id="filter3794-6-6-4"
+       inkscape:collect="always">
+      <feGaussianBlur
+         id="feGaussianBlur3796-6-0-2"
+         stdDeviation="0.79185836"
+         inkscape:collect="always" />
+    </filter>
+    <filter
+       style="color-interpolation-filters:sRGB"
+       id="filter10329-9-1"
+       inkscape:collect="always">
+      <feGaussianBlur
+         id="feGaussianBlur10331-7-8"
+         stdDeviation="1.0063305"
+         inkscape:collect="always" />
+    </filter>
+    <filter
+       style="color-interpolation-filters:sRGB"
+       id="filter10329-9-1-1"
+       inkscape:collect="always">
+      <feGaussianBlur
+         id="feGaussianBlur10331-7-8-7"
+         stdDeviation="1.0063305"
+         inkscape:collect="always" />
+    </filter>
+    <filter
+       style="color-interpolation-filters:sRGB"
+       id="filter10329-9-1-1-1"
+       inkscape:collect="always">
+      <feGaussianBlur
+         id="feGaussianBlur10331-7-8-7-5"
+         stdDeviation="1.0063305"
+         inkscape:collect="always" />
+    </filter>
+    <filter
+       style="color-interpolation-filters:sRGB"
+       id="filter10329-9-1-5"
+       inkscape:collect="always">
+      <feGaussianBlur
+         id="feGaussianBlur10331-7-8-2"
+         stdDeviation="1.0063305"
+         inkscape:collect="always" />
+    </filter>
+    <filter
+       style="color-interpolation-filters:sRGB"
+       id="filter10329-9-3"
+       inkscape:collect="always">
+      <feGaussianBlur
+         id="feGaussianBlur10331-7-6"
+         stdDeviation="1.0063305"
+         inkscape:collect="always" />
+    </filter>
+    <filter
+       style="color-interpolation-filters:sRGB"
+       id="filter10329-9-1-1-6"
+       inkscape:collect="always">
+      <feGaussianBlur
+         id="feGaussianBlur10331-7-8-7-7"
+         stdDeviation="1.0063305"
+         inkscape:collect="always" />
+    </filter>
+    <filter
+       style="color-interpolation-filters:sRGB"
+       id="filter10329-9-1-59"
+       inkscape:collect="always">
+      <feGaussianBlur
+         id="feGaussianBlur10331-7-8-8"
+         stdDeviation="1.0063305"
+         inkscape:collect="always" />
+    </filter>
+    <filter
+       style="color-interpolation-filters:sRGB"
+       id="filter10329-9-2"
+       inkscape:collect="always">
+      <feGaussianBlur
+         id="feGaussianBlur10331-7-9"
+         stdDeviation="1.0063305"
+         inkscape:collect="always" />
+    </filter>
+    <filter
+       style="color-interpolation-filters:sRGB"
+       id="filter10329-9-1-1-6-9"
+       inkscape:collect="always">
+      <feGaussianBlur
+         id="feGaussianBlur10331-7-8-7-7-1"
+         stdDeviation="1.0063305"
+         inkscape:collect="always" />
+    </filter>
+    <filter
+       style="color-interpolation-filters:sRGB"
+       id="filter10329-9-1-59-2"
+       inkscape:collect="always">
+      <feGaussianBlur
+         id="feGaussianBlur10331-7-8-8-4"
+         stdDeviation="1.0063305"
+         inkscape:collect="always" />
+    </filter>
+  </defs>
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="0.98994949"
+     inkscape:cx="441.25465"
+     inkscape:cy="958.00656"
+     inkscape:document-units="mm"
+     inkscape:current-layer="layer1"
+     showgrid="false"
+     inkscape:window-width="2560"
+     inkscape:window-height="1377"
+     inkscape:window-x="-8"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1" />
+  <metadata
+     id="metadata12003">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <g
+       transform="matrix(0.49164587,0,0,0.28666475,74.758944,-208.75504)"
+       id="g10397-0-9"
+       inkscape:export-filename="C:\Dev\GameDevelopment\BattleRoyale\public\Assets\UI\png\bars.png"
+       inkscape:export-xdpi="157.40482"
+       inkscape:export-ydpi="157.40482">
+      <path
+         style="fill:#271300;fill-opacity:1;stroke:#c08f14;stroke-width:6;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         d="m -87.18575,789.99568 h 291.83342 c 3.37063,0 5.22079,2.83854 7.3508,5.45085 l 27.25886,33.431 21.2869,-15.17956 -22.56096,-15.72564 -25.77369,35.53458 c -1.97901,2.7285 -4.19128,5.45086 -7.56191,5.45086 H -87.18575 c -3.370631,0 -5.167298,-3.07874 -7.561916,-5.45086 l -23.922514,-30.88073 -20.28816,13.72279 20.16887,15.48948 11.35829,-15.45765 c 1.14451,-1.55758 16.874799,-26.38512 20.24543,-26.38512 z"
+         id="rect2985-5-2-4"
+         inkscape:connector-curvature="0"
+         sodipodi:nodetypes="ssscccsssscccss" />
+      <path
+         style="fill:none;stroke:#fff076;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;filter:url(#filter3794-1-0-2)"
+         d="M -87.190467,790.03957 H 203.7619 c 3.37063,0 5.22078,2.83854 7.3508,5.45085 l 27.25886,33.431 21.2869,-15.17956 -22.56096,-15.72564 -25.77369,35.53458 c -1.97902,2.7285 -4.19128,5.45086 -7.56191,5.45086 H -87.190467 c -3.370631,0 -5.167298,-3.07873 -7.561916,-5.45086 l -23.922517,-30.88073 -20.28815,13.72279 20.16886,15.48948 11.35829,-15.45765 c 1.14451,-1.55758 16.874802,-26.38512 20.245433,-26.38512 z"
+         id="rect2985-9-71-7-0"
+         inkscape:connector-curvature="0"
+         sodipodi:nodetypes="ssscccsssscccss" />
+    </g>
+    <g
+       id="g7036"
+       transform="matrix(0.18500569,0,0,0.17448446,13.87174,-146.19112)"
+       inkscape:export-filename="C:\Dev\GameDevelopment\BattleRoyale\public\Assets\UI\png\bars.png"
+       inkscape:export-xdpi="157.40482"
+       inkscape:export-ydpi="157.40482">
+      <path
+         sodipodi:nodetypes="ccccccccccccccccc"
+         inkscape:connector-curvature="0"
+         id="rect6961"
+         d="M -57.029776,855.94902 H 8.6769726 l 17.1126304,-11.83703 17.11264,11.83703 h 65.706747 v 61.96875 l 13.08303,20.85064 -13.08303,18.98164 v 63.83775 H 45.172873 l -19.38327,15.4185 -20.2643094,-15.4185 H -57.029776 v -61.34575 l -12.46003,-21.47364 12.46003,-20.85064 z"
+         style="fill:#271300;fill-opacity:1;stroke:#c08f14;stroke-width:6;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+      <path
+         sodipodi:nodetypes="ccccccccccccccccc"
+         inkscape:connector-curvature="0"
+         id="rect6961-5"
+         d="M -57.139695,856.29831 H 8.5670554 l 17.1126296,-11.83703 17.11264,11.83703 h 65.706745 v 61.96879 l 13.08303,20.8506 -13.08303,18.9816 v 63.8378 H 45.062955 l -19.38327,15.4185 -20.2643096,-15.4185 H -57.139695 v -61.3458 l -12.460031,-21.4736 12.460031,-20.8506 z"
+         style="fill:none;stroke:#fbff00;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;filter:url(#filter7032)" />
+    </g>
+    <g
+       id="g7036-1"
+       transform="matrix(0.18500569,0,0,0.17448446,186.65046,-146.19116)"
+       inkscape:export-filename="C:\Dev\GameDevelopment\BattleRoyale\public\Assets\UI\png\bars.png"
+       inkscape:export-xdpi="157.40482"
+       inkscape:export-ydpi="157.40482">
+      <path
+         sodipodi:nodetypes="ccccccccccccccccc"
+         inkscape:connector-curvature="0"
+         id="rect6961-3"
+         d="M -57.029776,855.94902 H 8.6769726 l 17.1126304,-11.83703 17.11264,11.83703 h 65.706747 v 61.96875 l 13.08303,20.85064 -13.08303,18.98164 v 63.83775 H 45.172873 l -19.38327,15.4185 -20.2643094,-15.4185 H -57.029776 v -61.34575 l -12.46003,-21.47364 12.46003,-20.85064 z"
+         style="fill:#271300;fill-opacity:1;stroke:#c08f14;stroke-width:6;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+      <path
+         sodipodi:nodetypes="ccccccccccccccccc"
+         inkscape:connector-curvature="0"
+         id="rect6961-5-3"
+         d="M -57.139695,856.29831 H 8.5670554 l 17.1126296,-11.83703 17.11264,11.83703 h 65.706745 v 61.96879 l 13.08303,20.8506 -13.08303,18.9816 v 63.8378 H 45.062955 l -19.38327,15.4185 -20.2643096,-15.4185 H -57.139695 v -61.3458 l -12.460031,-21.4736 12.460031,-20.8506 z"
+         style="fill:none;stroke:#fbff00;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;filter:url(#filter7032-8)" />
+    </g>
+    <g
+       id="g21210"
+       transform="matrix(0.9770276,0,0,0.85907359,43.622979,105.0304)"
+       inkscape:export-filename="C:\Dev\GameDevelopment\BattleRoyale\public\Assets\UI\png\bars.png"
+       inkscape:export-xdpi="157.40482"
+       inkscape:export-ydpi="157.40482">
+      <path
+         inkscape:export-ydpi="90"
+         inkscape:export-xdpi="90"
+         inkscape:export-filename="C:\Documents and Settings\yury.dziashko\My Documents\My Pictures\ConceptArt\guielements.png"
+         style="fill:#271300;fill-opacity:1;stroke:#c08f14;stroke-width:0.62470609;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         d="M -1.4728471,-108.49805 H 54.94416 c 0.398746,0 0.629498,0.2529 0.869652,0.49946 l 3.225021,3.06319 2.518466,-1.39085 -2.6692,-1.44091 -3.049305,3.25596 c -0.234143,0.24999 -0.495888,0.49944 -0.894634,0.49944 H -1.4728471 c -0.3987789,0 -0.611331,-0.28208 -0.8946334,-0.49944 l -2.8303038,-2.82953 -2.4002982,1.25737 2.3861946,1.41928 1.3438151,-1.41634 c 0.1353888,-0.14273 1.9964468,-2.41763 2.3952257,-2.41763 z"
+         id="rect2985-96-8"
+         inkscape:connector-curvature="0"
+         sodipodi:nodetypes="ssscccsssscccss" />
+    </g>
+    <path
+       sodipodi:nodetypes="ssscccsssscccss"
+       inkscape:connector-curvature="0"
+       id="rect2985-9-8-0"
+       d="m 107.14045,-69.803727 h 476.85544 c 3.37063,0 5.32096,2.75996 7.3508,5.45085 l 27.25886,33.431 21.2869,-15.17956 -22.56096,-15.72564 -25.77369,35.53458 c -1.97901,2.7285 -4.19128,5.45086 -7.56191,5.45086 H 107.14045 c -3.37063,0 -5.1673,-3.07873 -7.561917,-5.45086 l -23.922516,-30.88073 -20.288154,13.72279 20.168863,15.48948 11.358292,-15.45765 c 1.144511,-1.55758 16.874802,-26.38512 20.245432,-26.38512 z"
+       style="fill:none;stroke:#fff076;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;filter:url(#filter3794-6-6)"
+       transform="matrix(0.11559256,0,0,0.07871477,29.799346,17.317186)"
+       inkscape:export-filename="C:\Dev\GameDevelopment\BattleRoyale\public\Assets\UI\png\bars.png"
+       inkscape:export-xdpi="157.40482"
+       inkscape:export-ydpi="157.40482" />
+    <path
+       sodipodi:nodetypes="ssscccsssscccss"
+       inkscape:connector-curvature="0"
+       id="rect2985-96-8-6"
+       d="m 167.49683,11.823381 h -55.06998 c -0.38922,0 -0.61448,0.217217 -0.8489,0.42897 l -3.14801,2.630907 -2.45835,-1.194576 2.6055,-1.237567 2.97649,2.79647 c 0.22854,0.214714 0.48405,0.428948 0.87327,0.428948 h 55.06998 c 0.38925,0 0.59672,-0.24225 0.87327,-0.428948 l 2.76271,-2.430213 2.34299,1.079917 -2.32921,1.218986 -1.31174,-1.216461 c -0.13213,-0.122585 -1.94877,-2.076433 -2.33802,-2.076433 z"
+       style="fill:#271300;fill-opacity:1;stroke:#c08f14;stroke-width:0.57199627;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       inkscape:export-filename="C:\Dev\GameDevelopment\BattleRoyale\public\Assets\UI\png\bars.png"
+       inkscape:export-xdpi="157.40482"
+       inkscape:export-ydpi="157.40482" />
+    <g
+       id="g21213"
+       transform="matrix(0.97642051,0,0,0.8588569,44.544098,105.00738)"
+       inkscape:export-filename="C:\Dev\GameDevelopment\BattleRoyale\public\Assets\UI\png\bars.png"
+       inkscape:export-xdpi="157.40482"
+       inkscape:export-ydpi="157.40482">
+      <path
+         inkscape:export-ydpi="90"
+         inkscape:export-xdpi="90"
+         inkscape:export-filename="C:\Documents and Settings\yury.dziashko\My Documents\My Pictures\ConceptArt\guielements.png"
+         transform="matrix(-0.11841328,0,0,0.09913322,138.71497,-101.75606)"
+         style="fill:none;stroke:#fff076;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;filter:url(#filter3794-6-6-4)"
+         d="m 107.14045,-69.803727 h 476.85544 c 3.37063,0 5.32096,2.75996 7.3508,5.45085 l 27.25886,33.431 21.2869,-15.17956 -22.56096,-15.72564 -25.77369,35.53458 c -1.97901,2.7285 -4.19128,5.45086 -7.56191,5.45086 H 107.14045 c -3.37063,0 -5.1673,-3.07873 -7.561917,-5.45086 l -23.922516,-30.88073 -20.288154,13.72279 20.168863,15.48948 11.358292,-15.45765 c 1.144511,-1.55758 16.874802,-26.38512 20.245432,-26.38512 z"
+         id="rect2985-9-8-0-9"
+         inkscape:connector-curvature="0"
+         sodipodi:nodetypes="ssscccsssscccss" />
+    </g>
+  </g>
+  <g
+     inkscape:groupmode="layer"
+     id="layer2"
+     inkscape:label="Layer 2">
+    <g
+       id="g16222"
+       transform="matrix(0.33316944,0,0,0.31782333,32.50184,-1.2500518)"
+       inkscape:export-filename="C:\Dev\GameDevelopment\BattleRoyale\public\Assets\UI\png\bars.png"
+       inkscape:export-xdpi="157.40482"
+       inkscape:export-ydpi="157.40482">
+      <path
+         inkscape:export-ydpi="90"
+         inkscape:export-xdpi="90"
+         inkscape:export-filename="C:\Documents and Settings\yury.dziashko\My Documents\My Pictures\ConceptArt\guielements.png"
+         style="fill:#1e0f00;fill-opacity:1;stroke:#c08f14;stroke-width:0.93794394;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         d="m 17.675474,64.653939 h 31.49851 c 0.22265,0 0.35147,0.319193 0.48557,0.63037 0.79692,2.416466 0.81822,30.886927 0.014,32.828207 -0.13073,0.31551 -0.27686,0.63034 -0.49951,0.63034 h -31.49851 c -0.22265,0 -0.34134,-0.35602 -0.49951,-0.63034 -0.84016,-1.9925 -0.82224,-30.473204 0.0638,-32.684935 0.29705,-0.740278 0.32441,-0.773642 0.43574,-0.773642 z"
+         id="rect2985-8-6"
+         inkscape:connector-curvature="0"
+         sodipodi:nodetypes="ssccssccs" />
+      <path
+         inkscape:export-ydpi="90"
+         inkscape:export-xdpi="90"
+         inkscape:export-filename="C:\Documents and Settings\yury.dziashko\My Documents\My Pictures\ConceptArt\guielements.png"
+         transform="matrix(0.06605467,0,0,0.11564303,43.132414,59.27914)"
+         style="fill:none;stroke:#ffe835;stroke-width:2.4396596;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;filter:url(#filter10329-9)"
+         d="M -385.09831,46.400755 H 91.757149 c 3.37063,0 5.32096,2.75996 7.3508,5.45085 12.064351,20.89607 12.386821,267.088535 0.21111,283.875365 -1.97901,2.7285 -4.19128,5.45086 -7.56191,5.45086 H -385.09831 c -3.37064,0 -5.1673,-3.07874 -7.56192,-5.45086 -12.71921,-17.22977 -12.44794,-263.510975 0.96542,-282.636265 4.49696,-6.40158 4.91118,-6.68995 6.5965,-6.68995 z"
+         id="rect2985-8-0-1"
+         inkscape:connector-curvature="0"
+         sodipodi:nodetypes="ssccssccs" />
+    </g>
+    <g
+       id="g16222-4"
+       transform="matrix(0.33316945,0,0,0.31782333,44.758028,-1.2500429)"
+       inkscape:export-filename="C:\Dev\GameDevelopment\BattleRoyale\public\Assets\UI\png\bars.png"
+       inkscape:export-xdpi="157.40482"
+       inkscape:export-ydpi="157.40482">
+      <path
+         inkscape:export-ydpi="90"
+         inkscape:export-xdpi="90"
+         inkscape:export-filename="C:\Documents and Settings\yury.dziashko\My Documents\My Pictures\ConceptArt\guielements.png"
+         style="fill:#1e0f00;fill-opacity:1;stroke:#c08f14;stroke-width:0.93794394;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         d="m 17.675474,64.653939 h 31.49851 c 0.22265,0 0.35147,0.319193 0.48557,0.63037 0.79692,2.416466 0.81822,30.886927 0.014,32.828207 -0.13073,0.31551 -0.27686,0.63034 -0.49951,0.63034 h -31.49851 c -0.22265,0 -0.34134,-0.35602 -0.49951,-0.63034 -0.84016,-1.9925 -0.82224,-30.473204 0.0638,-32.684935 0.29705,-0.740278 0.32441,-0.773642 0.43574,-0.773642 z"
+         id="rect2985-8-6-7"
+         inkscape:connector-curvature="0"
+         sodipodi:nodetypes="ssccssccs" />
+      <path
+         inkscape:export-ydpi="90"
+         inkscape:export-xdpi="90"
+         inkscape:export-filename="C:\Documents and Settings\yury.dziashko\My Documents\My Pictures\ConceptArt\guielements.png"
+         transform="matrix(0.06605467,0,0,0.11564303,43.132414,59.27914)"
+         style="fill:none;stroke:#ffe835;stroke-width:2.4396596;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;filter:url(#filter10329-9-1)"
+         d="M -385.09831,46.400755 H 91.757149 c 3.37063,0 5.32096,2.75996 7.3508,5.45085 12.064351,20.89607 12.386821,267.088535 0.21111,283.875365 -1.97901,2.7285 -4.19128,5.45086 -7.56191,5.45086 H -385.09831 c -3.37064,0 -5.1673,-3.07874 -7.56192,-5.45086 -12.71921,-17.22977 -12.44794,-263.510975 0.96542,-282.636265 4.49696,-6.40158 4.91118,-6.68995 6.5965,-6.68995 z"
+         id="rect2985-8-0-1-4"
+         inkscape:connector-curvature="0"
+         sodipodi:nodetypes="ssccssccs" />
+    </g>
+    <g
+       id="g16222-4-5"
+       transform="matrix(0.33316945,0,0,0.31782333,56.989855,-1.2500429)"
+       inkscape:export-filename="C:\Dev\GameDevelopment\BattleRoyale\public\Assets\UI\png\bars.png"
+       inkscape:export-xdpi="157.40482"
+       inkscape:export-ydpi="157.40482">
+      <path
+         inkscape:export-ydpi="90"
+         inkscape:export-xdpi="90"
+         inkscape:export-filename="C:\Documents and Settings\yury.dziashko\My Documents\My Pictures\ConceptArt\guielements.png"
+         style="fill:#1e0f00;fill-opacity:1;stroke:#c08f14;stroke-width:0.93794394;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         d="m 17.675474,64.653939 h 31.49851 c 0.22265,0 0.35147,0.319193 0.48557,0.63037 0.79692,2.416466 0.81822,30.886927 0.014,32.828207 -0.13073,0.31551 -0.27686,0.63034 -0.49951,0.63034 h -31.49851 c -0.22265,0 -0.34134,-0.35602 -0.49951,-0.63034 -0.84016,-1.9925 -0.82224,-30.473204 0.0638,-32.684935 0.29705,-0.740278 0.32441,-0.773642 0.43574,-0.773642 z"
+         id="rect2985-8-6-7-8"
+         inkscape:connector-curvature="0"
+         sodipodi:nodetypes="ssccssccs" />
+      <path
+         inkscape:export-ydpi="90"
+         inkscape:export-xdpi="90"
+         inkscape:export-filename="C:\Documents and Settings\yury.dziashko\My Documents\My Pictures\ConceptArt\guielements.png"
+         transform="matrix(0.06605467,0,0,0.11564303,43.132414,59.27914)"
+         style="fill:none;stroke:#ffe835;stroke-width:2.4396596;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;filter:url(#filter10329-9-1-1)"
+         d="M -385.09831,46.400755 H 91.757149 c 3.37063,0 5.32096,2.75996 7.3508,5.45085 12.064351,20.89607 12.386821,267.088535 0.21111,283.875365 -1.97901,2.7285 -4.19128,5.45086 -7.56191,5.45086 H -385.09831 c -3.37064,0 -5.1673,-3.07874 -7.56192,-5.45086 -12.71921,-17.22977 -12.44794,-263.510975 0.96542,-282.636265 4.49696,-6.40158 4.91118,-6.68995 6.5965,-6.68995 z"
+         id="rect2985-8-0-1-4-7"
+         inkscape:connector-curvature="0"
+         sodipodi:nodetypes="ssccssccs" />
+    </g>
+    <g
+       id="g16222-42"
+       transform="matrix(0.33316945,0,0,0.31782333,69.233413,-1.2500429)"
+       inkscape:export-filename="C:\Dev\GameDevelopment\BattleRoyale\public\Assets\UI\png\bars.png"
+       inkscape:export-xdpi="157.40482"
+       inkscape:export-ydpi="157.40482">
+      <path
+         inkscape:export-ydpi="90"
+         inkscape:export-xdpi="90"
+         inkscape:export-filename="C:\Documents and Settings\yury.dziashko\My Documents\My Pictures\ConceptArt\guielements.png"
+         style="fill:#1e0f00;fill-opacity:1;stroke:#c08f14;stroke-width:0.93794394;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         d="m 17.675474,64.653939 h 31.49851 c 0.22265,0 0.35147,0.319193 0.48557,0.63037 0.79692,2.416466 0.81822,30.886927 0.014,32.828207 -0.13073,0.31551 -0.27686,0.63034 -0.49951,0.63034 h -31.49851 c -0.22265,0 -0.34134,-0.35602 -0.49951,-0.63034 -0.84016,-1.9925 -0.82224,-30.473204 0.0638,-32.684935 0.29705,-0.740278 0.32441,-0.773642 0.43574,-0.773642 z"
+         id="rect2985-8-6-1"
+         inkscape:connector-curvature="0"
+         sodipodi:nodetypes="ssccssccs" />
+      <path
+         inkscape:export-ydpi="90"
+         inkscape:export-xdpi="90"
+         inkscape:export-filename="C:\Documents and Settings\yury.dziashko\My Documents\My Pictures\ConceptArt\guielements.png"
+         transform="matrix(0.06605467,0,0,0.11564303,43.132414,59.27914)"
+         style="fill:none;stroke:#ffe835;stroke-width:2.4396596;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;filter:url(#filter10329-9-3)"
+         d="M -385.09831,46.400755 H 91.757149 c 3.37063,0 5.32096,2.75996 7.3508,5.45085 12.064351,20.89607 12.386821,267.088535 0.21111,283.875365 -1.97901,2.7285 -4.19128,5.45086 -7.56191,5.45086 H -385.09831 c -3.37064,0 -5.1673,-3.07874 -7.56192,-5.45086 -12.71921,-17.22977 -12.44794,-263.510975 0.96542,-282.636265 4.49696,-6.40158 4.91118,-6.68995 6.5965,-6.68995 z"
+         id="rect2985-8-0-1-2"
+         inkscape:connector-curvature="0"
+         sodipodi:nodetypes="ssccssccs" />
+    </g>
+    <g
+       id="g16222-4-6"
+       transform="matrix(0.33316945,0,0,0.31782333,81.489609,-1.2500429)"
+       inkscape:export-filename="C:\Dev\GameDevelopment\BattleRoyale\public\Assets\UI\png\bars.png"
+       inkscape:export-xdpi="157.40482"
+       inkscape:export-ydpi="157.40482">
+      <path
+         inkscape:export-ydpi="90"
+         inkscape:export-xdpi="90"
+         inkscape:export-filename="C:\Documents and Settings\yury.dziashko\My Documents\My Pictures\ConceptArt\guielements.png"
+         style="fill:#1e0f00;fill-opacity:1;stroke:#c08f14;stroke-width:0.93794394;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         d="m 17.675474,64.653939 h 31.49851 c 0.22265,0 0.35147,0.319193 0.48557,0.63037 0.79692,2.416466 0.81822,30.886927 0.014,32.828207 -0.13073,0.31551 -0.27686,0.63034 -0.49951,0.63034 h -31.49851 c -0.22265,0 -0.34134,-0.35602 -0.49951,-0.63034 -0.84016,-1.9925 -0.82224,-30.473204 0.0638,-32.684935 0.29705,-0.740278 0.32441,-0.773642 0.43574,-0.773642 z"
+         id="rect2985-8-6-7-83"
+         inkscape:connector-curvature="0"
+         sodipodi:nodetypes="ssccssccs" />
+      <path
+         inkscape:export-ydpi="90"
+         inkscape:export-xdpi="90"
+         inkscape:export-filename="C:\Documents and Settings\yury.dziashko\My Documents\My Pictures\ConceptArt\guielements.png"
+         transform="matrix(0.06605467,0,0,0.11564303,43.132414,59.27914)"
+         style="fill:none;stroke:#ffe835;stroke-width:2.4396596;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;filter:url(#filter10329-9-1-5)"
+         d="M -385.09831,46.400755 H 91.757149 c 3.37063,0 5.32096,2.75996 7.3508,5.45085 12.064351,20.89607 12.386821,267.088535 0.21111,283.875365 -1.97901,2.7285 -4.19128,5.45086 -7.56191,5.45086 H -385.09831 c -3.37064,0 -5.1673,-3.07874 -7.56192,-5.45086 -12.71921,-17.22977 -12.44794,-263.510975 0.96542,-282.636265 4.49696,-6.40158 4.91118,-6.68995 6.5965,-6.68995 z"
+         id="rect2985-8-0-1-4-8"
+         inkscape:connector-curvature="0"
+         sodipodi:nodetypes="ssccssccs" />
+    </g>
+    <g
+       id="g16222-4-5-5"
+       transform="matrix(0.33316945,0,0,0.31782333,93.721439,-1.2500429)"
+       inkscape:export-filename="C:\Dev\GameDevelopment\BattleRoyale\public\Assets\UI\png\bars.png"
+       inkscape:export-xdpi="157.40482"
+       inkscape:export-ydpi="157.40482">
+      <path
+         inkscape:export-ydpi="90"
+         inkscape:export-xdpi="90"
+         inkscape:export-filename="C:\Documents and Settings\yury.dziashko\My Documents\My Pictures\ConceptArt\guielements.png"
+         style="fill:#1e0f00;fill-opacity:1;stroke:#c08f14;stroke-width:0.93794394;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         d="m 17.675474,64.653939 h 31.49851 c 0.22265,0 0.35147,0.319193 0.48557,0.63037 0.79692,2.416466 0.81822,30.886927 0.014,32.828207 -0.13073,0.31551 -0.27686,0.63034 -0.49951,0.63034 h -31.49851 c -0.22265,0 -0.34134,-0.35602 -0.49951,-0.63034 -0.84016,-1.9925 -0.82224,-30.473204 0.0638,-32.684935 0.29705,-0.740278 0.32441,-0.773642 0.43574,-0.773642 z"
+         id="rect2985-8-6-7-8-6"
+         inkscape:connector-curvature="0"
+         sodipodi:nodetypes="ssccssccs" />
+      <path
+         inkscape:export-ydpi="90"
+         inkscape:export-xdpi="90"
+         inkscape:export-filename="C:\Documents and Settings\yury.dziashko\My Documents\My Pictures\ConceptArt\guielements.png"
+         transform="matrix(0.06605467,0,0,0.11564303,43.132414,59.27914)"
+         style="fill:none;stroke:#ffe835;stroke-width:2.4396596;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;filter:url(#filter10329-9-1-1-1)"
+         d="M -385.09831,46.400755 H 91.757149 c 3.37063,0 5.32096,2.75996 7.3508,5.45085 12.064351,20.89607 12.386821,267.088535 0.21111,283.875365 -1.97901,2.7285 -4.19128,5.45086 -7.56191,5.45086 H -385.09831 c -3.37064,0 -5.1673,-3.07874 -7.56192,-5.45086 -12.71921,-17.22977 -12.44794,-263.510975 0.96542,-282.636265 4.49696,-6.40158 4.91118,-6.68995 6.5965,-6.68995 z"
+         id="rect2985-8-0-1-4-7-5"
+         inkscape:connector-curvature="0"
+         sodipodi:nodetypes="ssccssccs" />
+    </g>
+    <g
+       id="g16222-5"
+       transform="matrix(0.33316945,0,0,0.31782333,105.92826,-1.2500599)"
+       inkscape:export-filename="C:\Dev\GameDevelopment\BattleRoyale\public\Assets\UI\png\bars.png"
+       inkscape:export-xdpi="157.40482"
+       inkscape:export-ydpi="157.40482">
+      <path
+         inkscape:export-ydpi="90"
+         inkscape:export-xdpi="90"
+         inkscape:export-filename="C:\Documents and Settings\yury.dziashko\My Documents\My Pictures\ConceptArt\guielements.png"
+         style="fill:#1e0f00;fill-opacity:1;stroke:#c08f14;stroke-width:0.93794394;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         d="m 17.675474,64.653939 h 31.49851 c 0.22265,0 0.35147,0.319193 0.48557,0.63037 0.79692,2.416466 0.81822,30.886927 0.014,32.828207 -0.13073,0.31551 -0.27686,0.63034 -0.49951,0.63034 h -31.49851 c -0.22265,0 -0.34134,-0.35602 -0.49951,-0.63034 -0.84016,-1.9925 -0.82224,-30.473204 0.0638,-32.684935 0.29705,-0.740278 0.32441,-0.773642 0.43574,-0.773642 z"
+         id="rect2985-8-6-9"
+         inkscape:connector-curvature="0"
+         sodipodi:nodetypes="ssccssccs" />
+      <path
+         inkscape:export-ydpi="90"
+         inkscape:export-xdpi="90"
+         inkscape:export-filename="C:\Documents and Settings\yury.dziashko\My Documents\My Pictures\ConceptArt\guielements.png"
+         transform="matrix(0.06605467,0,0,0.11564303,43.132414,59.27914)"
+         style="fill:none;stroke:#ffe835;stroke-width:2.4396596;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;filter:url(#filter10329-9-2)"
+         d="M -385.09831,46.400755 H 91.757149 c 3.37063,0 5.32096,2.75996 7.3508,5.45085 12.064351,20.89607 12.386821,267.088535 0.21111,283.875365 -1.97901,2.7285 -4.19128,5.45086 -7.56191,5.45086 H -385.09831 c -3.37064,0 -5.1673,-3.07874 -7.56192,-5.45086 -12.71921,-17.22977 -12.44794,-263.510975 0.96542,-282.636265 4.49696,-6.40158 4.91118,-6.68995 6.5965,-6.68995 z"
+         id="rect2985-8-0-1-46"
+         inkscape:connector-curvature="0"
+         sodipodi:nodetypes="ssccssccs" />
+    </g>
+    <g
+       id="g16222-4-68"
+       transform="matrix(0.33316945,0,0,0.31782333,118.18443,-1.2500429)"
+       inkscape:export-filename="C:\Dev\GameDevelopment\BattleRoyale\public\Assets\UI\png\bars.png"
+       inkscape:export-xdpi="157.40482"
+       inkscape:export-ydpi="157.40482">
+      <path
+         inkscape:export-ydpi="90"
+         inkscape:export-xdpi="90"
+         inkscape:export-filename="C:\Documents and Settings\yury.dziashko\My Documents\My Pictures\ConceptArt\guielements.png"
+         style="fill:#1e0f00;fill-opacity:1;stroke:#c08f14;stroke-width:0.93794394;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         d="m 17.675474,64.653939 h 31.49851 c 0.22265,0 0.35147,0.319193 0.48557,0.63037 0.79692,2.416466 0.81822,30.886927 0.014,32.828207 -0.13073,0.31551 -0.27686,0.63034 -0.49951,0.63034 h -31.49851 c -0.22265,0 -0.34134,-0.35602 -0.49951,-0.63034 -0.84016,-1.9925 -0.82224,-30.473204 0.0638,-32.684935 0.29705,-0.740278 0.32441,-0.773642 0.43574,-0.773642 z"
+         id="rect2985-8-6-7-1"
+         inkscape:connector-curvature="0"
+         sodipodi:nodetypes="ssccssccs" />
+      <path
+         inkscape:export-ydpi="90"
+         inkscape:export-xdpi="90"
+         inkscape:export-filename="C:\Documents and Settings\yury.dziashko\My Documents\My Pictures\ConceptArt\guielements.png"
+         transform="matrix(0.06605467,0,0,0.11564303,43.132414,59.27914)"
+         style="fill:none;stroke:#ffe835;stroke-width:2.4396596;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;filter:url(#filter10329-9-1-59)"
+         d="M -385.09831,46.400755 H 91.757149 c 3.37063,0 5.32096,2.75996 7.3508,5.45085 12.064351,20.89607 12.386821,267.088535 0.21111,283.875365 -1.97901,2.7285 -4.19128,5.45086 -7.56191,5.45086 H -385.09831 c -3.37064,0 -5.1673,-3.07874 -7.56192,-5.45086 -12.71921,-17.22977 -12.44794,-263.510975 0.96542,-282.636265 4.49696,-6.40158 4.91118,-6.68995 6.5965,-6.68995 z"
+         id="rect2985-8-0-1-4-1"
+         inkscape:connector-curvature="0"
+         sodipodi:nodetypes="ssccssccs" />
+    </g>
+    <g
+       id="g16222-4-5-9"
+       transform="matrix(0.33316945,0,0,0.31782333,130.41628,-1.2500429)"
+       inkscape:export-filename="C:\Dev\GameDevelopment\BattleRoyale\public\Assets\UI\png\bars.png"
+       inkscape:export-xdpi="157.40482"
+       inkscape:export-ydpi="157.40482">
+      <path
+         inkscape:export-ydpi="90"
+         inkscape:export-xdpi="90"
+         inkscape:export-filename="C:\Documents and Settings\yury.dziashko\My Documents\My Pictures\ConceptArt\guielements.png"
+         style="fill:#1e0f00;fill-opacity:1;stroke:#c08f14;stroke-width:0.93794394;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         d="m 17.675474,64.653939 h 31.49851 c 0.22265,0 0.35147,0.319193 0.48557,0.63037 0.79692,2.416466 0.81822,30.886927 0.014,32.828207 -0.13073,0.31551 -0.27686,0.63034 -0.49951,0.63034 h -31.49851 c -0.22265,0 -0.34134,-0.35602 -0.49951,-0.63034 -0.84016,-1.9925 -0.82224,-30.473204 0.0638,-32.684935 0.29705,-0.740278 0.32441,-0.773642 0.43574,-0.773642 z"
+         id="rect2985-8-6-7-8-0"
+         inkscape:connector-curvature="0"
+         sodipodi:nodetypes="ssccssccs" />
+      <path
+         inkscape:export-ydpi="90"
+         inkscape:export-xdpi="90"
+         inkscape:export-filename="C:\Documents and Settings\yury.dziashko\My Documents\My Pictures\ConceptArt\guielements.png"
+         transform="matrix(0.06605467,0,0,0.11564303,43.132414,59.27914)"
+         style="fill:none;stroke:#ffe835;stroke-width:2.4396596;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;filter:url(#filter10329-9-1-1-6)"
+         d="M -385.09831,46.400755 H 91.757149 c 3.37063,0 5.32096,2.75996 7.3508,5.45085 12.064351,20.89607 12.386821,267.088535 0.21111,283.875365 -1.97901,2.7285 -4.19128,5.45086 -7.56191,5.45086 H -385.09831 c -3.37064,0 -5.1673,-3.07874 -7.56192,-5.45086 -12.71921,-17.22977 -12.44794,-263.510975 0.96542,-282.636265 4.49696,-6.40158 4.91118,-6.68995 6.5965,-6.68995 z"
+         id="rect2985-8-0-1-4-7-9"
+         inkscape:connector-curvature="0"
+         sodipodi:nodetypes="ssccssccs" />
+    </g>
+    <g
+       id="g16222-4-68-5"
+       transform="matrix(0.33316945,0,0,0.31782333,142.68265,-1.3469039)"
+       inkscape:export-filename="C:\Dev\GameDevelopment\BattleRoyale\public\Assets\UI\png\bars.png"
+       inkscape:export-xdpi="157.40482"
+       inkscape:export-ydpi="157.40482">
+      <path
+         inkscape:export-ydpi="90"
+         inkscape:export-xdpi="90"
+         inkscape:export-filename="C:\Documents and Settings\yury.dziashko\My Documents\My Pictures\ConceptArt\guielements.png"
+         style="fill:#1e0f00;fill-opacity:1;stroke:#c08f14;stroke-width:0.93794394;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         d="m 17.675474,64.653939 h 31.49851 c 0.22265,0 0.35147,0.319193 0.48557,0.63037 0.79692,2.416466 0.81822,30.886927 0.014,32.828207 -0.13073,0.31551 -0.27686,0.63034 -0.49951,0.63034 h -31.49851 c -0.22265,0 -0.34134,-0.35602 -0.49951,-0.63034 -0.84016,-1.9925 -0.82224,-30.473204 0.0638,-32.684935 0.29705,-0.740278 0.32441,-0.773642 0.43574,-0.773642 z"
+         id="rect2985-8-6-7-1-9"
+         inkscape:connector-curvature="0"
+         sodipodi:nodetypes="ssccssccs" />
+      <path
+         inkscape:export-ydpi="90"
+         inkscape:export-xdpi="90"
+         inkscape:export-filename="C:\Documents and Settings\yury.dziashko\My Documents\My Pictures\ConceptArt\guielements.png"
+         transform="matrix(0.06605467,0,0,0.11564303,43.132414,59.27914)"
+         style="fill:none;stroke:#ffe835;stroke-width:2.4396596;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;filter:url(#filter10329-9-1-59-2)"
+         d="M -385.09831,46.400755 H 91.757149 c 3.37063,0 5.32096,2.75996 7.3508,5.45085 12.064351,20.89607 12.386821,267.088535 0.21111,283.875365 -1.97901,2.7285 -4.19128,5.45086 -7.56191,5.45086 H -385.09831 c -3.37064,0 -5.1673,-3.07874 -7.56192,-5.45086 -12.71921,-17.22977 -12.44794,-263.510975 0.96542,-282.636265 4.49696,-6.40158 4.91118,-6.68995 6.5965,-6.68995 z"
+         id="rect2985-8-0-1-4-1-2"
+         inkscape:connector-curvature="0"
+         sodipodi:nodetypes="ssccssccs" />
+    </g>
+    <g
+       id="g16222-4-5-9-2"
+       transform="matrix(0.33316945,0,0,0.31782333,154.91448,-1.3469039)"
+       inkscape:export-filename="C:\Dev\GameDevelopment\BattleRoyale\public\Assets\UI\png\bars.png"
+       inkscape:export-xdpi="157.40482"
+       inkscape:export-ydpi="157.40482">
+      <path
+         inkscape:export-ydpi="90"
+         inkscape:export-xdpi="90"
+         inkscape:export-filename="C:\Documents and Settings\yury.dziashko\My Documents\My Pictures\ConceptArt\guielements.png"
+         style="fill:#1e0f00;fill-opacity:1;stroke:#c08f14;stroke-width:0.93794394;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         d="m 17.675474,64.653939 h 31.49851 c 0.22265,0 0.35147,0.319193 0.48557,0.63037 0.79692,2.416466 0.81822,30.886927 0.014,32.828207 -0.13073,0.31551 -0.27686,0.63034 -0.49951,0.63034 h -31.49851 c -0.22265,0 -0.34134,-0.35602 -0.49951,-0.63034 -0.84016,-1.9925 -0.82224,-30.473204 0.0638,-32.684935 0.29705,-0.740278 0.32441,-0.773642 0.43574,-0.773642 z"
+         id="rect2985-8-6-7-8-0-6"
+         inkscape:connector-curvature="0"
+         sodipodi:nodetypes="ssccssccs" />
+      <path
+         inkscape:export-ydpi="90"
+         inkscape:export-xdpi="90"
+         inkscape:export-filename="C:\Documents and Settings\yury.dziashko\My Documents\My Pictures\ConceptArt\guielements.png"
+         transform="matrix(0.06605467,0,0,0.11564303,43.132414,59.27914)"
+         style="fill:none;stroke:#ffe835;stroke-width:2.4396596;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;filter:url(#filter10329-9-1-1-6-9)"
+         d="M -385.09831,46.400755 H 91.757149 c 3.37063,0 5.32096,2.75996 7.3508,5.45085 12.064351,20.89607 12.386821,267.088535 0.21111,283.875365 -1.97901,2.7285 -4.19128,5.45086 -7.56191,5.45086 H -385.09831 c -3.37064,0 -5.1673,-3.07874 -7.56192,-5.45086 -12.71921,-17.22977 -12.44794,-263.510975 0.96542,-282.636265 4.49696,-6.40158 4.91118,-6.68995 6.5965,-6.68995 z"
+         id="rect2985-8-0-1-4-7-9-6"
+         inkscape:connector-curvature="0"
+         sodipodi:nodetypes="ssccssccs" />
+    </g>
+  </g>
+</svg>

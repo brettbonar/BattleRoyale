@@ -25,7 +25,7 @@ export default {
       actionRate: 5,
       actionType: "exclusive",
       automatic: true,
-      manaCost: 5
+      manaCost: 0
     },
     rendering: {
       imageSource: "../../Assets/magic/plasmaball.png",
@@ -116,7 +116,7 @@ export default {
       actionRate: 1,
       actionType: "blocking",
       automatic: false,
-      manaCost: 15
+      manaCost: 0
     },
     rendering: {
       imageSource: "../../Assets/magic/flare.png",

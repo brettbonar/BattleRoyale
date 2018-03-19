@@ -113,6 +113,10 @@ export default class Character extends GameObject {
   stopAction(action) {
   }
 
+  get perspectivePosition() {
+    return this.state.dead ? this.position : super.perspectivePosition;
+  }
+
   canDoAction(action) {
     let top = _.head(this.actionStack);
     if (top && (top.actionType === "exclusive" && action.actionType === "exclusive" || top.actionType === "blocking")) {
@@ -148,8 +152,6 @@ export default class Character extends GameObject {
       }
     } else {
       if (this.canDoAction(action)) {
-        this.state.currentHealth -= action.healthCost || 0;
-        this.state.currentMana -= action.manaCost || 0;
         let newAction = {
           type: type,
           name: action.name,
@@ -202,7 +204,15 @@ export default class Character extends GameObject {
         action.currentTime += (elapsedTime + cooldownTimeDiff);
         if (action.currentTime >= action.actionDuration) {
           let actionTimeDiff = action.actionDuration - action.currentTime;
-          if (action.cb) action.cb(actionTimeDiff);
+          if (action.action) {
+            let manaCost = action.action.manaCost || 0;
+            let healthCost = action.action.healthCost || 0;
+            if (this.state.currentMana >= manaCost && this.state.currentHealth >= healthCost) {
+              this.state.currentHealth -= action.action.healthCost || 0;
+              this.state.currentMana -= action.action.manaCost || 0;
+              if (action.cb) action.cb(actionTimeDiff);
+            }
+          }
 
           if (action.actionRate) {
             this.cooldowns.push({

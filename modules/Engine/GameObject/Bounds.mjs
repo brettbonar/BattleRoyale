@@ -9,10 +9,12 @@ const TYPE = {
 }
 
 export default class Bounds {
-  constructor(params) {
-    this.zheight = 0;
+  constructor(params, zheight) {
+    this.zheight = zheight || 0;
     this.opacity = params.opacity || 0;
-    if (!_.isUndefined(params.dimensions.width) && !_.isUndefined(params.dimensions.height)) {
+    if (!_.isUndefined(params.ul)) {
+      this.constructFromBox(params);
+    } else if (!_.isUndefined(params.dimensions.width) && !_.isUndefined(params.dimensions.height)) {
       this.constructFromRectangle(params);
     } else if (_.isArray(params)) {
       this.constructFromLine(params);
@@ -20,6 +22,8 @@ export default class Bounds {
       this.constructFromCircle(params);
     } else if (!_.isUndefined(params.position)) {
       this.position = new Point(params.position);
+    } else if (!_.isUndefined(params.ul)) {
+      this.constructFromBox(params);
     } else {
       console.log("Bad Bounds constructor");
     }
@@ -32,10 +36,33 @@ export default class Bounds {
       (z1 <= z2 && z1 + zheight1 >= z2) || (z2 <= z1 && z2 + zheight2 >= z1);
   }
 
+  constructFromBox(params) {
+    this.box = params;
+    this.zheight = params.zheight || 0;
+    this.lines = {
+      top: [this.box.ul, this.box.ur],
+      bottom: [this.box.lr, this.box.ll],
+      right: [this.box.ur, this.box.lr],
+      left: [this.box.ll, this.box.ul]
+    };
+  }
+
+  plus(box) {
+    let z = Math.min(this.box.ul.z, box.box.ul.z);
+    let zheight = Math.max(this.box.ul.z, box.box.ul.z) - z;
+    return new Bounds({
+      ul: new Point({ x: Math.min(this.box.ul.x, box.box.ul.x), y: Math.min(this.box.ul.y, box.box.ul.y), z: z }),
+      ur: new Point({ x: Math.max(this.box.ur.x, box.box.ur.x), y: Math.min(this.box.ur.y, box.box.ur.y), z: z }),
+      lr: new Point({ x: Math.max(this.box.lr.x, box.box.lr.x), y: Math.max(this.box.lr.y, box.box.lr.y), z: z }),
+      ll: new Point({ x: Math.min(this.box.ll.x, box.box.ll.x), y: Math.max(this.box.ll.y, box.box.ll.y), z: z })
+    }, zheight);
+  }
+
   extend(box) {
     // TODO: if box instanceof BoundingBox
 
-    let z = Math.max(this.box.ul.z, box.box.ul.z);
+    let z = Math.min(this.box.ul.z, box.box.ul.z);
+    this.zheight = Math.max(this.box.ul.z, box.box.ul.z) - z;
     this.box = {
       ul: new Point({ x: Math.min(this.box.ul.x, box.box.ul.x), y: Math.min(this.box.ul.y, box.box.ul.y), z: z }),
       ur: new Point({ x: Math.max(this.box.ur.x, box.box.ur.x), y: Math.min(this.box.ur.y, box.box.ur.y), z: z }),
@@ -49,6 +76,8 @@ export default class Bounds {
       right: [this.box.ur, this.box.lr],
       left: [this.box.ll, this.box.ul]
     };
+
+    return this;
   }
 
   constructFromLine(params) {
@@ -190,5 +219,21 @@ export default class Bounds {
   }
   get boundingBox() {
     return this.box;
+  }
+
+  get max() {
+    return new Point({
+      x: this.box.lr.x,
+      y: this.box.lr.y,
+      z: this.box.lr.z
+    });
+  }
+
+  get min() {
+    return new Point({
+      x: this.box.ul.x,
+      y: this.box.ul.y,
+      z: this.box.ul.z
+    });
   }
 }

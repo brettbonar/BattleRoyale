@@ -85,7 +85,7 @@ export default class PerspectiveRenderingEngine extends RenderingEngine{
   debugBoxes(objects) {
     if (window.debug) {
       for (const object of objects) {
-        this.context.strokeStyle = "blue";
+        this.context.strokeStyle = "black";
         this.context.beginPath();
         this.context.arc(object.position.x, object.position.y, 2, 0, 2 * Math.PI);
         this.context.closePath();
@@ -95,11 +95,24 @@ export default class PerspectiveRenderingEngine extends RenderingEngine{
         this.context.strokeStyle = "yellow";
         this.context.strokeRect(box.ul.x, box.ul.y, box.width, box.height);
           
+        for (const bounds of object.lastCollisionBounds) {
+          this.context.strokeStyle = "lawnGreen";
+          this.context.strokeRect(bounds.ul.x, bounds.ul.y - bounds.ul.z,
+            bounds.width, bounds.height);
+        }
+
         for (const bounds of object.collisionBounds) {
           this.context.strokeStyle = "crimson";
           this.context.strokeRect(bounds.ul.x, bounds.ul.y - bounds.ul.z,
             bounds.width, bounds.height);
         }
+
+        // for (let i = 0; i < object.collisionBounds.length; i++) {
+        //   this.context.strokeStyle = "blue";
+        //   let bounds = object.lastCollisionBounds[i].plus(object.collisionBounds[i]);
+        //   this.context.strokeRect(bounds.ul.x, bounds.ul.y - bounds.ul.z,
+        //     bounds.width, bounds.height);
+        // }
         // for (const terrainBox of object.terrainBoundingBox) {
         //   this.context.strokeStyle = "lawnGreen";
         //   this.context.strokeRect(terrainBox.ul.x, terrainBox.ul.y, terrainBox.width, terrainBox.height);

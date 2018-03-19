@@ -60,11 +60,9 @@ export default class Simulation {
       playerId: data.source.playerId,
       objectId: data.source.objectId
     });
-    console.log(object);
     if (object) {
       let target = this.game.getInteraction(object);
       if (target) {
-        console.log(target);
         target.interact(object);
       }
     }
@@ -120,10 +118,10 @@ export default class Simulation {
     }
   }
 
-  processUpdates(currentTime) {
+  processUpdates(elapsedTime, currentTime) {
     for (const update of this.updates) {
       let handler = this.eventHandlers[update.update.type];
-      let elapsedTime = update.elapsedTime + (currentTime - update.eventTime);
+      elapsedTime = 0;//update.elapsedTime + ((currentTime - update.eventTime) - elapsedTime);
       handler(update.update, elapsedTime);
     }
     this.updates.length = 0;
@@ -137,7 +135,7 @@ export default class Simulation {
     let elapsedTime = currentTime - this.previousTime;
     this.previousTime = currentTime;
     
-    this.processUpdates(currentTime);
+    this.processUpdates(elapsedTime, currentTime);
     this.game._update(elapsedTime);
     
     // TODO: do for each player
@@ -158,13 +156,17 @@ export default class Simulation {
     }
 
     this.lastState = this.game.gameState.objects.slice();
+
+    this.interval = setTimeout(() => {
+      this.update();
+    }, SIMULATION_TIME);
   }
 
   start() {
     this.game.previousTime = now();
     this.game.transitionState(Game.STATE.PLAYING);
 
-    this.interval = setInterval(() => {
+    this.interval = setTimeout(() => {
       this.update();
     }, SIMULATION_TIME);
   }

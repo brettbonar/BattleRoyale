@@ -45,6 +45,9 @@ GUI:
 https://opengameart.org/content/gui-elements
 https://opengameart.org/content/moderna-graphical-interface
 https://opengameart.org/content/lpc-pennomis-ui-elements
+https://opengameart.org/content/fantasy-ui-elements-by-ravenmore
+https://opengameart.org/content/fantasy-icon-pack-by-ravenmore-0
+https://opengameart.org/content/rpg-gui-contstruction-kit-vmoon
 
 https://nestlelion.deviantart.com/art/Some-Effects-107393192
 https://xypter.deviantart.com/art/Ultimate-Beam-Fx-3-150022444
