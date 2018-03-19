@@ -202,7 +202,7 @@ export default class Character extends GameObject {
       if (cooldownTimeDiff >= 0) {
         action.currentTime += (elapsedTime + cooldownTimeDiff);
         if (action.currentTime >= action.actionDuration) {
-          let actionTimeDiff = action.actionDuration - action.currentTime;
+          let actionTimeDiff = action.currentTime - action.actionDuration;
           if (action.action) {
             let manaCost = action.action.manaCost || 0;
             let healthCost = action.action.healthCost || 0;
@@ -216,17 +216,17 @@ export default class Character extends GameObject {
           if (action.actionRate) {
             this.cooldowns.push({
               actionName: action.name,
-              currentTime: actionTimeDiff,
+              currentTime: -actionTimeDiff,
               cooldownTime: 1000 / action.actionRate
             });
           }
 
           if (action.automatic) {
-            action.currentTime = actionTimeDiff;
+            action.currentTime = -actionTimeDiff;
           } else {
             this.actionStack.shift();
           }
-          this.nextAction(actionTimeDiff);
+          this.nextAction(-actionTimeDiff);
         }
       }
     }

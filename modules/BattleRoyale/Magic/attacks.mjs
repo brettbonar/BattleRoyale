@@ -176,7 +176,8 @@ export default {
             attackType: "fireLion",
             position: position,
             direction: collision.source.direction
-          }
+          },
+          remove: collision.source
         };
       }
       //zspeed: 5000

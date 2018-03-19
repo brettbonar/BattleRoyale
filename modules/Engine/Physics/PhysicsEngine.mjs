@@ -141,7 +141,10 @@ export default class PhysicsEngine {
       // TODO: create "bounce" or "elasticity" parameter - bounce objects back by
       // this much. If 0 then no bounce.
       // TODO: only bounce off first collision
-      if (obj.physics.surfaceType !== SURFACE_TYPE.GAS) {
+      if (obj.physics.surfaceType !== SURFACE_TYPE.GAS &&
+          (target.physics.surfaceType === SURFACE_TYPE.TERRAIN ||
+           target.physics.surfaceType === SURFACE_TYPE.DEFAULT ||
+           target.physics.surfaceType === SURFACE_TYPE.GROUND)) {
         if (collision.time !== 0) {
           obj.position[collision.axis] = (obj.lastPosition[collision.axis] +
             (obj.position[collision.axis] - obj.lastPosition[collision.axis]) * collision.time) -

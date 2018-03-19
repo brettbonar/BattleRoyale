@@ -226,7 +226,7 @@ export default class BattleRoyale extends Game {
           target: character.state.target,
           playerId: params.source.playerId,
           ownerId: params.source.objectId,
-          elapsedTime: timeDiff
+          //elapsedTime: timeDiff
         }));
       }
     });
@@ -430,6 +430,7 @@ export default class BattleRoyale extends Game {
       if (result.create.type === "Magic") {
         this.gameState.objects.push(Magic.create(result.create));
       }
+      _.pull(this.gameState.objects, result.remove);
     }
   }
 
@@ -510,11 +511,8 @@ export default class BattleRoyale extends Game {
     for (const obj of this.getPhysicsObjects()) {
       let update = obj.update(elapsedTime);
       if (update) {
-        updates.push(update);
+        this.onCollision(update);
       }
-    }
-    for (const update of updates) {
-      this.onCollision(update);
     }
 
     this.physicsEngine.update(elapsedTime, this.getPhysicsObjects());
