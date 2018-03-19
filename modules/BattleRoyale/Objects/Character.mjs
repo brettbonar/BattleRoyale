@@ -40,7 +40,6 @@ export default class Character extends GameObject {
     // active
     this.cooldowns = [];
     this.actionStack = [];
-    this.currentAction = null;
 
     if (params.collisionDimensions) {
       this.collisionDimensions = this.parseDimensions(params.collisionDimensions);
@@ -107,7 +106,7 @@ export default class Character extends GameObject {
   }
 
   startAction(action) {
-
+    this.latestAction = action;
   }
 
   stopAction(action) {
@@ -118,7 +117,7 @@ export default class Character extends GameObject {
   }
 
   canDoAction(action) {
-    let top = _.head(this.actionStack);
+    let top = this.currentAction;
     if (top && (top.actionType === "exclusive" && action.actionType === "exclusive" || top.actionType === "blocking")) {
       return false;
     }
@@ -141,7 +140,7 @@ export default class Character extends GameObject {
 
   // TODO: pull this outside of character class
   doAction(type, stopAction, action, elapsedTime, cb) {
-    let top = _.head(this.actionStack);
+    let top = this.currentAction;
     if (stopAction) {
       let actionToStop = _.find(this.actionStack, { name: action.name });
       // TODO: change "blocking" to "charging"?
@@ -191,7 +190,7 @@ export default class Character extends GameObject {
   }
 
   updateActions(elapsedTime) {
-    let action = _.head(this.actionStack);
+    let action = this.currentAction;
 
     if (action) {
       let cooldownTimeDiff = 0;
@@ -233,6 +232,10 @@ export default class Character extends GameObject {
     }
   }
 
+  get currentAction() {
+    return _.head(this.actionStack);
+  }
+
   update(elapsedTime) {
     this.renderer.update(elapsedTime + this.elapsedTime, this);
     for (const cooldown of this.cooldowns) {
@@ -240,9 +243,6 @@ export default class Character extends GameObject {
     }
     this.updateActions(elapsedTime);
     _.remove(this.cooldowns, (cooldown) => {
-      if (cooldown.currentTime >= cooldown.cooldownTime) {
-        console.log("remove");
-      }
       return cooldown.currentTime >= cooldown.cooldownTime;
     });
     
@@ -256,7 +256,15 @@ export default class Character extends GameObject {
   }
 
   updateState(state) {
-    _.merge(this, _.omit(state, "renderer"));
+    _.merge(this, state);
+    if (state.latestAction && (!this.currentAction || state.latestAction.name !== this.currentAction.name)) {
+      // Pause previous action
+      // if (this.currentAction) {
+      //   this.currentAction.currentTime = 0;
+      // }
+      this.actionStack.unshift(state.latestAction);
+      this.startAction(state.latestAction);
+    }
     if (state.target) {
       this.setTarget(state.target);
     }
@@ -266,12 +274,19 @@ export default class Character extends GameObject {
   }
 
   getUpdateState() {
-    let actionStack = [];
-    if (this.actionStack.length > 0) {
-      actionStack.push(_.pick(this.actionStack[0], [
+    let latestAction = this.currentAction || this.latestAction;
+    if (latestAction) {
+      latestAction = _.pick(latestAction, [
         "type", "name", "currentTime", "actionDuration", "actionRate"
-      ]));
+      ]);
     }
+    this.latestAction = null;
+    // let actionStack = [];
+    // if (this.actionStack.length > 0) {
+    //   actionStack.push(_.pick(this.actionStack[0], [
+    //     "type", "name", "currentTime", "actionDuration", "actionRate"
+    //   ]));
+    // }
     return Object.assign(super.getUpdateState(), _.pick(this, [
       "state",
       "body",
@@ -279,8 +294,9 @@ export default class Character extends GameObject {
       "isPlayer",
       // TODO: make this part of character type, or just part of weapon
       "damagedEffect"
-    ], {
-      actionStack: actionStack
-    }));
+    ]), {
+      //currentAction: this.currentAction,
+      latestAction: latestAction
+    });
   }
 }

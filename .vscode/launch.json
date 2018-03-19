@@ -10,7 +10,8 @@
       "name": "Launch Program",
       "program": "${workspaceFolder}\\app.mjs",
       "runtimeArgs": [
-        "--experimental-modules"
+        "--experimental-modules",
+        "--inspect-brk"
       ]
     }
   ]

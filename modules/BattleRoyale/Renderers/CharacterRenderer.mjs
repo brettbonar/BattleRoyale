@@ -205,6 +205,7 @@ export default class CharacterRenderer {
     this.prevAnimation = ANIMATIONS.MOVE_DOWN;
     this.frame = 0;
     this.currentTime = 0;
+    this.currentAnimationTime = 0;
     this.framesPerSec = 0;
     this.initBody(params);
 
@@ -312,39 +313,55 @@ export default class CharacterRenderer {
 
   render() {}
 
-  setAnimation(object) {
-    let animationTime = 0;
+  setAnimation(elapsedTime, object) {
+    this.currentAnimationTime += elapsedTime;
+    let currentAction = object.currentAction || object.latestAction;
+    // We may start and finish an action within a frame, make sure we still animate it
+    if (currentAction) {
+      this.currentAction = currentAction;
+      this.currentAnimationTime = 0;
+      // if (currentAction.name !== (this.currentAction && this.currentAction.name)) {
+      //   this.currentAction = currentAction;
+      //   this.currentAnimationTime = 0;
+      // }
+    }
+
     this.prevAnimation = this.animation;
     this.prevState = this.state;
+
     if (object.state.dead) {
       this.state = STATE.DEAD;
       this.animation = ANIMATIONS.DEATH;
-    } else if (object.state.attacking) {
+    } else if (this.currentAction && this.currentAction.type === "attack") {
       this.state = STATE.ATTACKING;
       this.animation = WEAPON_ANIMATIONS[object.state.loadout.weapon.attackType][object.state.characterDirection];
-      animationTime = object.state.attackDuration;
+      this.animationDuration = Math.max(this.currentAction.actionDuration, 250);
     } else if (object.direction.x || object.direction.y) {
       this.state = STATE.MOVING;
       this.animation = MOVE_ANIMATIONS[object.state.characterDirection];
     } else {
       this.state = STATE.IDLE;
       this.animation = MOVE_ANIMATIONS[object.state.characterDirection];
-    }    
+    }
 
     if (this.state !== this.prevState) {
       this.frame = 0;
       this.currentTime = 0;
-      this.framesPerSec = ANIMATION_SETTINGS[this.animation].framesPerSec;
-      // if (time) {
-      //   this.framesPerSec = ANIMATION_SETTINGS[animation].frames / (time / 1000);
-      // } else {
-      //   this.framesPerSec = ANIMATION_SETTINGS[animation].framesPerSec;
-      // }
+      if (this.animationDuration) {
+        this.framesPerSec = ANIMATION_SETTINGS[this.animation].frames / (this.animationDuration / 1000);
+      } else {
+        this.framesPerSec = ANIMATION_SETTINGS[this.animation].framesPerSec;
+      }
+    }
+
+    if (this.currentAction && this.currentAnimationTime >= this.animationDuration) {
+      this.currentAction = null;
+      this.animationDuration = 0;
     }
   }
 
   update(elapsedTime, object) {
-    this.setAnimation(object);
+    this.setAnimation(elapsedTime, object);
     if (this.state !== STATE.IDLE) {
       let animationSettings = ANIMATION_SETTINGS[this.animation];
       this.currentTime += elapsedTime;

@@ -1139,7 +1139,7 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="1.979899"
-     inkscape:cx="384.01975"
+     inkscape:cx="384.33215"
      inkscape:cy="1076.7187"
      inkscape:document-units="mm"
      inkscape:current-layer="layer1"
@@ -1186,7 +1186,10 @@
     </g>
     <g
        id="g21880"
-       transform="matrix(0.55032347,0,0,0.47807868,0.38167793,-15.58463)">
+       transform="matrix(0.55032347,0,0,0.47807868,0.38167793,-15.58463)"
+       inkscape:export-filename="C:\Dev\GameDevelopment\BattleRoyale\public\Assets\UI\png\bars.png"
+       inkscape:export-xdpi="157.40482"
+       inkscape:export-ydpi="157.40482">
       <path
          inkscape:export-ydpi="90"
          inkscape:export-xdpi="90"
@@ -1209,7 +1212,10 @@
     </g>
     <g
        id="g13901"
-       transform="matrix(0.06141436,0,0,0.09573665,-92.042218,-210.37255)">
+       transform="matrix(0.06141436,0,0,0.09573665,-92.042218,-210.37255)"
+       inkscape:export-filename="C:\Dev\GameDevelopment\BattleRoyale\public\Assets\UI\png\bars.png"
+       inkscape:export-xdpi="157.40482"
+       inkscape:export-ydpi="157.40482">
       <g
          id="g8700-3"
          transform="matrix(0.38737132,0.92192378,-0.60597417,0.25461651,2442.1328,762.47213)">
@@ -2945,7 +2951,10 @@
     </g>
     <g
        id="g21880-0"
-       transform="matrix(0.55032346,0,0,0.47807867,156.78283,-15.840616)">
+       transform="matrix(0.55032346,0,0,0.47807867,156.78283,-15.840616)"
+       inkscape:export-filename="C:\Dev\GameDevelopment\BattleRoyale\public\Assets\UI\png\bars.png"
+       inkscape:export-xdpi="157.40482"
+       inkscape:export-ydpi="157.40482">
       <path
          inkscape:export-ydpi="90"
          inkscape:export-xdpi="90"
@@ -2968,7 +2977,10 @@
     </g>
     <g
        id="g13901-7"
-       transform="matrix(0.06141436,0,0,0.09573665,64.358933,-210.62854)">
+       transform="matrix(0.06141436,0,0,0.09573665,64.358933,-210.62854)"
+       inkscape:export-filename="C:\Dev\GameDevelopment\BattleRoyale\public\Assets\UI\png\bars.png"
+       inkscape:export-xdpi="157.40482"
+       inkscape:export-ydpi="157.40482">
       <g
          id="g8700-3-98"
          transform="matrix(0.38737132,0.92192378,-0.60597417,0.25461651,2442.1328,762.47213)">

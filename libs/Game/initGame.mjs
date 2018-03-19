@@ -13,6 +13,7 @@ import StaticObject from "../../modules/BattleRoyale/Objects/StaticObject.mjs";
 import AnimationEffect from "../../modules/BattleRoyale/Effects/AnimationEffect.mjs";
 import effects from "../../modules/BattleRoyale/Effects/effects.mjs";
 import Item from "../../modules/BattleRoyale/Objects/Item.mjs";
+import scenes from "../../modules/BattleRoyale/Objects/Scenes.mjs";
 
 function initGame(players, maps) {
   let gameObjects = [
@@ -171,6 +172,17 @@ function initGame(players, maps) {
   //     z: -1
   //   }
   // }, objects.caveExit));
+
+  gameObjects = gameObjects.concat(scenes.corn.getObjects(
+    {
+      x: 250,
+      y: 250
+    },
+    {
+      width: 440,
+      height: 220
+    }
+  ));
 
   return gameObjects;
 }

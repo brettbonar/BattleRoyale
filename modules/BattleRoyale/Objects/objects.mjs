@@ -38,6 +38,180 @@ const caveEntranceDimensions = [
 ];
 
 export default {
+  // WHEAT
+  wheatUL: {
+    objectType: "wheatUL",
+    biome: "plain",
+    group: "wheat",
+    imageSource: "/Assets/terrain_atlas.png",
+    imageDimensions: {
+      x: 0,
+      y: 896,
+      width: 32,
+      height: 32
+    },
+    dimensions: {
+      width: 32,
+      height: 32
+    },
+    physics: {
+      surfaceType: "none"
+    }
+  },
+  wheatTop: {
+    objectType: "wheatTop",
+    biome: "plain",
+    group: "wheat",
+    imageSource: "/Assets/terrain_atlas.png",
+    imageDimensions: {
+      x: 32,
+      y: 896,
+      width: 32,
+      height: 32
+    },
+    dimensions: {
+      width: 32,
+      height: 32
+    },
+    physics: {
+      surfaceType: "none"
+    }
+  },
+  wheatUR: {
+    objectType: "wheatUR",
+    biome: "plain",
+    group: "wheat",
+    imageSource: "/Assets/terrain_atlas.png",
+    imageDimensions: {
+      x: 64,
+      y: 896,
+      width: 32,
+      height: 32
+    },
+    dimensions: {
+      width: 32,
+      height: 32
+    },
+    physics: {
+      surfaceType: "none"
+    }
+  },
+  wheatLeft: {
+    objectType: "wheatLeft",
+    biome: "plain",
+    group: "wheat",
+    imageSource: "/Assets/terrain_atlas.png",
+    imageDimensions: {
+      x: 0,
+      y: 928,
+      width: 32,
+      height: 32
+    },
+    dimensions: {
+      width: 32,
+      height: 32
+    },
+    physics: {
+      surfaceType: "none"
+    }
+  },
+  wheatMid: {
+    objectType: "wheatMid",
+    biome: "plain",
+    group: "wheat",
+    imageSource: "/Assets/terrain_atlas.png",
+    imageDimensions: {
+      x: 32,
+      y: 928,
+      width: 32,
+      height: 32
+    },
+    dimensions: {
+      width: 32,
+      height: 32
+    },
+    physics: {
+      surfaceType: "none"
+    }
+  },
+  wheatRight: {
+    objectType: "wheatRight",
+    biome: "plain",
+    group: "wheat",
+    imageSource: "/Assets/terrain_atlas.png",
+    imageDimensions: {
+      x: 64,
+      y: 928,
+      width: 32,
+      height: 32
+    },
+    dimensions: {
+      width: 32,
+      height: 32
+    },
+    physics: {
+      surfaceType: "none"
+    }
+  },
+  wheatLL: {
+    objectType: "wheatLL",
+    biome: "plain",
+    group: "wheat",
+    imageSource: "/Assets/terrain_atlas.png",
+    imageDimensions: {
+      x: 0,
+      y: 960,
+      width: 32,
+      height: 32
+    },
+    dimensions: {
+      width: 32,
+      height: 32
+    },
+    physics: {
+      surfaceType: "none"
+    }
+  },
+  wheatBottom: {
+    objectType: "wheatBottom",
+    biome: "plain",
+    group: "wheat",
+    imageSource: "/Assets/terrain_atlas.png",
+    imageDimensions: {
+      x: 32,
+      y: 960,
+      width: 32,
+      height: 32
+    },
+    dimensions: {
+      width: 32,
+      height: 32
+    },
+    physics: {
+      surfaceType: "none"
+    }
+  },
+  wheatRight: {
+    objectType: "wheatRight",
+    biome: "plain",
+    group: "wheat",
+    imageSource: "/Assets/terrain_atlas.png",
+    imageDimensions: {
+      x: 64,
+      y: 960,
+      width: 32,
+      height: 32
+    },
+    dimensions: {
+      width: 32,
+      height: 32
+    },
+    physics: {
+      surfaceType: "none"
+    }
+  },
+
+  // CORN
   corn1: {
     objectType: "corn1",
     biome: "plain",
@@ -49,18 +223,18 @@ export default {
       width: 30,
       height: 64
     },
-    collisionDimensions: {
-      offset: {
-        x: 1,
-        y: 47
-      },
-      dimensions: {
-        width: 28,
-        height: 12,
-        zheight: 64
-      },
-      opacity: 0.35
-    },
+    // collisionDimensions: {
+    //   offset: {
+    //     x: 1,
+    //     y: 47
+    //   },
+    //   dimensions: {
+    //     width: 28,
+    //     height: 12,
+    //     zheight: 64
+    //   },
+    //   opacity: 0.35
+    // },
     dimensions: {
       width: 30,
       height: 64
@@ -80,18 +254,18 @@ export default {
       width: 30,
       height: 64
     },
-    collisionDimensions: {
-      offset: {
-        x: 1,
-        y: 47
-      },
-      dimensions: {
-        width: 28,
-        height: 12,
-        zheight: 64
-      },
-      opacity: 0.35
-    },
+    // collisionDimensions: {
+    //   offset: {
+    //     x: 1,
+    //     y: 47
+    //   },
+    //   dimensions: {
+    //     width: 28,
+    //     height: 12,
+    //     zheight: 64
+    //   },
+    //   opacity: 0.35
+    // },
     dimensions: {
       width: 30,
       height: 64
@@ -111,18 +285,18 @@ export default {
       width: 30,
       height: 64
     },
-    collisionDimensions: {
-      offset: {
-        x: 1,
-        y: 47
-      },
-      dimensions: {
-        width: 28,
-        height: 12,
-        zheight: 64
-      },
-      opacity: 0.35
-    },
+    // collisionDimensions: {
+    //   offset: {
+    //     x: 1,
+    //     y: 47
+    //   },
+    //   dimensions: {
+    //     width: 28,
+    //     height: 12,
+    //     zheight: 64
+    //   },
+    //   opacity: 0.35
+    // },
     dimensions: {
       width: 30,
       height: 64

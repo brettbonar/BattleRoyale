@@ -19,7 +19,12 @@ export default class Simulation {
           water: 5
         }
       }),
-      "0": new Map()
+      "0": new Map({
+        seeds: {
+          plain: 5,
+          forest: 5
+        }
+      })
     };
     this.game = new BattleRoyale({
       isServer: true,

@@ -15,9 +15,9 @@ export default class PhysicsEngine {
       };
     }
 
-    // if (!A1.plus(A2).intersects(B1.plus(B2))) {
-    //   return false;
-    // }
+    if (!A1.plus(A2).intersects(B1.plus(B2))) {
+      return false;
+    }
 
     let vAx = A2.ul.x - A1.ul.x;
     let vAy = A2.ul.y - A1.ul.y;
