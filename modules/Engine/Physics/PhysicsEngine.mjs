@@ -141,10 +141,11 @@ export default class PhysicsEngine {
       // TODO: create "bounce" or "elasticity" parameter - bounce objects back by
       // this much. If 0 then no bounce.
       // TODO: only bounce off first collision
-      if (obj.physics.surfaceType !== SURFACE_TYPE.GAS &&
-          (target.physics.surfaceType === SURFACE_TYPE.TERRAIN ||
-           target.physics.surfaceType === SURFACE_TYPE.DEFAULT ||
-           target.physics.surfaceType === SURFACE_TYPE.GROUND)) {
+      if (obj.physics.surfaceType !== SURFACE_TYPE.GAS //&&
+          // (target.physics.surfaceType === SURFACE_TYPE.TERRAIN ||
+          //  target.physics.surfaceType === SURFACE_TYPE.DEFAULT ||
+          //  target.physics.surfaceType === SURFACE_TYPE.GROUND)
+          ) {
         if (collision.time !== 0) {
           obj.position[collision.axis] = (obj.lastPosition[collision.axis] +
             (obj.position[collision.axis] - obj.lastPosition[collision.axis]) * collision.time) -
@@ -215,11 +216,13 @@ export default class PhysicsEngine {
 
       if (obj.direction.x || obj.direction.y || obj.direction.z) {
         Object.assign(obj.lastPosition, obj.position);
-        obj.position.x += obj.direction.x * obj.speed * (time / 1000);
-        obj.position.y += obj.direction.y * obj.speed * (time / 1000);
+        obj.position.x = Math.round(obj.position.x + obj.direction.x * obj.speed * (time / 1000));
+        obj.position.y = Math.round(obj.position.y + obj.direction.y * obj.speed * (time / 1000));
         if (obj.direction.z) {
-          obj.position.z += obj.direction.z * (obj.zspeed || obj.speed) * (time / 1000);
+          obj.position.z = Math.round(obj.position.z + obj.direction.z * (obj.zspeed || obj.speed) * (time / 1000));
         }
+
+        obj.updatePosition();
       }
       if (obj.spin) {
         obj.rotation += obj.spin * (time / 1000);

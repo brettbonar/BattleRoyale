@@ -26,11 +26,8 @@ export default class RenderObject extends GameObject {
 
     if (rendering.offset) {
       this.position.add(rendering.offset);
+      this.updatePosition();
     }
-  }
-
-  getAllRenderObjects() {
-    return this.parts || this;
   }
 
   getUpdateState() {

@@ -22,7 +22,7 @@ export default class Item extends GameObject {
         this.renderer = new ObjectRenderer(item);
       }
     } else if (item.images) {
-      this.parts = _.map(item.images, (part) => {
+      this.renderObjects = _.map(item.images, (part) => {
         let piece = new Item(_.merge({}, item, params), part);
         return piece;
       });
@@ -34,10 +34,6 @@ export default class Item extends GameObject {
         this.done = true;
       }
     };
-  }
-
-  getAllRenderObjects() {
-    return this.parts || this;
   }
 
   getUpdateState() {

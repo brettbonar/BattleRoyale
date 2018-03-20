@@ -24,10 +24,7 @@ export default class Projectile extends GameObject {
     //   width: 32,
     //   height: 8
     // };
-    this.dimensions = new Dimensions({
-      width: this.attack.rendering.imageSize,
-      height: this.attack.rendering.imageSize
-    });
+    this.dimensions = new Dimensions(this.attack.effect.collisionDimensions[0].dimensions);
     this.collisionDimensions = this.attack.effect.collisionDimensions;
     this.speed = params.speed || this.attack.effect.speed;
     this.zspeed = params.zspeed || this.attack.effect.zspeed || this.speed;
@@ -56,6 +53,8 @@ export default class Projectile extends GameObject {
     if (this.currentTime >= this.maxTime) {
       this.done = true;
     }
+    this.rotation = Math.atan2(this.direction.y - this.direction.z, this.direction.x ) * 180 / Math.PI;
+
     this.renderer.update(elapsedTime);
 
     if (!this.done && this.effect.doTriggerCollision && this.effect.doTriggerCollision(this)) {

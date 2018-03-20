@@ -345,7 +345,7 @@ export default class CharacterRenderer {
     }
 
     if (this.state !== this.prevState) {
-      this.frame = 0;
+      this.frame = this.state === STATE.MOVING ? 1 : 0;
       this.currentTime = 0;
       if (this.animationDuration) {
         this.framesPerSec = ANIMATION_SETTINGS[this.animation].frames / (this.animationDuration / 1000);

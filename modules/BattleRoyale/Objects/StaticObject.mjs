@@ -7,10 +7,11 @@ import RenderObject from "./RenderObject.mjs";
 
 export default class StaticObject extends GameObject {
   constructor(params) {
-    super(Object.assign({
-      static: true
-    }, params));
     let object = objects[params.objectType];
+    super(Object.assign({
+      static: true,
+      renderClipped: object.renderClipped
+    }, params));
     Object.assign(this, object);
     this.type = "StaticObject";
 
@@ -18,15 +19,11 @@ export default class StaticObject extends GameObject {
       if (object.imageSource) {
         this.renderer = new ObjectRenderer(object);
       } else if (object.images) {
-        this.parts = _.map(object.images, (part) => {
+        this.renderObjects = _.map(object.images, (part) => {
           return new RenderObject(params, part);
         });
       }
     }
-  }
-
-  getAllRenderObjects() {
-    return this.parts || this;
   }
 
   getUpdateState() {

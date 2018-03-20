@@ -4,7 +4,8 @@ export default {
   house: {
     dimensions: {
       width: 194,
-      height: 290
+      height: 290,
+      zheight: 128
     },
     doors: [
       {
@@ -139,6 +140,11 @@ export default {
       // }
     ],
     interior: {
+      dimensions: {
+        width: 194,
+        height: 290,
+        zheight: 128
+      },
       imageSource: "../../Assets/Buildings/house1.png",
       imageDimensions: {
         x: 196,
@@ -179,6 +185,11 @@ export default {
         y: 0,
         width: 194,
         height: 290
+      },
+      dimensions: {
+        width: 194,
+        height: 290,
+        zheight: 128
       },
       fadeEndOffset: {
         y: 142

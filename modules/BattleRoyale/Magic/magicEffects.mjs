@@ -5,7 +5,8 @@ export default {
     name: "fireLion",
     dimensions: {
       width: 128,
-      height: 128
+      height: 128,
+      zheight: 128
     },
     rendering: {
       images: {

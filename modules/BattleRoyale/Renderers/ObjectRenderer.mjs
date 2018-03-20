@@ -1,4 +1,5 @@
-import { getAnimationOffset } from "../../Engine/Rendering/renderUtils.mjs";
+import { getAnimationOffset } from "../../Engine/Rendering/renderUtils.mjs"
+import Point from "../../Engine/GameObject/Point.mjs"
 
 //import Renderer from "../../Engine/Rendering/Renderer.mjs"
 
@@ -59,13 +60,28 @@ export default class ObjectRenderer {
       position.x, position.y, this.imageSize, this.imageSize);
   }
 
-  renderStatic(context, object, elapsedTime) {
+  renderStatic(context, object, elapsedTime, clipping) {
     if (!this.image.complete) return;
     
-    let position = object.position
-      .plus(this.imageDimensions.offset)
-      .minus({ y: object.position.z });
-    context.drawImage(this.image, this.imageDimensions.x, this.imageDimensions.y, this.imageDimensions.width, this.imageDimensions.height,
-      position.x, position.y, this.imageDimensions.width, this.imageDimensions.height);
+    let position = object.position;
+    if (this.imageDimensions.offset) {
+      position = {
+        x: position.x + this.imageDimensions.offset.x,
+        y: position.y + this.imageDimensions.offset.y,
+        z: position.z + this.imageDimensions.offset.z
+      }
+    }
+
+    if (clipping) {
+      let offset = new Point(clipping.offset);
+      position = offset.plus(position);
+      let imageOffset = offset.plus(this.imageDimensions);
+      let imageDimensions = clipping.dimensions || this.imageDimensions;
+      context.drawImage(this.image, imageOffset.x, imageOffset.y, clipping.dimensions.width, clipping.dimensions.height,
+        position.x, position.y - object.position.z, imageDimensions.width, imageDimensions.height);
+    } else {
+      context.drawImage(this.image, this.imageDimensions.x, this.imageDimensions.y, this.imageDimensions.width, this.imageDimensions.height,
+        position.x, position.y - object.position.z, this.imageDimensions.width, this.imageDimensions.height);
+    }
   }
 }

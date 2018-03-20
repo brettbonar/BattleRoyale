@@ -173,6 +173,15 @@ function initGame(players, maps) {
   //   }
   // }, objects.caveExit));
 
+  gameObjects.push(new StaticObject({
+    position: {
+      x: 100,
+      y: 100
+    },
+    objectType: "wheat",
+    simulation: true
+  }));
+
   gameObjects = gameObjects.concat(scenes.corn.getObjects(
     {
       x: 250,

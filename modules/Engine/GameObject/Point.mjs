@@ -1,3 +1,5 @@
+import Dimensions from "./Dimensions.mjs";
+
 export default class Point {
   constructor(params) {
     Object.assign(this, params);
@@ -36,32 +38,50 @@ export default class Point {
   }
 
   add(point) {
-    this.x += (point && point.x || 0);
-    this.y += (point && point.y || 0);
-    this.z += (point && point.z || 0);
+    if (point) {
+      this.x += point.x || 0;
+      this.y += point.y || 0;
+      this.z += point.z || 0;
+    }
     return this;
   }
   
   subtract(point) {
-    this.x -= (point && point.x || 0);
-    this.y -= (point && point.y || 0);
-    this.z -= (point && point.z || 0);
+    if (point) {
+      this.x -= point.x || 0;
+      this.y -= point.y || 0;
+      this.z -= point.z || 0;
+    }
     return this;
   }
   
   plus(point) {
-    return new Point({
-      x: this.x + (point && point.x || 0),
-      y: this.y + (point && point.y || 0),
-      z: this.z + (point && point.z || 0)
-    });
+    if (point) {
+      if (point instanceof Point || !_.isUndefined(point.x) || !_.isUndefined(point.y) || !_.isUndefined(point.z)) {
+        return new Point({
+          x: this.x + (point.x || 0),
+          y: this.y + (point.y || 0),
+          z: this.z + (point.z || 0)
+        });
+      } else if (point instanceof Dimensions || !_.isUndefined(point.width) || !_.isUndefined(point.height) || !_.isUndefined(point.zheight)) {
+        return new Point({
+          x: this.x + (point.width || 0),
+          y: this.y + (point.height || 0),
+          z: this.z + (point.zheight || 0)
+        });
+      }
+    }
+    return new Point(this);
   }
   
   minus(point) {
-    return new Point({
-      x: this.x - (point && point.x || 0),
-      y: this.y - (point && point.y || 0),
-      z: this.z - (point && point.z || 0)
-    });
+    if (point) {
+      return new Point({
+        x: this.x - (point.x || 0),
+        y: this.y - (point.y || 0),
+        z: this.z - (point.z || 0)
+      });
+    }
+    return new Point(this);
   }
 }

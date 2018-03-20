@@ -20,8 +20,13 @@ class GameObjectProxy {
     if (!params.static) {
       return new Proxy(this, {
         set: (object, key, value) => {
-          object[key] = value;
-          object._modified = true;
+          if (object[key] !== value) {
+            object[key] = value;
+            object._modified = true;
+            if (key === "position" && this.dimensions) {
+              this.updatePosition();
+            }
+          }
           return true;
         }
       });
@@ -85,7 +90,9 @@ export default class GameObject extends GameObjectProxy {
       });
     }
 
+    this.renderObjects = [this];
     this.direction = new Point(this.direction).normalize();
+    this.updatePosition();
     objectId++;
   }
 
@@ -117,16 +124,16 @@ export default class GameObject extends GameObjectProxy {
     });
   }
 
-  get perspectivePosition() {
+  updatePosition() {
     let zheight = this.perspectiveDimensions ? 
       this.perspectiveDimensions.zheight : this.dimensions.zheight;
-    let position = this.position;
+    let position = new Point(this.position);
     if (this.perspectiveOffset) {
-      position = position.plus(this.perspectiveOffset);
-    } else {
-      position = position.plus({ y: this.height });
+      position.add(this.perspectiveOffset);
+    } else if (zheight > 0 && !this.renderClipped) {
+      position.add({ y: this.height });
     }
-    return position.plus({ y: this.position.z });
+    this.perspectivePosition = position.add({ y: this.position.z });
   }
 
   getCenterOfPoints(points) {
@@ -154,14 +161,10 @@ export default class GameObject extends GameObjectProxy {
 
   update(elapsedTime) {}
 
-  render(context, elapsedTime, center) {
+  render(context, elapsedTime, clipping) {
     if (this.visible && this.renderer) {
-      this.renderer.render(context, this, elapsedTime, center);
+      this.renderer.render(context, this, elapsedTime, clipping);
     }
-  }
-
-  getAllRenderObjects() {
-    return [this];
   }
 
   get left() {
@@ -255,8 +258,12 @@ export default class GameObject extends GameObjectProxy {
   }
   get fadeBounds() {
     if (this.fadeDimensions) {
+      let position = new Point(this.position);
+      if (this.fadeDimensions.offset) {
+        position.add(this.fadeDimensions.offset);
+      }
       return new Bounds({
-        position: this.position.plus(this.fadeDimensions.offset),
+        position: position,
         dimensions: new Dimensions(this.fadeDimensions.dimensions)
       });
     }
@@ -343,15 +350,15 @@ export default class GameObject extends GameObjectProxy {
   }
 
   get zheight() {
-    return this.bounds.zheight;
+    return this.dimensions.zheight;
   }
 
   get height() {
-    return this.bounds.height;
+    return this.dimensions.height;
   }
 
   get width() {
-    return this.bounds.width;
+    return this.dimensions.width;
   }
   
   getUpdateState() {

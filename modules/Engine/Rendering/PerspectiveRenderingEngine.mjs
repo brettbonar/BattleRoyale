@@ -1,6 +1,8 @@
 import RenderingEngine from "./RenderingEngine.mjs"
-import { SURFACE_TYPE } from "../Physics/PhysicsConstants.mjs";
-import Bounds from "../GameObject/Bounds.mjs";
+import { SURFACE_TYPE } from "../Physics/PhysicsConstants.mjs"
+import Bounds from "../GameObject/Bounds.mjs"
+import Point from "../GameObject/Point.mjs"
+import Dimensions from "../GameObject/Dimensions.mjs"
 
 export default class PerspectiveRenderingEngine extends RenderingEngine{
   constructor(params) {
@@ -8,30 +10,35 @@ export default class PerspectiveRenderingEngine extends RenderingEngine{
   }
 
   renderFaded(object, elapsedTime) {
-    let fadeBounds = object.fadeBounds;
-    if (fadeBounds) {
+    if (object.fadeDimensions) {
       this.context.globalAlpha = 0.5;
-      object.render(this.context, elapsedTime);
+      //object.render(this.context, elapsedTime);
+      object.render(this.context, elapsedTime, object.fadeDimensions);
+      let offset = object.fadeDimensions.offset || new Point();
+      let dimensions = object.fadeDimensions.dimensions || new Dimensions();
 
-      // TODO: figure out why the following doesn't work
-      // Render faded region
-      // this.context.save();
-      // this.context.rect(fadeBounds.ul.x, fadeBounds.ul.y, fadeBounds.width, fadeBounds.height);
-      // this.context.clip();
-      // this.context.globalAlpha = 0.5;
-      // object.render(this.context, elapsedTime);
-      // this.context.restore();
-
-      // // Render the rest of the image
-      // this.context.save();
-      // this.context.rect(fadeBounds.ll.x, fadeBounds.ll.y, object.width, object.height);
-      // this.context.clip();
-      // object.render(this.context, 0);
-      // this.context.restore();
+      this.context.globalAlpha = 1;
+      object.render(this.context, 0, {
+        offset: offset.plus({ y: dimensions.height }),
+        dimensions: {
+          width: object.dimensions.width,
+          height: object.dimensions.height - dimensions.height
+        }
+      });
     } else {
       this.context.globalAlpha = 0.5;
       object.render(this.context, elapsedTime);
     }
+  }
+
+  renderObject(object, elapsedTime, center, clipping) {
+    this.context.save();
+    if (object.losFade && object.fadePosition.y > center.y - 20) {
+      this.renderFaded(object, elapsedTime, clipping);
+    } else {
+      object.render(this.context, elapsedTime, clipping);
+    }
+    this.context.restore();
   }
 
   // Render highest to lowest y
@@ -44,14 +51,70 @@ export default class PerspectiveRenderingEngine extends RenderingEngine{
     // }
 
     let renderObjects = this.getRenderObjects(objects, center);
-    for (const object of renderObjects) {
-      this.context.save();
-      if (object.losFade && object.fadePosition.y > center.y - 20) {
-        this.renderFaded(object, elapsedTime);
-      } else {
-        object.render(this.context, elapsedTime);
+    let clips = [];
+    //for (const object of renderObjects) {
+    let y, obj;
+    for (y = 0; y < renderObjects.length; y++) {
+      if (!renderObjects[y]) continue;
+      for (obj = 0; obj < renderObjects[y].length; obj++) {
+        let object = renderObjects[y][obj];
+        if (object.renderClipped) {
+          clips.push({
+            object: object,
+            previousClip: 0
+          });
+          continue;
+        }
+
+        for (const clip of clips) {
+          // this.context.rect(clip.object.position.x, clip.previousClip,
+          //   clip.object.width, (y - clip.previousClip) - clip.object.zheight);
+          // this.context.clip();
+          let height = 0;
+          if (y >= clip.object.bottom.y) {
+            height = clip.object.height - clip.previousClip;
+          } else {
+            height = Math.round(Math.min(clip.object.height - clip.previousClip,
+              (y - clip.object.top.y - clip.previousClip) - clip.object.zheight));
+          }
+
+          if (height > 0) {
+            let clipping = {
+              offset: new Point({
+                x: 0,
+                y: clip.previousClip
+              }),
+              dimensions: new Dimensions({
+                width: clip.object.width,
+                height: height
+              })
+            };
+            // TODO: reset elapsed time after first render?
+            this.renderObject(clip.object, elapsedTime, center, clipping);
+
+            clip.previousClip += height;
+            if (clip.previousClip >= clip.object.height) {
+              _.pull(clips, clip);
+            }
+          }
+        }
+
+        this.renderObject(object, elapsedTime, center);
       }
-      this.context.restore();
+    }
+
+    for (const clip of clips) {
+      let clipping = {
+        offset: new Point({
+          x: 0,
+          y: clip.previousClip
+        }),
+        dimensions: new Dimensions({
+          width: clip.object.width,
+          height: clip.object.height - clip.previousClip
+        })
+      };
+      this.renderObject(clip.object, elapsedTime, center, clipping);
     }
     
     this.debugBoxes(objects);
@@ -88,6 +151,12 @@ export default class PerspectiveRenderingEngine extends RenderingEngine{
         this.context.strokeStyle = "black";
         this.context.beginPath();
         this.context.arc(object.position.x, object.position.y, 2, 0, 2 * Math.PI);
+        this.context.closePath();
+        this.context.fill();
+
+        this.context.strokeStyle = "purple";
+        this.context.beginPath();
+        this.context.arc(object.perspectivePosition.x, object.perspectivePosition.y, 5, 0, 2 * Math.PI);
         this.context.closePath();
         this.context.fill();
 
@@ -131,16 +200,28 @@ export default class PerspectiveRenderingEngine extends RenderingEngine{
 
   getRenderObjects(objects, center) {
     let renderObjects = [];
+    let characters = [];
+    let losBounds = [];
     for (const object of objects) {
-      if (object.physics.surfaceType !== SURFACE_TYPE.CHARACTER || object.isThisPlayer) {
-        renderObjects = renderObjects.concat(object.getAllRenderObjects());
+      for (const renderObj of object.renderObjects) {
+        let pos = Math.round(renderObj.perspectivePosition.y);
+        if (!renderObjects[pos]) {
+          renderObjects[pos] = [];
+        }
+        renderObjects[pos].push(renderObj);
       }
+
+      //if (object.physics.surfaceType !== SURFACE_TYPE.CHARACTER || object.isThisPlayer) {
+      // } else {
+      //   characters.push(object);
+      // }
     }
     
-    renderObjects = renderObjects.concat(this.getCharactersInFov(objects, center));
+    //renderObjects = renderObjects.concat(this.getCharactersInFov(characters, center));
 
     //return _.sortBy(renderObjects, this.sortByY, this.sortByZ);
-    return _.sortBy(renderObjects, this.sortByPerspective);
+    //return _.sortBy(renderObjects, this.sortByPerspective);
+    return renderObjects;
   }
 
   getCharactersInFov(objects, center) {

@@ -39,6 +39,27 @@ const caveEntranceDimensions = [
 
 export default {
   // WHEAT
+  wheat: {
+    objectType: "wheat",
+    biome: "plain",
+    group: "wheat",
+    imageSource: "/Assets/terrain_atlas.png",
+    renderClipped: true,
+    imageDimensions: {
+      x: 0,
+      y: 906,
+      width: 98,
+      height: 83
+    },
+    dimensions: {
+      width: 98,
+      height: 83,
+      zheight: 18
+    },
+    physics: {
+      surfaceType: "none"
+    }
+  },
   wheatUL: {
     objectType: "wheatUL",
     biome: "plain",
@@ -237,7 +258,8 @@ export default {
     // },
     dimensions: {
       width: 30,
-      height: 64
+      height: 64,
+      zheight: 64
     },
     physics: {
       surfaceType: "none"
@@ -268,7 +290,8 @@ export default {
     // },
     dimensions: {
       width: 30,
-      height: 64
+      height: 64,
+      zheight: 64
     },
     physics: {
       surfaceType: "none"
@@ -299,7 +322,8 @@ export default {
     // },
     dimensions: {
       width: 30,
-      height: 64
+      height: 64,
+      zheight: 64
     },
     physics: {
       surfaceType: "none"
@@ -346,7 +370,8 @@ export default {
     // TODO: fix
     dimensions: {
       width: 103,
-      height: 50
+      height: 50,
+      zheight: 128
     },
     collisionDimensions: [
       {

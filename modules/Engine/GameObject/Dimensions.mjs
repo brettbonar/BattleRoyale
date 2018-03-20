@@ -8,6 +8,14 @@ export default class Dimensions {
     });
   }
 
+  plus(dimensions) {
+    return new Dimensions({
+      width: this.width + dimensions.width,
+      height: this.height + dimensions.height,
+      zheight: this.zheight + dimensions.zheight
+    });
+  }
+
   copy() {
     return new Dimensions({
       width: this.width,

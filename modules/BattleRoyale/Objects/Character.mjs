@@ -102,7 +102,9 @@ export default class Character extends GameObject {
 
   kill(source) {
     this.state.dead = true;
+    this.dimensions.zheight = 0;
     this.physics.surfaceType = SURFACE_TYPE.NONE;
+    this.updatePosition();
   }
 
   startAction(action) {
@@ -110,10 +112,6 @@ export default class Character extends GameObject {
   }
 
   stopAction(action) {
-  }
-
-  get perspectivePosition() {
-    return this.state.dead ? this.position : super.perspectivePosition;
   }
 
   canDoAction(action) {

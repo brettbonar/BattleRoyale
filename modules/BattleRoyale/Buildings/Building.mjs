@@ -35,7 +35,7 @@ export default class Building extends GameObject {
 
   insideCb(target) {
     if (target.isThisPlayer) {
-      this.outside = false;
+      this.renderObjects = [this.interior].concat(this.interiorDoors);
     }
   }
 
@@ -82,14 +82,7 @@ export default class Building extends GameObject {
   // }
 
   update(elapsedTime) {
-    this.outside = true;
-  }
-
-  getAllRenderObjects() {
-    if (this.outside) {
-      return [this.exterior, this.interior].concat(this.exteriorDoors);
-    }
-    return [this.interior].concat(this.interiorDoors);
+    this.renderObjects = [this.exterior, this.interior].concat(this.exteriorDoors);
   }
 
   getUpdateState() {
