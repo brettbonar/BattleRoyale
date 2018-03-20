@@ -23,7 +23,8 @@ import Item from "./Objects/Item.mjs"
 import AnimationEffect from "./Effects/AnimationEffect.mjs"
 import effects from "./Effects/effects.mjs"
 import attacks from "./Magic/attacks.mjs"
-import RenderObject from "./Objects/RenderObject.mjs";
+import RenderObject from "./Objects/RenderObject.mjs"
+import ImageCache from "../Engine/Rendering/ImageCache.mjs";
 
 const EVENTS = {
   MOVE_UP: "moveUp",
@@ -74,7 +75,7 @@ export default class BattleRoyale extends Game {
     };
 
     if (!this.simulation) {
-      this.ui = new Image();
+      this.ui = ImageCache
       this.ui.src = "/Assets/UI/png/bars.png";
     }
 
@@ -468,8 +469,9 @@ export default class BattleRoyale extends Game {
       if (!this.simulation && collision.source.rendering.hitEffect) {
         this.gameState.objects.push(new RenderObject({
           position: collision.position,
-          dimensions: collision.source.dimensions
-        }, collision.source.projectile.rendering.hitEffect));
+          //dimensions: collision.source.dimensions,
+          rotation: collision.source.rotation
+        }, collision.source.rendering.hitEffect));
       }
     } else {
       // collision.source.position.x = collision.source.lastPosition.x;

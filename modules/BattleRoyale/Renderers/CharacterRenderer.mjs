@@ -1,5 +1,6 @@
 import { drawShadow } from "../../Engine/Rendering/renderUtils.mjs";
 import Dimensions from "../../Engine/GameObject/Dimensions.mjs"
+import ImageCache from "../../Engine/Rendering/ImageCache.mjs";
 
 const imageSize = 64;
 
@@ -226,14 +227,11 @@ export default class CharacterRenderer {
   }
 
   initBody(params) {
-    this.body = new Image();
-    this.body.src = "../../Assets/character/body/" + params.gender + "/" + params.body + ".png";
-    this.body.onload = () => this.render = this._render;
+    this.body = ImageCache.getImage("../../Assets/character/body/" + params.gender + "/" + params.body + ".png");
 
     this.loadout = params.loadout;
     _.each(params.loadout, (piece) => {
-      piece.image = new Image();
-      piece.image.src = piece.imageSource;
+      piece.image = ImageCache.getImage(piece.imageSource);
     });
   }
 
@@ -285,7 +283,9 @@ export default class CharacterRenderer {
     }
   }
 
-  _render(context, object, elapsedTime, center) {
+  render(context, object, elapsedTime, center) {
+    if (!this.body.complete) return;
+
     let offset = getOffset(this.animation, this.frame, imageSize);
 
     if (object.position.z > 0) {
@@ -310,8 +310,6 @@ export default class CharacterRenderer {
     // context.strokeRect(terrainBox.ul.x, terrainBox.ul.y,
     //   object.terrainDimensions.width, object.terrainDimensions.height);
   }
-
-  render() {}
 
   setAnimation(elapsedTime, object) {
     this.currentAnimationTime += elapsedTime;

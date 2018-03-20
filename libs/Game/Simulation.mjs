@@ -114,7 +114,7 @@ export default class Simulation {
       //handler(data, elapsedTime);
       this.updates.push({
         update: data,
-        elapsedTime: elapsedTime,
+        elapsedTime: 0,//elapsedTime,
         eventTime: now()
       });
     } else {

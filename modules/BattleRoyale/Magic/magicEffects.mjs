@@ -11,7 +11,7 @@ export default {
     rendering: {
       images: {
         up: {
-          imageSource: "../../Assets/magic/firelion_up.png",
+          imageSource: "../../Assets/magic/firelion_up.png"
         },
         down: {
           imageSource: "../../Assets/magic/firelion_down.png"

@@ -4,7 +4,7 @@ import MagicRenderer from "./MagicRenderer.mjs"
 import Point from "../../Engine/GameObject/Point.mjs"
 import Dimensions from "../../Engine/GameObject/Dimensions.mjs"
 import { SURFACE_TYPE } from "../../Engine/Physics/PhysicsConstants.mjs"
-import ObjectRenderer from "../Renderers/ObjectRenderer.mjs";
+import ObjectRenderer from "../Renderers/ObjectRenderer.mjs"
 
 export default class Magic extends GameObject {
   constructor(params) {

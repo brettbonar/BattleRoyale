@@ -16,6 +16,73 @@ export default {
       speed: 512
     }
   },
+  arrow: {
+    type: "projectile",
+    name: "arrow",
+    dimensions: {
+      width: 32,
+      height: 32
+    },
+    action: {
+      name: "arrow",
+      actionDuration: 0,
+      actionRate: 2,
+      actionType: "exclusive",
+      automatic: false,
+      manaCost: 0
+    },
+    rendering: {
+      imageSource: "../../Assets/projectiles/Arrow2.png",
+      imageSize: 32,
+      frames: 4,
+      framesPerSec: 4,
+      repeat: true,
+      modelDimensions: {
+        offset: {
+          x: 5,
+          y: 12
+        },
+        dimensions: {
+          width: 23,
+          height: 9
+        }
+      },
+      hitEffect: {
+        imageSource: "../../Assets/projectiles/Arrow2.png",
+        imageDimensions: {
+          width: 32,
+          height: 32,
+          x: 0,
+          y: 0
+        },
+        // offset: {
+        //   x: 5,
+        //   y: 12
+        // },
+        duration: 5000
+      },
+      shadow: true
+    },
+    effect: {
+      path: "arc",
+      damage: 5,
+      // TODO: more shapes
+      collisionDimensions: [{
+        offset: {
+          x: 8,
+          y: 8
+        },
+        dimensions: {
+          width: 16,
+          height: 16,
+          zheight: 16
+        }
+      }],
+      range: 1000,
+      punchThrough: false,
+      speed: 350
+    }
+  },
   plasmaBall: {
     type: "projectile",
     name: "plasmaBall",
@@ -48,7 +115,21 @@ export default {
         imageSize: 32,
         frames: 4,
         framesPerSec: 16,
-        repeat: false
+        repeat: false,
+        imageDimensions: {
+          width: 32,
+          height: 32,
+          x: 0,
+          y: 0
+        },
+        offset: {
+          x: 8,
+          y: 8
+        },
+        dimensions: {
+          width: 16,
+          height: 16
+        }
       },
       shadow: false
     },

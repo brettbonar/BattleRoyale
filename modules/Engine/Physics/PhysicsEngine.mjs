@@ -182,6 +182,9 @@ export default class PhysicsEngine {
       }
 
       if (obj.position.z < 0) {
+        obj.position.z = 0;
+        obj.direction.z = 0;
+        // TODO: make sure you cant doubly collide with an object AND the ground
         collisions.push({
           source: obj,
           target: "ground",

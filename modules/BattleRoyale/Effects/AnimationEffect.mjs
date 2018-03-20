@@ -1,4 +1,5 @@
 import Effect from "../../Engine/Effects/Effect.mjs";
+import ImageCache from "../../Engine/Rendering/ImageCache.mjs";
 
 function getOffset(animation, frame, imageSize) {
   let offset = ANIMATION_SETTINGS[animation].offset;
@@ -13,8 +14,7 @@ export default class AnimationEffect extends Effect {
     super(params);
     Object.assign(this, effect);
 
-    this.image = new Image();
-    this.image.src = effect.imageSource;
+    this.image = ImageCache.getImage(effect.imageSource);
     this.frame = 0;
     this.currentTime = 0;
     this.totalTime = 0;

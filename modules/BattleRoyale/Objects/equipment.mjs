@@ -46,7 +46,7 @@ export default {
     hands: 1,
     gender: "male",
     attacks: {
-      1: "plasmaBall",
+      1: "arrow",
       2: "flare"
     }
   },

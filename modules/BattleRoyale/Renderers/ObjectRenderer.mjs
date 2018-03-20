@@ -1,38 +1,41 @@
 import { getAnimationOffset } from "../../Engine/Rendering/renderUtils.mjs"
 import Point from "../../Engine/GameObject/Point.mjs"
+import ImageCache from "../../Engine/Rendering/ImageCache.mjs";
 
 //import Renderer from "../../Engine/Rendering/Renderer.mjs"
 
 export default class ObjectRenderer {
-  constructor(params) {
-    _.merge(this, params);
-    this.image = new Image();
-    this.image.src = params.imageSource;
+  constructor(params, imageParams) {
+    _.merge(this, params, imageParams);
+    this.image = ImageCache.getImage(params.imageSource);
+    this.totalTime = 0;
 
     // TODO: come up with a more robust check for animations
     if (params.frames) {
       this.frame = 0;
       this.currentTime = 0;
-      this.totalTime = 0;
-
-      this.update = this.updateAnimation;
+      this.animating = true;
       this.render = this.renderAnimation;
     } else {
       this.render = this.renderStatic;
     }
   }
 
-  updateAnimation(elapsedTime) {
+  update(elapsedTime) {
     this.currentTime += elapsedTime;
-    while (this.currentTime > 1000 / this.framesPerSec) {
-      this.currentTime -= 1000 / this.framesPerSec;
-      this.frame++;
-      if (this.frame >= this.frames) {
-        if (this.repeat) {
-          this.frame = this.cycleStart || 0;
-        } else {
-          this.frame = this.frames - 1;
-          this.done = true;
+    this.totalTime += elapsedTime;
+
+    if (this.animating) {
+      while (this.currentTime > 1000 / this.framesPerSec) {
+        this.currentTime -= 1000 / this.framesPerSec;
+        this.frame++;
+        if (this.frame >= this.frames) {
+          if (this.repeat) {
+            this.frame = this.cycleStart || 0;
+          } else {
+            this.frame = this.frames - 1;
+            this.done = true;
+          }
         }
       }
     }
@@ -46,18 +49,33 @@ export default class ObjectRenderer {
     if (!this.image.complete || this.done) return;
 
     let frameOffset = getAnimationOffset(this.image, this.imageSize, this.frame)
-      
-    
     // if (this.rotation) {
     //   context.translate(pos.x + this.imageSize / 2, pos.y + this.imageSize / 2);
     //   context.rotate((this.rotation * Math.PI) / 180);
     //   context.translate(-(pos.x + this.imageSize / 2), -(pos.y + this.imageSize / 2));        
     // }
-    let position = object.position
-      .minus({ y: object.position.z }); //.plus(this.imageDimensions.offset);
+    let position = object.position.minus({ y: object.position.z });
+    if (this.imageDimensions) {
+      position.add(this.imageDimensions.offset);
+    }
+
     context.drawImage(this.image, frameOffset.x, frameOffset.y,
       this.imageSize, this.imageSize,
       position.x, position.y, this.imageSize, this.imageSize);
+  }
+
+  draw(context, object, position, clipping) {
+    if (clipping) {
+      let offset = new Point(clipping.offset);
+      position = offset.plus(position);
+      let imageOffset = offset.plus(this.imageDimensions);
+      let imageDimensions = clipping.dimensions || this.imageDimensions;
+      context.drawImage(this.image, imageOffset.x, imageOffset.y, clipping.dimensions.width, clipping.dimensions.height,
+        position.x, position.y - object.position.z, imageDimensions.width, imageDimensions.height);
+    } else {
+      context.drawImage(this.image, this.imageDimensions.x, this.imageDimensions.y, this.imageDimensions.width, this.imageDimensions.height,
+        position.x, position.y - object.position.z, this.imageDimensions.width, this.imageDimensions.height);
+    }
   }
 
   renderStatic(context, object, elapsedTime, clipping) {
@@ -72,16 +90,21 @@ export default class ObjectRenderer {
       }
     }
 
-    if (clipping) {
-      let offset = new Point(clipping.offset);
-      position = offset.plus(position);
-      let imageOffset = offset.plus(this.imageDimensions);
-      let imageDimensions = clipping.dimensions || this.imageDimensions;
-      context.drawImage(this.image, imageOffset.x, imageOffset.y, clipping.dimensions.width, clipping.dimensions.height,
-        position.x, position.y - object.position.z, imageDimensions.width, imageDimensions.height);
+    if (object.rotation) {
+      context.save();
+
+      let center = {
+        x: position.x + this.imageDimensions.width / 2,
+        y: position.y + this.imageDimensions.height / 2 - object.position.z
+      };
+      context.translate(center.x, center.y);
+      context.rotate((object.rotation * Math.PI) / 180);
+      context.translate(-center.x, -center.y); 
+      this.draw(context, object, position, clipping);    
+
+      context.restore();
     } else {
-      context.drawImage(this.image, this.imageDimensions.x, this.imageDimensions.y, this.imageDimensions.width, this.imageDimensions.height,
-        position.x, position.y - object.position.z, this.imageDimensions.width, this.imageDimensions.height);
+      this.draw(context, object, position, clipping);
     }
   }
 }

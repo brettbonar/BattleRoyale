@@ -1,9 +1,10 @@
+import ImageCache from "../../Engine/Rendering/ImageCache.mjs"
+
 export default class MagicRenderer {
   constructor(effect, imageSettings) {
     this.effect = effect;
     this.imageOffset = imageSettings.offset;
-    this.image = new Image();
-    this.image.src = imageSettings.imageSource;
+    this.image = ImageCache.getImage(imageSettings.imageSource);
     this.currentTime = 0;
     this.frame = 0;
   }

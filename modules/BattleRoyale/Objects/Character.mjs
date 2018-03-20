@@ -31,6 +31,7 @@ export default class Character extends GameObject {
       attackDuration: 1000
     });
     this.speed = params.speed || 96;
+    this.baseSpeed = this.speed;
 
     // actionDuration
     // actionRate
@@ -243,14 +244,21 @@ export default class Character extends GameObject {
     _.remove(this.cooldowns, (cooldown) => {
       return cooldown.currentTime >= cooldown.cooldownTime;
     });
-    
-    // if (this.state.attacking) {
-    //   this.state.attackTime += elapsedTime + this.elapsedTime;
-    //   if (this.state.attackTime >= this.attackDuration) {
-    //     this.state.attackTime = 0;
-    //     this.state.attacking = false;
+
+    // if (this.targetPosition) {
+    //   if (Math.abs(this.position.x - this.targetPosition.x) <= 15 && 
+    //       Math.abs(this.position.y - this.targetPosition.y) <= 15) {
+    //     this.targetPosition = null;
+    //     this.direction = new Point();
+    //   } else {
+    //     this.moveTo(this.targetPosition);
     //   }
     // }
+  }
+
+  moveTo(position) {
+    this.targetPosition = position;
+    this.setDirection(new Point(position).minus(this.position));
   }
 
   updateState(state) {

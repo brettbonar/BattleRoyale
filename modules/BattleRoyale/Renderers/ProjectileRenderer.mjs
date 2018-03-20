@@ -1,4 +1,5 @@
 import { drawShadow, getAnimationOffset } from "../../Engine/Rendering/renderUtils.mjs";
+import ImageCache from "../../Engine/Rendering/ImageCache.mjs";
 
 function getOffset(animation, frame, imageSize) {
   let offset = ANIMATION_SETTINGS[animation].offset;
@@ -11,8 +12,7 @@ function getOffset(animation, frame, imageSize) {
 export default class ProjectileRenderer {
   constructor(projectile) {
     this.projectile = projectile;
-    this.image = new Image();
-    this.image.src = projectile.imageSource;
+    this.image = ImageCache.getImage(projectile.imageSource);
     this.frame = 0;
     this.currentTime = 0;
   }
