@@ -29,6 +29,20 @@ export default class Point {
     return Object.assign(this, Point.normalize(this));
   }
 
+  scale(scale) {
+    this.x = this.x * scale;
+    this.y = this.y * scale;
+    this.z = this.z * scale;
+  }
+
+  times(scale) {
+    return new Point({
+      x: this.x * scale,
+      y: this.y * scale,
+      z: this.z * scale
+    });
+  }
+
   copy() {
     return new Point({
       x: this.x,

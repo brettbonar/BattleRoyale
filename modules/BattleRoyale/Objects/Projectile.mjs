@@ -24,6 +24,7 @@ export default class Projectile extends GameObject {
     //   width: 32,
     //   height: 8
     // };
+    _.merge(this, this.attack.effect);
     this.dimensions = new Dimensions(this.attack.effect.collisionDimensions[0].dimensions);
     this.collisionDimensions = this.attack.effect.collisionDimensions;
     this.speed = params.speed || this.attack.effect.speed;
@@ -53,6 +54,12 @@ export default class Projectile extends GameObject {
     if (this.currentTime >= this.maxTime) {
       this.done = true;
     }
+
+    if (this.effect.path === "beam") {
+      this.startPosition = this.source.position.copy(); // plus modifiers
+      this.position = this.source.position.copy();
+    }
+
     this.rotation = Math.atan2(this.direction.y - this.direction.z, this.direction.x ) * 180 / Math.PI;
 
     this.renderer.update(elapsedTime);

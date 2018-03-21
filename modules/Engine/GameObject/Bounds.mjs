@@ -35,7 +35,7 @@ export default class Bounds {
     return !_.isNumber(z1) || !_.isNumber(z2) ||
       (z1 <= z2 && z1 + zheight1 >= z2) || (z2 <= z1 && z2 + zheight2 >= z1);
   }
-
+  
   constructFromBox(params) {
     this.box = params;
     this.zheight = params.zheight || 0;

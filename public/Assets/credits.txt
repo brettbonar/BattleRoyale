@@ -42,6 +42,7 @@ https://opengameart.org/content/boulder-creation-animation
 https://opengameart.org/content/items
 https://opengameart.org/content/projectiles
 https://opengameart.org/content/rotating-arrow-projectile
+https://opengameart.org/content/animated-traps-and-obstacles
 
 GUI:
 https://opengameart.org/content/gui-elements

@@ -11,6 +11,7 @@ export default class Magic extends GameObject {
     super(params);
     this.type = "Magic";
     this.magic = magicEffects[params.attackType];
+    _.merge(this, this.magic.effect);
     this.dimensions = new Dimensions(this.magic.dimensions);
     this.collisionDimensions = this.magic.effect.collisionDimensions;
     this.effect = this.magic.effect;

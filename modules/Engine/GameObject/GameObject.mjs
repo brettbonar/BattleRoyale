@@ -4,6 +4,7 @@ import Point from "./Point.mjs"
 import Dimensions from "./Dimensions.mjs"
 import Renderer from "../Rendering/Renderers/Renderer.mjs"
 import { SURFACE_TYPE, MOVEMENT_TYPE } from "../../Engine/Physics/PhysicsConstants.mjs"
+import GameSettings from "../GameSettings.mjs";
 
 // boundsType: RECTANGLE, CIRCLE, POINT, LINE
 // dimensions: radius, width, height
@@ -13,7 +14,7 @@ import { SURFACE_TYPE, MOVEMENT_TYPE } from "../../Engine/Physics/PhysicsConstan
 // direction: Vector
 // speed: distance / time
 // acceleration: +/- speed / time
-let objectId = 1;
+let objectId = GameSettings.isServer ? 1 : -1;
 
 class GameObjectProxy {
   constructor(params) {
@@ -72,7 +73,10 @@ export default class GameObject extends GameObjectProxy {
     _.defaultsDeep(this, {
       physics: {
         surfaceType: SURFACE_TYPE.TERRAIN,
-        movementType: MOVEMENT_TYPE.NORMAL
+        movementType: MOVEMENT_TYPE.NORMAL,
+        elasticity: 0,
+        reflectivity: 0,
+        solidity: 1.0
       },
       position: {
         z: 0
@@ -93,7 +97,13 @@ export default class GameObject extends GameObjectProxy {
     this.renderObjects = [this];
     this.direction = new Point(this.direction).normalize();
     this.updatePosition();
-    objectId++;
+
+    // TODO: fix this hack
+    if (GameSettings.isServer) {
+      objectId++;
+    } else {
+      objectId--;
+    }
   }
 
   getDimensionsType(dimensions) {

@@ -7,11 +7,26 @@ export default class PhysicsEngine {
     _.merge(this, params);
   }
 
+  // https://gamedev.stackexchange.com/questions/13774/how-do-i-detect-the-direction-of-2d-rectangular-object-collisions
+  getCollisionAxis(A1, A2, B1, B2) {
+    // if (right collision or left collision)
+    if ((A1.right.x < B2.left.x && A2.right.x >=  B2.left.x) ||
+        (A1.left.x >= B2.right.x && A2.left.x < B2.right.x)) {
+      return "x";
+    }
+    return "y";
+
+    // return A1.bottom.y < B2.top.y && 
+    // B2.bottom.y >= B2.top.y
+    // return A1.top.y >= B2.bottom.y && // was not colliding
+    //        A2.top.y < B2.bottom.y;
+  }
+
   sweepTest(A1, A2, B1, B2) {
     if (A2.intersects(B2)) {
       return {
         time: 0,
-        axis: "x"
+        axis: this.getCollisionAxis(A1, A2, B1, B2)
       };
     }
 
@@ -126,13 +141,29 @@ export default class PhysicsEngine {
     return intersections;
   }
 
-  detectCollisions(obj, objects) {
+  alreadyCollided(obj, target, collisions) {
+    return _.find(collisions, (collision) => {
+      return collision.source === target && collision.target === obj;
+    });
+  }
+
+  getCollisionDirection(obj, target, axis) {
+    if (obj.physics.elasticity !== 0 || target.physics.reflectivity !== 0) {
+      let objVelocity = obj.speed * obj.direction[axis];
+      let targetVelocity = target.speed * target.direction[axis];
+      let newVelocity = (targetVelocity - objVelocity) * (obj.physics.elasticity + target.physics.reflectivity);
+      return newVelocity / obj.speed;
+    }
+    return obj.direction[axis];
+  }
+
+  detectCollisions(obj, objects, allCollisions) {
     let collisions = [];
     let intersections = this.getIntersections(obj, objects);
     // TODO: order by collision time?
     let intersection = _.minBy(intersections, (intersection) => intersection.collision.time);
     //for (const intersection of intersections) {
-    if (intersection) {
+    if (intersection && !this.alreadyCollided(obj, intersection.target, allCollisions)) {
       let target = intersection.target;
       let collision = intersection.collision;
 
@@ -141,19 +172,28 @@ export default class PhysicsEngine {
       // TODO: create "bounce" or "elasticity" parameter - bounce objects back by
       // this much. If 0 then no bounce.
       // TODO: only bounce off first collision
-      if (obj.physics.surfaceType !== SURFACE_TYPE.GAS //&&
-          // (target.physics.surfaceType === SURFACE_TYPE.TERRAIN ||
-          //  target.physics.surfaceType === SURFACE_TYPE.DEFAULT ||
-          //  target.physics.surfaceType === SURFACE_TYPE.GROUND)
-          ) {
+      if (obj.physics.solidity > 0 && target.physics.solidity > 0) {
         if (collision.time !== 0) {
           obj.position[collision.axis] = (obj.lastPosition[collision.axis] +
             (obj.position[collision.axis] - obj.lastPosition[collision.axis]) * collision.time) -
             Math.sign(obj.position[collision.axis] - obj.lastPosition[collision.axis]);
         } else {
+          // TODO: determine how much the bounds overlap and adjust by that much
+          // let sign = obj.position[collision.axis] - obj.lastPosition[collision.axis];
+          // if (sign > 0) {
+          //   let dimension = collision.axis === "x" ? "width" : "height";
+          //   obj.position[collision.axis] = intersection.targetBounds.ul[collision.axis] - obj.dimensions[dimension] - 1;
+          // } else {
+          //   obj.position[collision.axis] = intersection.targetBounds.lr[collision.axis] + 1;
+          // }
           obj.position.x = obj.lastPosition.x;
           obj.position.y = obj.lastPosition.y;
         }
+
+        // TODO: handle diagonal intersections
+        let newDirection = this.getCollisionDirection(obj, target, collision.axis);
+        target.direction[collision.axis] = this.getCollisionDirection(target, obj, collision.axis);
+        obj.direction[collision.axis] = newDirection;
       }
       
       collisions.push({
@@ -176,14 +216,15 @@ export default class PhysicsEngine {
       if (obj.physics.surfaceType === SURFACE_TYPE.CHARACTER || 
           obj.physics.surfaceType === SURFACE_TYPE.PROJECTILE ||
           obj.physics.surfaceType === SURFACE_TYPE.GAS) {
-        collisions = collisions.concat(this.detectCollisions(obj, objects));
+        collisions = collisions.concat(this.detectCollisions(obj, objects, collisions));
         // Do twice to capture additional collisions after movement
         //collisions = collisions.concat(this.detectCollisions(obj, objects));
       }
 
       if (obj.position.z < 0) {
         obj.position.z = 0;
-        obj.direction.z = 0;
+        obj.direction.z = -obj.direction.z * obj.physics.elasticity;
+        if (Math.abs(obj.direction.z) < 0.15) obj.direction.z = 0;
         // TODO: make sure you cant doubly collide with an object AND the ground
         collisions.push({
           source: obj,

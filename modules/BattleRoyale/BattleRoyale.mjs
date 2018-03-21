@@ -59,6 +59,7 @@ export default class BattleRoyale extends Game {
       context: this.context
     });
     this.menus = params.menus;
+    this.updates = [];
 
     this.gameState = {
       cursor: {
@@ -166,9 +167,9 @@ export default class BattleRoyale extends Game {
         playerId: object.playerId
       });
       if (existing) {
-        if (existing.revision <= object.revision) {
+        //if (existing.revision <= object.revision) {
           existing.updateState(object);
-        }
+        //}
       } else {
         this.gameState.objects.push(this.createObject(object));
       }
@@ -417,6 +418,7 @@ export default class BattleRoyale extends Game {
     if (params.source) {
       params.source.revision = ++this.gameState.player.revision;
     }
+    this.updates.push(params);
     this.socket.emit("update", params);
   }
 
@@ -461,7 +463,8 @@ export default class BattleRoyale extends Game {
           _.pull(this.gameState.objects, collision.source);
         }
       } else {
-        if (collision.source.physics.surfaceType === SURFACE_TYPE.PROJECTILE) {
+        if (collision.source.physics.surfaceType === SURFACE_TYPE.PROJECTILE &&
+            collision.source.physics.elasticity === 0) {
           _.pull(this.gameState.objects, collision.source);
         }
       }

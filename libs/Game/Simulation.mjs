@@ -5,10 +5,12 @@ import Map from "../../modules/Map.mjs"
 import Projectile from "../../modules/BattleRoyale/Objects/Projectile.mjs"
 import now from "performance-now"
 import StaticObject from "../../modules/BattleRoyale/Objects/StaticObject.mjs"
+import GameSettings from "../../modules/Engine/GameSettings.mjs"
 
 const TICK_RATE = 20;
 const SIMULATION_TIME = 1000 / TICK_RATE;
 
+GameSettings.isServer = true;
 export default class Simulation {
   constructor(params) {
     _.merge(this, params);
@@ -46,6 +48,8 @@ export default class Simulation {
       use: (data, elapsedTime) => this.use(data, elapsedTime),
       changeAltitude: (data, elapsedTime) => this.changeAltitude(data, elapsedTime)
     };
+
+    
   }
 
   // For testing
@@ -126,7 +130,7 @@ export default class Simulation {
   processUpdates(elapsedTime, currentTime) {
     for (const update of this.updates) {
       let handler = this.eventHandlers[update.update.type];
-      elapsedTime = 0;//update.elapsedTime + ((currentTime - update.eventTime) - elapsedTime);
+      elapsedTime = update.elapsedTime + ((currentTime - update.eventTime) - elapsedTime);
       handler(update.update, elapsedTime);
     }
     this.updates.length = 0;

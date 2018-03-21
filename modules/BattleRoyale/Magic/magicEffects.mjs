@@ -45,7 +45,10 @@ export default {
           height: 96,
           zheight: 96
         }
-      }]
+      }],
+      physics: {
+        solidity: 0
+      }
     }
   },
   snake: {

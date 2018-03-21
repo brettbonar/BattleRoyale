@@ -16,6 +16,64 @@ export default {
       speed: 512
     }
   },
+  boulder: {
+    type: "projectile",
+    name: "boulder",
+    dimensions: {
+      width: 32,
+      height: 32,
+      zheight: 32
+    },
+    action: {
+      name: "boulder",
+      actionDuration: 0,
+      actionRate: 0.5,
+      actionType: "exclusive",
+      automatic: false,
+      manaCost: 0
+    },
+    rendering: {
+      imageSource: "../../Assets/projectiles/boulder2.png",
+      imageSize: 32,
+      modelDimensions: {
+        offset: {
+          x: 4,
+          y: 4
+        },
+        dimensions: {
+          width: 24,
+          height: 24
+        }
+      },
+      shadow: true
+    },
+    effect: {
+      damage: 15,
+      // TODO: more shapes
+      collisionDimensions: [{
+        offset: {
+          x: 0,
+          y: 0
+        },
+        dimensions: {
+          width: 32,
+          height: 32,
+          zheight: 32
+        }
+      }],
+      physics: {
+        elasticity: 0.5
+      },
+      acceleration: {
+        z: -1
+      },
+      direction: {
+        z: 0.2
+      },
+      range: 3000,
+      speed: 250
+    }
+  },
   arrow: {
     type: "projectile",
     name: "arrow",
@@ -59,7 +117,7 @@ export default {
         //   x: 5,
         //   y: 12
         // },
-        duration: 5000
+        //duration: 5000
       },
       shadow: true
     },
@@ -244,11 +302,12 @@ export default {
         // TODO: change collisionDimensions to attackDimensions
         let position = collision.position
           .plus(collision.source.effect.collisionDimensions[0].offset)
-          .minus({ x: 64, y: 96, z: 32 })
-          .plus({
+          .subtract({ x: 64, y: 96, z: 32 })
+          .add({
             x: collision.source.effect.collisionDimensions[0].dimensions.width / 2,
             y: collision.source.effect.collisionDimensions[0].dimensions.height / 2
-          });
+          })
+          .add(collision.source.direction.times(collision.source.speed / 5));
         position.z = Math.max(0, position.z);
         collision.source.done = true;
         return {

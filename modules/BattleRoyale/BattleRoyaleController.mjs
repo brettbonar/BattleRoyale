@@ -4,6 +4,7 @@ import BattleRoyale from "../BattleRoyale/BattleRoyale.mjs"
 import BattleRoyaleUI from "../BattleRoyale/BattleRoyaleUI.mjs"
 import Map from "/modules/Map.mjs"
 import * as API from "./API.mjs"
+import GameSettings from "../Engine/GameSettings.mjs"
 
 export default class BattleRoyaleController extends GameController {
   constructor(element, params) {
