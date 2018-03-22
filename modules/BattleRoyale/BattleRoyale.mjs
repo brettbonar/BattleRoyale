@@ -24,7 +24,7 @@ import AnimationEffect from "./Effects/AnimationEffect.mjs"
 import effects from "./Effects/effects.mjs"
 import attacks from "./Magic/attacks.mjs"
 import RenderObject from "./Objects/RenderObject.mjs"
-import ImageCache from "../Engine/Rendering/ImageCache.mjs";
+import ImageCache from "../Engine/Rendering/ImageCache.mjs"
 
 const EVENTS = {
   MOVE_UP: "moveUp",
@@ -60,6 +60,7 @@ export default class BattleRoyale extends Game {
     });
     this.menus = params.menus;
     this.updates = [];
+    this.pendingUpdates = [];
 
     this.gameState = {
       cursor: {
@@ -109,6 +110,13 @@ export default class BattleRoyale extends Game {
     this.stateFunctions[Game.STATE.PLAYING].update = (elapsedTime) => this._update(elapsedTime);
     this.stateFunctions[Game.STATE.PLAYING].render = (elapsedTime) => this._render(elapsedTime);
 
+    this.updateHandlers = {
+      changeDirection: (data, elapsedTime) => this.changeDirectionEvent(data, elapsedTime),
+      changeTarget: (data, elapsedTime) => this.changeTargetEvent(data, elapsedTime),
+      attack: (data, elapsedTime) => this.attackEvent(data, elapsedTime),
+      use: (data, elapsedTime) => this.useEvent(data, elapsedTime),
+      changeAltitude: (data, elapsedTime) => this.changeAltitudeEvent(data, elapsedTime)
+    };
     // this.stateFunctions[Game.STATE.PAUSED].update = _.noop;//(elapsedTime) => this._update(elapsedTime);
     // this.stateFunctions[Game.STATE.PAUSED].render = _.noop;//(elapsedTime) => this._render(elapsedTime);
     // this.stateFunctions[Game.STATE.DONE].processInput = _.noop;
@@ -120,6 +128,90 @@ export default class BattleRoyale extends Game {
     // this.stateFunctions[Game.STATE.INITIALIZING].update = _.noop;//(elapsedTime) => this._update(elapsedTime);
     // this.stateFunctions[Game.STATE.INITIALIZING].render = _.noop;//(elapsedTime) => this._render(elapsedTime);
 
+  }
+
+  updateState(data, elapsedTime, eventTime) {
+    if (this.updateHandlers[data.type]) {
+      //handler(data, elapsedTime);
+      this.updates.push({
+        update: data,
+        elapsedTime: 0,//elapsedTime,
+        eventTime: eventTime
+      });
+    } else {
+      console.log("Unknown update: ", data.type);
+      console.log(data);
+    }
+  }
+  
+  // For testing
+  changeAltitudeEvent(data, elapsedTime) {
+    let object = _.find(this.gameState.objects, {
+      playerId: data.source.playerId,
+      objectId: data.source.objectId
+    });
+    if (object) {
+      object.position.z += data.z;
+      object.position.z = Math.max(0, object.position.z);
+    }
+  }
+
+  useEvent(data, elapsedTime) {
+    let object = _.find(this.gameState.objects, {
+      playerId: data.source.playerId,
+      objectId: data.source.objectId
+    });
+    if (object) {
+      let target = this.getInteraction(object);
+      if (target) {
+        target.interact(object);
+      }
+    }
+  }
+
+  changeTargetEvent(data, elapsedTime) {
+    let object = _.find(this.gameState.objects, {
+      playerId: data.source.playerId,
+      objectId: data.source.objectId
+    });
+    if (object) {
+      //object.target = data.target;
+      object.setTarget(data.target);
+      object.revision = data.source.revision;
+      object.elapsedTime = elapsedTime || 0;
+    }
+  }
+
+  changeDirectionEvent(data, elapsedTime) {
+    let object = _.find(this.gameState.objects, {
+      playerId: data.source.playerId,
+      objectId: data.source.objectId
+    });
+    if (object) {
+      object.direction = data.direction;
+      object.revision = data.source.revision;
+      object.elapsedTime = elapsedTime || 0;
+    }
+  }
+
+  attackEvent(data, elapsedTime) {
+    let object = _.find(this.gameState.objects, {
+      playerId: data.source.playerId,
+      objectId: data.source.objectId
+    });
+    if (object) {
+      object.revision = data.source.revision;
+      this.doAttack(object, data, elapsedTime);
+    }
+  }
+
+  processUpdates(elapsedTime, currentTime) {
+    for (const update of this.updates) {
+      let handler = this.updateHandlers[update.update.type];
+      elapsedTime = update.elapsedTime + ((currentTime - update.eventTime) - elapsedTime);
+      handler(update.update, elapsedTime);
+    }
+    this.updates.length = 0;
   }
 
   changeAltitude(event, amount) {
@@ -159,6 +251,14 @@ export default class BattleRoyale extends Game {
     }
   }
 
+  clearAndApplyUpdates(object) {
+    for (const update of this.pendingUpdates) {
+      if (update.source.revision <= object.revision) {
+        _.pull(this.pendingUpdates, update);
+      }
+    }
+  }
+
   updateObjects(objects) {
     for (const object of objects) {
       object.simulation = this.simulation;
@@ -167,9 +267,8 @@ export default class BattleRoyale extends Game {
         playerId: object.playerId
       });
       if (existing) {
-        //if (existing.revision <= object.revision) {
-          existing.updateState(object);
-        //}
+        existing.updateState(object);
+        this.clearAndApplyUpdates(object);
       } else {
         this.gameState.objects.push(this.createObject(object));
       }
@@ -216,15 +315,16 @@ export default class BattleRoyale extends Game {
 
   doAttack(character, params, elapsedTime) {
     let attack = attacks[character.state.loadout.weapon.attacks[params.attackType]];
-    character.doAction("attack", params.release, attack.action, elapsedTime, (timeDiff) => {
+    character.doAction("attack", params.release, attack.action, elapsedTime, (timeDiff, mods) => {
       if (attack.type === "projectile") {
-        let direction = character.state.target.minus(character.center).normalize();
+        let direction = character.state.target.minus(character.attackCenter).normalize();
         direction.z = 0;
         this.gameState.objects.push(Projectile.create({
           source: character,
           simulation: this.simulation,
           attack: attack,
           direction: direction,
+          modifiers: mods,
           target: character.state.target,
           playerId: params.source.playerId,
           ownerId: params.source.objectId,
@@ -275,30 +375,6 @@ export default class BattleRoyale extends Game {
       release: event.release
     });
   }
-
-  // secondaryFire(event) {
-  //   if (event.release) {
-  //     this.gameState.player.fireReady = true;
-  //   } else if (this.gameState.player.fireReady) {
-  //     this.gameState.player.attack(2000);
-  //     this.gameState.player.fireReady = false;
-  //     this.gameState.objects.push(new Magic({
-  //       target: target,
-  //       source: this.gameState.player.center,
-  //       type: "snake"
-  //     }));
-
-  //     this.sendEvent({
-  //       type: "attack",
-  //       source: {
-  //         playerId: this.player.playerId,
-  //         objectId: this.gameState.player.objectId
-  //       },
-  //       mode: 2,
-  //       target: target
-  //     });
-  //   }
-  // }
 
   move(event) {
     let direction = new Point({
@@ -418,7 +494,7 @@ export default class BattleRoyale extends Game {
     if (params.source) {
       params.source.revision = ++this.gameState.player.revision;
     }
-    this.updates.push(params);
+    this.pendingUpdates.push(params);
     this.socket.emit("update", params);
   }
 

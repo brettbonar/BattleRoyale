@@ -227,11 +227,11 @@ export default class CharacterRenderer {
   }
 
   initBody(params) {
-    this.body = ImageCache.getImage("../../Assets/character/body/" + params.gender + "/" + params.body + ".png");
+    this.body = ImageCache.get("../../Assets/character/body/" + params.gender + "/" + params.body + ".png");
 
     this.loadout = params.loadout;
     _.each(params.loadout, (piece) => {
-      piece.image = ImageCache.getImage(piece.imageSource);
+      piece.image = ImageCache.get(piece.imageSource);
     });
   }
 
@@ -315,7 +315,7 @@ export default class CharacterRenderer {
     this.currentAnimationTime += elapsedTime;
     let currentAction = object.currentAction || object.latestAction;
     // We may start and finish an action within a frame, make sure we still animate it
-    if (currentAction) {
+    if (currentAction && !currentAction.new) {
       this.currentAction = currentAction;
       this.currentAnimationTime = 0;
       // if (currentAction.name !== (this.currentAction && this.currentAction.name)) {

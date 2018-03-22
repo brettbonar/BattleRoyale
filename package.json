@@ -22,7 +22,7 @@
     "babel-register": "^6.26.0"
   },
   "scripts": {
-    "start": "node --experimental-modules --inspect-brk ./app.mjs",
+    "start": "node --experimental-modules --inspect ./app.mjs",
     "build-modules": "node buildModules.js",
     "build": "babel node_modules -d lib",
     "test": "echo \"Error: no test specified\" && exit 1"

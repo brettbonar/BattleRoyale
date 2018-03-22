@@ -7,7 +7,7 @@ import ImageCache from "../../Engine/Rendering/ImageCache.mjs";
 export default class ObjectRenderer {
   constructor(params, imageParams) {
     _.merge(this, params, imageParams);
-    this.image = ImageCache.getImage(params.imageSource);
+    this.image = ImageCache.get(params.imageSource);
     this.totalTime = 0;
 
     // TODO: come up with a more robust check for animations

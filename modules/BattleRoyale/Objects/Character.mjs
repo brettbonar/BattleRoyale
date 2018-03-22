@@ -3,6 +3,7 @@ import Point from "../../Engine/GameObject/Point.mjs"
 import Dimensions from "../../Engine/GameObject/Dimensions.mjs"
 import CharacterRenderer, { STATE } from "../Renderers/CharacterRenderer.mjs"
 import { SURFACE_TYPE } from "../../Engine/Physics/PhysicsConstants.mjs";
+import GameSettings from "../../Engine/GameSettings.mjs"
 
 class Action {
   constructor(params) {
@@ -94,6 +95,16 @@ export default class Character extends GameObject {
     this.direction = this.direction.normalize();
   }
 
+  get attackCenter() {
+    let center = this.position
+      .plus(this.attackOrigin.offset)
+      .plus({
+        x: this.attackOrigin.dimensions.width / 2,
+        y: this.attackOrigin.dimensions.height / 2
+      });
+    return center;
+  }
+
   damage(source) {
     this.state.currentHealth -= source.effect.damage;
     if (!this.state.dead && this.state.currentHealth <= 0) {
@@ -108,24 +119,38 @@ export default class Character extends GameObject {
     this.updatePosition();
   }
 
-  startAction(action) {
+  startAction(action, elapsedTime) {
     this.latestAction = action;
   }
 
-  stopAction(action) {
+  stopAction(action, elapsedTime) {
+    // Release charged attack
+    if (action.charge && this.canDoAction(action)) {
+      this.updateAction(action, elapsedTime);
+      if (action.currentTime >= action.actionDuration) {
+        let modifiers = {};
+        _.each(action.charge, (mod, type) => {
+          modifiers[type] = Math.min(mod.maxMult, 1 + (mod.maxMult - 1) * ((action.currentTime - action.actionDuration) / mod.maxTime));
+        });
+        this.completeAction(action, modifiers);
+      }
+    }
   }
 
   canDoAction(action) {
-    let top = this.currentAction;
-    if (top && (top.actionType === "exclusive" && action.actionType === "exclusive" || top.actionType === "blocking")) {
-      return false;
-    }
-
     let manaCost = action.manaCost || 0;
     let healthCost = action.healthCost || 0;
     // TODO: add elapsedTime to cooldown here?
     let cooldown = _.find(this.cooldowns, { actionName: action.name });
-    return this.state.currentMana >= manaCost && this.state.currentHealth >= healthCost && !cooldown;
+    return this.canQueueAction(action) && this.state.currentMana >= manaCost && this.state.currentHealth >= healthCost && !cooldown;
+  }
+
+  canQueueAction(action) {
+    let top = this.currentAction;
+    if (top !== action && top && (top.actionType === "exclusive" && action.actionType === "exclusive" || top.actionType === "blocking")) {
+      return false;
+    }
+    return true;
   }
 
   nextAction(elapsedTime) {
@@ -140,6 +165,7 @@ export default class Character extends GameObject {
   // TODO: pull this outside of character class
   doAction(type, stopAction, action, elapsedTime, cb) {
     let top = this.currentAction;
+    elapsedTime = elapsedTime || 0;
     if (stopAction) {
       let actionToStop = _.find(this.actionStack, { name: action.name });
       // TODO: change "blocking" to "charging"?
@@ -149,7 +175,7 @@ export default class Character extends GameObject {
         this.nextAction(elapsedTime);
       }
     } else {
-      if (this.canDoAction(action)) {
+      if (this.canQueueAction(action)) {
         let newAction = {
           type: type,
           name: action.name,
@@ -158,7 +184,9 @@ export default class Character extends GameObject {
           actionType: action.actionType,
           actionRate: action.actionRate,
           automatic: action.automatic,
+          charge: action.charge,
           action: action,
+          new: true,
           cb: cb
         };
         this.actionStack.unshift(newAction);
@@ -166,10 +194,44 @@ export default class Character extends GameObject {
         // Pause previous action
         if (top) {
           top.currentTime = 0;
+          top.finalTime = 0;
         }
         this.startAction(newAction, elapsedTime);
       }
     }
+  }
+
+  completeAction(action, modifiers) {
+    let actionTimeDiff = action.finishedTime - action.actionDuration;
+    if (action.action) {
+      let manaCost = action.action.manaCost || 0;
+      let healthCost = action.action.healthCost || 0;
+      if (this.state.currentMana >= manaCost && this.state.currentHealth >= healthCost) {
+        this.state.currentHealth -= action.action.healthCost || 0;
+        this.state.currentMana -= action.action.manaCost || 0;
+        if (action.cb) action.cb(actionTimeDiff, modifiers);
+      }
+    }
+
+    let cooldown;
+    if (action.actionRate) {
+      cooldown = {
+        actionName: action.name,
+        currentTime: actionTimeDiff - (1000 / action.actionRate),
+        cooldownTime: 1000 / action.actionRate
+      };
+      this.cooldowns.push(cooldown);
+    }
+
+    if (action.automatic) {
+      //action.currentTime = -actionTimeDiff;
+      action.currentTime = 0;
+      action.finishedTime = 0;
+      this.updateAction(action, 0);
+    } else {
+      this.actionStack.shift();
+    }
+    this.nextAction(-actionTimeDiff);
   }
 
   setTarget(target) {
@@ -188,10 +250,14 @@ export default class Character extends GameObject {
     }
   }
 
-  updateActions(elapsedTime) {
-    let action = this.currentAction;
-
+  updateAction(action, elapsedTime) {
     if (action) {
+      if (action.new) {
+        if (!this.canDoAction(action)) return;
+        console.log("new");
+        elapsedTime = 0;
+        action.new = false;
+      }
       let cooldownTimeDiff = 0;
       let cooldown = _.find(this.cooldowns, { actionName: action.name });
       if (cooldown) {
@@ -199,33 +265,13 @@ export default class Character extends GameObject {
       }
 
       if (cooldownTimeDiff >= 0) {
+        _.pull(this.cooldowns, cooldown);
         action.currentTime += (elapsedTime + cooldownTimeDiff);
         if (action.currentTime >= action.actionDuration) {
-          let actionTimeDiff = action.currentTime - action.actionDuration;
-          if (action.action) {
-            let manaCost = action.action.manaCost || 0;
-            let healthCost = action.action.healthCost || 0;
-            if (this.state.currentMana >= manaCost && this.state.currentHealth >= healthCost) {
-              this.state.currentHealth -= action.action.healthCost || 0;
-              this.state.currentMana -= action.action.manaCost || 0;
-              if (action.cb) action.cb(actionTimeDiff);
-            }
+          if (!action.finishedTime) action.finishedTime = action.currentTime;
+          if (!action.charge) {
+            this.completeAction(action);
           }
-
-          if (action.actionRate) {
-            this.cooldowns.push({
-              actionName: action.name,
-              currentTime: -actionTimeDiff,
-              cooldownTime: 1000 / action.actionRate
-            });
-          }
-
-          if (action.automatic) {
-            action.currentTime = -actionTimeDiff;
-          } else {
-            this.actionStack.shift();
-          }
-          this.nextAction(-actionTimeDiff);
         }
       }
     }
@@ -240,7 +286,7 @@ export default class Character extends GameObject {
     for (const cooldown of this.cooldowns) {
       cooldown.currentTime += elapsedTime;
     }
-    this.updateActions(elapsedTime);
+    this.updateAction(this.currentAction, elapsedTime);
     _.remove(this.cooldowns, (cooldown) => {
       return cooldown.currentTime >= cooldown.cooldownTime;
     });
@@ -283,7 +329,7 @@ export default class Character extends GameObject {
     let latestAction = this.currentAction || this.latestAction;
     if (latestAction) {
       latestAction = _.pick(latestAction, [
-        "type", "name", "currentTime", "actionDuration", "actionRate"
+        "type", "name", "currentTime", "finishedTime", "actionDuration", "actionRate", "new"
       ]);
     }
     this.latestAction = null;

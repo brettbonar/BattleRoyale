@@ -5,12 +5,15 @@ import BattleRoyaleUI from "../BattleRoyale/BattleRoyaleUI.mjs"
 import Map from "/modules/Map.mjs"
 import * as API from "./API.mjs"
 import GameSettings from "../Engine/GameSettings.mjs"
+import ImageCache from "../Engine/Rendering/ImageCache.mjs"
 
 export default class BattleRoyaleController extends GameController {
   constructor(element, params) {
     super(element, params, {
       menus: new BattleRoyaleUI()
     });
+
+    ImageCache.put("/Assets/terrain_atlas.png");
   }
 
   showCharacterCreation() {

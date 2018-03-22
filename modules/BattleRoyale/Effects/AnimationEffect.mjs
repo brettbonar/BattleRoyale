@@ -14,7 +14,7 @@ export default class AnimationEffect extends Effect {
     super(params);
     Object.assign(this, effect);
 
-    this.image = ImageCache.getImage(effect.imageSource);
+    this.image = ImageCache.get(effect.imageSource);
     this.frame = 0;
     this.currentTime = 0;
     this.totalTime = 0;

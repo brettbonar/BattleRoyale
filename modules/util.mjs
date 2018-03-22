@@ -1,7 +1,8 @@
 function getDistance(a, b) {
   let dx = a.x - b.x;
   let dy = a.y - b.y;
-  return Math.sqrt(dx * dx + dy * dy);
+  let dz = (a.z - b.z) || 0;
+  return Math.sqrt(dx * dx + dy * dy + dz * dz);
 };
 
 function normalize(point) {

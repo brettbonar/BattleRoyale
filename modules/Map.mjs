@@ -1,6 +1,8 @@
 "use strict";
 
-import { getDistance } from './util.mjs';
+import { getDistance } from './util.mjs'
+import flavor from "./BattleRoyale/Objects/flavor.mjs"
+import ImageCache from "./Engine/Rendering/ImageCache.mjs"
 
 const BIOMES = {
   FOREST: "forest",
@@ -9,6 +11,27 @@ const BIOMES = {
   PLAIN: "plain",
   WATER: "water",
   FIRE: "fire"
+};
+
+const BIOME_PARAMS = {
+  [BIOMES.DEATH]: {
+    flavorDensity: 0.05
+  },
+  [BIOMES.FIRE]: {
+    flavorDensity: 0.1
+  },
+  [BIOMES.WATER]: {
+    flavorDensity: 0.1
+  },
+  [BIOMES.DESERT]: {
+    flavorDensity: 0.1
+  },
+  [BIOMES.FOREST]: {
+    flavorDensity: 0.1
+  },
+  [BIOMES.PLAIN]: {
+    flavorDensity: 0.1
+  },
 };
 
 const GROWTH_TYPE = {
@@ -105,7 +128,8 @@ class Map {
       let tiles = [];
       for (let y = 0; y < map[x].length; y++) {
         tiles.push(new Tile({
-          type: map[x][y],
+          type: map[x][y].type,
+          flavor: map[x][y].flavor,
           position: {
             x: x,
             y: y
@@ -278,6 +302,13 @@ class Map {
 
     this.context.drawImage(this.terrain, offset.x, offset.y, size, size,
       position.x * size, position.y * size, size, size);
+    if (tile.flavor) {
+      let imageParams = _.find(flavor, { name: tile.flavor });
+      let dimensions = imageParams.imageDimensions;
+      let image = ImageCache.get(imageParams.imageSource);
+      this.context.drawImage(image, dimensions.x, dimensions.y, dimensions.width, dimensions.height,
+      position.x * size, position.y * size, size, size);
+    }
     //this.context.strokeRect(position.x * size, position.y * size, size, size);
   }
 
@@ -402,7 +433,11 @@ class Map {
 
   serializeMap(map) {
     return map.map((column) => {
-      return column.map((tile) => tile.type)
+      return column.map((tile) => {
+        return {
+          type: tile.type, flavor: tile.flavor
+        };
+      })
     });
   }
 
@@ -440,6 +475,13 @@ class Map {
     }
   }
 
+  initTile(tile, type) {
+    tile.type = type;
+    if (Math.random() <= BIOME_PARAMS[type].flavorDensity) {
+      tile.flavor = _.sample(_.filter(flavor, { biome: type })).name;
+    }
+  }
+
   growVoronoi(seeds) {
     // let box = {
     //   xl: 0,
@@ -456,8 +498,7 @@ class Map {
         let seed = _.minBy(seeds, (seed) => {
           return getDistance(seed.position, tile.position);
         });
-        tile.type = seed.type;
-        tile.biome = seed.biome;        
+        this.initTile(tile, seed.type); 
       }
     }
   }
@@ -480,7 +521,7 @@ class Map {
         }
 
         let tile = this.map[position.x][position.y];
-        tile.type = type;
+        this.initTile(tile, type);
         seeds.push(tile);
       }
     });

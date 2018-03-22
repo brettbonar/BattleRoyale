@@ -81,10 +81,9 @@ export default class Projectile extends GameObject {
   }
   
   // https://gamedev.stackexchange.com/questions/61301/how-to-implement-throw-curve-with-virtual-height-in-a-2d-side-view-game
-  static getInitialArcSpeed(speed, zspeed, acceleration, origin, target, height) {
+  static getInitialArcSpeed(speed, acceleration, origin, target, height) {
     let time = getDistance(origin, target) / speed;
-    // return (-origin.z / time) - ((acceleration.z * time) / 2);
-    //return Math.sqrt(height * 2 * -acceleration.z);
+    // TODO: take height into consideration?
     return -acceleration.z * time / 2;
   }
 
@@ -131,31 +130,33 @@ export default class Projectile extends GameObject {
     // this.position.subtract({ x: this.dimensions.width / 2, y: this.dimensions.height / 2});
     let acceleration = new Point();
     let direction = new Point(params.direction);
-    let zspeed = params.attack.effect.zspeed;
+    let speed = params.attack.effect.speed;
+    if (params.modifiers && !_.isUndefined(params.modifiers.speed)) {
+      speed *= params.modifiers.speed;
+    }
+    //let zspeed = params.attack.effect.zspeed;
     if (params.attack.effect.path === "arc") {
       // TODO: may need an offset to make this more accurate
       // TODO: put default gravity in settings somewhere
       acceleration = new Point(params.attack.effect.arcGravity || { z: -1 });
-      // direction.add({
-      //   z: Projectile.getArcAngle(params.attack.effect.speed, params.direction,
-      //     acceleration, params.target.minus(origin))
-      // });
-      //direction.z = 1;
-      direction.z = Projectile.getInitialArcSpeed(params.attack.effect.speed,
-        params.attack.effect.zspeed || params.attack.effect.speed,
+      direction.z = Projectile.getInitialArcSpeed(speed,
         acceleration, origin, params.target, params.attack.effect.arcHeight);
     }
 
-    return new Projectile({
+    // TODO: apply damage modifier, may need to make sure projectile effect is copied
+    let projectile = new Projectile({
       position: origin,
       simulation: params.simulation,
       attack: params.attack,
       //zspeed: zspeed,
       acceleration: acceleration,
+      speed: speed,
       direction: direction,
       playerId: params.source.playerId,
       ownerId: params.source.objectId,
       elapsedTime: params.elapsedTime
     });
+
+    return projectile;
   }
 }

@@ -12,7 +12,7 @@ function getOffset(animation, frame, imageSize) {
 export default class ProjectileRenderer {
   constructor(projectile) {
     this.projectile = projectile;
-    this.image = ImageCache.getImage(projectile.imageSource);
+    this.image = ImageCache.get(projectile.imageSource);
     this.frame = 0;
     this.currentTime = 0;
   }

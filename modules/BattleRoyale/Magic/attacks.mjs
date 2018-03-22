@@ -30,7 +30,13 @@ export default {
       actionRate: 0.5,
       actionType: "exclusive",
       automatic: false,
-      manaCost: 0
+      manaCost: 0,
+      charge: {
+        speed: {
+          maxTime: 1000,
+          maxMult: 2.0
+        }
+      },
     },
     rendering: {
       imageSource: "../../Assets/projectiles/boulder2.png",
@@ -62,7 +68,8 @@ export default {
         }
       }],
       physics: {
-        elasticity: 0.5
+        elasticity: 0.5,
+        friction: 0.8
       },
       acceleration: {
         z: -1
@@ -70,7 +77,7 @@ export default {
       direction: {
         z: 0.2
       },
-      range: 3000,
+      range: 5000,
       speed: 250
     }
   },
@@ -87,6 +94,12 @@ export default {
       actionRate: 2,
       actionType: "exclusive",
       automatic: false,
+      charge: {
+        speed: {
+          maxTime: 1000,
+          maxMult: 2.0
+        }
+      },
       manaCost: 0
     },
     rendering: {
@@ -147,7 +160,7 @@ export default {
     action: {
       name: "plasmaBall",
       actionDuration: 0,
-      actionRate: 5,
+      actionRate: 3,
       actionType: "exclusive",
       automatic: true,
       manaCost: 0
@@ -246,16 +259,22 @@ export default {
       speed: 200
     }
   },
-  flare: {
+  lionFlare: {
     type: "projectile",
-    name: "flare",
+    name: "lionFlare",
     action: {
-      name: "flare",
+      name: "lionFlare",
       actionDuration: 0,
       actionRate: .75,
-      actionType: "blocking",
+      actionType: "exclusive",
       automatic: false,
-      manaCost: 0
+      manaCost: 0,
+      charge: {
+        speed: {
+          maxTime: 1000,
+          maxMult: 2.0
+        }
+      },
     },
     rendering: {
       imageSource: "../../Assets/magic/flare.png",
@@ -291,7 +310,7 @@ export default {
         }
       }],
       range: 1000,
-      attackTime: 1000,
+      //attackTime: 1000,
       automatic: false,
       punchThrough: false,
       speed: 200,
@@ -306,8 +325,8 @@ export default {
           .add({
             x: collision.source.effect.collisionDimensions[0].dimensions.width / 2,
             y: collision.source.effect.collisionDimensions[0].dimensions.height / 2
-          })
-          .add(collision.source.direction.times(collision.source.speed / 5));
+          });
+          //.add(collision.source.direction.times(collision.source.speed / 5));
         position.z = Math.max(0, position.z);
         collision.source.done = true;
         return {

@@ -49,7 +49,7 @@ export default class Bounds {
 
   plus(box) {
     let z = Math.min(this.box.ul.z, box.box.ul.z);
-    let zheight = Math.max(this.box.ul.z, box.box.ul.z) - z;
+    let zheight = Math.max(this.box.ul.z + this.zheight, box.box.ul.z + box.zheight) - z;
     return new Bounds({
       ul: new Point({ x: Math.min(this.box.ul.x, box.box.ul.x), y: Math.min(this.box.ul.y, box.box.ul.y), z: z }),
       ur: new Point({ x: Math.max(this.box.ur.x, box.box.ur.x), y: Math.min(this.box.ur.y, box.box.ur.y), z: z }),
@@ -62,7 +62,7 @@ export default class Bounds {
     // TODO: if box instanceof BoundingBox
 
     let z = Math.min(this.box.ul.z, box.box.ul.z);
-    this.zheight = Math.max(this.box.ul.z, box.box.ul.z) - z;
+    this.zheight = Math.max(this.box.ul.z + this.zheight, box.box.ul.z + box.zheight) - z;
     this.box = {
       ul: new Point({ x: Math.min(this.box.ul.x, box.box.ul.x), y: Math.min(this.box.ul.y, box.box.ul.y), z: z }),
       ur: new Point({ x: Math.max(this.box.ur.x, box.box.ur.x), y: Math.min(this.box.ur.y, box.box.ur.y), z: z }),
@@ -186,6 +186,12 @@ export default class Bounds {
     return this.box.ll;
   }
 
+  get ztop() {
+    return this.box.ul.plus({ z: this.zheight });
+  }
+  get zbottom() {
+    return this.box.lr;
+  }
   get top() {
     return this.box.ul;
   }

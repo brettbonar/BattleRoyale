@@ -13,13 +13,12 @@ export default class PhysicsEngine {
     if ((A1.right.x < B2.left.x && A2.right.x >=  B2.left.x) ||
         (A1.left.x >= B2.right.x && A2.left.x < B2.right.x)) {
       return "x";
+    } else if ((A1.bottom.y < B2.top.y && B2.bottom.y >= B2.top.y || // top or bottom
+                A1.top.y >= B2.bottom.y && A2.top.y < B2.bottom.y))
+    {
+      return "y";
     }
-    return "y";
-
-    // return A1.bottom.y < B2.top.y && 
-    // B2.bottom.y >= B2.top.y
-    // return A1.top.y >= B2.bottom.y && // was not colliding
-    //        A2.top.y < B2.bottom.y;
+    return "z";
   }
 
   sweepTest(A1, A2, B1, B2) {
@@ -30,7 +29,13 @@ export default class PhysicsEngine {
       };
     }
 
-    if (!A1.plus(A2).intersects(B1.plus(B2))) {
+    // Just check if both Z's are within range
+    let AminZ = Math.min(A1.box.ul.z, A2.box.ul.z);
+    let AmaxZ = Math.max(A1.box.ul.z + A1.zheight, A2.box.ul.z + A2.zheight);
+    let BminZ = Math.min(B1.box.ul.z, B2.box.ul.z);
+    let BmaxZ = Math.max(B1.box.ul.z + B1.zheight, B2.box.ul.z + B2.zheight);
+
+    if (AmaxZ < BminZ || BmaxZ < AminZ) {
       return false;
     }
 
@@ -85,6 +90,7 @@ export default class PhysicsEngine {
     if (touched.x && touched.y && firstTouch <= lastTouch && firstTouch > 0 && firstTouch <= 1) {
       return {
         time: firstTouch,
+        // TODO: will probably need to handle Z for things that fall quickly
         axis: first.x > first.y ? "x" : "y"
       };
     }
@@ -152,9 +158,10 @@ export default class PhysicsEngine {
       let objVelocity = obj.speed * obj.direction[axis];
       let targetVelocity = target.speed * target.direction[axis];
       let newVelocity = (targetVelocity - objVelocity) * (obj.physics.elasticity + target.physics.reflectivity);
-      return newVelocity / obj.speed;
+      obj.speed = obj.speed * obj.physics.elasticity + target.speed * (1 - target.physics.elasticity);
+      return -obj.direction[axis];//newVelocity / obj.speed;
     }
-    return obj.direction[axis];
+    return 0;//obj.direction[axis];
   }
 
   detectCollisions(obj, objects, allCollisions) {
@@ -186,8 +193,38 @@ export default class PhysicsEngine {
           // } else {
           //   obj.position[collision.axis] = intersection.targetBounds.lr[collision.axis] + 1;
           // }
-          obj.position.x = obj.lastPosition.x;
-          obj.position.y = obj.lastPosition.y;
+          // Top
+          let diff = intersection.targetBounds.top.y - intersection.sourceBounds.bottom.y;
+          let axis = "y";
+          // Bottom
+          if (Math.abs(intersection.targetBounds.bottom.y - intersection.sourceBounds.top.y) < Math.abs(diff)) {
+            diff = intersection.targetBounds.bottom.y - intersection.sourceBounds.top.y;
+          }
+          // Left
+          if (Math.abs(intersection.targetBounds.left.x - intersection.sourceBounds.right.x) < Math.abs(diff)) {
+            axis = "x";
+            diff = intersection.targetBounds.left.x - intersection.sourceBounds.right.x;
+          }
+          // Right
+          if (Math.abs(intersection.targetBounds.right.x - intersection.sourceBounds.left.x) < Math.abs(diff)) {
+            axis = "x";
+            diff = intersection.targetBounds.right.x - intersection.sourceBounds.left.x;
+          }
+          // Z-Top
+          if (Math.abs(intersection.targetBounds.ztop.z - intersection.sourceBounds.zbottom.z) < Math.abs(diff)) {
+            axis = "z";
+            diff = intersection.targetBounds.ztop.z - intersection.sourceBounds.zbottom.z;
+          }
+          // Z-Bottom
+          if (Math.abs(intersection.targetBounds.zbottom.z - intersection.sourceBounds.ztop.z) < Math.abs(diff)) {
+            axis = "z";
+            diff = intersection.targetBounds.zbottom.z - intersection.sourceBounds.ztop.z;
+          }
+
+          obj.position[axis] += diff + 1;
+
+          // obj.position.x = obj.lastPosition.x;
+          // obj.position.y = obj.lastPosition.y;
         }
 
         // TODO: handle diagonal intersections
@@ -203,6 +240,7 @@ export default class PhysicsEngine {
         position: obj.position.copy()
       });
     }
+
 
     return collisions;
   }
@@ -247,6 +285,7 @@ export default class PhysicsEngine {
         time += obj.elapsedTime;
       }
 
+      obj.lastPosition = new Point(obj.position);
       // if (obj.physics.surfaceType === SURFACE_TYPE.CHARACTER) {
       //   obj.position.z += (elapsedTime / 10) * this.test;
       //   if (obj.position.z > 500) {
@@ -259,11 +298,17 @@ export default class PhysicsEngine {
       // }
 
       if (obj.direction.x || obj.direction.y || obj.direction.z) {
-        Object.assign(obj.lastPosition, obj.position);
-        obj.position.x = Math.round(obj.position.x + obj.direction.x * obj.speed * (time / 1000));
-        obj.position.y = Math.round(obj.position.y + obj.direction.y * obj.speed * (time / 1000));
+        obj.position.x = obj.position.x + obj.direction.x * obj.speed * (time / 1000);
+        obj.position.y = obj.position.y + obj.direction.y * obj.speed * (time / 1000);
         if (obj.direction.z) {
-          obj.position.z = Math.round(obj.position.z + obj.direction.z * (obj.zspeed || obj.speed) * (time / 1000));
+          obj.position.z = obj.position.z + obj.direction.z * obj.speed * (time / 1000);//(obj.zspeed || obj.speed) * (time / 1000));
+        }
+        if (obj.physics.friction > 0 && obj.position.z === 0) {
+          let amount = obj.speed * (time / 1000);
+          obj.speed = obj.speed - obj.speed * (time / 1000) * obj.physics.friction;
+          if (obj.speed < 1) {
+            obj.speed = 0;
+          }
         }
 
         obj.updatePosition();

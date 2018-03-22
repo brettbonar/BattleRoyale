@@ -3,7 +3,14 @@ class _ImageCache {
     this.images = {};
   }
 
-  getImage(source) {
+  put(source) {
+    if (!this.images[source]) {
+      this.images[source] = new Image();
+      this.images[source].src = source;
+    }
+  }
+
+  get(source) {
     if (this.images[source]) {
       return this.images[source];
     }

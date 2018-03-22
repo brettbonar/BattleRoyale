@@ -11,16 +11,17 @@ const TICK_RATE = 20;
 const SIMULATION_TIME = 1000 / TICK_RATE;
 
 GameSettings.isServer = true;
+
 export default class Simulation {
   constructor(params) {
     _.merge(this, params);
     let maps = {
-      "-1": new Map({
-        seeds: {
-          death: 5,
-          water: 5
-        }
-      }),
+      // "-1": new Map({
+      //   seeds: {
+      //     death: 5,
+      //     water: 5
+      //   }
+      // }),
       "0": new Map({
         seeds: {
           plain: 5,
@@ -39,101 +40,11 @@ export default class Simulation {
       objects: initGame(params.players, maps)
     });
     this.lastState = [];
-    this.updates = [];
-
-    this.eventHandlers = {
-      changeDirection: (data, elapsedTime) => this.changeDirection(data, elapsedTime),
-      changeTarget: (data, elapsedTime) => this.changeTarget(data, elapsedTime),
-      attack: (data, elapsedTime) => this.attack(data, elapsedTime),
-      use: (data, elapsedTime) => this.use(data, elapsedTime),
-      changeAltitude: (data, elapsedTime) => this.changeAltitude(data, elapsedTime)
-    };
-
-    
-  }
-
-  // For testing
-  changeAltitude(data, elapsedTime) {
-    let object = _.find(this.game.gameState.objects, {
-      playerId: data.source.playerId,
-      objectId: data.source.objectId
-    });
-    if (object) {
-      object.position.z += data.z;
-      object.position.z = Math.max(0, object.position.z);
-    }
-  }
-
-  use(data, elapsedTime) {
-    let object = _.find(this.game.gameState.objects, {
-      playerId: data.source.playerId,
-      objectId: data.source.objectId
-    });
-    if (object) {
-      let target = this.game.getInteraction(object);
-      if (target) {
-        target.interact(object);
-      }
-    }
-  }
-
-  changeTarget(data, elapsedTime) {
-    let object = _.find(this.game.gameState.objects, {
-      playerId: data.source.playerId,
-      objectId: data.source.objectId
-    });
-    if (object) {
-      //object.target = data.target;
-      object.setTarget(data.target);
-      object.revision = data.source.revision;
-      object.elapsedTime = elapsedTime || 0;
-    }
-  }
-
-  changeDirection(data, elapsedTime) {
-    let object = _.find(this.game.gameState.objects, {
-      playerId: data.source.playerId,
-      objectId: data.source.objectId
-    });
-    if (object) {
-      object.direction = data.direction;
-      object.revision = data.source.revision;
-      object.elapsedTime = elapsedTime || 0;
-    }
-  }
-
-  attack(data, elapsedTime) {
-    let object = _.find(this.game.gameState.objects, {
-      playerId: data.source.playerId,
-      objectId: data.source.objectId
-    });
-    if (object) {
-      object.revision = data.source.revision;
-      this.game.doAttack(object, data, elapsedTime);
-    }
+    this.updates = [];    
   }
 
   updateState(data, elapsedTime) {
-    if (this.eventHandlers[data.type]) {
-      //handler(data, elapsedTime);
-      this.updates.push({
-        update: data,
-        elapsedTime: 0,//elapsedTime,
-        eventTime: now()
-      });
-    } else {
-      console.log("Unknown update: ", data.type);
-      console.log(data);
-    }
-  }
-
-  processUpdates(elapsedTime, currentTime) {
-    for (const update of this.updates) {
-      let handler = this.eventHandlers[update.update.type];
-      elapsedTime = update.elapsedTime + ((currentTime - update.eventTime) - elapsedTime);
-      handler(update.update, elapsedTime);
-    }
-    this.updates.length = 0;
+    this.game.updateState(data, elapsedTime, now());
   }
 
   getMaps() { return this.game.maps }
@@ -144,7 +55,7 @@ export default class Simulation {
     let elapsedTime = currentTime - this.previousTime;
     this.previousTime = currentTime;
     
-    this.processUpdates(elapsedTime, currentTime);
+    this.game.processUpdates(elapsedTime, currentTime);
     this.game._update(elapsedTime);
     
     // TODO: do for each player
