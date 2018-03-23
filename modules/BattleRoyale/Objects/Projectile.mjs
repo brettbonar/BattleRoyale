@@ -4,6 +4,7 @@ import attacks from "../Magic/attacks.mjs"
 import Point from "../../Engine/GameObject/Point.mjs"
 import Dimensions from "../../Engine/GameObject/Dimensions.mjs"
 import { getDistance } from "../../Engine/util.mjs"
+import { getRangeMap, smoothStop } from "../../Engine/Math.mjs"
 import BeamRenderer from "../Renderers/BeamRenderer.mjs"
 
 export default class Projectile extends GameObject {
@@ -14,6 +15,8 @@ export default class Projectile extends GameObject {
     this.boundsType = "circle";
     this.damagedTargets = [];
     this.source = params.source;
+    // TODO: action IDs?
+    this.action = params.action;
 
     if (params.attackType) {
       this.attack = attacks[params.attackType];
@@ -66,7 +69,7 @@ export default class Projectile extends GameObject {
     }
 
     if (this.effect.path === "beam") {
-      if (!this.source || !this.source.currentAction || this.source.currentAction.name !== this.attack.action.name) {
+      if (!this.source || !this.source.currentAction || this.source.currentAction.actionId !== this.actionId) {
         this.done = true;
       } else {
         this.direction = this.source.state.target.minus(this.source.attackCenter).normalize();
@@ -81,9 +84,34 @@ export default class Projectile extends GameObject {
           this.currentTime = this.currentTime - this.damageInterval;
         }
       }
+    } else if (this.effect.path === "tracking") {
+      if (!this.source || !this.source.currentAction || this.source.currentAction.actionId !== this.actionId) {
+        this.speed = this.effect.speed;
+      } else {
+        let center = this.collisionBounds[0].center;
+        let dist = Math.min(100, getDistance(center, this.source.state.target));
+
+        if (dist < 5) {
+          this.speed = 0;
+        } else {
+          let targetDirection = this.source.state.target.minus(center).normalize();
+          targetDirection.z = 0;
+
+          let xdiff = targetDirection.x - this.direction.x;
+          let ydiff = targetDirection.y - this.direction.y
+          this.direction.add({
+            x: Math.max(xdiff, xdiff * (elapsedTime / 50)),
+            y: Math.max(ydiff, ydiff * (elapsedTime / 50))
+          }).normalize();
+          this.speed = getRangeMap(dist, 100, 0, this.effect.speed, 0, smoothStop(2));
+        }
+
+        // Keep resetting until the tracking projectile is released
+        this.currentTime = 0;
+      }
     }
 
-    this.rotation = Math.atan2(this.direction.y - this.direction.z, this.direction.x ) * 180 / Math.PI;
+    //this.rotation = Math.atan2(this.direction.y - this.direction.z, this.direction.x ) * 180 / Math.PI;
 
     this.renderer.update(elapsedTime);
 
@@ -97,10 +125,20 @@ export default class Projectile extends GameObject {
     }
   }
 
+  // updateState(state) {
+  //   let oldPos = new Point(this.position);
+  //   _.merge(this, state);
+  //   this.position = new Point(this.position);
+  //   if (!this.position.equals(oldPos)) {
+  //     this.position = oldPos.plus(this.position.minus(oldPos).times(0.1));
+  //   }
+  // }
+
   getUpdateState() {
     return Object.assign(super.getUpdateState(), {
       attackType: this.attack.name,
-      ownerId: this.ownerId
+      ownerId: this.ownerId,
+      actionId: this.actionId
     });
   }
   
@@ -176,6 +214,7 @@ export default class Projectile extends GameObject {
     // TODO: apply damage modifier, may need to make sure projectile effect is copied
     let projectile = new Projectile({
       source: params.source,
+      actionId: params.action.actionId,
       position: origin,
       simulation: params.simulation,
       attack: params.attack,

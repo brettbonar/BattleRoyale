@@ -29,6 +29,10 @@ export default class Point {
     return Object.assign(this, Point.normalize(this));
   }
 
+  equals(point) {
+    return this.x === point.x && this.y === point.y && this.z === point.z;
+  }
+
   scale(scale) {
     this.x = this.x * scale;
     this.y = this.y * scale;

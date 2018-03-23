@@ -86,7 +86,8 @@ export default {
     name: "lightBeam",
     dimensions: {
       width: 32,
-      height: 32
+      height: 32,
+      zheight: 16
     },
     action: {
       name: "lightBeam",
@@ -127,7 +128,7 @@ export default {
         //   x: 5,
         //   y: 12
         // },
-        //duration: 5000
+        duration: 1000
       },
       //shadow: true
     },
@@ -149,6 +150,78 @@ export default {
       }],
       range: 500,
       punchThrough: false
+    }
+  },
+  lightMote: {
+    type: "projectile",
+    name: "lightMote",
+    dimensions: {
+      width: 32,
+      height: 32,
+      zheight: 32
+    },
+    action: {
+      name: "lightMote",
+      actionDuration: 0,
+      actionRate: 4,
+      actionType: "channeling",
+      automatic: false,
+      manaCost: 0,
+      manaCostPerSec: 0
+    },
+    rendering: {
+      imageSource: "../../Assets/projectiles/lightMote.png",
+      imageSize: 32,
+      // TODO: add a "trail" particle effect option
+
+      // frames: 4,
+      // framesPerSec: 4,
+      // repeat: true,
+      modelDimensions: {
+        offset: {
+          x: 8,
+          y: 8
+        },
+        dimensions: {
+          width: 16,
+          height: 16
+        }
+      },
+      shadowColor: "white",
+      shadow: true,
+      hitEffect: {
+        imageSource: "../../Assets/projectiles/lightBeamHitEffect.png",
+        imageDimensions: {
+          width: 32,
+          height: 32,
+          x: 0,
+          y: 0
+        },
+        // offset: {
+        //   x: 5,
+        //   y: 12
+        // },
+        duration: 1000
+      }
+    },
+    effect: {
+      path: "tracking",
+      damage: 10,
+      // TODO: more shapes
+      collisionDimensions: [{
+        offset: {
+          x: 8,
+          y: 8
+        },
+        dimensions: {
+          width: 16,
+          height: 16,
+          zheight: 16
+        }
+      }],
+      punchThrough: false,
+      speed: 500,
+      range: 500
     }
   },
   arrow: {
@@ -288,7 +361,7 @@ export default {
           zheight: 16
         }
       }],
-      range: 1000,
+      range: 500,
       punchThrough: false,
       speed: 512
     }

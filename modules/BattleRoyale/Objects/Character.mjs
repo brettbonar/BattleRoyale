@@ -10,6 +10,8 @@ class Action {
   }
 }
 
+let actionId = 0;
+
 export default class Character extends GameObject {
   constructor(params) {
     super(params);
@@ -121,6 +123,9 @@ export default class Character extends GameObject {
 
   startAction(action, elapsedTime) {
     this.latestAction = action;
+    if (!this.currentAction) {
+      this.actionStack.unshift(action);
+    }
   }
 
   stopAction(action, elapsedTime) {
@@ -179,6 +184,7 @@ export default class Character extends GameObject {
         let newAction = {
           type: type,
           name: action.name,
+          actionId: actionId++,
           currentTime: elapsedTime || 0,
           actionDuration: action.actionDuration || 0,
           actionType: action.actionType,
@@ -210,7 +216,7 @@ export default class Character extends GameObject {
       if (this.state.currentMana >= manaCost && this.state.currentHealth >= healthCost) {
         this.state.currentHealth -= action.action.healthCost || 0;
         this.state.currentMana -= action.action.manaCost || 0;
-        if (action.cb) action.cb(actionTimeDiff, modifiers);
+        if (action.cb) action.cb(actionTimeDiff, modifiers, action);
       }
     }
 
@@ -312,13 +318,15 @@ export default class Character extends GameObject {
 
   updateState(state) {
     _.merge(this, state);
-    if (state.latestAction && (!this.currentAction || state.latestAction.name !== this.currentAction.name)) {
+    if (state.latestAction && (!this.currentAction || state.latestAction.actionId !== this.currentAction.actionId)) {
       // Pause previous action
       // if (this.currentAction) {
       //   this.currentAction.currentTime = 0;
       // }
       this.actionStack.unshift(state.latestAction);
       this.startAction(state.latestAction);
+    } else if (!state.latestAction) {
+      this.actionStack.length = 0;
     }
     if (state.target) {
       this.setTarget(state.target);
@@ -332,7 +340,15 @@ export default class Character extends GameObject {
     let latestAction = this.currentAction || this.latestAction;
     if (latestAction) {
       latestAction = _.pick(latestAction, [
-        "type", "name", "currentTime", "finishedTime", "actionDuration", "actionRate", "new"
+        "type",
+        "name",
+        "currentTime",
+        "finishedTime",
+        "actionDuration",
+        "actionRate",
+        "new",
+        "actionId",
+        "actionType"
       ]);
     }
     this.latestAction = null;

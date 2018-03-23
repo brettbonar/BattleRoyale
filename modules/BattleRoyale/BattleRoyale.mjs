@@ -338,12 +338,13 @@ export default class BattleRoyale extends Game {
     return point;
   }
 
-  createProjectile(character, params, attack, timeDiff, mods) {
+  createProjectile(character, params, attack, timeDiff, mods, action) {
     if (attack.type === "projectile") {
       let direction = character.state.target.minus(character.attackCenter).normalize();
       direction.z = 0;
       this.addObject(Projectile.create({
         source: character,
+        action: action,
         simulation: this.simulation,
         attack: attack,
         direction: direction,
@@ -359,8 +360,8 @@ export default class BattleRoyale extends Game {
   doAttack(character, params, elapsedTime) {
     let attack = attacks[character.state.loadout.weapon.attacks[params.attackType]];
     character.doAction("attack", params.release, attack.action, elapsedTime,
-      (timeDiff, mods) => {
-        this.createProjectile(character, params, attack, timeDiff, mods);
+      (timeDiff, mods, action) => {
+        this.createProjectile(character, params, attack, timeDiff, mods, action);
       });
   }
 
@@ -623,16 +624,18 @@ export default class BattleRoyale extends Game {
     // CLIENT ONLY
     if (!this.isServer) {
       let target = this.getAbsoluteCursorPosition();
-      this.gameState.player.setTarget(target);
+      if (!this.gameState.player.target || !target.equals(this.gameState.player.target)) {
+        this.gameState.player.setTarget(target);
 
-      this.sendEvent({
-        type: "changeTarget",
-        source: {
-          playerId: this.player.playerId,
-          objectId: this.gameState.player.objectId
-        },
-        target: target
-      });
+        this.sendEvent({
+          type: "changeTarget",
+          source: {
+            playerId: this.player.playerId,
+            objectId: this.gameState.player.objectId
+          },
+          target: target
+        });
+      }
       this.showInteractions();
     }
 

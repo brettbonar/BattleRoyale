@@ -46,8 +46,8 @@ export default {
     hands: 1,
     gender: "male",
     attacks: {
-      1: "boulder",
-      2: "lightBeam"
+      1: "lightBeam",
+      2: "lightMote"
     }
   },
   axe: {
