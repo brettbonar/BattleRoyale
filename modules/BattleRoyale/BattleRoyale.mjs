@@ -548,43 +548,26 @@ export default class BattleRoyale extends Game {
     if (collision.source.physics.surfaceType === SURFACE_TYPE.PROJECTILE ||
         collision.source.physics.surfaceType === SURFACE_TYPE.GAS) {
       if (_.get(collision.target, "physics.surfaceType") === SURFACE_TYPE.CHARACTER) {
-        if (collision.source.effect.path === "beam") {
-          if (collision.source.damageReady) {
-            collision.target.damage(collision.source);
-            collision.source.damageReady = false;
-            collision.source.currentTime = 0;
-            if (collision.target.damagedEffect && !this.simulation) {
-              this.particleEngine.addEffect(new AnimationEffect({
-                position: {
-                  x: collision.target.center.x,
-                  y: collision.target.center.y
-                },
-                duration: 1000
-              }, collision.target.damagedEffect));
-            }
+        // TODO: something else
+        if (!collision.source.damagedTargets.includes(collision.target)) {
+          collision.target.damage(collision.source);
+          collision.source.damagedTargets.push(collision.target);
+          // TODO: add effect based on character
+          if (collision.target.damagedEffect && !this.simulation) {
+            this.particleEngine.addEffect(new AnimationEffect({
+              position: {
+                x: collision.target.center.x,
+                y: collision.target.center.y
+              },
+              duration: 1000
+            }, collision.target.damagedEffect));
           }
-        } else {
-          // TODO: something else
-          if (!collision.source.damagedTargets.includes(collision.target)) {
-            collision.target.damage(collision.source);
-            collision.source.damagedTargets.push(collision.target);
-            // TODO: add effect based on character
-            if (collision.target.damagedEffect && !this.simulation) {
-              this.particleEngine.addEffect(new AnimationEffect({
-                position: {
-                  x: collision.target.center.x,
-                  y: collision.target.center.y
-                },
-                duration: 1000
-              }, collision.target.damagedEffect));
-            }
-          }
-          // if (!character.dead && character.currentHealth <= 0) {
-          //   character.kill();
-          // }
-          if (!collision.source.effect.punchThrough) {
-            this.removeObject(collision.source);
-          }
+        }
+        // if (!character.dead && character.currentHealth <= 0) {
+        //   character.kill();
+        // }
+        if (!collision.source.effect.punchThrough && collision.source.effect.path !== "beam") {
+          this.removeObject(collision.source);
         }
       } else {
         if (collision.source.physics.surfaceType === SURFACE_TYPE.PROJECTILE &&
@@ -611,8 +594,6 @@ export default class BattleRoyale extends Game {
   }
 
   _update(elapsedTime) {
-    // TODO: fix this hack
-    // TODO: remove objects outside of game bounds
     for (const obj of this.gameState.objects) {
       obj.elapsedTime = 0;
       if (obj.done && (this.simulation || obj.type === "RenderObject")) {
@@ -642,9 +623,24 @@ export default class BattleRoyale extends Game {
     // TODO: move above physics?
     let updates = [];
     for (const obj of this.getPhysicsObjects()) {
-      let update = obj.update(elapsedTime);
-      if (update) {
-        this.onCollision(update);
+      obj.elapsedTime = 0;
+      // TODO: fix this hack
+      // TODO: remove objects outside of game bounds
+      if (obj.done && (this.simulation || obj.type === "RenderObject")) {
+        this.removeObject(obj);
+      } else {
+        let update = obj.update(elapsedTime);
+        if (update) {
+          this.onCollision(update);
+        }
+        // Test if a beam intersects any other beams
+        if (obj instanceof Projectile && obj.effect.path === "beam") {
+          for (const target of this.gameState.objects) {
+            if (target instanceof Projectile && target.effect.path === "beam") {
+              obj.beamIntersects(target);
+            }
+          }
+        }
       }
     }
 

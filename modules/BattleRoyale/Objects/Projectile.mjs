@@ -37,7 +37,6 @@ export default class Projectile extends GameObject {
     this.projectile = this.attack;
     this.rendering = this.attack.rendering;
     this.effect = this.attack.effect;
-    this.damageReady = true;
     if (this.effect.path === "beam") {
       this.damageInterval = this.effect.damageRate / 1000;
     }
@@ -62,6 +61,64 @@ export default class Projectile extends GameObject {
     return getDistance(this.position, this.startPosition);
   }
 
+  // https://stackoverflow.com/questions/563198/how-do-you-detect-where-two-line-segments-intersect/1968345#1968345
+  getLineIntersection(line1, line2) {
+    let minZ1 = Math.min(line1[0].z, line1[0].z);
+    let maxZ1 = Math.max(line1[1].z, line1[1].z);
+    let minZ2 = Math.min(line2[0].z, line2[0].z);
+    let maxZ2 = Math.max(line2[1].z, line2[1].z);
+
+    if (minZ1 > maxZ2 || minZ2 > maxZ1) {
+      return false;
+    }
+
+    let s1_x, s1_y, s2_x, s2_y;
+    s1_x = line1[1].x - line1[0].x;     s1_y = line1[1].y - line1[0].y;
+    s2_x = line2[1].x - line2[0].x;     s2_y = line2[1].y - line2[0].y;
+
+    let s, t;
+    s = (-s1_y * (line1[0].x - line2[0].x) + s1_x * (line1[0].y - line2[0].y)) / (-s2_x * s1_y + s1_x * s2_y);
+    t = ( s2_x * (line1[0].y - line2[0].y) - s2_y * (line1[0].x - line2[0].x)) / (-s2_x * s1_y + s1_x * s2_y);
+
+    if (s >= 0 && s <= 1 && t >= 0 && t <= 1)
+    {
+      // Collision detected
+      return new Point({
+        x: line1[0].x + (t * s1_x),
+        y: line1[0].y + (t * s1_y)
+      });
+    }
+
+    return false;
+  }
+
+  beamIntersects(target) {
+    let last = this.lastPosition.plus({
+      x: this.width / 2,
+      y: this.height / 2
+    });
+    let current = this.position.plus({
+      x: this.width / 2,
+      y: this.height / 2
+    });
+    let targetLast = target.lastPosition.plus({
+      x: target.width / 2,
+      y: target.height / 2
+    });
+    let targetCurrent = target.position.plus({
+      x: target.width / 2,
+      y: target.height / 2
+    });
+    // TODO: change this to test boxes instead of just center line
+    let intersection = this.getLineIntersection([last, current], [targetLast, targetCurrent]);
+    if (intersection) {
+      this.position.x = intersection.x;
+      this.position.y = intersection.y;
+      target.position.x = intersection.x;
+      target.position.y = intersection.y;
+    }
+  }
+
   update(elapsedTime) {
     this.currentTime += elapsedTime;
     if (this.currentTime >= this.maxTime) {
@@ -72,7 +129,7 @@ export default class Projectile extends GameObject {
       if (!this.source || !this.source.currentAction || this.source.currentAction.actionId !== this.actionId) {
         this.done = true;
       } else {
-        this.direction = this.source.state.target.minus(this.source.attackCenter).normalize();
+        this.direction = new Point(this.source.state.target).subtract(this.source.attackCenter).normalize();
         this.direction.z = 0;
         this.lastPosition = Projectile.getAttackOrigin(this.source, this.attack, this.direction);
         this.position = this.lastPosition.plus(this.direction.times(this.effect.range));
@@ -80,7 +137,7 @@ export default class Projectile extends GameObject {
         this.position.y = Math.max(0, this.position.y);
 
         if (this.currentTime >= this.damageInterval) {
-          this.damageReady = true;
+          this.damagedTargets.length = 0;
           this.currentTime = this.currentTime - this.damageInterval;
         }
       }
@@ -94,11 +151,11 @@ export default class Projectile extends GameObject {
         if (dist < 5) {
           this.speed = 0;
         } else {
-          let targetDirection = this.source.state.target.minus(center).normalize();
+          let targetDirection = new Point(this.source.state.target).subtract(center).normalize();
           targetDirection.z = 0;
 
           let xdiff = targetDirection.x - this.direction.x;
-          let ydiff = targetDirection.y - this.direction.y
+          let ydiff = targetDirection.y - this.direction.y;
           this.direction.add({
             x: Math.max(xdiff, xdiff * (elapsedTime / 50)),
             y: Math.max(ydiff, ydiff * (elapsedTime / 50))

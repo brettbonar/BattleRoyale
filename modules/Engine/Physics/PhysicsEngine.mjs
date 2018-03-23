@@ -1,6 +1,7 @@
 import GameObject from "../GameObject/GameObject.mjs"
 import { MOVEMENT_TYPE, SURFACE_TYPE } from "./PhysicsConstants.mjs";
 import Point from "../GameObject/Point.mjs";
+import Bounds from "../GameObject/Bounds.mjs";
 
 export default class PhysicsEngine {
   constructor(params) {
@@ -21,6 +22,11 @@ export default class PhysicsEngine {
     return "z";
   }
 
+  sweepTest(A1, A2, B1, B2) {
+
+  }
+
+  // https://www.gamasutra.com/view/feature/3383/simple_intersection_tests_for_games.php?page=3
   sweepTest(A1, A2, B1, B2) {
     if (A2.intersects(B2)) {
       return {
@@ -44,10 +50,18 @@ export default class PhysicsEngine {
     let vBx = B2.ul.x - B1.ul.x;
     let vBy = B2.ul.y - B1.ul.y;
 
+    // let ATest = new Bounds({
+    //   position: A1.ul,
+    //   dimensions: {
+    //     width: A1.width + B2.width,
+    //     height: A1.height + B2.height
+    //   }
+    // })
+
     let v = {
       x: vBx - vAx,
       y: vBy - vAy
-    }
+    };
     let first = {
       x: 0,
       y: 0
@@ -84,8 +98,8 @@ export default class PhysicsEngine {
       }
     });
 
-    let firstTouch = _.max(_.toArray(first));
-    let lastTouch = _.min(_.toArray(last));
+    let firstTouch = Math.max(first.x, first.y);
+    let lastTouch = Math.min(last.x, last.y);
 
     if (touched.x && touched.y && firstTouch <= lastTouch && firstTouch > 0 && firstTouch <= 1) {
       return {
@@ -132,6 +146,9 @@ export default class PhysicsEngine {
         }
 
         for (let targetBoundIdx = 0; targetBoundIdx < targetCollisionBounds.length; targetBoundIdx++) {
+          if (obj.physics.surfaceType === "projectile" && target.physics.surfaceType === "projectile") {
+            console.log("here");
+          }
           let collision = this.sweepTest(objLastCollisionBounds[objBoundIdx], objCollisionBounds[objBoundIdx],
             targetLastCollisionBounds[targetBoundIdx], targetCollisionBounds[targetBoundIdx]);
           if (collision) {
@@ -190,6 +207,9 @@ export default class PhysicsEngine {
           obj.position.y = (obj.lastPosition.y +
             (obj.position.y - obj.lastPosition.y) * collision.time) -
             Math.sign(obj.position.y - obj.lastPosition.y);
+          obj.position.z = (obj.lastPosition.z +
+            (obj.position.z - obj.lastPosition.z) * collision.time) -
+            Math.sign(obj.position.z - obj.lastPosition.z);
         } else {
           // TODO: determine how much the bounds overlap and adjust by that much
           // let sign = obj.position[collision.axis] - obj.lastPosition[collision.axis];
@@ -242,6 +262,12 @@ export default class PhysicsEngine {
       collisions.push({
         source: obj,
         target: target,
+        // TODO: use position of collision from sweep test
+        position: obj.position.copy()
+      });
+      collisions.push({
+        source: target,
+        target: obj,
         // TODO: use position of collision from sweep test
         position: obj.position.copy()
       });

@@ -193,25 +193,25 @@ function initGame(players, maps) {
   //   }
   // }, objects.caveExit));
 
-  gameObjects.push(new StaticObject({
-    position: {
-      x: 100,
-      y: 100
-    },
-    objectType: "wheat",
-    simulation: true
-  }));
+  // gameObjects.push(new StaticObject({
+  //   position: {
+  //     x: 100,
+  //     y: 100
+  //   },
+  //   objectType: "wheat",
+  //   simulation: true
+  // }));
 
-  gameObjects = gameObjects.concat(scenes.corn.getObjects(
-    {
-      x: 250,
-      y: 250
-    },
-    {
-      width: 440,
-      height: 220
-    }
-  ));
+  // gameObjects = gameObjects.concat(scenes.corn.getObjects(
+  //   {
+  //     x: 250,
+  //     y: 250
+  //   },
+  //   {
+  //     width: 440,
+  //     height: 220
+  //   }
+  // ));
 
   return gameObjects;
 }
