@@ -4,7 +4,7 @@ import Point from "../GameObject/Point.mjs";
 
 export default class PhysicsEngine {
   constructor(params) {
-    _.merge(this, params);
+    this.quadTrees = params;
   }
 
   // https://gamedev.stackexchange.com/questions/13774/how-do-i-detect-the-direction-of-2d-rectangular-object-collisions
@@ -108,19 +108,29 @@ export default class PhysicsEngine {
     let intersections = [];
     let objCollisionBounds = obj.collisionBounds;
     let objLastCollisionBounds = obj.lastCollisionBounds;
-    for (const target of targets) {
-      if (target === obj || target.physics.surfaceType === SURFACE_TYPE.NONE) continue;
-      // Only need to test projectiles against characters, not both ways
-      // TODO: do all tests, but exclude ones already found
-      if (obj.physics.surfaceType === SURFACE_TYPE.CHARACTER &&
-          (target.physics.surfaceType === SURFACE_TYPE.PROJECTILE ||
-           target.physics.surfaceType === SURFACE_TYPE.GAS)) {
-        continue;
-      }
-      let targetCollisionBounds = target.collisionBounds;
-      let targetLastCollisionBounds = target.lastCollisionBounds;
 
-      for (let objBoundIdx = 0; objBoundIdx < objCollisionBounds.length; objBoundIdx++) {
+    for (let objBoundIdx = 0; objBoundIdx < objCollisionBounds.length; objBoundIdx++) {
+      //let targets = this.quadTrees[obj.level].colliding(objLastCollisionBounds[objBoundIdx].plus(objCollisionBounds[objBoundIdx]));
+
+      for (const target of targets) {
+        if (target === obj || target.physics.surfaceType === SURFACE_TYPE.NONE) continue;
+        // Only need to test projectiles against characters, not both ways
+        // TODO: do all tests, but exclude ones already found
+        if (obj.physics.surfaceType === SURFACE_TYPE.CHARACTER &&
+            (target.physics.surfaceType === SURFACE_TYPE.PROJECTILE ||
+             target.physics.surfaceType === SURFACE_TYPE.GAS)) {
+          continue;
+        }
+        let targetCollisionBounds = target.collisionBounds;
+        let targetLastCollisionBounds = target.lastCollisionBounds;
+  
+        // TODO: do this after all other physics calculations?
+        for (const functionBox of target.getAllFunctionBounds()) {
+          if (objCollisionBounds[objBoundIdx].intersects(functionBox.box)) {
+            functionBox.cb(obj);
+          }
+        }
+
         for (let targetBoundIdx = 0; targetBoundIdx < targetCollisionBounds.length; targetBoundIdx++) {
           let collision = this.sweepTest(objLastCollisionBounds[objBoundIdx], objCollisionBounds[objBoundIdx],
             targetLastCollisionBounds[targetBoundIdx], targetCollisionBounds[targetBoundIdx]);
@@ -133,13 +143,6 @@ export default class PhysicsEngine {
               collision: collision
             });
           }
-        }
-      }
-
-      // TODO: do this after all other physics calculations?
-      for (const functionBox of target.getAllFunctionBounds()) {
-        if (objCollisionBounds.some((bounds) => bounds.intersects(functionBox.box))) {
-          functionBox.cb(obj);
         }
       }
     }
@@ -181,9 +184,12 @@ export default class PhysicsEngine {
       // TODO: only bounce off first collision
       if (obj.physics.solidity > 0 && target.physics.solidity > 0) {
         if (collision.time !== 0) {
-          obj.position[collision.axis] = (obj.lastPosition[collision.axis] +
-            (obj.position[collision.axis] - obj.lastPosition[collision.axis]) * collision.time) -
-            Math.sign(obj.position[collision.axis] - obj.lastPosition[collision.axis]);
+          obj.position.x = (obj.lastPosition.x +
+            (obj.position.x - obj.lastPosition.x) * collision.time) -
+            Math.sign(obj.position.x - obj.lastPosition.x);
+          obj.position.y = (obj.lastPosition.y +
+            (obj.position.y - obj.lastPosition.y) * collision.time) -
+            Math.sign(obj.position.y - obj.lastPosition.y);
         } else {
           // TODO: determine how much the bounds overlap and adjust by that much
           // let sign = obj.position[collision.axis] - obj.lastPosition[collision.axis];
@@ -239,6 +245,11 @@ export default class PhysicsEngine {
         // TODO: use position of collision from sweep test
         position: obj.position.copy()
       });
+
+      // this.quadTrees[obj.level].remove(obj);
+      // this.quadTrees[obj.level].push(obj);
+      // this.quadTrees[target.level].remove(target);
+      // this.quadTrees[target.level].push(target);
     }
 
 
@@ -270,6 +281,8 @@ export default class PhysicsEngine {
           position: obj.position.copy()
         });
       }
+
+      obj.updatePosition();
     }
 
     return collisions;
@@ -285,7 +298,6 @@ export default class PhysicsEngine {
         time += obj.elapsedTime;
       }
 
-      obj.lastPosition = new Point(obj.position);
       // if (obj.physics.surfaceType === SURFACE_TYPE.CHARACTER) {
       //   obj.position.z += (elapsedTime / 10) * this.test;
       //   if (obj.position.z > 500) {
@@ -297,7 +309,8 @@ export default class PhysicsEngine {
       //   }
       // }
 
-      if (obj.direction.x || obj.direction.y || obj.direction.z) {
+      if (obj.speed && (obj.direction.x || obj.direction.y || obj.direction.z)) {
+        obj.lastPosition = new Point(obj.position);
         obj.position.x = obj.position.x + obj.direction.x * obj.speed * (time / 1000);
         obj.position.y = obj.position.y + obj.direction.y * obj.speed * (time / 1000);
         if (obj.direction.z) {
@@ -323,6 +336,9 @@ export default class PhysicsEngine {
           z: obj.acceleration.z * (time / 1000)
         });
       }
+
+      // this.quadTrees[obj.level].remove(obj);
+      // this.quadTrees[obj.level].push(obj);
     }
   }
 }

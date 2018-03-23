@@ -51,10 +51,16 @@ export default class BattleRoyaleController extends GameController {
       $.when(API.getMaps(game.gameId), API.getObjects(game.gameId))
       .done((mapsData, objectsData) => {
         let maps = {};
+        let quadTrees = {};
         _.each(mapsData[0], (map, level) => {
           maps[level] = new Map(Object.assign({
             gameCanvas: document.getElementById("canvas-main")
           }, map));
+          quadTrees[level] = new Quadtree({
+            width: map.mapWidth * map.tileSize,
+            height: map.mapHeight * map.tileSize,
+            maxElements: 5
+          });
         });
         let mapCanvas = document.getElementById("canvas-map");
         this.game = new BattleRoyale({
@@ -65,7 +71,8 @@ export default class BattleRoyaleController extends GameController {
           gameSettings: {
             viewDistance: 32 * 12
           },
-          socket: this.socket
+          socket: this.socket,
+          quadTrees: quadTrees
         });
         this.game.updateObjects(objectsData[0]);
         this.socket.emit("initialized", "initialized");

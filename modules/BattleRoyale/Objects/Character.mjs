@@ -163,7 +163,7 @@ export default class Character extends GameObject {
   }
 
   // TODO: pull this outside of character class
-  doAction(type, stopAction, action, elapsedTime, cb) {
+  doAction(type, stopAction, action, elapsedTime, cb, stopCb) {
     let top = this.currentAction;
     elapsedTime = elapsedTime || 0;
     if (stopAction) {
@@ -187,6 +187,7 @@ export default class Character extends GameObject {
           charge: action.charge,
           action: action,
           new: true,
+          stopCb: stopCb,
           cb: cb
         };
         this.actionStack.unshift(newAction);
@@ -228,10 +229,13 @@ export default class Character extends GameObject {
       action.currentTime = 0;
       action.finishedTime = 0;
       this.updateAction(action, 0);
+      //this.nextAction(-actionTimeDiff);
+    } else if (action.actionType === "channeling") {
+      action.channeling = true;
     } else {
       this.actionStack.shift();
+      this.nextAction(-actionTimeDiff);
     }
-    this.nextAction(-actionTimeDiff);
   }
 
   setTarget(target) {
@@ -251,10 +255,9 @@ export default class Character extends GameObject {
   }
 
   updateAction(action, elapsedTime) {
-    if (action) {
+    if (action && !action.channeling) {
       if (action.new) {
         if (!this.canDoAction(action)) return;
-        console.log("new");
         elapsedTime = 0;
         action.new = false;
       }

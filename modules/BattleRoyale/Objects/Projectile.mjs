@@ -4,6 +4,7 @@ import attacks from "../Magic/attacks.mjs"
 import Point from "../../Engine/GameObject/Point.mjs"
 import Dimensions from "../../Engine/GameObject/Dimensions.mjs"
 import { getDistance } from "../../Engine/util.mjs"
+import BeamRenderer from "../Renderers/BeamRenderer.mjs"
 
 export default class Projectile extends GameObject {
   constructor(params) {
@@ -12,6 +13,7 @@ export default class Projectile extends GameObject {
     this.physics.surfaceType = "projectile";
     this.boundsType = "circle";
     this.damagedTargets = [];
+    this.source = params.source;
 
     if (params.attackType) {
       this.attack = attacks[params.attackType];
@@ -27,17 +29,25 @@ export default class Projectile extends GameObject {
     _.merge(this, this.attack.effect);
     this.dimensions = new Dimensions(this.attack.effect.collisionDimensions[0].dimensions);
     this.collisionDimensions = this.attack.effect.collisionDimensions;
-    this.speed = params.speed || this.attack.effect.speed;
+    this.speed = params.speed || this.attack.effect.speed || 0;
     this.zspeed = params.zspeed || this.attack.effect.zspeed || this.speed;
     this.projectile = this.attack;
     this.rendering = this.attack.rendering;
     this.effect = this.attack.effect;
+    this.damageReady = true;
+    if (this.effect.path === "beam") {
+      this.damageInterval = this.effect.damageRate / 1000;
+    }
 
     this.startPosition = new Point(this.position);
     this.onCollision = this.attack.effect.onCollision;
 
     if (!params.simulation) {
-      this.renderer = new ProjectileRenderer(this.attack.rendering);
+      if (this.effect.path === "beam") {
+        this.renderer = new BeamRenderer(this.attack.rendering);
+      } else {
+        this.renderer = new ProjectileRenderer(this.attack.rendering);
+      }
     }
     this.currentTime = 0;
     this.maxTime = (this.attack.effect.range / this.attack.effect.speed) * 1000;
@@ -56,8 +66,21 @@ export default class Projectile extends GameObject {
     }
 
     if (this.effect.path === "beam") {
-      this.startPosition = this.source.position.copy(); // plus modifiers
-      this.position = this.source.position.copy();
+      if (!this.source || !this.source.currentAction || this.source.currentAction.name !== this.attack.action.name) {
+        this.done = true;
+      } else {
+        this.direction = this.source.state.target.minus(this.source.attackCenter).normalize();
+        this.direction.z = 0;
+        this.lastPosition = Projectile.getAttackOrigin(this.source, this.attack, this.direction);
+        this.position = this.lastPosition.plus(this.direction.times(this.effect.range));
+        this.position.x = Math.max(0, this.position.x);
+        this.position.y = Math.max(0, this.position.y);
+
+        if (this.currentTime >= this.damageInterval) {
+          this.damageReady = true;
+          this.currentTime = this.currentTime - this.damageInterval;
+        }
+      }
     }
 
     this.rotation = Math.atan2(this.direction.y - this.direction.z, this.direction.x ) * 180 / Math.PI;
@@ -76,7 +99,8 @@ export default class Projectile extends GameObject {
 
   getUpdateState() {
     return Object.assign(super.getUpdateState(), {
-      attackType: this.attack.name
+      attackType: this.attack.name,
+      ownerId: this.ownerId
     });
   }
   
@@ -87,13 +111,13 @@ export default class Projectile extends GameObject {
     return -acceleration.z * time / 2;
   }
 
-  static create(params) {
+  static getAttackOrigin(source, attack, direction) {
     // TODO: do this better
-    let sourceOrigin = params.source.position.plus(params.source.attackOrigin.offset);
-    let sourceDimensions = params.source.attackOrigin.dimensions;
+    let sourceOrigin = source.position.plus(source.attackOrigin.offset);
+    let sourceDimensions = source.attackOrigin.dimensions;
     let origin = sourceOrigin.copy();
-    let attackDimensions = params.attack.effect.attackDimensions ||
-      params.attack.effect.collisionDimensions[0];
+    let attackDimensions = attack.effect.attackDimensions ||
+      attack.effect.collisionDimensions[0];
 
     // Create projectile, center it within the attacking character, then move it along direction
     // until the projectile's bounds are outside of the character's collision dimensions
@@ -106,25 +130,31 @@ export default class Projectile extends GameObject {
     //origin.subtract(attackDimensions.offset);
     // Offset projectile by any custom amount (usually a zheight)
     // TODO: subtract?
-    origin.add(params.attack.effect.offset);
+    origin.add(attack.effect.offset);
     // Move projectile bounds along direction until they no longer collide with character bounds
     let directionXOffset = Number.MAX_VALUE;
-    if (params.direction.x) {
-      directionXOffset = Math.sign(params.direction.x) * 
+    if (direction.x) {
+      directionXOffset = Math.sign(direction.x) * 
         ((((sourceOrigin.x + sourceDimensions.width) - (origin.x - attackDimensions.dimensions.width)) /
-          params.direction.x) + 1);
+          direction.x) + 1);
     }
     let directionYOffset = Number.MAX_VALUE;
-    if (params.direction.y) {
-      directionYOffset = Math.sign(params.direction.y) * 
+    if (direction.y) {
+      directionYOffset = Math.sign(direction.y) * 
       ((((sourceOrigin.y + sourceDimensions.height) - (origin.y - attackDimensions.dimensions.height)) /
-        params.direction.y) + 1);
+        direction.y) + 1);
     }
     let directionOffset = Math.min(directionXOffset, directionYOffset);
     origin.add({
-      x: directionOffset * params.direction.x,
-      y: directionOffset * params.direction.y
+      x: directionOffset * direction.x,
+      y: directionOffset * direction.y
     });
+
+    return origin;
+  }
+
+  static create(params) {
+    let origin = Projectile.getAttackOrigin(params.source, params.attack, params.direction);
 
     // TRICKY: given position will be relative to center, shift so its centered
     // this.position.subtract({ x: this.dimensions.width / 2, y: this.dimensions.height / 2});
@@ -145,6 +175,7 @@ export default class Projectile extends GameObject {
 
     // TODO: apply damage modifier, may need to make sure projectile effect is copied
     let projectile = new Projectile({
+      source: params.source,
       position: origin,
       simulation: params.simulation,
       attack: params.attack,

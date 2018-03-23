@@ -50,7 +50,7 @@ export default class BattleRoyale extends Game {
     }
 
     this.maps = params.maps;
-    this.physicsEngine = new PhysicsEngine();
+    this.physicsEngine = new PhysicsEngine(params.quadTrees);
 
     this.renderingEngine = new PerspectiveRenderingEngine({
       context: this.context
@@ -69,12 +69,18 @@ export default class BattleRoyale extends Game {
           y: params.canvas.height / 2 + 64
         }
       },
-      objects: params.objects || [],
+      objects: [],
       characters: [],
       projectiles: [],
       dynamicObjects: [],
       staticObjects: []
     };
+
+    if (params.objects) {
+      for (const obj of params.objects) {
+        this.addObject(obj);
+      }
+    }
 
     if (!this.simulation) {
       this.ui = ImageCache
@@ -128,6 +134,20 @@ export default class BattleRoyale extends Game {
     // this.stateFunctions[Game.STATE.INITIALIZING].update = _.noop;//(elapsedTime) => this._update(elapsedTime);
     // this.stateFunctions[Game.STATE.INITIALIZING].render = _.noop;//(elapsedTime) => this._render(elapsedTime);
 
+  }
+
+  addObject(object) {
+    this.gameState.objects.push(object);
+    // TODO: move objects between quad trees when level changes
+    if (object.collisionDimensions.length > 0) {
+      //this.quadTrees[object.level].push(object);
+    }
+  }
+
+  removeObject(object) {
+    // TODO: move objects between quad trees when level changes
+    //this.quadTrees[object.level].remove(object);
+    _.pull(this.gameState.objects, object);
   }
 
   updateState(data, elapsedTime, eventTime) {
@@ -243,6 +263,7 @@ export default class BattleRoyale extends Game {
     } else if (object.type === "StaticObject") {
       return new StaticObject(object);
     } else if (object.type === "Projectile") {
+      object.source = _.find(this.gameState.objects, { objectId: object.ownerId });
       return new Projectile(object);
     } else if (object.type === "Item") {
       return new Item(object);
@@ -270,14 +291,18 @@ export default class BattleRoyale extends Game {
         existing.updateState(object);
         this.clearAndApplyUpdates(object);
       } else {
-        this.gameState.objects.push(this.createObject(object));
+        this.addObject(this.createObject(object));
       }
     }
   }
 
   removeObjects(objects) {
     // TODO: optimize
-    _.remove(this.gameState.objects, (obj) => objects.includes(obj.objectId));
+    for (const obj of this.gameState.objects) {
+      if (objects.includes(obj.objectId)) {
+        this.removeObject(obj);
+      }
+    }
   }
 
   handleMouseMove(event) {
@@ -313,25 +338,30 @@ export default class BattleRoyale extends Game {
     return point;
   }
 
+  createProjectile(character, params, attack, timeDiff, mods) {
+    if (attack.type === "projectile") {
+      let direction = character.state.target.minus(character.attackCenter).normalize();
+      direction.z = 0;
+      this.addObject(Projectile.create({
+        source: character,
+        simulation: this.simulation,
+        attack: attack,
+        direction: direction,
+        modifiers: mods,
+        target: character.state.target,
+        playerId: params.source.playerId,
+        ownerId: params.source.objectId,
+        //elapsedTime: timeDiff
+      }));
+    }
+  }
+
   doAttack(character, params, elapsedTime) {
     let attack = attacks[character.state.loadout.weapon.attacks[params.attackType]];
-    character.doAction("attack", params.release, attack.action, elapsedTime, (timeDiff, mods) => {
-      if (attack.type === "projectile") {
-        let direction = character.state.target.minus(character.attackCenter).normalize();
-        direction.z = 0;
-        this.gameState.objects.push(Projectile.create({
-          source: character,
-          simulation: this.simulation,
-          attack: attack,
-          direction: direction,
-          modifiers: mods,
-          target: character.state.target,
-          playerId: params.source.playerId,
-          ownerId: params.source.objectId,
-          //elapsedTime: timeDiff
-        }));
-      }
-    });
+    character.doAction("attack", params.release, attack.action, elapsedTime,
+      (timeDiff, mods) => {
+        this.createProjectile(character, params, attack, timeDiff, mods);
+      });
   }
 
   use(event) {
@@ -507,9 +537,9 @@ export default class BattleRoyale extends Game {
     if (result.create && this.simulation) {
       result.create.simulation = this.simulation;
       if (result.create.type === "Magic") {
-        this.gameState.objects.push(Magic.create(result.create));
+        this.addObject(Magic.create(result.create));
       }
-      _.pull(this.gameState.objects, result.remove);
+      this.removeObject(result.remove);
     }
   }
 
@@ -517,31 +547,48 @@ export default class BattleRoyale extends Game {
     if (collision.source.physics.surfaceType === SURFACE_TYPE.PROJECTILE ||
         collision.source.physics.surfaceType === SURFACE_TYPE.GAS) {
       if (_.get(collision.target, "physics.surfaceType") === SURFACE_TYPE.CHARACTER) {
-        // TODO: something else
-        if (!collision.source.damagedTargets.includes(collision.target)) {
-          collision.target.damage(collision.source);
-          collision.source.damagedTargets.push(collision.target);
-          // TODO: add effect based on character
-          if (collision.target.damagedEffect && !this.simulation) {
-            this.particleEngine.addEffect(new AnimationEffect({
-              position: {
-                x: collision.target.center.x,
-                y: collision.target.center.y
-              },
-              duration: 1000
-            }, collision.target.damagedEffect));
+        if (collision.source.effect.path === "beam") {
+          if (collision.source.damageReady) {
+            collision.target.damage(collision.source);
+            collision.source.damageReady = false;
+            collision.source.currentTime = 0;
+            if (collision.target.damagedEffect && !this.simulation) {
+              this.particleEngine.addEffect(new AnimationEffect({
+                position: {
+                  x: collision.target.center.x,
+                  y: collision.target.center.y
+                },
+                duration: 1000
+              }, collision.target.damagedEffect));
+            }
           }
-        }
-        // if (!character.dead && character.currentHealth <= 0) {
-        //   character.kill();
-        // }
-        if (!collision.source.effect.punchThrough) {
-          _.pull(this.gameState.objects, collision.source);
+        } else {
+          // TODO: something else
+          if (!collision.source.damagedTargets.includes(collision.target)) {
+            collision.target.damage(collision.source);
+            collision.source.damagedTargets.push(collision.target);
+            // TODO: add effect based on character
+            if (collision.target.damagedEffect && !this.simulation) {
+              this.particleEngine.addEffect(new AnimationEffect({
+                position: {
+                  x: collision.target.center.x,
+                  y: collision.target.center.y
+                },
+                duration: 1000
+              }, collision.target.damagedEffect));
+            }
+          }
+          // if (!character.dead && character.currentHealth <= 0) {
+          //   character.kill();
+          // }
+          if (!collision.source.effect.punchThrough) {
+            this.removeObject(collision.source);
+          }
         }
       } else {
         if (collision.source.physics.surfaceType === SURFACE_TYPE.PROJECTILE &&
-            collision.source.physics.elasticity === 0) {
-          _.pull(this.gameState.objects, collision.source);
+            collision.source.physics.elasticity === 0 && collision.source.effect.path !== "beam") {
+          this.removeObject(collision.source);
         }
       }
 
@@ -565,10 +612,12 @@ export default class BattleRoyale extends Game {
   _update(elapsedTime) {
     // TODO: fix this hack
     // TODO: remove objects outside of game bounds
-    _.remove(this.gameState.objects, (obj) => {
+    for (const obj of this.gameState.objects) {
       obj.elapsedTime = 0;
-      return obj.done && (this.simulation || obj.type === "RenderObject");
-    });
+      if (obj.done && (this.simulation || obj.type === "RenderObject")) {
+        this.removeObject(obj);
+      }
+    }
 
     // TODO: do this at end -- for some reason setTarget has to be up here
     // CLIENT ONLY

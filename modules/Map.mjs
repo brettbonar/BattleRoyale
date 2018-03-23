@@ -91,7 +91,8 @@ class Map {
   constructor(params) {
     _.merge(this, params);
     _.defaults(this, {
-      mapSize: 200,
+      mapWidth: 200,
+      mapHeight: 200,
       tileSize: 32,
       map: [],
       seeds: {
@@ -171,9 +172,9 @@ class Map {
   }
 
   initializeMap() {
-    for (const x in _.range(this.mapSize)) {
+    for (const x in _.range(this.mapWidth)) {
       let tiles = [];
-      for (const y in _.range(this.mapSize)) {
+      for (const y in _.range(this.mapHeight)) {
         tiles.push(new Tile({
           position: {
             x: x,
@@ -443,7 +444,8 @@ class Map {
 
   toJSON() {
     return {
-      mapSize: this.mapSize,
+      mapWidth: this.mapWidth,
+      mapHeight: this.mapHeight,
       tileSize: this.tileSize,
       map: this.serializeMap(this.map)
     };
@@ -456,8 +458,8 @@ class Map {
       this.canvas = $("<canvas>", {
         class: "game-canvas map-save-canvas"
       }).appendTo(document.getElementById("canvas-group"))[0];
-      this.canvas.width = this.tileSize * this.mapSize;
-      this.canvas.height = this.tileSize * this.mapSize;
+      this.canvas.width = this.tileSize * this.mapWidth;
+      this.canvas.height = this.tileSize * this.mapHeight;
       this.context = this.canvas.getContext("2d");
       for (const column of this.map) {
         for (const tile of column) {

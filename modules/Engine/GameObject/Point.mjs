@@ -43,6 +43,14 @@ export default class Point {
     });
   }
 
+  times2D(scale) {
+    return new Point({
+      x: this.x * scale,
+      y: this.y * scale,
+      z: this.z
+    });
+  }
+
   copy() {
     return new Point({
       x: this.x,

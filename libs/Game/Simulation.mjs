@@ -6,6 +6,7 @@ import Projectile from "../../modules/BattleRoyale/Objects/Projectile.mjs"
 import now from "performance-now"
 import StaticObject from "../../modules/BattleRoyale/Objects/StaticObject.mjs"
 import GameSettings from "../../modules/Engine/GameSettings.mjs"
+import Quadtree from "quadtree-lib"
 
 const TICK_RATE = 20;
 const SIMULATION_TIME = 1000 / TICK_RATE;
@@ -29,6 +30,14 @@ export default class Simulation {
         }
       })
     };
+    let quadTrees = {};
+    _.each(maps, (map, level) => {
+      quadTrees[level] = new Quadtree({
+        width: map.mapWidth * map.tileSize,
+        height: map.mapHeight * map.tileSize,
+        maxElements: 5
+      });
+    });
     this.game = new BattleRoyale({
       isServer: true,
       simulation: true,
@@ -37,6 +46,7 @@ export default class Simulation {
         height: 2048
       },
       maps: maps,
+      quadTrees: quadTrees,
       objects: initGame(params.players, maps)
     });
     this.lastState = [];

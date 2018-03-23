@@ -213,6 +213,9 @@ export default class Bounds {
     });
   }
 
+  get x() { return this.box.ul.x; }
+  get y() { return this.box.ul.y; }
+
   get width() {
     return this.box.ur.x - this.box.ul.x;
   }

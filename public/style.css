@@ -70,10 +70,12 @@ hr {
 
   width: 100vw; 
   /* height: 100vw; */
-  height: 56.25vw; /* height:width ratio = 9/16 = .5625  */
+  /* height: 56.25vw; height:width ratio = 9/16 = .5625  */
+  height: 75vw; /* 12/16 */
   max-height: 100vh;
   /* max-width: 100vh; */
-  max-width: 177.78vh; /* 16/9 = 1.778 */
+  /* max-width: 177.78vh; 16/9 = 1.778 */
+  max-width: 133.33vh; /* 16/12 */
   margin: auto;
   position: absolute;
   top:0;bottom:0; /* vertical center */

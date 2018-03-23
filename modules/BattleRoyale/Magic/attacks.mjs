@@ -27,7 +27,7 @@ export default {
     action: {
       name: "boulder",
       actionDuration: 0,
-      actionRate: 0.5,
+      actionRate: 2,
       actionType: "exclusive",
       automatic: false,
       manaCost: 0,
@@ -79,6 +79,76 @@ export default {
       },
       range: 5000,
       speed: 250
+    }
+  },
+  lightBeam: {
+    type: "projectile",
+    name: "lightBeam",
+    dimensions: {
+      width: 32,
+      height: 32
+    },
+    action: {
+      name: "lightBeam",
+      actionDuration: 0,
+      actionRate: 4,
+      actionType: "channeling",
+      automatic: false,
+      manaCost: 0,
+      manaCostPerSec: 0
+    },
+    rendering: {
+      start: {
+        imageSource: "../../Assets/projectiles/lightBeamStart.png",
+        imageSize: 32,
+        // frames: 4,
+        // framesPerSec: 4,
+        // repeat: true,
+        // modelDimensions: {
+        //   dimensions: {
+        //     width: 32,
+        //     height: 32
+        //   }
+        // },
+      },
+      body: {
+        imageSource: "/Assets/projectiles/lightBeamBody.png",
+        imageSize: 32
+      },
+      hitEffect: {
+        imageSource: "../../Assets/projectiles/lightBeamHitEffect.png",
+        imageDimensions: {
+          width: 32,
+          height: 32,
+          x: 0,
+          y: 0
+        },
+        // offset: {
+        //   x: 5,
+        //   y: 12
+        // },
+        //duration: 5000
+      },
+      //shadow: true
+    },
+    effect: {
+      path: "beam",
+      damage: 1,
+      damageRate: 4,
+      // TODO: more shapes
+      collisionDimensions: [{
+        offset: {
+          x: 8,
+          y: 8
+        },
+        dimensions: {
+          width: 16,
+          height: 16,
+          zheight: 16
+        }
+      }],
+      range: 500,
+      punchThrough: false
     }
   },
   arrow: {

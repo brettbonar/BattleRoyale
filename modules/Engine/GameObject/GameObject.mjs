@@ -106,6 +106,9 @@ export default class GameObject extends GameObjectProxy {
     }
   }
 
+  get x() { return this.position.x }
+  get y() { return this.position.y }
+
   getDimensionsType(dimensions) {
     if (!_.isUndefined(this.dimensions.width) || !_.isUndefined(this.dimensions.height)) {
       return Bounds.TYPE.RECTANGLE;
