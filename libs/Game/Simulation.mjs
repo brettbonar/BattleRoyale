@@ -50,7 +50,8 @@ export default class Simulation {
       objects: initGame(params.players, maps)
     });
     this.lastState = [];
-    this.updates = [];    
+    this.lastObjects = [];
+    this.removedObjects = [];
   }
 
   updateState(data, elapsedTime) {
@@ -67,25 +68,32 @@ export default class Simulation {
     
     this.game.processUpdates(elapsedTime, currentTime);
     this.game._update(elapsedTime);
+
+    if (this.lastState.length > 0) {
+      for (const player of this.players) {
+        player.socket.emit("update", this.lastState);
+      }
+      this.lastState.length = 0;
+    }
+
+    if (this.removedObjects.length > 0) {
+      for (const player of this.players) {
+        player.socket.emit("remove", this.removedObjects);
+      }
+      this.removedObjects.length = 0;
+    }
+
+    this.removedObjects = _.difference(this.lastObjects, this.game.gameState.objects)
+      .map((obj) => obj.objectId);
+    this.lastObjects = this.game.gameState.objects.slice();
     
     // TODO: do for each player
-    let state = this.game.gameState.objects
+    this.lastState = this.game.gameState.objects
       .filter((obj) => obj._modified)
       .map(obj => {
         obj._modified = false;
         return obj.getUpdateState();
       });
-
-    for (const player of this.players) {
-      player.socket.emit("update", state);
-    }
-
-    let removedObjects = _.difference(this.lastState, this.game.gameState.objects);
-    for (const player of this.players) {
-      player.socket.emit("remove", _.map(removedObjects, "objectId"));
-    }
-
-    this.lastState = this.game.gameState.objects.slice();
 
     this.interval = setTimeout(() => {
       this.update();

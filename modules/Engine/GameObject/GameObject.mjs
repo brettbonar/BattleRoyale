@@ -373,6 +373,11 @@ export default class GameObject extends GameObjectProxy {
   get width() {
     return this.dimensions.width;
   }
+
+  moveTo(position) {
+    this.targetPosition = position;
+    this.setDirection(new Point(position).minus(this.position));
+  }
   
   getUpdateState() {
     // TODO: probably don't want to do this here

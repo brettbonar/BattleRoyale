@@ -72,7 +72,7 @@ class Game {
 
     _.defaults(this, {
       maxPlayers: 96,
-      startPlayers: 1,
+      startPlayers: 2,
       status: STATUS.LOBBY
     });
 
@@ -249,7 +249,7 @@ function getGame(gameId) {
 }
 
 games.push(new Game({ name: "Game1" }));
-games.push(new Game({ name: "Game2", maxPlayers: 5 }));
+//games.push(new Game({ name: "Game2", maxPlayers: 5 }));
 
 export { 
   validateGame,

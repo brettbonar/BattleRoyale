@@ -6,6 +6,7 @@ import Map from "/modules/Map.mjs"
 import * as API from "./API.mjs"
 import GameSettings from "../Engine/GameSettings.mjs"
 import ImageCache from "../Engine/Rendering/ImageCache.mjs"
+//import { initialize } from "../Engine/Rendering/Scratch.mjs"
 
 export default class BattleRoyaleController extends GameController {
   constructor(element, params) {
@@ -13,6 +14,7 @@ export default class BattleRoyaleController extends GameController {
       menus: new BattleRoyaleUI()
     });
 
+    //initialize();
     ImageCache.put("/Assets/terrain_atlas.png");
   }
 

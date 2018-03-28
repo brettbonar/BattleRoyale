@@ -146,9 +146,6 @@ export default class PhysicsEngine {
         }
 
         for (let targetBoundIdx = 0; targetBoundIdx < targetCollisionBounds.length; targetBoundIdx++) {
-          if (obj.physics.surfaceType === "projectile" && target.physics.surfaceType === "projectile") {
-            console.log("here");
-          }
           let collision = this.sweepTest(objLastCollisionBounds[objBoundIdx], objCollisionBounds[objBoundIdx],
             targetLastCollisionBounds[targetBoundIdx], targetCollisionBounds[targetBoundIdx]);
           if (collision) {

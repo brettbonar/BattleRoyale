@@ -54,7 +54,7 @@ export default class Projectile extends GameObject {
     this.currentTime = 0;
     this.maxTime = (this.attack.effect.range / this.attack.effect.speed) * 1000;
 
-    this.rotation = Math.atan2(this.direction.y, this.direction.x) * 180 / Math.PI;
+    this.rotation = Math.atan2(this.direction.y - this.direction.z, this.direction.x ) * 180 / Math.PI;
   }
 
   get distanceTravelled() {
@@ -112,10 +112,11 @@ export default class Projectile extends GameObject {
     // TODO: change this to test boxes instead of just center line
     let intersection = this.getLineIntersection([last, current], [targetLast, targetCurrent]);
     if (intersection) {
-      this.position.x = intersection.x;
-      this.position.y = intersection.y;
-      target.position.x = intersection.x;
-      target.position.y = intersection.y;
+      // TODO: clean this up
+      this.position.x = intersection.x - this.direction.x * 16;
+      this.position.y = intersection.y - this.direction.y * 16;
+      target.position.x = intersection.x - target.direction.x * 16;
+      target.position.y = intersection.y - target.direction.y * 16;
     }
   }
 
@@ -168,7 +169,7 @@ export default class Projectile extends GameObject {
       }
     }
 
-    //this.rotation = Math.atan2(this.direction.y - this.direction.z, this.direction.x ) * 180 / Math.PI;
+    this.rotation = Math.atan2(this.direction.y - this.direction.z, this.direction.x ) * 180 / Math.PI;
 
     this.renderer.update(elapsedTime);
 

@@ -311,11 +311,6 @@ export default class Character extends GameObject {
     // }
   }
 
-  moveTo(position) {
-    this.targetPosition = position;
-    this.setDirection(new Point(position).minus(this.position));
-  }
-
   updateState(state) {
     _.merge(this, state);
     if (state.latestAction && (!this.currentAction || state.latestAction.actionId !== this.currentAction.actionId)) {

@@ -29,6 +29,13 @@ export default class Point {
     return Object.assign(this, Point.normalize(this));
   }
 
+  distanceTo(point) {
+    let dx = this.x - point.x;
+    let dy = this.y - point.y;
+    let dz = (this.z - point.z) || 0;
+    return Math.sqrt(dx * dx + dy * dy + dz * dz);
+  };
+
   equals(point) {
     return this.x === point.x && this.y === point.y && this.z === point.z;
   }
@@ -37,6 +44,7 @@ export default class Point {
     this.x = this.x * scale;
     this.y = this.y * scale;
     this.z = this.z * scale;
+    return this;
   }
 
   times(scale) {

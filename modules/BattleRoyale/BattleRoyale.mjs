@@ -634,6 +634,8 @@ export default class BattleRoyale extends Game {
           this.onCollision(update);
         }
         // Test if a beam intersects any other beams
+        // TODO: fix this so it doesn't ignore people in path of beam
+        // TODO: make beams consist of start box, end box, and lines for center and sides
         if (obj instanceof Projectile && obj.effect.path === "beam") {
           for (const target of this.gameState.objects) {
             if (target instanceof Projectile && target.effect.path === "beam") {
