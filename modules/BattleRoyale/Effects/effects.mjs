@@ -15,19 +15,43 @@ export default {
     framesPerSec: 12
   },
   light: {
-    // Particles per second
-    frequency: 4,
-    // Distribution of particle spawning
+    initialCount: 10,
     radius: 10,
-    duration: 500,
+    duration: 0,
     particles: {
       imageSource: "/Assets/effects/light.png",
       dimensions: {
         width: 5,
         height: 5
       },
-      speed: 10,
-      duration: 100
+      speed: 20,
+      zspeed: 10,
+      duration: 2000,
+      acceleration: {
+        z: -0.5
+      },
+      // Stickiness, friction, and elasticity currently only apply to the ground
+      friction: 3.0,
+      stickiness: 0.5,
+      elasticity: 0.5
+    }
+    // acceleration
+    // TODO: spread: angle of direction
+  },
+  lightRay: {
+    // Particles per second
+    frequency: 20,
+    // Distribution of particle spawning
+    radius: 10,
+    duration: 100,
+    particles: {
+      imageSource: "/Assets/effects/lightRay.png",
+      dimensions: {
+        width: 12,
+        height: 11
+      },
+      speed: 100,
+      duration: 500
     }
     // acceleration
     // TODO: spread: angle of direction

@@ -123,6 +123,9 @@ export default {
           height: 32
         }
       },
+      // TODO: may need a maximum rate at which hit effects are added
+      // Right now a new hit effect is created each frame
+      // TODO: maybe attach a single effect to each projectile and move it with projectile?
       hitEffect: {
         particleEffect: "light"
       },
@@ -186,18 +189,7 @@ export default {
       shadowColor: "white",
       shadow: true,
       hitEffect: {
-        imageSource: "../../Assets/projectiles/lightBeamHitEffect.png",
-        imageDimensions: {
-          width: 32,
-          height: 32,
-          x: 0,
-          y: 0
-        },
-        // offset: {
-        //   x: 5,
-        //   y: 12
-        // },
-        duration: 1000
+        particleEffect: "light"
       }
     },
     effect: {

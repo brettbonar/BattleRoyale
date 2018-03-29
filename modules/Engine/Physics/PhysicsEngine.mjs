@@ -340,14 +340,20 @@ export default class PhysicsEngine {
         obj.lastPosition = new Point(obj.position);
         obj.position.x = obj.position.x + obj.direction.x * obj.speed * (time / 1000);
         obj.position.y = obj.position.y + obj.direction.y * obj.speed * (time / 1000);
+        // TODO: use zspeed so friction won't slow down falling
         if (obj.direction.z) {
           obj.position.z = obj.position.z + obj.direction.z * obj.speed * (time / 1000);//(obj.zspeed || obj.speed) * (time / 1000));
         }
+
         if (obj.physics.friction > 0 && obj.position.z === 0) {
-          let amount = obj.speed * (time / 1000);
-          obj.speed = obj.speed - obj.speed * (time / 1000) * obj.physics.friction;
-          if (obj.speed < 1) {
+          if (obj.physics.friction === Infinity) {
             obj.speed = 0;
+          } else {
+            let amount = obj.speed * (time / 1000);
+            obj.speed = obj.speed - obj.speed * (time / 1000) * obj.physics.friction;
+            if (obj.speed < 1) {
+              obj.speed = 0;
+            }
           }
         }
 

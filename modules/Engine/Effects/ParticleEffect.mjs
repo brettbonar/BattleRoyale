@@ -3,29 +3,72 @@ import ImageCache from "../Rendering/ImageCache.mjs"
 
 class Particle {
   constructor(params) {
-    this.currentTime = 0;
-    this.rotation = 0;
     _.merge(this, params);
-
+    this.currentTime = 0;
     this.image = ImageCache.get(this.particleInfo.imageSource);
+    this.rotation = Math.atan2(this.direction.y - this.direction.z, this.direction.x ) * 180 / Math.PI;
+    this.rotationDiff = 0;
+    this.speed = this.particleInfo.speed || 0;
+    this.zspeed = this.particleInfo.zspeed || this.speed;
+
+    if (this.particleInfo.acceleration) {
+      this.particleInfo.acceleration = new Point(this.particleInfo.acceleration);
+    }
   }
 
   get perspectivePosition() { return this.position; }
 
   update(elapsedTime) {
+    let timestep = elapsedTime / 1000;
     this.currentTime += elapsedTime;
 
-    if (this.direction && this.particleInfo.speed) {
-      this.position.add(this.direction.times(this.particleInfo.speed * (elapsedTime / 1000)));
+    let groundSpeed = this.speed * timestep;
+    if (this.direction) {
+      this.position.add({
+        x: this.direction.x * groundSpeed,
+        y: this.direction.y * groundSpeed,
+        z: this.direction.z * this.zspeed * timestep
+      });
+      if (this.position.z <= 0) {
+        this.position.z = 0;
+
+        if (this.particleInfo.elasticity) {
+          this.direction.z = -this.direction.z * this.particleInfo.elasticity;
+          if (Math.abs(this.direction.z) < 0.15) this.direction.z = 0;
+        }
+
+        if (this.particleInfo.stickiness) {
+          this.direction.subtract(this.direction.times(this.particleInfo.stickiness));
+        }
+      }
+
+      if (this.particleInfo.friction > 0 && this.position.z === 0) {
+        if (this.particleInfo.friction === Infinity) {
+          this.speed = 0;
+        } else {
+          let amount = this.speed * timestep;
+          this.speed -= this.speed * timestep * this.particleInfo.friction;
+          if (this.speed < 1) {
+            this.speed = 0;
+          }
+        }
+      }
     }
 
-    if (this.acceleration && this.particleInfo.speed) {
-      this.direction.add(this.acceleration.times(this.particleInfo.speed * (elapsedTime / 1000)));
+    if (this.particleInfo.acceleration) {
+      this.direction.add({
+        x: this.particleInfo.acceleration.x * groundSpeed,
+        y: this.particleInfo.acceleration.y * groundSpeed,
+        z: this.particleInfo.acceleration.z * this.zspeed * timestep
+      });
+      //this.direction.add(this.particleInfo.acceleration.times(this.speed * timestep));
     }
 
     if (this.spin) {
-      this.rotation += this.spin * (elapsedTime / 1000);
+      this.rotationDiff += this.spin * timestep;
+      this.rotation += this.rotationDiff;
     }
+    this.rotation = Math.atan2(this.direction.y - this.direction.z, this.direction.x ) * 180 / Math.PI;
 
     if (this.currentTime >= this.particleInfo.duration) {
       this.done = true;
@@ -48,7 +91,7 @@ class Particle {
     context.save();
     
     if (this.rotation) {
-      let center = position.plus({ x: this.particleInfo.dimensions.width / 2, y: this.particleInfo.dimensions.height / 2});
+      let center = position.plus({ x: this.particleInfo.dimensions.width / 2, y: this.particleInfo.dimensions.height / 2 });
       context.translate(center.x, center.y);
       context.rotate((this.rotation * Math.PI) / 180);
       context.translate(-center.x, -center.y);        
@@ -72,6 +115,29 @@ export default class ParticleEffect {
     this.frequency = params.effect.frequency;
     this.radius = params.effect.radius;
     this.duration = params.effect.duration;
+
+    if (params.effect.initialCount) {
+      for (let i = 0; i < params.effect.initialCount; i++) {
+        this.createParticle();
+      }
+    }
+  }
+
+  createParticle() {
+    let position = this.position.copy();
+    let direction = new Point({
+      x: _.random(-1, 1, true),
+      y: _.random(-1, 1, true),
+      z: _.random(-1, 1, true)
+    }).normalize();
+    if (this.radius) {
+      position.add(direction.times(_.random(0, this.radius)));
+    }
+    this.particles.push(new Particle({
+      position: position,
+      direction: direction,
+      particleInfo: this.particleInfo
+    }));
   }
 
   update(elapsedTime) {
@@ -87,22 +153,9 @@ export default class ParticleEffect {
     if (this.currentTime <= this.duration) {
       let numParticles = Math.floor(this.frequency * (this.particleTime / 1000));
       for (let i = 0; i < numParticles; i++) {
-        let position = this.position.copy();
-        let direction = new Point({
-          x: _.random(-1, 1, true),
-          y: _.random(-1, 1, true),
-          z: _.random(-1, 1, true)
-        }).normalize();
-        if (this.radius) {
-          position.add(direction.times(this.radius));
-        }
-        this.particles.push(new Particle({
-          position: this.position,
-          direction: direction,
-          particleInfo: this.particleInfo
-        }));
+        this.createParticle();
       }
-      this.particleTime -= numParticles * (this.frequency / 1000);
+      this.particleTime -= numParticles * (1000 / this.frequency);
     }
 
     if (this.currentTime >= this.duration && this.particles.length === 0) {
