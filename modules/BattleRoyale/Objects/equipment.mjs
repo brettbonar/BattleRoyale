@@ -50,6 +50,42 @@ export default {
       2: "lightMote"
     }
   },
+  staffMale: {
+    imageSource: "/Assets/character/weapons/right hand/male/staff_male.png",
+    imageSize: 64,
+    type: "weapon",
+    attackType: "thrust",
+    hands: 1,
+    gender: "male",
+    attacks: {
+      1: "plasmaBall",
+      2: "lightMote"
+    }
+  },
+  fireStaffMale: {
+    imageSource: "/Assets/character/weapons/right hand/male/fireStaff_male.png",
+    imageSize: 64,
+    type: "weapon",
+    attackType: "thrust",
+    hands: 1,
+    gender: "male",
+    attacks: {
+      1: "lightBeam",
+      2: "lionFlare"
+    }
+  },
+  lightStaffMale: {
+    imageSource: "/Assets/character/weapons/right hand/male/lightStaff.png",
+    imageSize: 64,
+    type: "weapon",
+    attackType: "thrust",
+    hands: 1,
+    gender: "male",
+    attacks: {
+      1: "lightBeam",
+      2: "lightMote"
+    }
+  },
   axe: {
     imageSource: "/Assets/character/weapons/right hand/either/axe.png",
     imageSize: 64,

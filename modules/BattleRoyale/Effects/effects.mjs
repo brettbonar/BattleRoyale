@@ -16,15 +16,20 @@ export default {
   },
   light: {
     // Particles per second
-    imageSource: "/Assets/effects/light.png",
-    frequency: 10,
+    frequency: 4,
     // Distribution of particle spawning
     radius: 10,
+    duration: 500,
     particles: {
-      speed: 100,
-      duration: 500
+      imageSource: "/Assets/effects/light.png",
+      dimensions: {
+        width: 5,
+        height: 5
+      },
+      speed: 10,
+      duration: 100
     }
     // acceleration
-    // TODO: angle of direction
+    // TODO: spread: angle of direction
   }
 }

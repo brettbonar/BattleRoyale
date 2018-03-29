@@ -258,13 +258,17 @@ export default class PhysicsEngine {
       
       collisions.push({
         source: obj,
+        sourceBounds: intersection.sourceBounds,
         target: target,
+        targetBounds: intersection.targetBounds,
         // TODO: use position of collision from sweep test
         position: obj.position.copy()
       });
       collisions.push({
         source: target,
+        sourceBounds: intersection.targetBounds,
         target: obj,
+        targetBounds: intersection.sourceBounds,
         // TODO: use position of collision from sweep test
         position: obj.position.copy()
       });

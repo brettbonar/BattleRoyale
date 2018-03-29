@@ -101,7 +101,7 @@ function initGame(players, maps) {
         simulation: true,
         damagedEffect: effects.blood,
         loadout: {
-          weapon: equipment.spearMale,
+          weapon: equipment.lightStaffMale,
           torso: equipment.leatherChestMale,
           legs: equipment.tealPantsMale,
           head: equipment.clothHoodMale,

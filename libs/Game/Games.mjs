@@ -72,7 +72,7 @@ class Game {
 
     _.defaults(this, {
       maxPlayers: 96,
-      startPlayers: 2,
+      startPlayers: 1,
       status: STATUS.LOBBY
     });
 

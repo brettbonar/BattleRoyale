@@ -15,6 +15,7 @@ export default class BeamRenderer {
   constructor(rendering) {
     this.rendering = rendering;
     this.imageStart = ImageCache.get(rendering.start.imageSource);
+    this.imageEnd = ImageCache.get(rendering.end.imageSource);
     this.imageBody = ImageCache.get(rendering.body.imageSource);
     this.frame = 0;
     this.currentTime = 0;
@@ -53,12 +54,11 @@ export default class BeamRenderer {
   drawBody(context, object, elapsedTime) {
     context.save();
 
-    let imageSize = this.rendering.body.imageSize;
+    let dimensions = this.rendering.body.dimensions;
     let imageOffset = this.rendering.start.imageSize / 2;
     let distance = Math.ceil(object.lastPosition.distanceTo(object.position));
-    let imageDimensions = { width: imageSize, height: imageSize };
-    for (let i = 0; i < distance; i += this.rendering.body.imageSize) {
-      Scratch.put(this.imageBody, { x: i, y: 0 }, imageDimensions);
+    for (let i = 0; i < distance; i += dimensions.width) {
+      Scratch.put(this.imageBody, { x: i, y: 0 }, dimensions);
     }
     //let rotation = Math.atan2(object.direction.y - object.direction.z, object.direction.x ) * 180 / Math.PI;
 
@@ -71,12 +71,12 @@ export default class BeamRenderer {
     //center.add(imageParams.renderOffset)
 
     if (object.rotation) {
-      context.translate(start.x, start.y + imageSize / 2);
+      context.translate(start.x, start.y + dimensions.height / 2);
       context.rotate((object.rotation * Math.PI) / 180);
-      context.translate(-start.x, -(start.y + imageSize / 2));
+      context.translate(-start.x, -(start.y + dimensions.height / 2));
     }
 
-    let fullDimensions = { width: distance, height: imageSize };
+    let fullDimensions = { width: distance, height: dimensions.height };
     Scratch.drawImageTo(context, new Point(), fullDimensions, start, fullDimensions);
 
     context.restore();
@@ -89,7 +89,7 @@ export default class BeamRenderer {
 
     this.drawBody(context, object, elapsedTime);
     this.renderAt(context, this.imageStart, this.rendering.start, object.lastPosition, object);
-    this.renderAt(context, this.imageStart, this.rendering.start, object.position, object);
+    this.renderAt(context, this.imageEnd, this.rendering.end, object.position, object);
   }
 
   update(elapsedTime) {

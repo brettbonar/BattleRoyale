@@ -15,6 +15,16 @@ export default class EffectsEngine {
     _.remove(this.effects, "done");
   }
 
+  getRenderObjects() {
+    // TODO: pass in a position or bounding box to only get objects in area?
+    // let objects = [];
+    // for (const effect of this.effects) {
+    //   objects = objects.concat(effect.renderObjects);
+    // }
+    // return objects;
+    return this.effects;
+  }
+
   render(elapsedTime, center) {
     this.context.save();
 

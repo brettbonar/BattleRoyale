@@ -112,23 +112,19 @@ export default {
         //   }
         // },
       },
+      end: {
+        imageSource: "../../Assets/projectiles/lightBeamEnd.png",
+        imageSize: 32,
+      },
       body: {
         imageSource: "/Assets/projectiles/lightBeamBody.png",
-        imageSize: 32
+        dimensions: {
+          width: 32,
+          height: 32
+        }
       },
       hitEffect: {
-        imageSource: "../../Assets/projectiles/lightBeamHitEffect.png",
-        imageDimensions: {
-          width: 32,
-          height: 32,
-          x: 0,
-          y: 0
-        },
-        // offset: {
-        //   x: 5,
-        //   y: 12
-        // },
-        duration: 1000
+        particleEffect: "light"
       },
       //shadow: true
     },

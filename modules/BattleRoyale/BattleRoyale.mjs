@@ -25,6 +25,7 @@ import effects from "./Effects/effects.mjs"
 import attacks from "./Magic/attacks.mjs"
 import RenderObject from "./Objects/RenderObject.mjs"
 import ImageCache from "../Engine/Rendering/ImageCache.mjs"
+import ParticleEffect from "../Engine/Effects/ParticleEffect.mjs";
 
 const EVENTS = {
   MOVE_UP: "moveUp",
@@ -448,7 +449,7 @@ export default class BattleRoyale extends Game {
   }
 
   getRenderObjects() {
-    return this.gameState.objects;
+    return this.gameState.objects.concat(this.particleEngine.getRenderObjects());
     // return this.gameState.staticObjects
     //   .concat(this.gameState.dynamicObjects)
     //   .concat(this.gameState.characters)
@@ -490,7 +491,7 @@ export default class BattleRoyale extends Game {
     -(this.gameState.player.center.y - this.context.canvas.height / 2));
 
     this.renderingEngine.render(this.getRenderObjects(), elapsedTime, this.gameState.player.center);
-    this.particleEngine.render(elapsedTime, this.gameState.player.center);
+    //this.particleEngine.render(elapsedTime, this.gameState.player.center);
     this.renderInteractions();
     this.context.restore();
 
@@ -554,13 +555,13 @@ export default class BattleRoyale extends Game {
           collision.source.damagedTargets.push(collision.target);
           // TODO: add effect based on character
           if (collision.target.damagedEffect && !this.simulation) {
-            this.particleEngine.addEffect(new AnimationEffect({
-              position: {
-                x: collision.target.center.x,
-                y: collision.target.center.y
-              },
-              duration: 1000
-            }, collision.target.damagedEffect));
+            // this.particleEngine.addEffect(new AnimationEffect({
+            //   position: {
+            //     x: collision.target.center.x,
+            //     y: collision.target.center.y
+            //   },
+            //   duration: 1000
+            // }, collision.target.damagedEffect));
           }
         }
         // if (!character.dead && character.currentHealth <= 0) {
@@ -577,11 +578,22 @@ export default class BattleRoyale extends Game {
       }
 
       if (!this.simulation && collision.source.rendering.hitEffect) {
-        this.gameState.objects.push(new RenderObject({
-          position: collision.position,
-          //dimensions: collision.source.dimensions,
-          rotation: collision.source.rotation
-        }, collision.source.rendering.hitEffect));
+        if (collision.source.rendering.hitEffect.particleEffect) {
+          this.particleEngine.addEffect(new ParticleEffect({
+            position: collision.source.position.plus({
+              x: collision.sourceBounds.width / 2,
+              y: collision.sourceBounds.height / 2
+            }),
+            rotation: collision.source.rotation,
+            effect: effects[collision.source.rendering.hitEffect.particleEffect]
+          }));
+        } else {
+          this.gameState.objects.push(new RenderObject({
+            position: collision.position,
+            //dimensions: collision.source.dimensions,
+            rotation: collision.source.rotation
+          }, collision.source.rendering.hitEffect));
+        }
       }
     } else {
       // collision.source.position.x = collision.source.lastPosition.x;
@@ -618,6 +630,7 @@ export default class BattleRoyale extends Game {
         });
       }
       this.showInteractions();
+      this.particleEngine.update(elapsedTime);
     }
 
     // TODO: move above physics?
