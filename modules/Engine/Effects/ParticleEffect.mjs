@@ -122,6 +122,7 @@ export default class ParticleEffect {
     this.particles = [];
     this.position = params.position;
     this.direction = params.direction;
+    this.speed = params.speed;
     this.particleInfo = params.effect.particles;
     this.frequency = params.effect.frequency;
     this.radius = params.effect.radius;
@@ -136,11 +137,28 @@ export default class ParticleEffect {
 
   createParticle() {
     let position = this.position.copy();
-    let direction = new Point({
-      x: _.random(-1, 1, true),
-      y: _.random(-1, 1, true),
-      z: _.random(-1, 1, true)
-    }).normalize();
+    let direction = new Point();
+
+    if (this.particleInfo.momentum) {
+      // TODO: vary this a bit
+      direction.add(this.direction);
+    } else if (!this.particleInfo.baseDirection) {
+      direction.add({
+        x: _.random(-1, 1, true),
+        y: _.random(-1, 1, true),
+        z: _.random(-1, 1, true)
+      });
+    }
+
+    if (this.particleInfo.baseDirection) {
+      direction.add({
+        x: _.random(this.particleInfo.baseDirection.min.x, this.particleInfo.baseDirection.max.x, true),
+        y: _.random(this.particleInfo.baseDirection.min.y, this.particleInfo.baseDirection.max.y, true),
+        z: _.random(this.particleInfo.baseDirection.min.z, this.particleInfo.baseDirection.max.z, true)
+      });
+    }
+    direction.normalize()
+
     if (this.radius) {
       position.add(direction.times(_.random(0, this.radius)));
     }

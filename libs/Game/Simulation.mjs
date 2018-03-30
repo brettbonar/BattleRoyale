@@ -7,6 +7,7 @@ import now from "performance-now"
 import StaticObject from "../../modules/BattleRoyale/Objects/StaticObject.mjs"
 import GameSettings from "../../modules/Engine/GameSettings.mjs"
 import Quadtree from "quadtree-lib"
+import BattleRoyaleServer from "../../modules/BattleRoyale/BattleRoyaleServer.mjs"
 
 const TICK_RATE = 20;
 const SIMULATION_TIME = 1000 / TICK_RATE;
@@ -38,7 +39,7 @@ export default class Simulation {
         maxElements: 5
       });
     });
-    this.game = new BattleRoyale({
+    this.game = new BattleRoyaleServer({
       isServer: true,
       simulation: true,
       canvas: {

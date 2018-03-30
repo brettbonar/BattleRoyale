@@ -3,6 +3,7 @@ import Point from "./Point.mjs"
 const TYPE = {
   RECTANGLE: "rectangle",
   RECTANGLE_UL: "rectangleUl",
+  AABB: "aabb",
   CIRCLE: "circle",
   POINT: "point",
   LINE: "line"
@@ -12,16 +13,19 @@ export default class Bounds {
   constructor(params, zheight) {
     this.zheight = zheight || 0;
     this.opacity = params.opacity || 0;
+    this.type = TYPE.AABB;
     if (!_.isUndefined(params.ul)) {
       this.constructFromBox(params);
     } else if (!_.isUndefined(params.dimensions.width) && !_.isUndefined(params.dimensions.height)) {
       this.constructFromRectangle(params);
     } else if (_.isArray(params)) {
       this.constructFromLine(params);
+      this.type = TYPE.LINE;
     } else if (!_.isUndefined(params.dimensions.radius)) {
       this.constructFromCircle(params);
     } else if (!_.isUndefined(params.position)) {
       this.position = new Point(params.position);
+      this.type = TYPE.POINT;
     } else if (!_.isUndefined(params.ul)) {
       this.constructFromBox(params);
     } else {

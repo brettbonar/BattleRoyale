@@ -6,6 +6,7 @@ import Map from "/modules/Map.mjs"
 import * as API from "./API.mjs"
 import GameSettings from "../Engine/GameSettings.mjs"
 import ImageCache from "../Engine/Rendering/ImageCache.mjs"
+import BattleRoyaleClient from "./BattleRoyaleClient.mjs"
 //import { initialize } from "../Engine/Rendering/Scratch.mjs"
 
 export default class BattleRoyaleController extends GameController {
@@ -65,7 +66,7 @@ export default class BattleRoyaleController extends GameController {
           });
         });
         let mapCanvas = document.getElementById("canvas-map");
-        this.game = new BattleRoyale({
+        this.game = new BattleRoyaleClient({
           canvas: document.getElementById("canvas-main"),
           mapCanvas: mapCanvas,
           maps: maps,

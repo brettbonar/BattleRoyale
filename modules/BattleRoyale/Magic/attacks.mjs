@@ -133,7 +133,7 @@ export default {
     },
     effect: {
       path: "beam",
-      damage: 1,
+      damage: 2,
       damageRate: 4,
       // TODO: more shapes
       collisionDimensions: [{

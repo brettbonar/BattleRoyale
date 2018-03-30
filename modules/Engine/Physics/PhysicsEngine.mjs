@@ -22,10 +22,6 @@ export default class PhysicsEngine {
     return "z";
   }
 
-  sweepTest(A1, A2, B1, B2) {
-
-  }
-
   // https://www.gamasutra.com/view/feature/3383/simple_intersection_tests_for_games.php?page=3
   sweepTest(A1, A2, B1, B2) {
     if (A2.intersects(B2)) {
@@ -112,6 +108,19 @@ export default class PhysicsEngine {
     return false;
   }
 
+  rayTest(lastBounds, currentBounds, targetLastBounds, targetCurrentBounds) {
+    // TODO: do broadphase detection first
+    
+  }
+
+  getCollision(lastBounds, currentBounds, targetLastBounds, targetCurrentBounds) {
+    if (currentBounds.type === Bounds.TYPE.AABB && targetCurrentBounds.type === Bounds.TYPE.AABB) {
+      return this.sweepTest(lastBounds, currentBounds, targetLastBounds, targetCurrentBounds);
+    } else {
+      return this.rayTest(lastBounds, currentBounds, targetLastBounds, targetCurrentBounds);
+    }
+  }
+
   intersects(bounds1, bounds2) {
     return bounds1
       .some((bounds) => bounds2
@@ -146,8 +155,8 @@ export default class PhysicsEngine {
         }
 
         for (let targetBoundIdx = 0; targetBoundIdx < targetCollisionBounds.length; targetBoundIdx++) {
-          let collision = this.sweepTest(objLastCollisionBounds[objBoundIdx], objCollisionBounds[objBoundIdx],
-            targetLastCollisionBounds[targetBoundIdx], targetCollisionBounds[targetBoundIdx]);
+          let collision = this.getCollision(objLastCollisionBounds[objBoundIdx], objCollisionBounds[objBoundIdx],
+              targetLastCollisionBounds[targetBoundIdx], targetCollisionBounds[targetBoundIdx])
           if (collision) {
             intersections.push({
               source: obj,

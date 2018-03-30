@@ -39,7 +39,7 @@ export default class Projectile extends GameObject {
     this.rendering = this.attack.rendering;
     this.effect = this.attack.effect;
     if (this.effect.path === "beam") {
-      this.damageInterval = this.effect.damageRate / 1000;
+      this.damageInterval = 1000 / this.effect.damageRate;
     }
 
     this.startPosition = new Point(this.position);
@@ -139,7 +139,7 @@ export default class Projectile extends GameObject {
         this.position.y = Math.max(0, this.position.y);
 
         if (this.currentTime >= this.damageInterval) {
-          //this.damagedTargets.length = 0;
+          this.damagedTargets.length = 0;
           this.damageReady = true;
           this.currentTime = this.currentTime - this.damageInterval;
         }
