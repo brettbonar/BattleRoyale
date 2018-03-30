@@ -10,6 +10,8 @@ function drawShadow(context, object, modelDimensions, shadowColor) {
     return;
   }
 
+  context.save();
+
   let shadowPos = object.position.plus(modelDimensions.offset).plus({
     y: modelDimensions.dimensions.height - modelDimensions.dimensions.width / 2
   });
@@ -28,6 +30,8 @@ function drawShadow(context, object, modelDimensions, shadowColor) {
   context.fillStyle = gradient;
   context.fillRect(shadowPos.x, shadowPos.y,
     modelDimensions.dimensions.width, modelDimensions.dimensions.width);
+
+  context.restore();
 }
 
 function getAnimationOffset(image, imageSize, frame) {

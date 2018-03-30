@@ -32,28 +32,28 @@ export default [
       height: 32
     }
   },
-  {
-    name: "forestGrass4",
-    biome: "forest",
-    imageSource: "/Assets/terrain_atlas.png",
-    imageDimensions: {
-      x: 192,
-      y: 768,
-      width: 32,
-      height: 32
-    }
-  },
-  {
-    name: "forestGrass5",
-    biome: "forest",
-    imageSource: "/Assets/terrain_atlas.png",
-    imageDimensions: {
-      x: 192,
-      y: 800,
-      width: 32,
-      height: 32
-    }
-  },
+  // {
+  //   name: "forestGrass4",
+  //   biome: "forest",
+  //   imageSource: "/Assets/terrain_atlas.png",
+  //   imageDimensions: {
+  //     x: 192,
+  //     y: 768,
+  //     width: 32,
+  //     height: 32
+  //   }
+  // },
+  // {
+  //   name: "forestGrass5",
+  //   biome: "forest",
+  //   imageSource: "/Assets/terrain_atlas.png",
+  //   imageDimensions: {
+  //     x: 192,
+  //     y: 800,
+  //     width: 32,
+  //     height: 32
+  //   }
+  // },
   // leaves1: {
   //   biome: "forest",
   //   imageSource: "../../Assets/terrain_atlas-64.png",
@@ -136,38 +136,38 @@ export default [
       width: 32,
       height: 32
     }
-  },
-  {
-    name: "flowers1",
-    biome: "plain",
-    imageSource: "/Assets/terrain_atlas.png",
-    imageDimensions: {
-      x: 672,
-      y: 352,
-      width: 32,
-      height: 32
-    }
-  },
-  {
-    name: "flowers2",
-    biome: "plain",
-    imageSource: "/Assets/terrain_atlas.png",
-    imageDimensions: {
-      x: 704,
-      y: 352,
-      width: 32,
-      height: 32
-    }
-  },
-  {
-    name: "flowers3",
-    biome: "plain",
-    imageSource: "/Assets/terrain_atlas.png",
-    imageDimensions: {
-      x: 736,
-      y: 352,
-      width: 32,
-      height: 32
-    }
   }
+  // {
+  //   name: "flowers1",
+  //   biome: "plain",
+  //   imageSource: "/Assets/terrain_atlas.png",
+  //   imageDimensions: {
+  //     x: 672,
+  //     y: 352,
+  //     width: 32,
+  //     height: 32
+  //   }
+  // },
+  // {
+  //   name: "flowers2",
+  //   biome: "plain",
+  //   imageSource: "/Assets/terrain_atlas.png",
+  //   imageDimensions: {
+  //     x: 704,
+  //     y: 352,
+  //     width: 32,
+  //     height: 32
+  //   }
+  // },
+  // {
+  //   name: "flowers3",
+  //   biome: "plain",
+  //   imageSource: "/Assets/terrain_atlas.png",
+  //   imageDimensions: {
+  //     x: 736,
+  //     y: 352,
+  //     width: 32,
+  //     height: 32
+  //   }
+  // }
 ]

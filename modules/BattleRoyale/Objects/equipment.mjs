@@ -58,8 +58,8 @@ export default {
     hands: 1,
     gender: "male",
     attacks: {
-      1: "plasmaBall",
-      2: "lightMote"
+      1: "arrow",
+      2: "plasmaBall"
     }
   },
   fireStaffMale: {
@@ -70,7 +70,7 @@ export default {
     hands: 1,
     gender: "male",
     attacks: {
-      1: "lightBeam",
+      1: "boulder",
       2: "lionFlare"
     }
   },

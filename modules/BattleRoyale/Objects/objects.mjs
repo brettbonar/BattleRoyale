@@ -345,7 +345,8 @@ export default {
           y: 196
         },
         offset: {
-          z: 196
+          z: 156,
+          y: 156
         },
         losFade: true
       },

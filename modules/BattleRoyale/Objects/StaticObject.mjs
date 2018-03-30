@@ -3,7 +3,7 @@ import ObjectRenderer from "../Renderers/ObjectRenderer.mjs"
 import objects from "./objects.mjs"
 import items from "./items.mjs"
 import { SURFACE_TYPE } from "../../Engine/Physics/PhysicsConstants.mjs"
-import RenderObject from "./RenderObject.mjs";
+import RenderObject from "./RenderObject.mjs"
 
 export default class StaticObject extends GameObject {
   constructor(params) {
@@ -12,7 +12,7 @@ export default class StaticObject extends GameObject {
       static: true,
       renderClipped: object.renderClipped
     }, params));
-    Object.assign(this, object);
+    _.merge(this, object);
     this.type = "StaticObject";
 
     if (!params.simulation) {

@@ -148,6 +148,8 @@ export default class PerspectiveRenderingEngine extends RenderingEngine{
   debugBoxes(objects) {
     if (window.debug) {
       for (const object of objects) {
+        if (object.particles) continue;
+
         this.context.strokeStyle = "black";
         this.context.beginPath();
         this.context.arc(object.position.x, object.position.y, 2, 0, 2 * Math.PI);
@@ -160,9 +162,9 @@ export default class PerspectiveRenderingEngine extends RenderingEngine{
         this.context.closePath();
         this.context.fill();
 
-        let box = object.boundingBox;
-        this.context.strokeStyle = "yellow";
-        this.context.strokeRect(box.ul.x, box.ul.y, box.width, box.height);
+        // let box = object.boundingBox;
+        // this.context.strokeStyle = "yellow";
+        // this.context.strokeRect(box.ul.x, box.ul.y, box.width, box.height);
           
         for (const bounds of object.lastCollisionBounds) {
           this.context.strokeStyle = "lawnGreen";

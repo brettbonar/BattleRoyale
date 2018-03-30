@@ -34,7 +34,7 @@ export default class BeamRenderer {
     // }
 
     position = position.minus({ y: position.z });
-    let center = position.plus({ x: imageParams.imageSize / 2, y: imageParams.imageSize / 2});
+    let center = position.plus({ x: imageParams.imageSize / 2, y: imageParams.imageSize / 2 });
     position.add(imageParams.renderOffset)
     
     if (object.rotation) {

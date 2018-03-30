@@ -149,19 +149,19 @@ function initGame(players, maps) {
   //   simulation: true
   // }));
   
-  // for (let i = 0; i < 10; i++) {
-  //   //let type = _.sample(_.filter(objects, { biome: "plain" }));
-  //   //let type = _.sample(objects);
-  //   //let type = objects.plainTree;
-  //   gameObjects.push(new StaticObject({
-  //     objectType: "plainTree",
-  //     position: {
-  //       x: _.random(0, 1000),
-  //       y: _.random(0, 1000)
-  //     },
-  //     simulation: true
-  //   }));
-  // }
+  for (let i = 0; i < 10; i++) {
+    //let type = _.sample(_.filter(objects, { biome: "plain" }));
+    //let type = _.sample(objects);
+    //let type = objects.plainTree;
+    gameObjects.push(new StaticObject({
+      objectType: "plainTree",
+      position: {
+        x: _.random(0, 1000),
+        y: _.random(0, 1000)
+      },
+      simulation: true
+    }));
+  }
 
   // let x = 250;
   // let y = 250;
@@ -193,25 +193,25 @@ function initGame(players, maps) {
   //   }
   // }, objects.caveExit));
 
-  // gameObjects.push(new StaticObject({
-  //   position: {
-  //     x: 100,
-  //     y: 100
-  //   },
-  //   objectType: "wheat",
-  //   simulation: true
-  // }));
+  gameObjects.push(new StaticObject({
+    position: {
+      x: 100,
+      y: 100
+    },
+    objectType: "wheat",
+    simulation: true
+  }));
 
-  // gameObjects = gameObjects.concat(scenes.corn.getObjects(
-  //   {
-  //     x: 250,
-  //     y: 250
-  //   },
-  //   {
-  //     width: 440,
-  //     height: 220
-  //   }
-  // ));
+  gameObjects = gameObjects.concat(scenes.corn.getObjects(
+    {
+      x: 250,
+      y: 250
+    },
+    {
+      width: 440,
+      height: 220
+    }
+  ));
 
   return gameObjects;
 }

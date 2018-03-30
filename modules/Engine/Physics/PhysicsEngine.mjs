@@ -207,15 +207,18 @@ export default class PhysicsEngine {
       // TODO: only bounce off first collision
       if (obj.physics.solidity > 0 && target.physics.solidity > 0) {
         if (collision.time !== 0) {
-          obj.position.x = (obj.lastPosition.x +
-            (obj.position.x - obj.lastPosition.x) * collision.time) -
-            Math.sign(obj.position.x - obj.lastPosition.x);
-          obj.position.y = (obj.lastPosition.y +
-            (obj.position.y - obj.lastPosition.y) * collision.time) -
-            Math.sign(obj.position.y - obj.lastPosition.y);
-          obj.position.z = (obj.lastPosition.z +
-            (obj.position.z - obj.lastPosition.z) * collision.time) -
-            Math.sign(obj.position.z - obj.lastPosition.z);
+          _.each(obj.position, (val, axis) => {
+            let diff = (obj.position[axis] - obj.lastPosition[axis]) * collision.time;
+            if (diff !== 0) {
+              obj.position[axis] = obj.lastPosition[axis] + diff + Math.sign(obj.position[axis] - obj.lastPosition[axis]);
+            }
+          });
+          // obj.position.y = (obj.lastPosition.y +
+          //   (obj.position.y - obj.lastPosition.y) * collision.time) -
+          //   Math.sign(obj.position.y - obj.lastPosition.y);
+          // obj.position.z = (obj.lastPosition.z +
+          //   (obj.position.z - obj.lastPosition.z) * collision.time) -
+          //   Math.sign(obj.position.z - obj.lastPosition.z);
         } else {
           // TODO: determine how much the bounds overlap and adjust by that much
           // let sign = obj.position[collision.axis] - obj.lastPosition[collision.axis];
@@ -229,34 +232,37 @@ export default class PhysicsEngine {
           let diff = intersection.targetBounds.top.y - intersection.sourceBounds.bottom.y;
           let axis = "y";
           // Bottom
-          if (Math.abs(intersection.targetBounds.bottom.y - intersection.sourceBounds.top.y) < Math.abs(diff)) {
+          if (intersection.targetBounds.bottom.y - intersection.sourceBounds.top.y < diff) {
             diff = intersection.targetBounds.bottom.y - intersection.sourceBounds.top.y;
           }
           // Left
-          if (Math.abs(intersection.targetBounds.left.x - intersection.sourceBounds.right.x) < Math.abs(diff)) {
+          if (intersection.targetBounds.left.x - intersection.sourceBounds.right.x < diff) {
             axis = "x";
             diff = intersection.targetBounds.left.x - intersection.sourceBounds.right.x;
           }
           // Right
-          if (Math.abs(intersection.targetBounds.right.x - intersection.sourceBounds.left.x) < Math.abs(diff)) {
+          if (intersection.targetBounds.right.x - intersection.sourceBounds.left.x < diff) {
             axis = "x";
             diff = intersection.targetBounds.right.x - intersection.sourceBounds.left.x;
           }
           // Z-Top
-          if (Math.abs(intersection.targetBounds.ztop.z - intersection.sourceBounds.zbottom.z) < Math.abs(diff)) {
+          if (intersection.targetBounds.ztop.z - intersection.sourceBounds.zbottom.z < diff) {
             axis = "z";
             diff = intersection.targetBounds.ztop.z - intersection.sourceBounds.zbottom.z;
           }
           // Z-Bottom
-          if (Math.abs(intersection.targetBounds.zbottom.z - intersection.sourceBounds.ztop.z) < Math.abs(diff)) {
+          if (intersection.targetBounds.zbottom.z - intersection.sourceBounds.ztop.z < diff) {
             axis = "z";
             diff = intersection.targetBounds.zbottom.z - intersection.sourceBounds.ztop.z;
           }
 
-          obj.position[axis] += diff + 1;
-
-          // obj.position.x = obj.lastPosition.x;
-          // obj.position.y = obj.lastPosition.y;
+          if (diff > 0) {
+            obj.position[axis] += diff + 1;
+          } else {
+            obj.position.x = obj.lastPosition.x;
+            obj.position.y = obj.lastPosition.y;
+            obj.position.z = obj.lastPosition.z;
+          }
         }
 
         // TODO: handle diagonal intersections
