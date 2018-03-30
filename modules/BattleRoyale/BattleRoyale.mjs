@@ -550,7 +550,7 @@ export default class BattleRoyale extends Game {
         collision.source.physics.surfaceType === SURFACE_TYPE.GAS) {
       if (_.get(collision.target, "physics.surfaceType") === SURFACE_TYPE.CHARACTER) {
         // TODO: something else
-        if (!collision.source.damagedTargets.includes(collision.target)) {
+        if (!collision.source.damagedTargets.includes(collision.target) && collision.source.damageReady) {
           collision.target.damage(collision.source);
           collision.source.damagedTargets.push(collision.target);
           // TODO: add effect based on character
@@ -577,7 +577,7 @@ export default class BattleRoyale extends Game {
         }
       }
 
-      if (!this.simulation && collision.source.rendering.hitEffect) {
+      if (!this.simulation && collision.source.rendering.hitEffect && collision.source.damageReady) {
         if (collision.source.rendering.hitEffect.particleEffect) {
           this.particleEngine.addEffect(new ParticleEffect({
             position: collision.source.position.plus({

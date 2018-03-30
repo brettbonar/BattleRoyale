@@ -127,7 +127,7 @@ export default {
       // Right now a new hit effect is created each frame
       // TODO: maybe attach a single effect to each projectile and move it with projectile?
       hitEffect: {
-        particleEffect: "light"
+        particleEffect: "lightSmall"
       },
       //shadow: true
     },

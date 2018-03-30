@@ -17,6 +17,7 @@ export default class Projectile extends GameObject {
     this.source = params.source;
     // TODO: action IDs?
     this.action = params.action;
+    this.damageReady = true;
 
     if (params.attackType) {
       this.attack = attacks[params.attackType];
@@ -138,7 +139,8 @@ export default class Projectile extends GameObject {
         this.position.y = Math.max(0, this.position.y);
 
         if (this.currentTime >= this.damageInterval) {
-          this.damagedTargets.length = 0;
+          //this.damagedTargets.length = 0;
+          this.damageReady = true;
           this.currentTime = this.currentTime - this.damageInterval;
         }
       }

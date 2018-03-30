@@ -8,7 +8,18 @@ class Particle {
     this.image = ImageCache.get(this.particleInfo.imageSource);
     this.rotation = Math.atan2(this.direction.y - this.direction.z, this.direction.x ) * 180 / Math.PI;
     this.rotationDiff = 0;
-    this.speed = this.particleInfo.speed || 0;
+
+    if (this.particleInfo.minDuration || this.particleInfo.maxDuration) {
+      this.duration = _.random(this.particleInfo.minDuration, this.particleInfo.maxDuration);
+    } else {
+      this.duration = this.particleInfo.duration || 0;
+    }
+
+    if (this.particleInfo.minSpeed || this.particleInfo.maxSpeed) {
+      this.speed = _.random(this.particleInfo.minSpeed, this.particleInfo.maxSpeed);
+    } else {
+      this.speed = this.particleInfo.speed || 0;
+    }
     this.zspeed = this.particleInfo.zspeed || this.speed;
 
     if (this.particleInfo.acceleration) {
@@ -70,7 +81,7 @@ class Particle {
     }
     this.rotation = Math.atan2(this.direction.y - this.direction.z, this.direction.x ) * 180 / Math.PI;
 
-    if (this.currentTime >= this.particleInfo.duration) {
+    if (this.currentTime >= this.duration) {
       this.done = true;
     }
   }
