@@ -40,6 +40,7 @@ export default class Projectile extends GameObject {
     this.effect = this.attack.effect;
     if (this.effect.path === "beam") {
       this.damageInterval = 1000 / this.effect.damageRate;
+      this.renderClipped = true;
     }
 
     this.startPosition = new Point(this.position);
@@ -119,6 +120,19 @@ export default class Projectile extends GameObject {
       target.position.x = intersection.x - target.direction.x * 16;
       target.position.y = intersection.y - target.direction.y * 16;
     }
+  }
+
+  updatePosition() {
+    if (this.lastPosition) {
+      this.dimensions.width = Math.abs(this.position.x - this.lastPosition.x);
+      this.dimensions.height = Math.abs(this.position.y - this.lastPosition.y);
+      this.perspectiveOffset = {
+        x: Math.min(this.position.x, this.lastPosition.x) - this.position.x,
+        y: Math.min(this.position.y, this.lastPosition.y) - this.position.y
+      };
+    }
+
+    super.updatePosition();
   }
 
   update(elapsedTime) {

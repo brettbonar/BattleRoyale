@@ -149,19 +149,19 @@ function initGame(players, maps) {
   //   simulation: true
   // }));
   
-  for (let i = 0; i < 10; i++) {
-    //let type = _.sample(_.filter(objects, { biome: "plain" }));
-    //let type = _.sample(objects);
-    //let type = objects.plainTree;
-    gameObjects.push(new StaticObject({
-      objectType: "plainTree",
-      position: {
-        x: _.random(0, 1000),
-        y: _.random(0, 1000)
-      },
-      simulation: true
-    }));
-  }
+  // for (let i = 0; i < 10; i++) {
+  //   //let type = _.sample(_.filter(objects, { biome: "plain" }));
+  //   //let type = _.sample(objects);
+  //   //let type = objects.plainTree;
+  //   gameObjects.push(new StaticObject({
+  //     objectType: "plainTree",
+  //     position: {
+  //       x: _.random(0, 1000),
+  //       y: _.random(0, 1000)
+  //     },
+  //     simulation: true
+  //   }));
+  // }
 
   // let x = 250;
   // let y = 250;

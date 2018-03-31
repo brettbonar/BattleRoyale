@@ -37,11 +37,11 @@ export default class BeamRenderer {
     let center = position.plus({ x: imageParams.imageSize / 2, y: imageParams.imageSize / 2 });
     position.add(imageParams.renderOffset)
     
-    if (object.rotation) {
-      context.translate(center.x, center.y);
-      context.rotate((object.rotation * Math.PI) / 180);
-      context.translate(-center.x, -center.y);        
-    }
+    // if (object.rotation) {
+    //   context.translate(center.x, center.y);
+    //   context.rotate((object.rotation * Math.PI) / 180);
+    //   context.translate(-center.x, -center.y);        
+    // }
     
     context.drawImage(image, offset.x, offset.y,
       imageParams.imageSize, imageParams.imageSize,
@@ -51,45 +51,73 @@ export default class BeamRenderer {
     context.restore();
   }
 
-  drawBody(context, object, elapsedTime) {
+  drawBody(context, object, elapsedTime, clipping) {
     context.save();
 
     let dimensions = this.rendering.body.dimensions;
     let imageOffset = this.rendering.start.imageSize / 2;
-    let distance = Math.ceil(object.lastPosition.distanceTo(object.position));
-    for (let i = 0; i < distance; i += dimensions.width) {
-      Scratch.put(this.imageBody, { x: i, y: 0 }, dimensions);
-    }
-    //let rotation = Math.atan2(object.direction.y - object.direction.z, object.direction.x ) * 180 / Math.PI;
-
     let start = object.lastPosition
       .plus({ y: -object.lastPosition.z })
       .plus({ x: imageOffset });
-    //let end = object.position.minus({ y: object.position.z });
 
-    //let center = start.plus(end).scale(0.5);
-    //center.add(imageParams.renderOffset)
-
-    if (object.rotation) {
-      context.translate(start.x, start.y + dimensions.height / 2);
-      context.rotate((object.rotation * Math.PI) / 180);
-      context.translate(-start.x, -(start.y + dimensions.height / 2));
+    let distance = Math.ceil(object.lastPosition.distanceTo(object.position));
+    for (let i = 0; i < distance; i += dimensions.width) {
+      Scratch.put(this.imageBody, { x: i, y: 0 }, dimensions);
+      //context.drawImage(this.imageBody, start.x + i, start.y, dimensions.width, dimensions.height);
     }
 
     let fullDimensions = { width: distance, height: dimensions.height };
     Scratch.drawImageTo(context, new Point(), fullDimensions, start, fullDimensions);
 
+    
+    // context.drawImage(this.canvas, position.x, position.y, dimensions.width, dimensions.height,
+    //   targetPosition.x, targetPosition.y, targetDimensions.width, targetDimensions.height);
+
     context.restore();
   }
 
-  render(context, object, elapsedTime) {
+  render(context, object, elapsedTime, clipping) {
     if (!this.imageStart.complete || !this.imageBody.complete) {
       return;
     }
 
-    this.drawBody(context, object, elapsedTime);
+    if (clipping) {
+      let clipStart = object.bounds.ul
+        .add(object.perspectiveOffset)
+        .add(clipping.offset)
+        .subtract({ y: object.position.z });
+      
+      context.beginPath();
+      if (clipping.offset.y > 0) {
+        clipStart.y += this.rendering.start.imageSize;
+      }
+      context.rect(clipStart.x, clipStart.y,
+        clipping.dimensions.width + this.rendering.start.imageSize,
+        clipping.dimensions.height + this.rendering.start.imageSize);
+
+      if (window.debug) {
+        context.strokeStyle = "red";
+        context.stroke();
+      }
+      context.clip();
+    }
+
+    if (object.rotation) {
+      let imageOffset = this.rendering.start.imageSize / 2;
+      let start = object.lastPosition
+        .plus({ y: -object.lastPosition.z })
+        .plus({ x: imageOffset });
+      context.translate(start.x, start.y + imageOffset);
+      context.rotate((object.rotation * Math.PI) / 180);
+      context.translate(-start.x, -(start.y + imageOffset));
+    }
+
+    this.drawBody(context, object, elapsedTime, clipping);
     this.renderAt(context, this.imageStart, this.rendering.start, object.lastPosition, object);
-    this.renderAt(context, this.imageEnd, this.rendering.end, object.position, object);
+
+    let distance = Math.ceil(object.lastPosition.distanceTo(object.position));
+    this.renderAt(context, this.imageEnd, this.rendering.end,
+      object.lastPosition.plus({ x: distance }), object);
   }
 
   update(elapsedTime) {

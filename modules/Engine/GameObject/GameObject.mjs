@@ -181,31 +181,35 @@ export default class GameObject extends GameObjectProxy {
   }
 
   get left() {
-    return {
+    return new Point({
       x: this.boundingBox.box.ul.x,
-      y: this.center.y
-    };
+      y: this.center.y,
+      z: this.position.z
+    });
   }
 
   get right() {
-    return {
+    return new Point({
       x: this.boundingBox.box.lr.x,
-      y: this.center.y
-    };
+      y: this.center.y,
+      z: this.position.z
+    });
   }
 
   get top() {
-    return {
+    return new Point({
       x: this.center.x,
-      y: this.boundingBox.box.ul.y
-    };
+      y: this.boundingBox.box.ul.y,
+      z: this.position.z
+    });
   }
 
   get bottom() {
-    return {
+    return new Point({
       x: this.center.x,
-      y: this.boundingBox.box.lr.y
-    };
+      y: this.boundingBox.box.lr.y,
+      z: this.position.z
+    });
   }
 
   get center() {

@@ -61,21 +61,20 @@ export default class PerspectiveRenderingEngine extends RenderingEngine{
         if (object.renderClipped) {
           clips.push({
             object: object,
+            bottom: y + object.height,
+            top: y,
             previousClip: 0
           });
           continue;
         }
 
         for (const clip of clips) {
-          // this.context.rect(clip.object.position.x, clip.previousClip,
-          //   clip.object.width, (y - clip.previousClip) - clip.object.zheight);
-          // this.context.clip();
           let height = 0;
-          if (y >= clip.object.bottom.y) {
+          if (y >= clip.bottom) {
             height = clip.object.height - clip.previousClip;
           } else {
             height = Math.round(Math.min(clip.object.height - clip.previousClip,
-              (y - clip.object.top.y - clip.previousClip) - clip.object.zheight));
+              (y - clip.top - clip.previousClip) - clip.object.zheight));
           }
 
           if (height > 0) {
@@ -86,7 +85,7 @@ export default class PerspectiveRenderingEngine extends RenderingEngine{
               }),
               dimensions: new Dimensions({
                 width: clip.object.width,
-                height: height
+                height: height + 1 // TRICKY: add 1 to prevent one off rendering artifacts
               })
             };
             // TODO: reset elapsed time after first render?
@@ -150,21 +149,30 @@ export default class PerspectiveRenderingEngine extends RenderingEngine{
       for (const object of objects) {
         if (object.particles) continue;
 
-        this.context.strokeStyle = "black";
+        this.context.fillStyle = "black";
         this.context.beginPath();
         this.context.arc(object.position.x, object.position.y, 2, 0, 2 * Math.PI);
         this.context.closePath();
         this.context.fill();
 
-        this.context.strokeStyle = "purple";
-        this.context.beginPath();
-        this.context.arc(object.perspectivePosition.x, object.perspectivePosition.y, 5, 0, 2 * Math.PI);
-        this.context.closePath();
-        this.context.fill();
+        // this.context.fillStyle = "purple";
+        // this.context.beginPath();
+        // this.context.arc(object.perspectivePosition.x, object.perspectivePosition.y, 5, 0, 2 * Math.PI);
+        // this.context.closePath();
+        // this.context.fill();
 
-        // let box = object.boundingBox;
-        // this.context.strokeStyle = "yellow";
-        // this.context.strokeRect(box.ul.x, box.ul.y, box.width, box.height);
+        let perspectivePosition = object.perspectivePosition;
+        if (perspectivePosition) {
+          this.context.strokeStyle = "purple";
+          this.context.strokeRect(perspectivePosition.x, perspectivePosition.y,
+            object.width, object.height);
+        }
+
+        let box = object.boundingBox;
+        if (box) {
+          this.context.strokeStyle = "yellow";
+          this.context.strokeRect(box.ul.x, box.ul.y, box.width, box.height);
+        }
           
         for (const bounds of object.lastCollisionBounds) {
           this.context.strokeStyle = "lawnGreen";

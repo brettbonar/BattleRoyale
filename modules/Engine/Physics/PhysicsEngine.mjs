@@ -271,13 +271,17 @@ export default class PhysicsEngine {
         obj.direction[collision.axis] = newDirection;
       }
       
+      let collisionPosition = obj.position.plus({
+        x: intersection.sourceBounds.width / 2,
+        y: intersection.sourceBounds.height / 2
+      });
       collisions.push({
         source: obj,
         sourceBounds: intersection.sourceBounds,
         target: target,
         targetBounds: intersection.targetBounds,
         // TODO: use position of collision from sweep test
-        position: obj.position.copy()
+        position: collisionPosition
       });
       collisions.push({
         source: target,
@@ -285,7 +289,7 @@ export default class PhysicsEngine {
         target: obj,
         targetBounds: intersection.sourceBounds,
         // TODO: use position of collision from sweep test
-        position: obj.position.copy()
+        position: collisionPosition
       });
 
       // this.quadTrees[obj.level].remove(obj);
