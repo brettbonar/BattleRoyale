@@ -15,4 +15,6 @@ const MOVEMENT_TYPE = {
   NORMAL: "normal" // object has "normal" physics
 };
 
-export { SURFACE_TYPE, MOVEMENT_TYPE }
+const AXES = ["x", "y", "z"];
+
+export { SURFACE_TYPE, MOVEMENT_TYPE, AXES }

@@ -66,7 +66,10 @@ export default class Character extends GameObject {
 
     if (!params.attackOrigin) {
       this.attackOrigin = {
-        offset: new Point(this.collisionDimensions[0].offset).plus({ z: 20 }),
+        offset: new Point(this.collisionDimensions[0].offset).plus({
+          y: this.collisionDimensions[0].dimensions.height,
+          z: 20
+        }),
         dimensions: new Dimensions({
           width: this.collisionDimensions[0].dimensions.width,
           height: this.collisionDimensions[0].dimensions.height

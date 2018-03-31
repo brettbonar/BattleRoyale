@@ -33,15 +33,11 @@ export default class BeamRenderer {
     //   drawShadow(context, object, this.rendering.modelDimensions, this.rendering.shadowColor);
     // }
 
-    position = position.minus({ y: position.z });
-    let center = position.plus({ x: imageParams.imageSize / 2, y: imageParams.imageSize / 2 });
+    let imageOffset = imageParams.imageSize / 2;
+    position = position.minus({
+      y: position.z + imageOffset
+    });
     position.add(imageParams.renderOffset)
-    
-    // if (object.rotation) {
-    //   context.translate(center.x, center.y);
-    //   context.rotate((object.rotation * Math.PI) / 180);
-    //   context.translate(-center.x, -center.y);        
-    // }
     
     context.drawImage(image, offset.x, offset.y,
       imageParams.imageSize, imageParams.imageSize,
@@ -56,14 +52,15 @@ export default class BeamRenderer {
 
     let dimensions = this.rendering.body.dimensions;
     let imageOffset = this.rendering.start.imageSize / 2;
-    let start = object.lastPosition
-      .plus({ y: -object.lastPosition.z })
-      .plus({ x: imageOffset });
+    let start = object.lastPosition.plus({
+      x: imageOffset,
+      y: -(object.lastPosition.z + imageOffset)
+    });
 
     let distance = Math.ceil(object.lastPosition.distanceTo(object.position));
     for (let i = 0; i < distance; i += dimensions.width) {
       Scratch.put(this.imageBody, { x: i, y: 0 }, dimensions);
-      //context.drawImage(this.imageBody, start.x + i, start.y, dimensions.width, dimensions.height);
+      //context.drawImage(this.imageBody, start.x + i, start.y, dimensions.width + 1, dimensions.height);
     }
 
     let fullDimensions = { width: distance, height: dimensions.height };
@@ -81,11 +78,12 @@ export default class BeamRenderer {
       return;
     }
 
+    let imageOffset = this.rendering.start.imageSize / 2;
     if (clipping) {
       let clipStart = object.bounds.ul
         .add(object.perspectiveOffset)
         .add(clipping.offset)
-        .subtract({ y: object.position.z });
+        .subtract({ y: object.position.z + imageOffset });
       
       context.beginPath();
       if (clipping.offset.y > 0) {
@@ -103,13 +101,12 @@ export default class BeamRenderer {
     }
 
     if (object.rotation) {
-      let imageOffset = this.rendering.start.imageSize / 2;
       let start = object.lastPosition
         .plus({ y: -object.lastPosition.z })
         .plus({ x: imageOffset });
-      context.translate(start.x, start.y + imageOffset);
+      context.translate(start.x, start.y);
       context.rotate((object.rotation * Math.PI) / 180);
-      context.translate(-start.x, -(start.y + imageOffset));
+      context.translate(-start.x, -start.y);
     }
 
     this.drawBody(context, object, elapsedTime, clipping);

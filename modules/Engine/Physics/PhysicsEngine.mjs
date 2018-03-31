@@ -1,11 +1,29 @@
 import GameObject from "../GameObject/GameObject.mjs"
-import { MOVEMENT_TYPE, SURFACE_TYPE } from "./PhysicsConstants.mjs";
+import { AXES, MOVEMENT_TYPE, SURFACE_TYPE } from "./PhysicsConstants.mjs";
 import Point from "../GameObject/Point.mjs";
 import Bounds from "../GameObject/Bounds.mjs";
 
 export default class PhysicsEngine {
   constructor(params) {
     this.quadTrees = params;
+  }
+
+  getCollisionTime(A1, A2, B1, B2) {
+    let times = AXES.map((axis) => {
+      let diff = A2.ul[axis] - A1.ul[axis];
+      let time = 0;
+      if (diff > 0) { // moving in positive direction
+        time = 1 - (Math.abs(B2.min[axis] - A2.max[axis]) / Math.abs(diff));
+      } else if (diff < 0) { // moving in negative direction
+        time = 1 - (Math.abs(B2.max[axis] - A2.min[axis]) / Math.abs(diff));
+      }
+      return {
+        axis: axis,
+        time: time
+      };
+    });
+
+    return _.maxBy(times, "time");
   }
 
   // https://gamedev.stackexchange.com/questions/13774/how-do-i-detect-the-direction-of-2d-rectangular-object-collisions
@@ -25,10 +43,7 @@ export default class PhysicsEngine {
   // https://www.gamasutra.com/view/feature/3383/simple_intersection_tests_for_games.php?page=3
   sweepTest(A1, A2, B1, B2) {
     if (A2.intersects(B2)) {
-      return {
-        time: 0,
-        axis: this.getCollisionAxis(A1, A2, B1, B2)
-      };
+      return this.getCollisionTime(A1, A2, B1, B2);
     }
 
     // Just check if both Z's are within range
@@ -67,8 +82,8 @@ export default class PhysicsEngine {
       y: Infinity
     };
     let touched = {
-      x: false,
-      y: false
+      x: A2.intersectsAxis(B2, "x"),
+      y: A2.intersectsAxis(B2, "y")
     };
 
     _.each(v, (velocity, axis) => {
@@ -200,68 +215,12 @@ export default class PhysicsEngine {
       let target = intersection.target;
       let collision = intersection.collision;
 
-      // TODO: make this more robust for high speeds
-      // TODO: don't always do this (e.g. piercing projectiles)
-      // TODO: create "bounce" or "elasticity" parameter - bounce objects back by
-      // this much. If 0 then no bounce.
-      // TODO: only bounce off first collision
       if (obj.physics.solidity > 0 && target.physics.solidity > 0) {
-        if (collision.time !== 0) {
-          _.each(obj.position, (val, axis) => {
-            let diff = (obj.position[axis] - obj.lastPosition[axis]) * collision.time;
-            if (diff !== 0) {
-              obj.position[axis] = obj.lastPosition[axis] + diff + Math.sign(obj.position[axis] - obj.lastPosition[axis]);
-            }
-          });
-          // obj.position.y = (obj.lastPosition.y +
-          //   (obj.position.y - obj.lastPosition.y) * collision.time) -
-          //   Math.sign(obj.position.y - obj.lastPosition.y);
-          // obj.position.z = (obj.lastPosition.z +
-          //   (obj.position.z - obj.lastPosition.z) * collision.time) -
-          //   Math.sign(obj.position.z - obj.lastPosition.z);
-        } else {
-          // TODO: determine how much the bounds overlap and adjust by that much
-          // let sign = obj.position[collision.axis] - obj.lastPosition[collision.axis];
-          // if (sign > 0) {
-          //   let dimension = collision.axis === "x" ? "width" : "height";
-          //   obj.position[collision.axis] = intersection.targetBounds.ul[collision.axis] - obj.dimensions[dimension] - 1;
-          // } else {
-          //   obj.position[collision.axis] = intersection.targetBounds.lr[collision.axis] + 1;
-          // }
-          // Top
-          let diff = intersection.targetBounds.top.y - intersection.sourceBounds.bottom.y;
-          let axis = "y";
-          // Bottom
-          if (intersection.targetBounds.bottom.y - intersection.sourceBounds.top.y < diff) {
-            diff = intersection.targetBounds.bottom.y - intersection.sourceBounds.top.y;
-          }
-          // Left
-          if (intersection.targetBounds.left.x - intersection.sourceBounds.right.x < diff) {
-            axis = "x";
-            diff = intersection.targetBounds.left.x - intersection.sourceBounds.right.x;
-          }
-          // Right
-          if (intersection.targetBounds.right.x - intersection.sourceBounds.left.x < diff) {
-            axis = "x";
-            diff = intersection.targetBounds.right.x - intersection.sourceBounds.left.x;
-          }
-          // Z-Top
-          if (intersection.targetBounds.ztop.z - intersection.sourceBounds.zbottom.z < diff) {
-            axis = "z";
-            diff = intersection.targetBounds.ztop.z - intersection.sourceBounds.zbottom.z;
-          }
-          // Z-Bottom
-          if (intersection.targetBounds.zbottom.z - intersection.sourceBounds.ztop.z < diff) {
-            axis = "z";
-            diff = intersection.targetBounds.zbottom.z - intersection.sourceBounds.ztop.z;
-          }
-
-          if (diff > 0) {
-            obj.position[axis] += diff + 1;
-          } else {
-            obj.position.x = obj.lastPosition.x;
-            obj.position.y = obj.lastPosition.y;
-            obj.position.z = obj.lastPosition.z;
+        // TODO: find a good way to allow you to slide along walls without also screwing up beams
+        for (const axis of AXES) {
+          let diff = (obj.position[axis] - obj.lastPosition[axis]) * collision.time;
+          if (diff !== 0) {
+            obj.position[axis] = obj.lastPosition[axis] + diff - Math.sign(obj.position[axis] - obj.lastPosition[axis]);
           }
         }
 
@@ -269,6 +228,8 @@ export default class PhysicsEngine {
         let newDirection = this.getCollisionDirection(obj, target, collision.axis);
         target.direction[collision.axis] = this.getCollisionDirection(target, obj, collision.axis);
         obj.direction[collision.axis] = newDirection;
+
+        obj.updatePosition();
       }
       
       let collisionPosition = obj.position.plus({

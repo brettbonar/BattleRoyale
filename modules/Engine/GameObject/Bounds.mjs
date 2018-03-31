@@ -152,6 +152,10 @@ export default class Bounds {
     return [];
   }
 
+  intersectsAxis(target, axis) {
+    return this.min[axis] < target.max[axis] && this.max[axis] > target.min[axis];
+  }
+
   intersects(target) {
     // TODO: add circle intersection tests
     if (target instanceof Bounds) {
@@ -238,7 +242,7 @@ export default class Bounds {
     return new Point({
       x: this.box.lr.x,
       y: this.box.lr.y,
-      z: this.box.lr.z
+      z: this.box.lr.z + this.zheight
     });
   }
 

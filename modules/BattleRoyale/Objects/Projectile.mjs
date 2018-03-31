@@ -123,7 +123,7 @@ export default class Projectile extends GameObject {
   }
 
   updatePosition() {
-    if (this.lastPosition) {
+    if (this.lastPosition && this.effect && this.effect.path === "beam") {
       this.dimensions.width = Math.abs(this.position.x - this.lastPosition.x);
       this.dimensions.height = Math.abs(this.position.y - this.lastPosition.y);
       this.perspectiveOffset = {
@@ -235,8 +235,8 @@ export default class Projectile extends GameObject {
     // until the projectile's bounds are outside of the character's collision dimensions
     // Center projectile within character's attack origin bounds
     origin.add({
-      x: sourceDimensions.width / 2 - attackDimensions.dimensions.width / 2,
-      y: sourceDimensions.height / 2 - attackDimensions.dimensions.height / 2,
+      x: sourceDimensions.width / 2 - (attackDimensions.dimensions.width / 2 + attackDimensions.offset.x),
+      y: sourceDimensions.height / 2 - (attackDimensions.dimensions.height / 2 + attackDimensions.offset.y),
     });
     // Offset by where the projectile's collision dimensions are located
     //origin.subtract(attackDimensions.offset);

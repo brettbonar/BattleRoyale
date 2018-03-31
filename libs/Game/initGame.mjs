@@ -17,47 +17,47 @@ import scenes from "../../modules/BattleRoyale/Objects/Scenes.mjs";
 
 function initGame(players, maps) {
   let gameObjects = [
-    new Character({
-      body: "darkelf",
-      gender: "female",
-      simulation: true,
-      damagedEffect: effects.blood,
-      loadout: {
-        weapon: equipment.axe,
-        torso: equipment.leatherChestMale,
-        legs: equipment.tealPantsMale,
-        head: equipment.clothHoodMale,
-        feet: equipment.brownShoesMale,
-        hands: equipment.leatherBracersMale
-      },
-      characterDirection: "right",
-      fireReady: true,
-      position: {
-        x: 600,
-        y: 285,
-        z: 0
-      }
-    }),
-    new Character({
-      body: "darkelf",
-      gender: "female",
-      simulation: true,
-      damagedEffect: effects.blood,
-      loadout: {
-        weapon: equipment.axe,
-        torso: equipment.leatherChestMale,
-        legs: equipment.tealPantsMale,
-        head: equipment.clothHoodMale,
-        feet: equipment.brownShoesMale,
-        hands: equipment.leatherBracersMale
-      },
-      fireReady: true,
-      position: {
-        x: 550,
-        y: 550,
-        z: 0
-      }
-    }),
+    // new Character({
+    //   body: "darkelf",
+    //   gender: "female",
+    //   simulation: true,
+    //   damagedEffect: effects.blood,
+    //   loadout: {
+    //     weapon: equipment.axe,
+    //     torso: equipment.leatherChestMale,
+    //     legs: equipment.tealPantsMale,
+    //     head: equipment.clothHoodMale,
+    //     feet: equipment.brownShoesMale,
+    //     hands: equipment.leatherBracersMale
+    //   },
+    //   characterDirection: "right",
+    //   fireReady: true,
+    //   position: {
+    //     x: 600,
+    //     y: 285,
+    //     z: 0
+    //   }
+    // }),
+    // new Character({
+    //   body: "darkelf",
+    //   gender: "female",
+    //   simulation: true,
+    //   damagedEffect: effects.blood,
+    //   loadout: {
+    //     weapon: equipment.axe,
+    //     torso: equipment.leatherChestMale,
+    //     legs: equipment.tealPantsMale,
+    //     head: equipment.clothHoodMale,
+    //     feet: equipment.brownShoesMale,
+    //     hands: equipment.leatherBracersMale
+    //   },
+    //   fireReady: true,
+    //   position: {
+    //     x: 550,
+    //     y: 550,
+    //     z: 0
+    //   }
+    // }),
     new Character({
       body: "darkelf",
       gender: "female",
@@ -149,6 +149,16 @@ function initGame(players, maps) {
   //   simulation: true
   // }));
   
+
+    gameObjects.push(new StaticObject({
+      objectType: "plainTree",
+      position: {
+        x: 500,
+        y: 250
+      },
+      simulation: true
+    }));
+
   // for (let i = 0; i < 10; i++) {
   //   //let type = _.sample(_.filter(objects, { biome: "plain" }));
   //   //let type = _.sample(objects);
@@ -193,25 +203,25 @@ function initGame(players, maps) {
   //   }
   // }, objects.caveExit));
 
-  gameObjects.push(new StaticObject({
-    position: {
-      x: 100,
-      y: 100
-    },
-    objectType: "wheat",
-    simulation: true
-  }));
+  // gameObjects.push(new StaticObject({
+  //   position: {
+  //     x: 100,
+  //     y: 100
+  //   },
+  //   objectType: "wheat",
+  //   simulation: true
+  // }));
 
-  gameObjects = gameObjects.concat(scenes.corn.getObjects(
-    {
-      x: 250,
-      y: 250
-    },
-    {
-      width: 440,
-      height: 220
-    }
-  ));
+  // gameObjects = gameObjects.concat(scenes.corn.getObjects(
+  //   {
+  //     x: 250,
+  //     y: 250
+  //   },
+  //   {
+  //     width: 440,
+  //     height: 220
+  //   }
+  // ));
 
   return gameObjects;
 }

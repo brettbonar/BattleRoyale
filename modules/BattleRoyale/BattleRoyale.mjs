@@ -59,6 +59,8 @@ export default class BattleRoyale extends Game {
       }
     }
 
+    // TODO: create static objects for map boundaries. Also for ground?
+
     this.updateHandlers = {
       changeDirection: (data, elapsedTime) => this.changeDirectionEvent(data, elapsedTime),
       changeTarget: (data, elapsedTime) => this.changeTargetEvent(data, elapsedTime),
@@ -260,6 +262,8 @@ export default class BattleRoyale extends Game {
     this.physicsEngine.update(elapsedTime, this.getPhysicsObjects());
 
     let collisions = this.physicsEngine.getCollisions(this.getPhysicsObjects());
+    // this.physicsEngine.getCollisions(_.map(collisions, "source"))
+    //   .filter((obj) => !(obj instanceof Projectile && obj.effect.path === "beam"));
     for (const collision of collisions) {
       this.handleCollision(collision);
     }
