@@ -246,21 +246,33 @@ export default class GameObject extends GameObjectProxy {
     // return [this.boundingBox];
   }
 
+  getRayBounds(dimensions) {
+    // Place the ray start/end positions perpendicular to the path of the start/end position of this object
+    let direction = this.position.minus(this.lastPosition).normalize();
+    let start = this.lastPosition.plus({
+      x: (dimensions.dimensions.rayDistance / 2) * direction.y,
+      y: -(dimensions.dimensions.rayDistance / 2) * direction.x
+    });
+    let end = this.position.plus({
+      x: (dimensions.dimensions.rayDistance / 2) * direction.y,
+      y: -(dimensions.dimensions.rayDistance / 2) * direction.x
+    });
+    return new Bounds({
+      dimensions: {
+        line: [start, end]
+      },
+      opacity: dimensions.opacity
+    });
+  }
+
   getBoundsFromDimens(position, dimens) {
     let bounds = [];
     for (const dimensions of _.castArray(dimens)) {
-      if (dimensions.offset) {
-        bounds = bounds.concat(_.castArray(dimensions.offset.z).map((z) => {
-          let offset = { x: dimensions.offset.x, y: dimensions.offset.y, z: z };
-          return new Bounds({
-            position: position.plus(offset),
-            dimensions: dimensions.dimensions || this.dimensions,
-            opacity: dimensions.opacity
-          });
-        }));
+      if (dimensions.type === Bounds.TYPE.RAY) {
+        bounds.push(this.getRayBounds(dimensions));
       } else {
         bounds.push(new Bounds({
-          position: position,
+          position: position.plus(dimensions.offset),
           dimensions: dimensions.dimensions || this.dimensions,
           opacity: dimensions.opacity
         }));

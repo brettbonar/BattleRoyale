@@ -264,8 +264,8 @@ export default class Projectile extends GameObject {
       directionOffset = (sourceOrigin.y + sourceDimensions.width) - origin.y;
     }
     origin.add({
-      x: directionOffset * direction.x,
-      y: directionOffset * direction.y
+      x: directionOffset * direction.x + Math.sign(direction.x),
+      y: directionOffset * direction.y + Math.sign(direction.y)
     });
 
     return origin;

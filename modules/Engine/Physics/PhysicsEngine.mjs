@@ -123,16 +123,61 @@ export default class PhysicsEngine {
     return false;
   }
 
-  rayTest(lastBounds, currentBounds, targetLastBounds, targetCurrentBounds) {
-    // TODO: do broadphase detection first
+  // https://stackoverflow.com/questions/563198/how-do-you-detect-where-two-line-segments-intersect/1968345#1968345
+  getLineIntersection(line1, line2) {
+    let minZ1 = Math.min(line1[0].z, line1[0].z);
+    let maxZ1 = Math.max(line1[1].z, line1[1].z);
+    let minZ2 = Math.min(line2[0].z, line2[0].z);
+    let maxZ2 = Math.max(line2[1].z, line2[1].z);
+
+    if (minZ1 > maxZ2 || minZ2 > maxZ1) {
+      return false;
+    }
+
+    let s1_x, s1_y, s2_x, s2_y;
+    s1_x = line1[1].x - line1[0].x;     s1_y = line1[1].y - line1[0].y;
+    s2_x = line2[1].x - line2[0].x;     s2_y = line2[1].y - line2[0].y;
+
+    let s, t;
+    s = (-s1_y * (line1[0].x - line2[0].x) + s1_x * (line1[0].y - line2[0].y)) / (-s2_x * s1_y + s1_x * s2_y);
+    t = ( s2_x * (line1[0].y - line2[0].y) - s2_y * (line1[0].x - line2[0].x)) / (-s2_x * s1_y + s1_x * s2_y);
+
+    if (s >= 0 && s <= 1 && t >= 0 && t <= 1)
+    {
+      // Collision detected
+      return new Point({
+        x: line1[0].x + (t * s1_x),
+        y: line1[0].y + (t * s1_y)
+      });
+    }
+
+    return false;
+  }
+
+  // https://gamedev.stackexchange.com/questions/29479/swept-aabb-vs-line-segment-2d
+  rayBoxTest(A1, A2, ray) {
+    // TODO: can make this more efficient by not getting every line
+    // TODO: first test if either endpoint is within the box
+    // Get lines representing both boxes and the lines between them
+    let lines = _.map(A1.box, (point, loc) => {
+      return [point, A2.box[loc]];
+    }).concat(A1.lines, A2.lines);
     
+    let intersection = _.minBy(lines, (line) => {
+
+    });
   }
 
   getCollision(lastBounds, currentBounds, targetLastBounds, targetCurrentBounds) {
+    // TODO: do broadphase detection first
     if (currentBounds.type === Bounds.TYPE.AABB && targetCurrentBounds.type === Bounds.TYPE.AABB) {
       return this.sweepTest(lastBounds, currentBounds, targetLastBounds, targetCurrentBounds);
+    } else if (currentBounds.type === Bounds.TYPE.AABB && targetCurrentBounds.type === Bounds.TYPE.LINE) {
+      return this.rayBoxTest(lastBounds, currentBounds, targetCurrentBounds);
+    } else if (currentBounds.type === Bounds.TYPE.LINE && targetCurrentBounds.type === Bounds.TYPE.AABB) {
+      return this.rayBoxTest(targetLastBounds, targetCurrentBounds, currentBounds);
     } else {
-      return this.rayTest(lastBounds, currentBounds, targetLastBounds, targetCurrentBounds);
+      return this.rayRayTest(currentBounds, targetCurrentBounds);
     }
   }
 
@@ -258,7 +303,6 @@ export default class PhysicsEngine {
       // this.quadTrees[target.level].remove(target);
       // this.quadTrees[target.level].push(target);
     }
-
 
     return collisions;
   }

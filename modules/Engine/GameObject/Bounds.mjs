@@ -6,19 +6,20 @@ const TYPE = {
   AABB: "aabb",
   CIRCLE: "circle",
   POINT: "point",
-  LINE: "line"
+  LINE: "line",
+  RAY: "ray"
 }
 
 export default class Bounds {
   constructor(params, zheight) {
     this.zheight = zheight || 0;
     this.opacity = params.opacity || 0;
-    this.type = TYPE.AABB;
+    this.type = params.type || TYPE.AABB;
     if (!_.isUndefined(params.ul)) {
       this.constructFromBox(params);
     } else if (!_.isUndefined(params.dimensions.width) && !_.isUndefined(params.dimensions.height)) {
       this.constructFromRectangle(params);
-    } else if (_.isArray(params)) {
+    } else if (!_.isUndefined(params.dimensions.line)) {
       this.constructFromLine(params);
       this.type = TYPE.LINE;
     } else if (!_.isUndefined(params.dimensions.radius)) {
@@ -159,12 +160,17 @@ export default class Bounds {
   intersects(target) {
     // TODO: add circle intersection tests
     if (target instanceof Bounds) {
-      let box = target.box;
-      return this.checkZ(this.box.ul.z, this.zheight, box.ul.z, target.zheight) &&
-        this.box.ul.x < box.lr.x &&
-        this.box.lr.x > box.ul.x &&
-        this.box.ul.y < box.lr.y &&
-        this.box.lr.y > box.ul.y;
+      if (this.type === TYPE.AABB && target.type === TYPE.AABB) {
+        let box = target.box;
+        return this.checkZ(this.box.ul.z, this.zheight, box.ul.z, target.zheight) &&
+          this.box.ul.x < box.lr.x &&
+          this.box.lr.x > box.ul.x &&
+          this.box.ul.y < box.lr.y &&
+          this.box.lr.y > box.ul.y;
+      } else {
+        // TODO: do better check
+        return _.some(this.lines, (line) => _.some((target.lines), (targetLine) => this.intersectsLine(line, targetLine)));
+      }
     } else if (_.isArray(target)) { // Line [{ x, y }, { x, y }]
       return _.some(this.lines, (line) => this.intersectsLine(line, target));
     } else if (!_.isUndefined(target.x) && !_.isUndefined(target.y)) { // Point { x, y }

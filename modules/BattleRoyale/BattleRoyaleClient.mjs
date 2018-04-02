@@ -80,8 +80,7 @@ export default class BattleRoyaleClient extends BattleRoyale {
         this.addObject(obj);
       }
     }
-    // this.ui = ImageCache
-    // this.ui.src = "/Assets/UI/png/bars.png";
+    this.ui = ImageCache.get("/Assets/UI/png/bars.png");
 
     //this.addEventHandler(Game.EVENT.PAUSE, () => this.pause());
     this.keyBindings[KEY_CODE.W] = EVENTS.MOVE_UP;
@@ -368,10 +367,10 @@ export default class BattleRoyaleClient extends BattleRoyale {
 
     this.context.restore();
 
-    // if (this.ui.complete) {
-    //   this.context.drawImage(this.ui, this.context.canvas.width / 2 - 512,
-    //     this.context.canvas.height - 104, 1024, 104);
-    // }
+    if (this.ui.complete) {
+      this.context.drawImage(this.ui, this.context.canvas.width / 2 - 512,
+        this.context.canvas.height - 104, 1024, 104);
+    }
   }
 
   getInteraction(target) {

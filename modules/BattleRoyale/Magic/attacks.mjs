@@ -134,7 +134,7 @@ export default {
     effect: {
       path: "beam",
       damage: 2,
-      damageRate: 4,
+      damageRate: 8,
       // TODO: more shapes
       collisionDimensions: [{
         offset: {
@@ -145,6 +145,27 @@ export default {
           width: 16,
           height: 16,
           zheight: 16
+        }
+      },
+      {
+        type: "ray",
+        offset: {
+          x: 8,
+          y: 8
+        },
+        dimensions: {
+          // Perpendicular distance from object position + offset
+          rayDistance: 11
+        }
+      },
+      {
+        type: "ray",
+        offset: {
+          x: 8,
+          y: 8
+        },
+        dimensions: {
+          rayDistance: -11
         }
       }],
       range: 500,
