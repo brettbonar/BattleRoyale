@@ -36,6 +36,8 @@ const EVENTS = {
   MOVE_RIGHT: "moveRight",
   PRIMARY_FIRE: "primaryFire",
   SECONDARY_FIRE: "secondaryFire",
+  PREVIOUS_WEAPON: "previousWeapon",
+  NEXT_WEAPON: "nextWeapon",
   USE: "use",
   RAISE_ALTITUDE: "raiseAltitude",
   LOWER_ALTITUDE: "lowerAltitude"
@@ -88,6 +90,8 @@ export default class BattleRoyaleClient extends BattleRoyale {
     this.keyBindings[KEY_CODE.A] = EVENTS.MOVE_LEFT;
     this.keyBindings[KEY_CODE.D] = EVENTS.MOVE_RIGHT;
     this.keyBindings[KEY_CODE.E] = EVENTS.USE;
+    this.keyBindings[KEY_CODE.Q] = EVENTS.PREVIOUS_WEAPON;
+    this.keyBindings[KEY_CODE.R] = EVENTS.NEXT_WEAPON;
     this.keyBindings[KEY_CODE.UP] = EVENTS.RAISE_ALTITUDE;
     this.keyBindings[KEY_CODE.DOWN] = EVENTS.LOWER_ALTITUDE;
     this.keyBindings["leftClick"] = EVENTS.PRIMARY_FIRE;
@@ -107,6 +111,8 @@ export default class BattleRoyaleClient extends BattleRoyale {
     this.addEventHandler(EVENTS.USE, (event) => this.use(event));
     this.addEventHandler(EVENTS.RAISE_ALTITUDE, (event) => this.changeAltitude(event, 10));
     this.addEventHandler(EVENTS.LOWER_ALTITUDE, (event) => this.changeAltitude(event, -10));
+    this.addEventHandler(EVENTS.PREVIOUS_WEAPON, (event) => this.previousWeapon(event));
+    this.addEventHandler(EVENTS.NEXT_WEAPON, (event) => this.nextWeapon(event));
 
     this.stateFunctions[Game.STATE.PLAYING].update = (elapsedTime) => this._update(elapsedTime);
     this.stateFunctions[Game.STATE.PLAYING].render = (elapsedTime) => this._render(elapsedTime);
@@ -124,6 +130,26 @@ export default class BattleRoyaleClient extends BattleRoyale {
       console.log("Unknown update: ", data.type);
       console.log(data);
     }
+  }
+
+  previousWeapon(event) {
+    this.sendEvent({
+      type: "previousWeapon",
+      source: {
+        playerId: this.player.playerId,
+        objectId: this.gameState.player.objectId
+      }
+    })
+  }
+
+  nextWeapon(event) {
+    this.sendEvent({
+      type: "nextWeapon",
+      source: {
+        playerId: this.player.playerId,
+        objectId: this.gameState.player.objectId
+      }
+    })
   }
   
   processUpdates(elapsedTime, currentTime) {
@@ -330,7 +356,7 @@ export default class BattleRoyaleClient extends BattleRoyale {
       this.context.save();
       this.context.fillStyle = "green";
       this.context.fillRect(this.interaction.center.x - 8,
-        this.interaction.position.y - this.interaction.height - 20, 
+        this.interaction.position.y - 20, 
         16, 16);
       this.context.restore();
     }
@@ -367,10 +393,10 @@ export default class BattleRoyaleClient extends BattleRoyale {
 
     this.context.restore();
 
-    if (this.ui.complete) {
-      this.context.drawImage(this.ui, this.context.canvas.width / 2 - 512,
-        this.context.canvas.height - 104, 1024, 104);
-    }
+    // if (this.ui.complete) {
+    //   this.context.drawImage(this.ui, this.context.canvas.width / 2 - 512,
+    //     this.context.canvas.height - 104, 1024, 104);
+    // }
   }
 
   getInteraction(target) {

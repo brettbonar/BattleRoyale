@@ -1,5 +1,38 @@
 // TODO: fix sprites that share edges
 import magicEffects from "../Magic/magicEffects.mjs"
+import Bounds from "../../Engine/GameObject/Bounds.mjs"
+
+let items = {
+  fireOrb: {
+    type: "item",
+    itemType: "fireStaff",
+    equipmentType: "fireStaff",
+    name: "Fire Orb",
+    biome: "any",
+    imageSource: "../../Assets/items/fireOrb.png",
+    imageDimensions: {
+      x: 0,
+      y: 0,
+      width: 32,
+      height: 32
+    },
+    physics: {
+      surfaceType: "none",
+    },
+    dimensions: {
+      width: 32,
+      height: 32
+    },
+    interactionDimensions: [
+      {
+        dimensions: {
+          radius: 10
+        },
+        boundsType: Bounds.TYPE.CIRCLE
+      }
+    ]
+  }
+};
 
 export default {
   dragonspear: {
@@ -53,6 +86,7 @@ export default {
   staffMale: {
     imageSource: "/Assets/character/weapons/right hand/male/staff_male.png",
     imageSize: 64,
+    itemType: "staffMale",
     type: "weapon",
     attackType: "thrust",
     hands: 1,
@@ -65,6 +99,7 @@ export default {
   fireStaffMale: {
     imageSource: "/Assets/character/weapons/right hand/male/fireStaff_male.png",
     imageSize: 64,
+    itemType: "fireStaffMale",
     type: "weapon",
     attackType: "thrust",
     hands: 1,
@@ -72,7 +107,8 @@ export default {
     attacks: {
       1: "boulder",
       2: "lionFlare"
-    }
+    },
+    world: items.fireOrb
   },
   lightStaffMale: {
     imageSource: "/Assets/character/weapons/right hand/male/lightStaff.png",

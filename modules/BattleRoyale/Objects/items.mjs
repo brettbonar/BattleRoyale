@@ -37,29 +37,30 @@ export default {
       restoreHealth: 25
     }
   },
-  fireOrb: {
+  fireStaff: {
     type: "item",
-    itemType: "fireOrb",
+    itemType: "fireStaff",
+    equipmentType: "fireStaff",
     name: "Fire Orb",
     biome: "any",
-    imageSource: "../../Assets/items/items.png",
+    imageSource: "../../Assets/items/fireOrb.png",
     imageDimensions: {
-      x: 39,
-      y: 98,
-      width: 19,
-      height: 29
+      x: 0,
+      y: 0,
+      width: 32,
+      height: 32
     },
     physics: {
       surfaceType: "none",
     },
     dimensions: {
-      width: 19,
-      height: 29
+      width: 32,
+      height: 32
     },
     interactionDimensions: [
       {
         dimensions: {
-          radius: 15
+          radius: 10
         },
         boundsType: Bounds.TYPE.CIRCLE
       }

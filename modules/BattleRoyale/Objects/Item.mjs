@@ -1,7 +1,7 @@
 import GameObject from "../../Engine/GameObject/GameObject.mjs"
 import ObjectRenderer from "../Renderers/ObjectRenderer.mjs"
 import objects from "./objects.mjs"
-import items from "./items.mjs"
+import equipment from "./equipment.mjs"
 import { SURFACE_TYPE } from "../../Engine/Physics/PhysicsConstants.mjs"
 
 export default class Item extends GameObject {
@@ -13,9 +13,10 @@ export default class Item extends GameObject {
       }
     }, params));
 
-    let item = items[params.itemType];
+    let item = equipment[params.itemType].world;
     _.merge(this, item);
     this.type = "Item";
+    this.itemType = params.itemType;
 
     if (item.imageSource) {
       if (!params.simulation) {

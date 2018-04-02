@@ -35,7 +35,9 @@ export default class BattleRoyaleServer extends BattleRoyale {
       changeTarget: (data, elapsedTime) => this.changeTargetEvent(data, elapsedTime),
       attack: (data, elapsedTime) => this.attackEvent(data, elapsedTime),
       use: (data, elapsedTime) => this.useEvent(data, elapsedTime),
-      changeAltitude: (data, elapsedTime) => this.changeAltitudeEvent(data, elapsedTime)
+      changeAltitude: (data, elapsedTime) => this.changeAltitudeEvent(data, elapsedTime),
+      nextWeapon: (data, elapsedTime) => this.nextWeaponEvent(data, elapsedTime),
+      previousWeapon: (data, elapsedTime) => this.previousWeaponEvent(data, elapsedTime)
     };
   }
 
@@ -50,6 +52,26 @@ export default class BattleRoyaleServer extends BattleRoyale {
     } else {
       console.log("Unknown update: ", data.type);
       console.log(data);
+    }
+  }
+
+  nextWeaponEvent(data, elapsedTime) {
+    let object = _.find(this.gameState.objects, {
+      playerId: data.source.playerId,
+      objectId: data.source.objectId
+    });
+    if (object) {
+      object.nextWeapon();
+    }
+  }
+
+  previousWeaponEvent(data, elapsedTime) {
+    let object = _.find(this.gameState.objects, {
+      playerId: data.source.playerId,
+      objectId: data.source.objectId
+    });
+    if (object) {
+      object.previousWeapon();
     }
   }
   

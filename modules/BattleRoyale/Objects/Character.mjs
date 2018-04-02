@@ -2,8 +2,9 @@ import GameObject from "../../Engine/GameObject/GameObject.mjs"
 import Point from "../../Engine/GameObject/Point.mjs"
 import Dimensions from "../../Engine/GameObject/Dimensions.mjs"
 import CharacterRenderer, { STATE } from "../Renderers/CharacterRenderer.mjs"
-import { SURFACE_TYPE } from "../../Engine/Physics/PhysicsConstants.mjs";
+import { SURFACE_TYPE } from "../../Engine/Physics/PhysicsConstants.mjs"
 import GameSettings from "../../Engine/GameSettings.mjs"
+import equipment from "./equipment.mjs"
 
 class Action {
   constructor(params) {
@@ -92,6 +93,33 @@ export default class Character extends GameObject {
         loadout: params.state.loadout,
         isOtherPlayer: this.isOtherPlayer
       });
+    }
+  }
+
+  isWeapon(item) {
+    return equipment[item].type === "weapon";
+  }
+
+  previousWeapon() {
+    let inventory = _.reverse(this.state.inventory.slice());
+    let current = inventory.indexOf(this.state.loadout.weapon.itemType);
+    let next = _.find(inventory, this.isWeapon, current + 1);
+    if (!next) {
+      next = _.find(inventory, this.isWeapon);
+    }
+    if (next) {
+      this.state.loadout.weapon = equipment[next];
+    }
+  }
+
+  nextWeapon() {
+    let current = this.state.inventory.indexOf(this.state.loadout.weapon.itemType);
+    let next = _.find(this.state.inventory, this.isWeapon, current + 1);
+    if (!next) {
+      next = _.find(this.state.inventory, this.isWeapon);
+    }
+    if (next) {
+      this.state.loadout.weapon = equipment[next];
     }
   }
 

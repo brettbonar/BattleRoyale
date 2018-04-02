@@ -92,35 +92,35 @@ function initGame(players, maps) {
   let pos = 255;
   //players.push({ playerId: 1, socket: { emit: _.noop } });
   for (const player of players) {
-    gameObjects.push(
-      new Character({
-        body: "tanned",
-        gender: "male",
-        isPlayer: true,
-        playerId: player.playerId,
-        simulation: true,
-        damagedEffect: effects.blood,
-        loadout: {
-          weapon: equipment.lightStaffMale,
-          torso: equipment.leatherChestMale,
-          legs: equipment.tealPantsMale,
-          head: equipment.clothHoodMale,
-          feet: equipment.brownShoesMale,
-          hands: equipment.leatherBracersMale
-        },
-        fireReady: true,
-        position: {
-          x: pos,
-          y: pos,
-          z: 0
-        },
-        direction: {
-          x: 0,
-          y: 0,
-          z: 0
-        }
-      })
-    );
+    let char = new Character({
+      body: "tanned",
+      gender: "male",
+      isPlayer: true,
+      playerId: player.playerId,
+      simulation: true,
+      damagedEffect: effects.blood,
+      loadout: {
+        weapon: equipment.staffMale,
+        torso: equipment.leatherChestMale,
+        legs: equipment.tealPantsMale,
+        head: equipment.clothHoodMale,
+        feet: equipment.brownShoesMale,
+        hands: equipment.leatherBracersMale
+      },
+      fireReady: true,
+      position: {
+        x: pos,
+        y: pos,
+        z: 0
+      },
+      direction: {
+        x: 0,
+        y: 0,
+        z: 0
+      }
+    });
+    char.state.inventory.push("staffMale");
+    gameObjects.push(char);
     pos += 100;
   }
 
@@ -140,14 +140,14 @@ function initGame(players, maps) {
   //   itemType: "healthPotion",
   //   simulation: true
   // }));
-  // gameObjects.push(new Item({
-  //   position: {
-  //     x: 265,
-  //     y: 505
-  //   },
-  //   itemType: "healthPotion",
-  //   simulation: true
-  // }));
+  gameObjects.push(new Item({
+    position: {
+      x: 265,
+      y: 505
+    },
+    itemType: "fireStaffMale",
+    simulation: true
+  }));
   
 
     gameObjects.push(new StaticObject({
