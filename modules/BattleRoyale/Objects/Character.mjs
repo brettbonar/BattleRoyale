@@ -101,13 +101,14 @@ export default class Character extends GameObject {
   }
 
   previousWeapon() {
-    let inventory = _.reverse(this.state.inventory.slice());
+    let inventory = this.state.inventory.slice().reverse();
     let current = inventory.indexOf(this.state.loadout.weapon.itemType);
     let next = _.find(inventory, this.isWeapon, current + 1);
     if (!next) {
       next = _.find(inventory, this.isWeapon);
     }
     if (next) {
+      this.stopAllActions();
       this.state.loadout.weapon = equipment[next];
     }
   }
@@ -119,6 +120,7 @@ export default class Character extends GameObject {
       next = _.find(this.state.inventory, this.isWeapon);
     }
     if (next) {
+      this.stopAllActions();
       this.state.loadout.weapon = equipment[next];
     }
   }
@@ -159,6 +161,14 @@ export default class Character extends GameObject {
     }
   }
 
+  stopAllActions() {
+    let topAction = this.actionStack.shift();
+    while (topAction) {
+      this.stopAction(topAction);
+      topAction = this.actionStack.shift();
+    }
+  }
+
   stopAction(action, elapsedTime) {
     // Release charged attack
     if (action.charge && this.canDoAction(action)) {
@@ -171,6 +181,8 @@ export default class Character extends GameObject {
         this.completeAction(action, modifiers);
       }
     }
+    _.pull(this.actionStack, action);
+    this.nextAction(elapsedTime);
   }
 
   canDoAction(action) {
@@ -207,8 +219,6 @@ export default class Character extends GameObject {
       // TODO: change "blocking" to "charging"?
       if (actionToStop && actionToStop.actionType !== "blocking") {
         this.stopAction(actionToStop, elapsedTime);
-        _.pull(this.actionStack, actionToStop);
-        this.nextAction(elapsedTime);
       }
     } else {
       if (this.canQueueAction(action)) {

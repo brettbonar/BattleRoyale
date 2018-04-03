@@ -235,6 +235,14 @@ export default class CharacterRenderer {
     });
   }
 
+  updateLoadout(character) {
+    // TODO: don't clone every time. Just update pieces that have changed.
+    this.loadout = _.cloneDeep(character.state.loadout);
+    _.each(this.loadout, (piece) => {
+      piece.image = ImageCache.get(piece.imageSource);
+    });
+  }
+
   static get ANIMATIONS() { return ANIMATIONS; }
   static get WEAPON_ANIMATIONS() { return WEAPON_ANIMATIONS; }
   static get MOVE_ANIMATIONS() { return MOVE_ANIMATIONS; }
@@ -359,6 +367,7 @@ export default class CharacterRenderer {
   }
 
   update(elapsedTime, object) {
+    this.updateLoadout(object);
     this.setAnimation(elapsedTime, object);
     if (this.state !== STATE.IDLE) {
       let animationSettings = ANIMATION_SETTINGS[this.animation];

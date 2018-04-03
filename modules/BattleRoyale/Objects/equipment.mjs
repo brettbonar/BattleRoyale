@@ -31,6 +31,35 @@ let items = {
         boundsType: Bounds.TYPE.CIRCLE
       }
     ]
+  },
+  lightOrb: {
+    type: "item",
+    itemType: "lightStaff",
+    equipmentType: "lightStaff",
+    name: "Light Orb",
+    biome: "any",
+    imageSource: "../../Assets/items/lightOrb.png",
+    imageDimensions: {
+      x: 0,
+      y: 0,
+      width: 32,
+      height: 32
+    },
+    physics: {
+      surfaceType: "none",
+    },
+    dimensions: {
+      width: 32,
+      height: 32
+    },
+    interactionDimensions: [
+      {
+        dimensions: {
+          radius: 10
+        },
+        boundsType: Bounds.TYPE.CIRCLE
+      }
+    ]
   }
 };
 
@@ -113,6 +142,7 @@ export default {
   lightStaffMale: {
     imageSource: "/Assets/character/weapons/right hand/male/lightStaff.png",
     imageSize: 64,
+    itemType: "lightStaffMale",
     type: "weapon",
     attackType: "thrust",
     hands: 1,
@@ -120,7 +150,8 @@ export default {
     attacks: {
       1: "lightBeam",
       2: "lightMote"
-    }
+    },
+    world: items.lightOrb
   },
   axe: {
     imageSource: "/Assets/character/weapons/right hand/either/axe.png",

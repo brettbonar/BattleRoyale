@@ -133,6 +133,7 @@ export default class BattleRoyaleClient extends BattleRoyale {
   }
 
   previousWeapon(event) {
+    if (event.release) return;
     this.sendEvent({
       type: "previousWeapon",
       source: {
@@ -143,6 +144,7 @@ export default class BattleRoyaleClient extends BattleRoyale {
   }
 
   nextWeapon(event) {
+    if (event.release) return;
     this.sendEvent({
       type: "nextWeapon",
       source: {
