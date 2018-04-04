@@ -3,7 +3,10 @@ export default {
   magicBall: {
     rendering: {
       imageSource: "../../Assets/magic/magic-ball.png",
-      imageSize: 32,
+      dimensions: {
+        width: 32,
+        height: 32
+      },
       frames: 8,
       framesPerSec: 8,
       repeat: true,
@@ -40,7 +43,10 @@ export default {
     },
     rendering: {
       imageSource: "../../Assets/projectiles/boulder2.png",
-      imageSize: 32,
+      dimensions: {
+        width: 32,
+        height: 32
+      },
       modelDimensions: {
         offset: {
           x: 4,
@@ -101,7 +107,10 @@ export default {
     rendering: {
       start: {
         imageSource: "../../Assets/projectiles/lightBeamStart.png",
-        imageSize: 32,
+        dimensions: {
+          width: 32,
+          height: 32
+        },
         // frames: 4,
         // framesPerSec: 4,
         // repeat: true,
@@ -114,7 +123,10 @@ export default {
       },
       end: {
         imageSource: "../../Assets/projectiles/lightBeamEnd.png",
-        imageSize: 32,
+        dimensions: {
+          width: 32,
+          height: 32
+        },
       },
       body: {
         imageSource: "/Assets/projectiles/lightBeamBody.png",
@@ -191,7 +203,10 @@ export default {
     },
     rendering: {
       imageSource: "../../Assets/projectiles/lightMote.png",
-      imageSize: 32,
+      dimensions: {
+        width: 32,
+        height: 32
+      },
       // TODO: add a "trail" particle effect option
 
       // frames: 4,
@@ -256,7 +271,10 @@ export default {
     },
     rendering: {
       imageSource: "../../Assets/projectiles/Arrow2.png",
-      imageSize: 32,
+      dimensions: {
+        width: 32,
+        height: 32
+      },
       frames: 4,
       framesPerSec: 4,
       repeat: true,
@@ -319,7 +337,10 @@ export default {
     },
     rendering: {
       imageSource: "../../Assets/magic/plasmaball.png",
-      imageSize: 32,
+      dimensions: {
+        width: 32,
+        height: 32
+      },
       frames: 4,
       framesPerSec: 4,
       repeat: true,
@@ -335,7 +356,10 @@ export default {
       },
       hitEffect: {
         imageSource: "../../Assets/magic/plasmaBallHit.png",
-        imageSize: 32,
+        dimensions: {
+          width: 32,
+          height: 32
+        },
         frames: 4,
         framesPerSec: 16,
         repeat: false,
@@ -379,36 +403,41 @@ export default {
     type: "projectile",
     name: "flamethrower",
     rendering: {
-      imageSource: "../../Assets/magic/flamethrower.png",
-      imageSize: 128,
-      frames: 8,
-      framesPerSec: 16,
-      repeat: false,
-      renderOffset: {
-        x: 48,
-        y: 16
+      imageSource: "../../Assets/projectiles/flame.png",
+      dimensions: {
+        width: 64,
+        height: 48
       },
       shadow: false
     },
+    action: {
+      name: "flamethrower",
+      actionDuration: 0,
+      actionRate: 16,
+      actionType: "exclusive",
+      automatic: true,
+      manaCost: 0
+    },
     effect: {
+      path: "stream",
       damage: 5,
       // TODO: more shapes
       collisionDimensions: [{
         offset: {
-          x: 64,
-          y: 64
+          x: 8,
+          y: 8
         },
         dimensions: {
-          width: 16,
-          height: 16,
-          zheight: 16
+          width: 32,
+          height: 32,
+          zheight: 32
         }
       }],
-      range: 100,
+      range: 220,
       attackTime: 1000,
       automatic: true,
-      punchThrough: true,
-      speed: 200
+      punchThrough: false,
+      speed: 400
     }
   },
   lionFlare: {
@@ -430,7 +459,10 @@ export default {
     },
     rendering: {
       imageSource: "../../Assets/magic/flare.png",
-      imageSize: 32,
+      dimensions: {
+        width: 32,
+        height: 32
+      },
       frames: 4,
       framesPerSec: 8,
       repeat: true,

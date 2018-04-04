@@ -3,14 +3,6 @@ import ImageCache from "../../Engine/Rendering/ImageCache.mjs"
 import Point from "../../Engine/GameObject/Point.mjs"
 import Scratch from "../../Engine/Rendering/Scratch.mjs"
 
-function getOffset(animation, frame, imageSize) {
-  let offset = ANIMATION_SETTINGS[animation].offset;
-  return {
-    x: offset.x + frame * imageSize,
-    y: offset.y * imageSize
-  };
-}
-
 export default class BeamRenderer {
   constructor(rendering) {
     this.rendering = rendering;
@@ -26,23 +18,22 @@ export default class BeamRenderer {
 
     let offset = new Point();
     if (imageParams.frames) {
-      offset = getAnimationOffset(this.image, imageParams.imageSize, this.frame);
+      offset = getAnimationOffset(this.image, imageParams.dimensions, this.frame);
     }
 
     // if (this.rendering.shadow) {
     //   drawShadow(context, object, this.rendering.modelDimensions, this.rendering.shadowColor);
     // }
 
-    let imageOffset = imageParams.imageSize / 2;
     position = position.minus({
-      y: position.z + imageOffset
+      y: position.z
     });
     position.add(imageParams.renderOffset)
     
     context.drawImage(image, offset.x, offset.y,
-      imageParams.imageSize, imageParams.imageSize,
+      imageParams.dimensions.width, imageParams.dimensions.height,
       position.x, position.y,
-      imageParams.imageSize, imageParams.imageSize);
+      imageParams.dimensions.width, imageParams.dimensions.height);
 
     context.restore();
   }
@@ -51,10 +42,9 @@ export default class BeamRenderer {
     context.save();
 
     let dimensions = this.rendering.body.dimensions;
-    let imageOffset = this.rendering.start.imageSize / 2;
     let start = object.lastPosition.plus({
-      x: imageOffset,
-      y: -(object.lastPosition.z + imageOffset)
+      x: this.rendering.start.dimensions.width / 2,
+      y: -object.lastPosition.z
     });
 
     let distance = Math.ceil(object.lastPosition.distanceTo(object.position));
@@ -78,20 +68,19 @@ export default class BeamRenderer {
       return;
     }
 
-    let imageOffset = this.rendering.start.imageSize / 2;
     if (clipping) {
       let clipStart = object.bounds.ul
         .add(object.perspectiveOffset)
         .add(clipping.offset)
-        .subtract({ y: object.position.z + imageOffset });
+        .subtract({ y: object.position.z });
       
       context.beginPath();
       if (clipping.offset.y > 0) {
-        clipStart.y += this.rendering.start.imageSize;
+        clipStart.y += this.rendering.start.dimensions.height;
       }
       context.rect(clipStart.x, clipStart.y,
-        clipping.dimensions.width + this.rendering.start.imageSize,
-        clipping.dimensions.height + this.rendering.start.imageSize);
+        clipping.dimensions.width + this.rendering.start.dimensions.width,
+        clipping.dimensions.height + this.rendering.start.dimensions.height);
 
       if (window.debug) {
         context.strokeStyle = "red";
@@ -102,8 +91,8 @@ export default class BeamRenderer {
 
     if (object.rotation) {
       let start = object.lastPosition
-        .plus({ y: -object.lastPosition.z })
-        .plus({ x: imageOffset });
+        .plus({ y: -object.lastPosition.z + this.rendering.start.dimensions.height / 2 })
+        .plus({ x: this.rendering.start.dimensions.width / 2 });
       context.translate(start.x, start.y);
       context.rotate((object.rotation * Math.PI) / 180);
       context.translate(-start.x, -start.y);

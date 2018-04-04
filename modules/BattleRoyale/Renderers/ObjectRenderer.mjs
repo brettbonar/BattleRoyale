@@ -48,7 +48,7 @@ export default class ObjectRenderer {
   renderAnimation(context, object, elapsedTime) {
     if (!this.image.complete || this.done) return;
 
-    let frameOffset = getAnimationOffset(this.image, this.imageSize, this.frame)
+    let frameOffset = getAnimationOffset(this.image, this.imageSize || this.dimensions, this.frame)
     // if (this.rotation) {
     //   context.translate(pos.x + this.imageSize / 2, pos.y + this.imageSize / 2);
     //   context.rotate((this.rotation * Math.PI) / 180);

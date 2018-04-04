@@ -134,7 +134,7 @@ export default {
     hands: 1,
     gender: "male",
     attacks: {
-      1: "boulder",
+      1: "flamethrower",
       2: "lionFlare"
     },
     world: items.fireOrb

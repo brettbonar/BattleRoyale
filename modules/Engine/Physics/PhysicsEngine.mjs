@@ -168,6 +168,8 @@ export default class PhysicsEngine {
     });
   }
 
+  rayRayTest() {}
+
   getCollision(lastBounds, currentBounds, targetLastBounds, targetCurrentBounds) {
     // TODO: do broadphase detection first
     if (currentBounds.type === Bounds.TYPE.AABB && targetCurrentBounds.type === Bounds.TYPE.AABB) {
@@ -270,9 +272,11 @@ export default class PhysicsEngine {
         }
 
         // TODO: handle diagonal intersections
-        let newDirection = this.getCollisionDirection(obj, target, collision.axis);
-        target.direction[collision.axis] = this.getCollisionDirection(target, obj, collision.axis);
-        obj.direction[collision.axis] = newDirection;
+        if (obj.physics.elasticity !== 0 || target.physics.reflectivity !== 0) {
+          let newDirection = this.getCollisionDirection(obj, target, collision.axis);
+          target.direction[collision.axis] = this.getCollisionDirection(target, obj, collision.axis);
+          obj.direction[collision.axis] = newDirection;
+        }
 
         obj.updatePosition();
       }

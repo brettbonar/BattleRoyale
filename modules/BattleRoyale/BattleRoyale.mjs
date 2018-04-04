@@ -86,14 +86,14 @@ export default class BattleRoyale extends Game {
 
   createProjectile(character, params, attack, timeDiff, mods, action) {
     if (attack.type === "projectile") {
-      let direction = character.state.target.minus(character.attackCenter).normalize();
-      direction.z = 0;
+      // let direction = character.state.target.minus(character.attackCenter).normalize();
+      // direction.z = 0;
       this.addObject(Projectile.create({
         source: character,
         action: action,
         simulation: this.simulation,
         attack: attack,
-        direction: direction,
+        //direction: direction,
         modifiers: mods,
         target: character.state.target,
         playerId: params.source.playerId,
@@ -164,6 +164,12 @@ export default class BattleRoyale extends Game {
   handleCollision(collision) {
     if (collision.source.physics.surfaceType === SURFACE_TYPE.PROJECTILE ||
         collision.source.physics.surfaceType === SURFACE_TYPE.GAS) {
+      
+      // Don't let stream weapons interact with themselves
+      if (collision.source.actionId === collision.target.actionId && collision.source.effect.path === "stream") {
+        return;
+      }
+
       if (_.get(collision.target, "physics.surfaceType") === SURFACE_TYPE.CHARACTER) {
         // TODO: something else
         if (!collision.source.damagedTargets.includes(collision.target) && collision.source.damageReady) {
@@ -261,6 +267,7 @@ export default class BattleRoyale extends Game {
 
     this.physicsEngine.update(elapsedTime, this.getPhysicsObjects());
 
+    // TODO: don't simulate projectile collisions on client. Send collision results to client instead.
     let collisions = this.physicsEngine.getCollisions(this.getPhysicsObjects());
     // this.physicsEngine.getCollisions(_.map(collisions, "source"))
     //   .filter((obj) => !(obj instanceof Projectile && obj.effect.path === "beam"));

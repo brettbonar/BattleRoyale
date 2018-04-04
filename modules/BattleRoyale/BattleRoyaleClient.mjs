@@ -254,25 +254,6 @@ export default class BattleRoyaleClient extends BattleRoyale {
     //this.gameState.cursor.position.x =  Math.min(Math.max(x, 0), this.gameSettings.playArea.width - this.gameState.cursor.width);
   }
 
-  createProjectile(character, params, attack, timeDiff, mods, action) {
-    if (attack.type === "projectile") {
-      let direction = character.state.target.minus(character.attackCenter).normalize();
-      direction.z = 0;
-      this.addObject(Projectile.create({
-        source: character,
-        action: action,
-        simulation: this.simulation,
-        attack: attack,
-        direction: direction,
-        modifiers: mods,
-        target: character.state.target,
-        playerId: params.source.playerId,
-        ownerId: params.source.objectId,
-        //elapsedTime: timeDiff
-      }));
-    }
-  }
-
   use(event) {
     if (event.release) {
       this.sendEvent({

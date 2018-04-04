@@ -143,7 +143,7 @@ function initGame(players, maps) {
   gameObjects.push(new Item({
     position: {
       x: 265,
-      y: 505
+      y: 305
     },
     itemType: "fireStaffMale",
     simulation: true
@@ -151,7 +151,7 @@ function initGame(players, maps) {
   gameObjects.push(new Item({
     position: {
       x: 235,
-      y: 505
+      y: 305
     },
     itemType: "lightStaffMale",
     simulation: true
@@ -211,14 +211,14 @@ function initGame(players, maps) {
   //   }
   // }, objects.caveExit));
 
-  // gameObjects.push(new StaticObject({
-  //   position: {
-  //     x: 100,
-  //     y: 100
-  //   },
-  //   objectType: "wheat",
-  //   simulation: true
-  // }));
+  gameObjects.push(new StaticObject({
+    position: {
+      x: 700,
+      y: 700
+    },
+    objectType: "wheat",
+    simulation: true
+  }));
 
   // gameObjects = gameObjects.concat(scenes.corn.getObjects(
   //   {

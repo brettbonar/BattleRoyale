@@ -35,10 +35,12 @@ function drawShadow(context, object, modelDimensions, shadowColor) {
 }
 
 function getAnimationOffset(image, imageSize, frame) {
-  let framesPerRow = image.width / imageSize;
+  let width = imageSize.width || imageSize || 0;
+  let height = imageSize.height || imageSize || 0;
+  let framesPerRow = image.width / width;
   return new Point({
-    x: (frame % framesPerRow) * imageSize,
-    y: imageSize * Math.floor(frame / framesPerRow)
+    x: (frame % framesPerRow) * width,
+    y: height * Math.floor(frame / framesPerRow)
   });
 }
 

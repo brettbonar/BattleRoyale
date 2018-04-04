@@ -1,14 +1,6 @@
 import { drawShadow, getAnimationOffset } from "../../Engine/Rendering/renderUtils.mjs";
 import ImageCache from "../../Engine/Rendering/ImageCache.mjs";
 
-function getOffset(animation, frame, imageSize) {
-  let offset = ANIMATION_SETTINGS[animation].offset;
-  return {
-    x: offset.x + frame * imageSize,
-    y: offset.y * imageSize
-  };
-}
-
 export default class ProjectileRenderer {
   constructor(projectile) {
     this.projectile = projectile;
@@ -21,14 +13,17 @@ export default class ProjectileRenderer {
     if (!this.image.complete) {
       return;
     }
-    let offset = getAnimationOffset(this.image, this.projectile.imageSize, this.frame);
+    let offset = getAnimationOffset(this.image, this.projectile.dimensions, this.frame);
 
     if (this.projectile.shadow) {
       drawShadow(context, object, this.projectile.modelDimensions, this.projectile.shadowColor);
     }
 
     let position = object.position.minus({ y: object.position.z });
-    let center = position.plus({ x: this.projectile.imageSize / 2, y: this.projectile.imageSize / 2});
+    let center = position.plus({
+      x: this.projectile.dimensions.width / 2,
+      y: this.projectile.dimensions.height / 2
+    });
     position.add(this.projectile.renderOffset)
 
     context.save();
@@ -40,9 +35,9 @@ export default class ProjectileRenderer {
     }
     
     context.drawImage(this.image, offset.x, offset.y,
-      this.projectile.imageSize, this.projectile.imageSize,
+      this.projectile.dimensions.width, this.projectile.dimensions.height,
       position.x, position.y,
-      this.projectile.imageSize, this.projectile.imageSize);
+      this.projectile.dimensions.width, this.projectile.dimensions.height);
 
     context.restore();
   }

@@ -41,6 +41,10 @@ export default class PerspectiveRenderingEngine extends RenderingEngine{
     this.context.restore();
   }
 
+  sortClips(clip) {
+    return clip.object.position.z + clip.object.dimensions.zheight;
+  }
+
   // Render highest to lowest y
   render(objects, elapsedTime, center) {
     //window.debug = true;
@@ -65,6 +69,7 @@ export default class PerspectiveRenderingEngine extends RenderingEngine{
             top: y,
             previousClip: 0
           });
+          clips = _.sortBy(clips, this.sortClips);
           continue;
         }
 
@@ -175,12 +180,14 @@ export default class PerspectiveRenderingEngine extends RenderingEngine{
         }
           
         for (const bounds of object.lastCollisionBounds) {
+          if (!bounds.box) continue; // TODO: render ray bounds
           this.context.strokeStyle = "lawnGreen";
           this.context.strokeRect(bounds.ul.x, bounds.ul.y - bounds.ul.z,
             bounds.width, bounds.height);
         }
 
         for (const bounds of object.collisionBounds) {
+          if (!bounds.box) continue; // TODO: render ray bounds
           this.context.strokeStyle = "crimson";
           this.context.strokeRect(bounds.ul.x, bounds.ul.y - bounds.ul.z,
             bounds.width, bounds.height);

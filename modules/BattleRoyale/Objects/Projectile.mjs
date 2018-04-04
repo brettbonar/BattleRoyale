@@ -145,8 +145,7 @@ export default class Projectile extends GameObject {
       if (!this.source || !this.source.currentAction || this.source.currentAction.actionId !== this.actionId) {
         this.done = true;
       } else {
-        this.direction = new Point(this.source.state.target).subtract(this.source.attackCenter).normalize();
-        this.direction.z = 0;
+        this.direction = Projectile.getAttackDirection(this.source, this.attack);
         this.lastPosition = Projectile.getAttackOrigin(this.source, this.attack, this.direction);
         this.position = this.lastPosition.plus(this.direction.times(this.effect.range));
         this.position.x = Math.max(0, this.position.x);
@@ -168,9 +167,7 @@ export default class Projectile extends GameObject {
         if (dist < 5) {
           this.speed = 0;
         } else {
-          let targetDirection = new Point(this.source.state.target).subtract(center).normalize();
-          targetDirection.z = 0;
-
+          let targetDirection = Projectile.getAttackDirection(this.source, this.attack, center);
           let xdiff = targetDirection.x - this.direction.x;
           let ydiff = targetDirection.y - this.direction.y;
           this.direction.add({
@@ -222,6 +219,16 @@ export default class Projectile extends GameObject {
     // TODO: take height into consideration?
     return -acceleration.z * time / 2;
   }
+  
+  static getAttackDirection(source, attack, origin) {
+    let direction = source.state.target.minus(origin || source.attackCenter);
+    //if (attack.effect.path !== "arc") {
+    direction.y -= direction.z;
+    //}
+    direction.z = 0;
+    direction.normalize();
+    return direction;
+  }
 
   static getAttackOrigin(source, attack, direction) {
     // TODO: do this better
@@ -272,12 +279,12 @@ export default class Projectile extends GameObject {
   }
 
   static create(params) {
-    let origin = Projectile.getAttackOrigin(params.source, params.attack, params.direction);
+    let direction = Projectile.getAttackDirection(params.source, params.attack);
+    let origin = Projectile.getAttackOrigin(params.source, params.attack, direction);
 
     // TRICKY: given position will be relative to center, shift so its centered
     // this.position.subtract({ x: this.dimensions.width / 2, y: this.dimensions.height / 2});
     let acceleration = new Point();
-    let direction = new Point(params.direction);
     let speed = params.attack.effect.speed;
     if (params.modifiers && !_.isUndefined(params.modifiers.speed)) {
       speed *= params.modifiers.speed;
