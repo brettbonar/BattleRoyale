@@ -78,15 +78,15 @@ function initGame(players, maps) {
         z: 0
       }
     }),
-    new Building({
-      buildingType: "house",
-      simulation: true,
-      position: {
-        x: 500,
-        y: 500,
-        z: 0
-      }
-    })
+    // new Building({
+    //   buildingType: "house",
+    //   simulation: true,
+    //   position: {
+    //     x: 500,
+    //     y: 500,
+    //     z: 0
+    //   }
+    // })
   ];
 
   let pos = 255;
@@ -156,6 +156,14 @@ function initGame(players, maps) {
     itemType: "lightStaffMale",
     simulation: true
   }));
+  gameObjects.push(new Item({
+    position: {
+      x: 295,
+      y: 305
+    },
+    itemType: "bow",
+    simulation: true
+  }));
   
 
     gameObjects.push(new StaticObject({
@@ -220,16 +228,23 @@ function initGame(players, maps) {
     simulation: true
   }));
 
-  // gameObjects = gameObjects.concat(scenes.corn.getObjects(
-  //   {
-  //     x: 250,
-  //     y: 250
-  //   },
-  //   {
-  //     width: 440,
-  //     height: 220
-  //   }
-  // ));
+  gameObjects = gameObjects.concat(scenes.house.getObjects(
+    {
+      x: 500,
+      y: 500
+    }
+  ));
+
+  gameObjects = gameObjects.concat(scenes.corn.getObjects(
+    {
+      x: 250,
+      y: 250
+    },
+    {
+      width: 440,
+      height: 220
+    }
+  ));
 
   return gameObjects;
 }

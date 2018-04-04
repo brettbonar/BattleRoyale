@@ -3,6 +3,35 @@ import magicEffects from "../Magic/magicEffects.mjs"
 import Bounds from "../../Engine/GameObject/Bounds.mjs"
 
 let items = {
+  bow: {
+    type: "item",
+    itemType: "bow",
+    equipmentType: "bow",
+    name: "Bow",
+    biome: "any",
+    imageSource: "../../Assets/items/bow.png",
+    imageDimensions: {
+      x: 0,
+      y: 0,
+      width: 64,
+      height: 64
+    },
+    physics: {
+      surfaceType: "none",
+    },
+    dimensions: {
+      width: 64,
+      height: 64
+    },
+    interactionDimensions: [
+      {
+        dimensions: {
+          radius: 15
+        },
+        boundsType: Bounds.TYPE.CIRCLE
+      }
+    ]
+  },
   fireOrb: {
     type: "item",
     itemType: "fireStaff",
@@ -111,6 +140,19 @@ export default {
       1: "lightBeam",
       2: "lightMote"
     }
+  },
+  bow: {
+    imageSource: "/Assets/character/weapons/right hand/either/bow.png",
+    imageSize: 64,
+    itemType: "bow",
+    type: "weapon",
+    attackType: "bow",
+    hands: 1,
+    gender: "either",
+    attacks: {
+      1: "arrow"
+    },
+    world: items.bow
   },
   staffMale: {
     imageSource: "/Assets/character/weapons/right hand/male/staff_male.png",

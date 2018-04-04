@@ -1,9 +1,32 @@
 import objects from "./objects.mjs"
 import StaticObject from "./StaticObject.mjs"
+import Building from "../Buildings/Building.mjs"
 
 const scenes = {};
 
+scenes.house = {
+  biomes: ["plain"],
+  minCount: 1,
+  maxCount: 2,
+  size: {
+    width: 200,
+    height: 400
+  },
+  getObjects: function (position, dimensions) {
+    return [
+      new Building({
+        buildingType: "house",
+        simulation: true,
+        position: position
+      })
+    ];
+  }
+}
+
 scenes.corn = {
+  biomes: ["plain"],
+  minCount: 2,
+  maxCount: 4,
   // 10x5
   minSize: {
     width: 220,

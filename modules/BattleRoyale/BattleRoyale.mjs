@@ -105,10 +105,12 @@ export default class BattleRoyale extends Game {
 
   doAttack(character, params, elapsedTime) {
     let attack = attacks[character.state.loadout.weapon.attacks[params.attackType]];
-    character.doAction("attack", params.release, attack.action, elapsedTime,
-      (timeDiff, mods, action) => {
-        this.createProjectile(character, params, attack, timeDiff, mods, action);
-      });
+    if (attack) {
+      character.doAction("attack", params.release, attack.action, elapsedTime,
+        (timeDiff, mods, action) => {
+          this.createProjectile(character, params, attack, timeDiff, mods, action);
+        });
+    }
   }
 
   attack(event, attackType) {
