@@ -1,4 +1,5 @@
 import BattleRoyale from "./BattleRoyale.mjs"
+import BattleRoyaleInterface from "./BattleRoyaleInterface.mjs"
 
 import KEY_CODE from "../util/keyCodes.mjs"
 import Game from "../Engine/Game.mjs"
@@ -40,7 +41,8 @@ const EVENTS = {
   NEXT_WEAPON: "nextWeapon",
   USE: "use",
   RAISE_ALTITUDE: "raiseAltitude",
-  LOWER_ALTITUDE: "lowerAltitude"
+  LOWER_ALTITUDE: "lowerAltitude",
+  SHOW_MAP: "showMap"
 }
 
 let sequenceNumber = 1;
@@ -66,6 +68,7 @@ export default class BattleRoyaleClient extends BattleRoyale {
     this.menus = params.menus;
     this.updates = [];
     this.pendingUpdates = [];
+    this.objectUpdates = [];
 
     this.gameState = {
       cursor: {
@@ -82,7 +85,7 @@ export default class BattleRoyaleClient extends BattleRoyale {
         this.addObject(obj);
       }
     }
-    this.ui = ImageCache.get("/Assets/UI/png/bars.png");
+    this.interface = new BattleRoyaleInterface();
 
     //this.addEventHandler(Game.EVENT.PAUSE, () => this.pause());
     this.keyBindings[KEY_CODE.W] = EVENTS.MOVE_UP;
@@ -92,6 +95,7 @@ export default class BattleRoyaleClient extends BattleRoyale {
     this.keyBindings[KEY_CODE.E] = EVENTS.USE;
     this.keyBindings[KEY_CODE.Q] = EVENTS.PREVIOUS_WEAPON;
     this.keyBindings[KEY_CODE.R] = EVENTS.NEXT_WEAPON;
+    this.keyBindings[KEY_CODE.M] = EVENTS.SHOW_MAP;
     this.keyBindings[KEY_CODE.UP] = EVENTS.RAISE_ALTITUDE;
     this.keyBindings[KEY_CODE.DOWN] = EVENTS.LOWER_ALTITUDE;
     this.keyBindings["leftClick"] = EVENTS.PRIMARY_FIRE;
@@ -113,22 +117,15 @@ export default class BattleRoyaleClient extends BattleRoyale {
     this.addEventHandler(EVENTS.LOWER_ALTITUDE, (event) => this.changeAltitude(event, -10));
     this.addEventHandler(EVENTS.PREVIOUS_WEAPON, (event) => this.previousWeapon(event));
     this.addEventHandler(EVENTS.NEXT_WEAPON, (event) => this.nextWeapon(event));
+    this.addEventHandler(EVENTS.SHOW_MAP, (event) => this.showMap(event));
 
     this.stateFunctions[Game.STATE.PLAYING].update = (elapsedTime) => this._update(elapsedTime);
     this.stateFunctions[Game.STATE.PLAYING].render = (elapsedTime) => this._render(elapsedTime);
   }
 
-  updateState(data, elapsedTime, eventTime) {
-    if (this.updateHandlers[data.type]) {
-      //handler(data, elapsedTime);
-      this.updates.push({
-        update: data,
-        elapsedTime: 0,//elapsedTime,
-        eventTime: eventTime
-      });
-    } else {
-      console.log("Unknown update: ", data.type);
-      console.log(data);
+  showMap(event) {
+    if (!event.release) {
+      this.interface.showFullMap = !this.interface.showFullMap;
     }
   }
 
@@ -152,15 +149,6 @@ export default class BattleRoyaleClient extends BattleRoyale {
         objectId: this.gameState.player.objectId
       }
     })
-  }
-  
-  processUpdates(elapsedTime, currentTime) {
-    for (const update of this.updates) {
-      let handler = this.updateHandlers[update.update.type];
-      elapsedTime = update.elapsedTime + ((currentTime - update.eventTime) - elapsedTime);
-      handler(update.update, elapsedTime);
-    }
-    this.updates.length = 0;
   }
 
   changeAltitude(event, amount) {
@@ -209,20 +197,34 @@ export default class BattleRoyaleClient extends BattleRoyale {
     }
   }
 
-  updateObjects(objects) {
-    for (const object of objects) {
-      object.simulation = this.simulation;
-      let existing = _.find(this.gameState.objects, {
-        objectId: object.objectId,
-        playerId: object.playerId
-      });
-      if (existing) {
-        existing.updateState(object);
-        this.clearAndApplyUpdates(object);
-      } else {
-        this.addObject(this.createObject(object));
+  processUpdates(elapsedTime) {
+    let now = performance.now();
+    for (const update of this.objectUpdates) {
+      for (const object of update.objects) {
+        object.simulation = this.simulation;
+        let existing = _.find(this.gameState.objects, {
+          objectId: object.objectId,
+          playerId: object.playerId
+        });
+        if (existing) {
+          existing.updateState(object);
+          this.clearAndApplyUpdates(object);
+        } else {
+          let obj = this.createObject(object);
+          obj.elapsedTime = (now - update.time) - elapsedTime;
+          this.addObject(obj);
+        }
       }
     }
+
+    this.objectUpdates.length = 0;
+  }
+
+  updateObjects(objects) {
+    this.objectUpdates.push({
+      objects: objects,
+      time: performance.now()
+    });
   }
 
   removeObjects(objects) {
@@ -380,6 +382,7 @@ export default class BattleRoyaleClient extends BattleRoyale {
     //   this.context.drawImage(this.ui, this.context.canvas.width / 2 - 512,
     //     this.context.canvas.height - 104, 1024, 104);
     // }
+    this.interface.render(this.context, this.gameState.player, this.maps);
   }
 
   getInteraction(target) {
@@ -406,6 +409,7 @@ export default class BattleRoyaleClient extends BattleRoyale {
   }
 
   _update(elapsedTime) {
+    this.processUpdates(elapsedTime);
     super._update(elapsedTime);
 
     let target = this.getAbsoluteCursorPosition();

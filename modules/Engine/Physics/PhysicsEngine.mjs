@@ -4,8 +4,9 @@ import Point from "../GameObject/Point.mjs";
 import Bounds from "../GameObject/Bounds.mjs";
 
 export default class PhysicsEngine {
-  constructor(params) {
-    this.quadTrees = params;
+  constructor(grid) {
+    //this.quadTrees = params;
+    //this.grid = grid;
   }
 
   getCollisionTime(A1, A2, B1, B2) {
@@ -311,7 +312,7 @@ export default class PhysicsEngine {
     return collisions;
   }
 
-  getCollisions(objects) {
+  getCollisions(objects, grid) {
     let collisions = [];
     for (const obj of objects) {
       // if (obj.physics.movementType === MOVEMENT_TYPE.NORMAL) {
@@ -320,7 +321,8 @@ export default class PhysicsEngine {
       if (obj.physics.surfaceType === SURFACE_TYPE.CHARACTER || 
           obj.physics.surfaceType === SURFACE_TYPE.PROJECTILE ||
           obj.physics.surfaceType === SURFACE_TYPE.GAS) {
-        collisions = collisions.concat(this.detectCollisions(obj, objects, collisions));
+        let collisionObjects = grid.getAdjacent(obj);
+        collisions = collisions.concat(this.detectCollisions(obj, collisionObjects, collisions));
         // Do twice to capture additional collisions after movement
         //collisions = collisions.concat(this.detectCollisions(obj, objects));
       }
@@ -343,7 +345,7 @@ export default class PhysicsEngine {
     return collisions;
   }
 
-  update(elapsedTime, objects) {
+  update(elapsedTime, objects, grid) {
     // TRICKY: Not sure why this happens at the beginning
     if (!elapsedTime) return [];
 
@@ -385,6 +387,7 @@ export default class PhysicsEngine {
           }
         }
 
+        grid.update(obj);
         obj.updatePosition();
       }
       if (obj.spin) {

@@ -121,7 +121,7 @@ export default class PerspectiveRenderingEngine extends RenderingEngine{
       this.renderObject(clip.object, elapsedTime, center, clipping);
     }
     
-    this.debugBoxes(objects);
+    this.debugBoxes(renderObjects);
 
     
     // let pos = {
@@ -151,66 +151,69 @@ export default class PerspectiveRenderingEngine extends RenderingEngine{
 
   debugBoxes(objects) {
     if (window.debug) {
-      for (const object of objects) {
-        if (object.particles) continue;
+      for (const objSets of objects) {
+        if (!objSets) continue;
+        for (const object of objSets) {
+          if (object.particles) continue;
 
-        this.context.fillStyle = "black";
-        this.context.beginPath();
-        this.context.arc(object.position.x, object.position.y, 2, 0, 2 * Math.PI);
-        this.context.closePath();
-        this.context.fill();
+          this.context.fillStyle = "black";
+          this.context.beginPath();
+          this.context.arc(object.position.x, object.position.y, 2, 0, 2 * Math.PI);
+          this.context.closePath();
+          this.context.fill();
 
-        // this.context.fillStyle = "purple";
-        // this.context.beginPath();
-        // this.context.arc(object.perspectivePosition.x, object.perspectivePosition.y, 5, 0, 2 * Math.PI);
-        // this.context.closePath();
-        // this.context.fill();
+          // this.context.fillStyle = "purple";
+          // this.context.beginPath();
+          // this.context.arc(object.perspectivePosition.x, object.perspectivePosition.y, 5, 0, 2 * Math.PI);
+          // this.context.closePath();
+          // this.context.fill();
 
-        let perspectivePosition = object.perspectivePosition;
-        if (perspectivePosition) {
-          this.context.strokeStyle = "purple";
-          this.context.strokeRect(perspectivePosition.x, perspectivePosition.y,
-            object.width, object.height);
+          let perspectivePosition = object.perspectivePosition;
+          if (perspectivePosition) {
+            this.context.strokeStyle = "purple";
+            this.context.strokeRect(perspectivePosition.x, perspectivePosition.y,
+              object.width, object.height);
+          }
+
+          let box = object.boundingBox;
+          if (box) {
+            this.context.strokeStyle = "yellow";
+            this.context.strokeRect(box.ul.x, box.ul.y, box.width, box.height);
+          }
+            
+          for (const bounds of object.lastCollisionBounds) {
+            if (!bounds.box) continue; // TODO: render ray bounds
+            this.context.strokeStyle = "lawnGreen";
+            this.context.strokeRect(bounds.ul.x, bounds.ul.y - bounds.ul.z,
+              bounds.width, bounds.height);
+          }
+
+          for (const bounds of object.collisionBounds) {
+            if (!bounds.box) continue; // TODO: render ray bounds
+            this.context.strokeStyle = "crimson";
+            this.context.strokeRect(bounds.ul.x, bounds.ul.y - bounds.ul.z,
+              bounds.width, bounds.height);
+          }
+
+          // for (let i = 0; i < object.collisionBounds.length; i++) {
+          //   this.context.strokeStyle = "blue";
+          //   let bounds = object.lastCollisionBounds[i].plus(object.collisionBounds[i]);
+          //   this.context.strokeRect(bounds.ul.x, bounds.ul.y - bounds.ul.z,
+          //     bounds.width, bounds.height);
+          // }
+          // for (const terrainBox of object.terrainBoundingBox) {
+          //   this.context.strokeStyle = "lawnGreen";
+          //   this.context.strokeRect(terrainBox.ul.x, terrainBox.ul.y, terrainBox.width, terrainBox.height);
+          // }
+          // for (const hitbox of object.hitbox) {
+          //   this.context.strokeStyle = "crimson";
+          //   this.context.strokeRect(hitbox.ul.x, hitbox.ul.y, hitbox.width, hitbox.height);
+          // }
+          // for (const losBox of object.losBoundingBox) {
+          //   this.context.strokeStyle = "aqua";
+          //   this.context.strokeRect(losBox.ul.x, losBox.ul.y, losBox.width, losBox.height);
+          // }
         }
-
-        let box = object.boundingBox;
-        if (box) {
-          this.context.strokeStyle = "yellow";
-          this.context.strokeRect(box.ul.x, box.ul.y, box.width, box.height);
-        }
-          
-        for (const bounds of object.lastCollisionBounds) {
-          if (!bounds.box) continue; // TODO: render ray bounds
-          this.context.strokeStyle = "lawnGreen";
-          this.context.strokeRect(bounds.ul.x, bounds.ul.y - bounds.ul.z,
-            bounds.width, bounds.height);
-        }
-
-        for (const bounds of object.collisionBounds) {
-          if (!bounds.box) continue; // TODO: render ray bounds
-          this.context.strokeStyle = "crimson";
-          this.context.strokeRect(bounds.ul.x, bounds.ul.y - bounds.ul.z,
-            bounds.width, bounds.height);
-        }
-
-        // for (let i = 0; i < object.collisionBounds.length; i++) {
-        //   this.context.strokeStyle = "blue";
-        //   let bounds = object.lastCollisionBounds[i].plus(object.collisionBounds[i]);
-        //   this.context.strokeRect(bounds.ul.x, bounds.ul.y - bounds.ul.z,
-        //     bounds.width, bounds.height);
-        // }
-        // for (const terrainBox of object.terrainBoundingBox) {
-        //   this.context.strokeStyle = "lawnGreen";
-        //   this.context.strokeRect(terrainBox.ul.x, terrainBox.ul.y, terrainBox.width, terrainBox.height);
-        // }
-        // for (const hitbox of object.hitbox) {
-        //   this.context.strokeStyle = "crimson";
-        //   this.context.strokeRect(hitbox.ul.x, hitbox.ul.y, hitbox.width, hitbox.height);
-        // }
-        // for (const losBox of object.losBoundingBox) {
-        //   this.context.strokeStyle = "aqua";
-        //   this.context.strokeRect(losBox.ul.x, losBox.ul.y, losBox.width, losBox.height);
-        // }
       }
     }
   }
@@ -221,11 +224,15 @@ export default class PerspectiveRenderingEngine extends RenderingEngine{
     let losBounds = [];
     for (const object of objects) {
       for (const renderObj of object.renderObjects) {
-        let pos = Math.round(renderObj.perspectivePosition.y);
-        if (!renderObjects[pos]) {
-          renderObjects[pos] = [];
+        if (renderObj.position.x + renderObj.width > center.x - this.context.canvas.width && renderObj.position.x + renderObj.width < center.x + this.context.canvas.width &&
+            renderObj.position.y + renderObj.height > center.y - this.context.canvas.height && renderObj.position.y + renderObj.height < center.y + this.context.canvas.height)
+        {
+          let pos = Math.round(renderObj.perspectivePosition.y);
+          if (!renderObjects[pos]) {
+            renderObjects[pos] = [];
+          }
+          renderObjects[pos].push(renderObj);
         }
-        renderObjects[pos].push(renderObj);
       }
 
       //if (object.physics.surfaceType !== SURFACE_TYPE.CHARACTER || object.isThisPlayer) {

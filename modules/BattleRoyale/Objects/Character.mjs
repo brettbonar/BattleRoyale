@@ -334,9 +334,9 @@ export default class Character extends GameObject {
   update(elapsedTime) {
     this.renderer.update(elapsedTime + this.elapsedTime, this);
     for (const cooldown of this.cooldowns) {
-      cooldown.currentTime += elapsedTime;
+      cooldown.currentTime += elapsedTime + this.elapsedTime;
     }
-    this.updateAction(this.currentAction, elapsedTime);
+    this.updateAction(this.currentAction, elapsedTime + this.elapsedTime);
     _.remove(this.cooldowns, (cooldown) => {
       return cooldown.currentTime >= cooldown.cooldownTime;
     });

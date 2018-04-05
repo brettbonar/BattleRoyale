@@ -27,6 +27,14 @@ class Particle {
     }
   }
 
+  get width() {
+    return this.particleInfo.dimensions.width;
+  }
+
+  get height() {
+    return this.particleInfo.dimensions.height;
+  }
+
   get perspectivePosition() { return this.position; }
 
   update(elapsedTime) {

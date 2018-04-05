@@ -1,8 +1,9 @@
 "use strict";
 
-import { getDistance } from './util.mjs'
+import { getDistance } from "./util.mjs"
 import flavor from "./BattleRoyale/Objects/flavor.mjs"
 import ImageCache from "./Engine/Rendering/ImageCache.mjs"
+import SimplexNoise from "../shared/SimplexNoise.mjs"
 
 const BIOMES = {
   FOREST: "forest",
@@ -24,13 +25,28 @@ const BIOME_PARAMS = {
     flavorDensity: 0.1
   },
   [BIOMES.DESERT]: {
-    flavorDensity: 0.1
+    flavorDensity: 0.1,
+    sceneDensity: 0.025,
+    noise: {
+      min: -1,
+      max: -0.5
+    }
   },
   [BIOMES.FOREST]: {
-    flavorDensity: 0.1
+    flavorDensity: 0.1,
+    sceneDensity: 0.025,
+    noise: {
+      min: -0.5,
+      max: 0.25
+    }
   },
   [BIOMES.PLAIN]: {
-    flavorDensity: 0.1
+    flavorDensity: 0.1,
+    sceneDensity: 0.005,
+    noise: {
+      min: 0.25,
+      max: 1.0
+    }
   },
 };
 
@@ -117,11 +133,12 @@ class Map {
       this.buildMap(params.map);
     } else {
       this.initializeMap();
-      this.generateVoronoi();
+      this.generateSimplex();
     }    
   }
 
   static get BIOMES() { return BIOMES; }
+  static get BIOME_PARAMS() { return BIOME_PARAMS; }
 
   buildMap(map) {
     this.map = [];
@@ -469,11 +486,20 @@ class Map {
     }
   }
 
-  render(context, position) {
+  render(context, position, location, dimensions) {
     if (this.canvas) {
-      context.drawImage(this.canvas, position.x - context.canvas.width / 2, position.y - context.canvas.height / 2,
-        context.canvas.width, context.canvas.height, 0, 0, context.canvas.width, context.canvas.height);
-      //context.drawImage(this.canvas, 0, 0, context.canvas.width, context.canvas.height);
+      if (location) {
+        if (dimensions) {
+          context.drawImage(this.canvas, 
+            position.x - dimensions.width / 2, position.y - dimensions.height / 2, dimensions.width, dimensions.height,
+            location.position.x, location.position.y, location.dimensions.width, location.dimensions.height);  
+        } else {
+          context.drawImage(this.canvas, location.position.x, location.position.y, location.dimensions.width, location.dimensions.height);  
+        }
+      } else {
+        context.drawImage(this.canvas, position.x - context.canvas.width / 2, position.y - context.canvas.height / 2,
+          context.canvas.width, context.canvas.height, 0, 0, context.canvas.width, context.canvas.height);
+      }
     }
   }
 
@@ -529,6 +555,38 @@ class Map {
     });
 
     this.growVoronoi(seeds);
+  }
+
+  getTileType(noise) {
+    return _.findKey(BIOME_PARAMS, (params, type) => {
+      return params.noise && noise < params.noise.max && noise >= params.noise.min;
+    });
+  }
+
+  initTileSimplex(tile, noise) {
+    let type = this.getTileType(noise);
+    tile.type = type;
+    // Get noise in 0-1 range
+    tile.noise = (noise - BIOME_PARAMS[type].noise.min) / (BIOME_PARAMS[type].noise.max - BIOME_PARAMS[type].noise.min);
+    if (Math.random() <= BIOME_PARAMS[type].flavorDensity) {
+      let tileFlavor = _.sample(_.filter(flavor, { biome: type }));
+      if (tileFlavor) {
+        tile.flavor = tileFlavor.name;
+      }
+    }
+  }
+
+  generateSimplex() {
+    let simplexNoise = new SimplexNoise();
+
+    let width = this.map.length;
+    for (let x = 0; x < width; x++) {
+      let height = this.map[x].length;
+      for (let y = 0; y < height; y++) {
+        let noise = simplexNoise.noise2D(x / width - 0.5, y / height - 0.5)
+        this.initTileSimplex(this.map[x][y], noise);
+      }
+    }    
   }
 }
 

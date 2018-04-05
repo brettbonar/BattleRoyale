@@ -16,7 +16,7 @@ export default class ProjectileRenderer {
     let offset = getAnimationOffset(this.image, this.projectile.dimensions, this.frame);
 
     if (this.projectile.shadow) {
-      drawShadow(context, object, this.projectile.modelDimensions, this.projectile.shadowColor);
+      //drawShadow(context, object, this.projectile.modelDimensions, this.projectile.shadowColor);
     }
 
     let position = object.position.minus({ y: object.position.z });

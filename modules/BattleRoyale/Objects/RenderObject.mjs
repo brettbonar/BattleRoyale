@@ -15,10 +15,12 @@ export default class RenderObject extends GameObject {
     }, params));
     this.type = "RenderObject";
     this.renderer = new ObjectRenderer(rendering);
-    this.perspectiveDimensions = this.perspectiveDimensions || rendering.perspectiveDimensions;
+    this.perspectiveDimensions = rendering.perspectiveDimensions || this.perspectiveDimensions;
     this.losFade = params.losFade || rendering.losFade;
     this.fadeEndOffset = rendering.fadeEndOffset;
     this.fadeDimensions = rendering.fadeDimensions;
+    this.dimensions = rendering.dimensions || this.dimensions;
+    this.perspectiveOffset = rendering.perspectiveOffset || this.perspectiveOffset;
 
     if (rendering.collisionDimensions) {
       this.collisionDimensions = this.parseDimensions(rendering.collisionDimensions);

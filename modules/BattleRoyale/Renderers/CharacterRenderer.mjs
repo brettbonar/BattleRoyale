@@ -347,9 +347,9 @@ export default class CharacterRenderer {
 
     let offset = getOffset(this.animation, this.frame, imageSize);
 
-    if (object.position.z > 0) {
-      drawShadow(context, object, this.modelDimensions);
-    }
+    //if (object.position.z > 0) {
+      //drawShadow(context, object, this.modelDimensions);
+    //}
 
     context.drawImage(this.body, offset.x, offset.y, imageSize, imageSize,
       object.position.x, object.position.y - object.position.z, imageSize, imageSize);

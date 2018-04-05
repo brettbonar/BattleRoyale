@@ -24,6 +24,7 @@ app.use(session({
 
 app.use(express.static("public"));
 app.use("/modules", express.static("modules"));
+app.use("/shared", express.static("shared/client"));
 app.use("/extern", express.static("node_modules"));
 app.use("/node_modules", express.static("node_modules"));
 app.use("/games", games);

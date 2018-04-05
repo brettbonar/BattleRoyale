@@ -25,7 +25,8 @@ import effects from "./Effects/effects.mjs"
 import attacks from "./Magic/attacks.mjs"
 import RenderObject from "./Objects/RenderObject.mjs"
 import ImageCache from "../Engine/Rendering/ImageCache.mjs"
-import ParticleEffect from "../Engine/Effects/ParticleEffect.mjs";
+import ParticleEffect from "../Engine/Effects/ParticleEffect.mjs"
+import Grid from "../Engine/Grid.mjs"
 
 const EVENTS = {
   MOVE_UP: "moveUp",
@@ -45,9 +46,12 @@ export default class BattleRoyale extends Game {
   constructor(params) {
     super(params);
     
-    this.physicsEngine = new PhysicsEngine(params.quadTrees);
+    // TODO: create a separate render grid?
+    this.grid = new Grid(400);
+    this.physicsEngine = new PhysicsEngine(this.grid);
     this.updates = [];
     this.pendingUpdates = [];
+    // TODO: create grid for each level
 
     this.gameState = {
       objects: []
@@ -75,12 +79,14 @@ export default class BattleRoyale extends Game {
     // TODO: move objects between quad trees when level changes
     if (object.collisionDimensions.length > 0) {
       //this.quadTrees[object.level].push(object);
+      this.grid.add(object);
     }
   }
 
   removeObject(object) {
     // TODO: move objects between quad trees when level changes
     //this.quadTrees[object.level].remove(object);
+    this.grid.remove(object);
     _.pull(this.gameState.objects, object);
   }
 
@@ -214,7 +220,7 @@ export default class BattleRoyale extends Game {
             effect: effects[collision.source.rendering.hitEffect.particleEffect]
           }));
         } else {
-          this.gameState.objects.push(new RenderObject({
+          this.addObject(new RenderObject({
             position: collision.position,
             //dimensions: collision.source.dimensions,
             rotation: collision.source.rotation
@@ -235,7 +241,7 @@ export default class BattleRoyale extends Game {
 
   _update(elapsedTime) {
     for (const obj of this.gameState.objects) {
-      obj.elapsedTime = 0;
+      //obj.elapsedTime = 0;
       if (obj.done && (this.simulation || obj.type === "RenderObject")) {
         this.removeObject(obj);
       }
@@ -244,42 +250,46 @@ export default class BattleRoyale extends Game {
     // TODO: move above physics?
     let updates = [];
     for (const obj of this.getPhysicsObjects()) {
-      obj.elapsedTime = 0;
+      //obj.elapsedTime = 0;
       // TODO: fix this hack
       // TODO: remove objects outside of game bounds
       if (obj.done && (this.simulation || obj.type === "RenderObject")) {
         this.removeObject(obj);
       } else {
         let update = obj.update(elapsedTime);
+        if (!obj.position.equals(obj.lastPosition)) {
+          this.grid.update(obj);
+        }
         if (update) {
           this.onCollision(update);
         }
         // Test if a beam intersects any other beams
         // TODO: fix this so it doesn't ignore people in path of beam
         // TODO: make beams consist of start box, end box, and lines for center and sides
-        if (obj instanceof Projectile && obj.effect.path === "beam") {
-          for (const target of this.gameState.objects) {
-            if (target instanceof Projectile && target.effect.path === "beam") {
-              obj.beamIntersects(target);
-            }
-          }
-        }
+        // if (obj instanceof Projectile && obj.effect.path === "beam") {
+        //   for (const target of this.gameState.objects) {
+        //     if (target instanceof Projectile && target.effect.path === "beam") {
+        //       obj.beamIntersects(target);
+        //     }
+        //   }
+        // }
       }
     }
 
-    this.physicsEngine.update(elapsedTime, this.getPhysicsObjects());
+    this.physicsEngine.update(elapsedTime, this.getPhysicsObjects(), this.grid);
 
     // TODO: don't simulate projectile collisions on client. Send collision results to client instead.
-    let collisions = this.physicsEngine.getCollisions(this.getPhysicsObjects());
+    let collisions = this.physicsEngine.getCollisions(this.getPhysicsObjects(), this.grid);
     // this.physicsEngine.getCollisions(_.map(collisions, "source"))
     //   .filter((obj) => !(obj instanceof Projectile && obj.effect.path === "beam"));
     for (const collision of collisions) {
       this.handleCollision(collision);
     }
 
-    for (const character of this.gameState.objects) {
-      if (character instanceof Character && !character.dead && character.currentHealth <= 0) {
-        character.kill();
+    for (const obj of this.gameState.objects) {
+      obj.elapsedTime = 0;
+      if (obj instanceof Character && !obj.dead && obj.currentHealth <= 0) {
+        obj.kill();
       }
     }
   }

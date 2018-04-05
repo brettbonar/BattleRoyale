@@ -85,6 +85,7 @@ export default class GameObject extends GameObjectProxy {
 
     this.position = new Point(this.position);    
     this.lastPosition = new Point(this.position);
+    this.grids = [];
 
     if (this.static) {
       this.staticBox = new Bounds({
@@ -147,6 +148,8 @@ export default class GameObject extends GameObjectProxy {
       position.add({ y: this.height });
     }
     this.perspectivePosition = position.add({ y: this.position.z });
+
+    this.updateBounds();
   }
 
   getCenterOfPoints(points) {
@@ -298,12 +301,45 @@ export default class GameObject extends GameObjectProxy {
     }
   }
 
+  updateBounds() {
+    // if (this.lastPosition) {
+    //   this.lastCollisionBounds = this.getBoundsFromDimens(this.lastPosition, this.collisionDimensions);
+    //   this.collisionBounds = this.getBoundsFromDimens(this.position, this.collisionDimensions);
+    //   this.lastLosBounds = this.getBoundsFromDimens(this.lastPosition,
+    //       _.castArray(this.collisionDimensions).filter((dimens) => dimens.opacity > 0));
+    //   this.losBounds = this.getBoundsFromDimens(this.position,
+    //       _.castArray(this.collisionDimensions).filter((dimens) => dimens.opacity > 0));
+    //   this.getLastInteractionsBoundingBox = this.getAllBounds(this.lastPosition, this.interactionDimensions);
+    //   this.interactionsBoundingBox = this.getAllBounds(this.position, this.interactionDimensions);
+    //   this.boundingBox = this.staticBox || 
+    //       new Bounds({
+    //         position: this.position,
+    //         dimensions: this.dimensions,
+    //         boundsType: this.boundsType
+    //       });
+    //   this.bounds = this.boundingBox;
+    //   this.prevBounds = this.staticBox || 
+    //     new Bounds({
+    //       position: this.lastPosition,
+    //       dimensions: this.dimensions,
+    //       boundsType: this.boundsType
+    //     });
+    //   }
+  }
+
   get lastCollisionBounds() {
     return this.getBoundsFromDimens(this.lastPosition, this.collisionDimensions);
   }
 
   get collisionBounds() {
     return this.getBoundsFromDimens(this.position, this.collisionDimensions);
+  }
+
+  get collisionExtents() {
+    let bounds = this.collisionBounds.concat(this.lastCollisionBounds);
+    return bounds.reduce((prev, current) => {
+      return prev.plus(current);
+    }, bounds[0]);
   }
   
   get lastLosBounds() {

@@ -87,6 +87,16 @@ export default class Bounds {
 
   constructFromLine(params) {
     this.lines = [params.dimensions.line];
+    let A = params.dimensions.line[0];
+    let B = params.dimensions.line[1];
+    let z = Math.min(params.dimensions.line[0].z, params.dimensions.line[1].z);
+    this.zheight = z + Math.max(params.dimensions.line[0].z, params.dimensions.line[1].z);
+    this.box = {
+      ul: new Point({ x: Math.min(A.x, B.x), y: Math.min(A.y, B.y), z: z}),
+      ur: new Point({ x: Math.max(A.x, B.x), y: Math.min(A.y, B.y), z: z}),
+      lr: new Point({ x: Math.max(A.x, B.x), y: Math.max(A.y, B.y), z: z}),
+      ll: new Point({ x: Math.min(A.x, B.x), y: Math.max(A.y, B.y), z: z})
+    };
   }
 
   constructFromCircle(params) {

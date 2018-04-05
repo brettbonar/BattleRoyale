@@ -136,7 +136,7 @@ export default class Projectile extends GameObject {
   }
 
   update(elapsedTime) {
-    this.currentTime += elapsedTime;
+    this.currentTime += elapsedTime + this.elapsedTime;
     if (this.currentTime >= this.maxTime) {
       this.done = true;
     }
@@ -171,8 +171,8 @@ export default class Projectile extends GameObject {
           let xdiff = targetDirection.x - this.direction.x;
           let ydiff = targetDirection.y - this.direction.y;
           this.direction.add({
-            x: Math.max(xdiff, xdiff * (elapsedTime / 50)),
-            y: Math.max(ydiff, ydiff * (elapsedTime / 50))
+            x: Math.max(xdiff, xdiff * ((elapsedTime + this.elapsedTime) / 50)),
+            y: Math.max(ydiff, ydiff * ((elapsedTime + this.elapsedTime) / 50))
           }).normalize();
           this.speed = getRangeMap(dist, 100, 0, this.effect.speed, 0, smoothStop(2));
         }
@@ -184,7 +184,7 @@ export default class Projectile extends GameObject {
 
     this.rotation = Math.atan2(this.direction.y - this.direction.z, this.direction.x ) * 180 / Math.PI;
 
-    this.renderer.update(elapsedTime);
+    this.renderer.update(elapsedTime + this.elapsedTime);
 
     if (!this.done && this.effect.doTriggerCollision && this.effect.doTriggerCollision(this)) {
       this.done = true;

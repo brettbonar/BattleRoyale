@@ -342,7 +342,7 @@ export default {
           height: 178,
         },
         fadeEndOffset: {
-          y: 196
+          y: 64
         },
         offset: {
           z: 156,
@@ -362,6 +362,20 @@ export default {
         offset: {
           x: 41,
           y: 156
+        }
+      },
+      {
+        // Tree shadow
+        imageSource: "../../Assets/plants/plant repack-64.png",
+        imageDimensions: {
+          x: 7,
+          y: 1231,
+          width: 130,
+          height: 64
+        },
+        offset: {
+          x: 28,
+          y: 181
         }
       }
     ],
@@ -444,28 +458,99 @@ export default {
   },
   forestTree: {
     biome: "forest",
-    imageSource: "../../Assets/terrain_atlas-64.png",
-    imageDimensions: {
-      x: 1922,
-      y: 10,
-      width: 126,
-      height: 293,
-      offset: {
-        x: 65
+    images: [
+      {
+        // Tree top
+        imageSource: "../../Assets/plants/plant repack-64.png",
+        imageDimensions: {
+          x: 370,
+          y: 1030,
+          width: 170,
+          height: 184,
+        },
+        dimensions: {
+          width: 170,
+          height: 184,
+          zheight: 184
+        },
+        fadeEndOffset: {
+          y: 64
+        },
+        offset: {
+          z: 164,
+          y: 164
+        },
+        losFade: true
+      },
+      {
+        // Tree base
+        imageSource: "../../Assets/plants/plant repack-64.png",
+        imageDimensions: {
+          x: 552,
+          y: 1090,
+          width: 120,
+          height: 128
+        },
+        perspectiveOffset: {
+          y: 105
+        },
+        dimensions: {
+          width: 120,
+          height: 128,
+          zheight: 128
+        },
+        offset: {
+          x: 30,
+          y: 164
+        }
+      },
+      {
+        // Tree shadow
+        imageSource: "../../Assets/plants/plant repack-64.png",
+        imageDimensions: {
+          x: 685,
+          y: 1158,
+          width: 120,
+          height: 60
+        },
+        perspectiveOffset: {
+          y: 0
+        },
+        dimensions: {
+          width: 120,
+          height: 60,
+          zheight: 0
+        },
+        offset: {
+          x: 30,
+          y: 232
+        }
       }
-    },
+    ],
     physics: {
       surfaceType: "terrain"
     },
+    // 522, 924 -> 170x294
+    // TODO: fix
     dimensions: {
-      width: 66,
-      height: 34
+      width: 170,
+      height: 294,
+      zheight: 273
     },
-    losDimensions: {
-      width: 66,
-      height: 34
-    },
-    losFade: true
+    collisionDimensions: [
+      {
+        offset: {
+          x: 73,
+          y: 256
+        },
+        dimensions: {
+          width: 32,
+          height: 12,
+          zheight: 196
+        },
+        opacity: 1.0
+      }
+    ]
   },
   darkRock1: {
     biome: "darkRock",

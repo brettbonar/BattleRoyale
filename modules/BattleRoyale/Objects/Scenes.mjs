@@ -4,6 +4,56 @@ import Building from "../Buildings/Building.mjs"
 
 const scenes = {};
 
+scenes.plainTree = {
+  biomes: ["plain"],
+  size: {
+    width: 96,
+    height: 44
+  },
+  weight: 25,
+  getObjects: function (position, dimensions) {
+    let offset = {
+      x: -45,
+      y: -188
+    };
+    return [
+      new StaticObject({
+        objectType: "plainTree",
+        position: {
+          x: position.x + offset.x,
+          y: position.y + offset.y
+        },
+        simulation: true
+      })
+    ];
+  }
+}
+
+scenes.forestTree = {
+  biomes: ["forest"],
+  size: {
+    width: 200,
+    height: 400
+  },
+  weight: 1,
+  getObjects: function (position, dimensions) {
+    let offset = {
+      x: -73,
+      y: -256
+    };
+    return [
+      new StaticObject({
+        objectType: "forestTree",
+        position: {
+          x: position.x + offset.x,
+          y: position.y + offset.y
+        },
+        simulation: true
+      })
+    ];
+  }
+}
+
 scenes.house = {
   biomes: ["plain"],
   minCount: 1,
@@ -12,6 +62,7 @@ scenes.house = {
     width: 200,
     height: 400
   },
+  weight: 1,
   getObjects: function (position, dimensions) {
     return [
       new Building({
@@ -36,9 +87,14 @@ scenes.corn = {
     width: 440,
     height: 220
   },
+  weight: 3,
   getObjects: function (position, dimensions) {
     let spacing = 22;
     let sceneObjects = [];
+    dimensions = {
+      width: 330,
+      height: 160
+    };
     for (let i = 0; i < dimensions.width / spacing; i++) {
       for (let j = 0; j < dimensions.height / spacing; j++) {
         let type = _.sample(_.filter(objects, { group: "corn" })).objectType;
