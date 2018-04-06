@@ -189,10 +189,26 @@ export default class BattleRoyaleClient extends BattleRoyale {
     }
   }
 
+  applyUpdate(update) {
+    if (update.type === "changeDirection") {
+      let obj = _.find(this.gameState.objects, update.source);
+      if (obj) {
+        obj.setDirection(update.direction);
+      }
+    } else if (update.type === "changeTarget") {
+      let obj = _.find(this.gameState.objects, update.source);
+      if (obj) {
+        obj.setTarget(update.target);
+      }
+    }
+  }
+
   clearAndApplyUpdates(object) {
     for (const update of this.pendingUpdates) {
       if (update.source.revision <= object.revision) {
         _.pull(this.pendingUpdates, update);
+      } else {
+        this.applyUpdate(update);
       }
     }
   }
@@ -207,7 +223,11 @@ export default class BattleRoyaleClient extends BattleRoyale {
           playerId: object.playerId
         });
         if (existing) {
-          existing.updateState(object, object.elapsedTime - (now - update.time));
+          //if (existing.revision <= object.revision) {
+            existing.updateState(object, update.elapsedTime);
+          //}
+            //existing.updateState(object, object.elapsedTime - (now - update.time));
+          //}
           this.clearAndApplyUpdates(object);
         } else {
           let obj = this.createObject(object);
@@ -322,19 +342,16 @@ export default class BattleRoyaleClient extends BattleRoyale {
       direction.x += 1;
     }
 
-    if (this.gameState.player.direction.x !== direction.x ||
-        this.gameState.player.direction.y !== direction.y) {
-      this.gameState.player.setDirection(direction);
+    this.gameState.player.setDirection(direction);
 
-      this.sendEvent({
-        type: "changeDirection",
-        source: {
-          playerId: this.player.playerId,
-          objectId: this.gameState.player.objectId
-        },
-        direction: direction
-      });
-    }
+    this.sendEvent({
+      type: "changeDirection",
+      source: {
+        playerId: this.player.playerId,
+        objectId: this.gameState.player.objectId
+      },
+      direction: direction
+    });
   }
 
   renderInteractions() {
@@ -414,7 +431,7 @@ export default class BattleRoyaleClient extends BattleRoyale {
     super._update(elapsedTime);
 
     let target = this.getAbsoluteCursorPosition();
-    if (!this.gameState.player.target || !target.equals(this.gameState.player.target)) {
+    if (!this.gameState.player.state.target || !target.equals(this.gameState.player.state.target)) {
       this.gameState.player.setTarget(target);
 
       this.sendEvent({

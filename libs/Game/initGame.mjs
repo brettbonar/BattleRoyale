@@ -100,26 +100,26 @@ function initGame(players, maps) {
     //     z: 0
     //   }
     // }),
-    new Character({
-      body: "darkelf",
-      gender: "female",
-      simulation: true,
-      damagedEffect: effects.blood,
-      loadout: {
-        weapon: equipment.axe,
-        torso: equipment.leatherChestMale,
-        legs: equipment.tealPantsMale,
-        head: equipment.clothHoodMale,
-        feet: equipment.brownShoesMale,
-        hands: equipment.leatherBracersMale
-      },
-      fireReady: true,
-      position: {
-        x: 500,
-        y: 100,
-        z: 0
-      }
-    }),
+    // new Character({
+    //   body: "darkelf",
+    //   gender: "female",
+    //   simulation: true,
+    //   damagedEffect: effects.blood,
+    //   loadout: {
+    //     weapon: equipment.axe,
+    //     torso: equipment.leatherChestMale,
+    //     legs: equipment.tealPantsMale,
+    //     head: equipment.clothHoodMale,
+    //     feet: equipment.brownShoesMale,
+    //     hands: equipment.leatherBracersMale
+    //   },
+    //   fireReady: true,
+    //   position: {
+    //     x: 500,
+    //     y: 100,
+    //     z: 0
+    //   }
+    // }),
     // new Building({
     //   buildingType: "house",
     //   simulation: true,

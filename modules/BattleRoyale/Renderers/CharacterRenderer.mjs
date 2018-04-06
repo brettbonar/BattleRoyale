@@ -393,7 +393,7 @@ export default class CharacterRenderer {
       this.state = STATE.ATTACKING;
       this.animation = WEAPON_ANIMATIONS[object.state.loadout.weapon.attackType][object.state.characterDirection];
       this.animationDuration = Math.max(this.currentAction.actionDuration, 250);
-    } else if (object.direction.x || object.direction.y) {
+    } else if (object.direction.x || object.direction.y || object.moving) {
       this.state = STATE.MOVING;
       this.animation = MOVE_ANIMATIONS[object.state.characterDirection];
     } else {

@@ -75,10 +75,9 @@ export default class BattleRoyaleInterface {
   }
 
   render(context, player, maps) {
+    this.drawMinimap(context, player, maps);
     if (this.showFullMap) {
       this.drawFullMap(context, player, maps);
-    } else {
-      this.drawMinimap(context, player, maps);
     }
   }
 }

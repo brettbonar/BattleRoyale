@@ -499,6 +499,7 @@ class Map {
       } else {
         context.drawImage(this.canvas, position.x - context.canvas.width / 2, position.y - context.canvas.height / 2,
           context.canvas.width, context.canvas.height, 0, 0, context.canvas.width, context.canvas.height);
+        //context.drawImage(this.canvas, 0, 0, context.canvas.width, context.canvas.height);
       }
     }
   }

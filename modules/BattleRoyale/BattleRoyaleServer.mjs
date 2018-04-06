@@ -119,7 +119,7 @@ export default class BattleRoyaleServer extends BattleRoyale {
       objectId: data.source.objectId
     });
     if (object) {
-      object.direction = data.direction;
+      object.setDirection(data.direction);
       object.revision = data.source.revision;
       object.elapsedTime = elapsedTime || 0;
     }

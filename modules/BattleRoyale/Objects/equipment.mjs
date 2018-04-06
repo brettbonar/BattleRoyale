@@ -163,8 +163,8 @@ export default {
     hands: 1,
     gender: "male",
     attacks: {
-      1: "arrow",
-      2: "plasmaBall"
+      1: "plasmaBall",
+      2: "boulder"
     }
   },
   fireStaffMale: {

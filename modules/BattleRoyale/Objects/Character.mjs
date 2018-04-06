@@ -332,15 +332,17 @@ export default class Character extends GameObject {
   }
 
   update(elapsedTime) {
-    if (this.moveToPosition) {
-      this.currentInterpolateTime += elapsedTime;
-      let time = Math.min(1.0, this.currentInterpolateTime / this.interpolateTime);
-      this.position = this.startPosition
-        .plus(this.moveToPosition.minus(this.startPosition).times(time));
-      if (time >= 1.0) {
-        this.moveToPosition = null;
-      }
-    }
+    // if (this.moveToPosition) {
+    //   this.moving = true;
+    //   this.currentInterpolateTime += elapsedTime;
+    //   let time = Math.min(1.0, this.currentInterpolateTime / this.interpolateTime);
+    //   this.position = this.startPosition
+    //     .plus(this.moveToPosition.minus(this.startPosition).times(time));
+    //   if (time >= 1.0) {
+    //     this.moveToPosition = null;
+    //     this.moving = false;
+    //   }
+    // }
 
     this.renderer.update(elapsedTime + this.elapsedTime, this);
     for (const cooldown of this.cooldowns) {
@@ -364,6 +366,7 @@ export default class Character extends GameObject {
 
   updateState(state, interpolateTime) {
     _.merge(this, _.omit(state, "position", "direction"));
+    //_.merge(this, state);
     if (state.latestAction && (!this.currentAction || state.latestAction.actionId !== this.currentAction.actionId)) {
       // Pause previous action
       // if (this.currentAction) {
@@ -378,20 +381,28 @@ export default class Character extends GameObject {
     if (state.target) {
       this.setTarget(state.target);
     }
-    if (state.position) {
-      if (this.moveToPosition) {
-        this.position = this.moveToPosition;
-      }
-      this.startPosition = this.position;
-      this.moveToPosition = state.position;
-      this.elapsedInterpolateTime = 0;
-      this.interpolateTime = interpolateTime;
-      this.direction = new Point();
+    if (state.direction) {
+      this.setDirection(state.direction);
     }
-
-    // if (state.direction) {
-    //   this.setDirection(state.direction);
-    // }
+    if (state.position && !this.position.equals(state.position)) {
+      // if (this.moveToPosition) {
+      //   this.position = this.moveToPosition;
+      // }
+      let dist = this.position.distanceTo(state.position);
+      if (interpolateTime > 0 && dist >= 1) {
+        this.startPosition = new Point(this.position);
+        this.moveToPosition = new Point(state.position);
+        this.currentInterpolateTime = 0;
+        this.interpolateTime = interpolateTime;
+        this.direction = this.moveToPosition.minus(this.startPosition).normalize();
+        this.speed = dist * (1000 / interpolateTime);
+      } else {
+        this.position = new Point(state.position);
+        this.lastPosition = new Point(this.position);
+        this.speed = state.speed || this.baseSpeed;
+        this.direction = new Point(state.direction) || new Point();
+      }
+    }
   }
 
   getUpdateState() {
