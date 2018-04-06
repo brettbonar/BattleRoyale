@@ -208,7 +208,7 @@ export default class BattleRoyaleClient extends BattleRoyale {
       if (update.source.revision <= object.revision) {
         _.pull(this.pendingUpdates, update);
       } else {
-        this.applyUpdate(update);
+        //this.applyUpdate(update);
       }
     }
   }
@@ -350,7 +350,8 @@ export default class BattleRoyaleClient extends BattleRoyale {
         playerId: this.player.playerId,
         objectId: this.gameState.player.objectId
       },
-      direction: direction
+      direction: direction,
+      position: this.gameState.player.position
     });
   }
 
@@ -445,5 +446,16 @@ export default class BattleRoyaleClient extends BattleRoyale {
     }
     this.showInteractions();
     this.particleEngine.update(elapsedTime);
+
+
+    // this.sendEvent({
+    //   type: "changeDirection",
+    //   source: {
+    //     playerId: this.player.playerId,
+    //     objectId: this.gameState.player.objectId
+    //   },
+    //   direction: this.gameState.player.direction,
+    //   position: this.gameState.player.position
+    // });
   }
 }

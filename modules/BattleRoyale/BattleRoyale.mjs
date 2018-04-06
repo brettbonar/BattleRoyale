@@ -64,14 +64,6 @@ export default class BattleRoyale extends Game {
     }
 
     // TODO: create static objects for map boundaries. Also for ground?
-
-    this.updateHandlers = {
-      changeDirection: (data, elapsedTime) => this.changeDirectionEvent(data, elapsedTime),
-      changeTarget: (data, elapsedTime) => this.changeTargetEvent(data, elapsedTime),
-      attack: (data, elapsedTime) => this.attackEvent(data, elapsedTime),
-      use: (data, elapsedTime) => this.useEvent(data, elapsedTime),
-      changeAltitude: (data, elapsedTime) => this.changeAltitudeEvent(data, elapsedTime)
-    };
   }
 
   addObject(object) {

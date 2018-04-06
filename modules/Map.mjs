@@ -36,16 +36,16 @@ const BIOME_PARAMS = {
     flavorDensity: 0.1,
     sceneDensity: 0.025,
     noise: {
-      min: -0.5,
-      max: 0.25
+      min: 0.25,
+      max: 1.0
     }
   },
   [BIOMES.PLAIN]: {
     flavorDensity: 0.1,
     sceneDensity: 0.005,
     noise: {
-      min: 0.25,
-      max: 1.0
+      min: -0.5,
+      max: 0.25
     }
   },
 };

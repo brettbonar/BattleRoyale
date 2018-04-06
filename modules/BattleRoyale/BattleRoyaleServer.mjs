@@ -119,6 +119,10 @@ export default class BattleRoyaleServer extends BattleRoyale {
       objectId: data.source.objectId
     });
     if (object) {
+      if (data.position) {
+        // TODO: could remove this so players cant cheat
+        object.position = new Point(data.position);
+      }
       object.setDirection(data.direction);
       object.revision = data.source.revision;
       object.elapsedTime = elapsedTime || 0;

@@ -19,7 +19,7 @@ export default class Character extends GameObject {
     _.defaults(this, {
       type: "Character",
       state: {
-        target: this.position.plus({ x: 32, y: 32 }),
+        target: this.position.plus({ x: 100 }),
         inventory: [],
         loadout: params.loadout,
         characterDirection: "down",
@@ -343,6 +343,18 @@ export default class Character extends GameObject {
     //     this.moving = false;
     //   }
     // }
+    // TODO: handle overshooting movetoposition
+    if (this.moveToPosition && !this.moveToPosition.equals(this.position)) {
+      let direction = this.moveToPosition.minus(this.position);
+      let dist = this.position.distanceTo(this.moveToPosition);
+      if (dist <= 1) {
+        this.position = this.moveToPosition;
+        this.moveToPosition = null;
+        this.direction = new Point();
+      } else {
+        //this.position.add(direction);
+      }
+    }
 
     this.renderer.update(elapsedTime + this.elapsedTime, this);
     for (const cooldown of this.cooldowns) {
@@ -365,7 +377,8 @@ export default class Character extends GameObject {
   }
 
   updateState(state, interpolateTime) {
-    _.merge(this, _.omit(state, "position", "direction"));
+    _.merge(this, _.omit(state, "position", "direction", "state"));
+    _.merge(this.state, _.omit(state.state, "target"));
     //_.merge(this, state);
     if (state.latestAction && (!this.currentAction || state.latestAction.actionId !== this.currentAction.actionId)) {
       // Pause previous action
@@ -378,30 +391,36 @@ export default class Character extends GameObject {
       this.actionStack.length = 0;
     }
     // TODO: interpolate target location
-    if (state.target) {
-      this.setTarget(state.target);
-    }
-    if (state.direction) {
-      this.setDirection(state.direction);
-    }
-    if (state.position && !this.position.equals(state.position)) {
+    // if (state.position) {
+    //   this.moveToPosition = new Point(state.position);
+    // }
+    if (!this.isThisPlayer) {
       // if (this.moveToPosition) {
       //   this.position = this.moveToPosition;
       // }
-      let dist = this.position.distanceTo(state.position);
-      if (interpolateTime > 0 && dist >= 1) {
-        this.startPosition = new Point(this.position);
-        this.moveToPosition = new Point(state.position);
-        this.currentInterpolateTime = 0;
-        this.interpolateTime = interpolateTime;
-        this.direction = this.moveToPosition.minus(this.startPosition).normalize();
-        this.speed = dist * (1000 / interpolateTime);
-        //this.targetDirection = state.direction;
-      } else {
-        // this.position = new Point(state.position);
-        // this.lastPosition = new Point(this.position);
-        this.speed = state.speed || this.baseSpeed;
-        this.direction = new Point(state.direction) || new Point();
+      if (state.state.target) {
+        this.setTarget(state.state.target);
+      }
+      if (state.direction) {
+        this.setDirection(state.direction);
+      }
+
+      if (state.position && !this.position.equals(state.position)) {
+        let dist = this.position.distanceTo(state.position);
+        if (interpolateTime > 0 && dist >= 1) {
+          this.startPosition = new Point(this.position);
+          this.moveToPosition = new Point(state.position);
+          this.currentInterpolateTime = 0;
+          this.interpolateTime = interpolateTime;
+          this.setDirection(this.moveToPosition.minus(this.startPosition));
+          //this.speed = dist * (1000 / interpolateTime);
+          //this.targetDirection = state.direction;
+        } else {
+          // this.position = new Point(state.position);
+          // this.lastPosition = new Point(this.position);
+          this.speed = state.speed || this.baseSpeed;
+          this.direction = new Point(state.direction) || new Point();
+        }
       }
     }
   }
