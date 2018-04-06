@@ -445,7 +445,9 @@ export default class GameObject extends GameObjectProxy {
       "ownerId",
       "playerId",
       "elapsedTime",
-      "physics"
+      "physics",
+      "speed",
+      "zspeed"
     ]);
   }
 

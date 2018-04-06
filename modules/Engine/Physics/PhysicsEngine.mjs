@@ -337,9 +337,8 @@ export default class PhysicsEngine {
           target: "ground",
           position: obj.position.copy()
         });
+        obj.updatePosition();
       }
-
-      obj.updatePosition();
     }
 
     return collisions;
@@ -372,7 +371,7 @@ export default class PhysicsEngine {
         obj.position.y = obj.position.y + obj.direction.y * obj.speed * (time / 1000);
         // TODO: use zspeed so friction won't slow down falling
         if (obj.direction.z) {
-          obj.position.z = obj.position.z + obj.direction.z * obj.speed * (time / 1000);//(obj.zspeed || obj.speed) * (time / 1000));
+          obj.position.z = obj.position.z + obj.direction.z * (obj.zspeed || obj.speed) * (time / 1000);
         }
 
         if (obj.physics.friction > 0 && obj.position.z === 0) {

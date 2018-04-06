@@ -173,7 +173,7 @@ export default class Character extends GameObject {
     // Release charged attack
     if (action.charge && this.canDoAction(action)) {
       this.updateAction(action, elapsedTime);
-      if (action.currentTime >= action.actionDuration) {
+      if (!action.actionDuration || action.currentTime >= action.actionDuration) {
         let modifiers = {};
         _.each(action.charge, (mod, type) => {
           modifiers[type] = Math.min(mod.maxMult, 1 + (mod.maxMult - 1) * ((action.currentTime - action.actionDuration) / mod.maxTime));
@@ -317,7 +317,7 @@ export default class Character extends GameObject {
       if (cooldownTimeDiff >= 0) {
         _.pull(this.cooldowns, cooldown);
         action.currentTime += (elapsedTime + cooldownTimeDiff);
-        if (action.currentTime >= action.actionDuration) {
+        if (!action.actionDuration || action.currentTime >= action.actionDuration) {
           if (!action.finishedTime) action.finishedTime = action.currentTime;
           if (!action.charge) {
             this.completeAction(action);
@@ -396,9 +396,10 @@ export default class Character extends GameObject {
         this.interpolateTime = interpolateTime;
         this.direction = this.moveToPosition.minus(this.startPosition).normalize();
         this.speed = dist * (1000 / interpolateTime);
+        //this.targetDirection = state.direction;
       } else {
-        this.position = new Point(state.position);
-        this.lastPosition = new Point(this.position);
+        // this.position = new Point(state.position);
+        // this.lastPosition = new Point(this.position);
         this.speed = state.speed || this.baseSpeed;
         this.direction = new Point(state.direction) || new Point();
       }

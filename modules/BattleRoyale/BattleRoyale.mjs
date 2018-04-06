@@ -287,7 +287,9 @@ export default class BattleRoyale extends Game {
     }
 
     for (const obj of this.gameState.objects) {
-      obj.elapsedTime = 0;
+      if (obj.elapsedTime) {
+        obj.elapsedTime = 0;
+      }
       if (obj instanceof Character && !obj.dead && obj.currentHealth <= 0) {
         obj.kill();
       }

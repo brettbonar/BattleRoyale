@@ -95,7 +95,7 @@ export default class Simulation {
       .filter((obj) => obj._modified)
       .map(obj => {
         obj._modified = false;
-        return obj.getUpdateState();
+        return _.cloneDeep(obj.getUpdateState());
       });
 
     this.interval = setTimeout(() => {
