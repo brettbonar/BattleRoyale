@@ -332,6 +332,16 @@ export default class Character extends GameObject {
   }
 
   update(elapsedTime) {
+    if (this.moveToPosition) {
+      this.currentInterpolateTime += elapsedTime;
+      let time = Math.min(1.0, this.currentInterpolateTime / this.interpolateTime);
+      this.position = this.startPosition
+        .plus(this.moveToPosition.minus(this.startPosition).times(time));
+      if (time >= 1.0) {
+        this.moveToPosition = null;
+      }
+    }
+
     this.renderer.update(elapsedTime + this.elapsedTime, this);
     for (const cooldown of this.cooldowns) {
       cooldown.currentTime += elapsedTime + this.elapsedTime;
@@ -352,8 +362,8 @@ export default class Character extends GameObject {
     // }
   }
 
-  updateState(state) {
-    _.merge(this, state);
+  updateState(state, interpolateTime) {
+    _.merge(this, _.omit(state, "position", "direction"));
     if (state.latestAction && (!this.currentAction || state.latestAction.actionId !== this.currentAction.actionId)) {
       // Pause previous action
       // if (this.currentAction) {
@@ -364,12 +374,24 @@ export default class Character extends GameObject {
     } else if (!state.latestAction) {
       this.actionStack.length = 0;
     }
+    // TODO: interpolate target location
     if (state.target) {
       this.setTarget(state.target);
     }
-    if (state.direction) {
-      this.setDirection(state.direction);
+    if (state.position) {
+      if (this.moveToPosition) {
+        this.position = this.moveToPosition;
+      }
+      this.startPosition = this.position;
+      this.moveToPosition = state.position;
+      this.elapsedInterpolateTime = 0;
+      this.interpolateTime = interpolateTime;
+      this.direction = new Point();
     }
+
+    // if (state.direction) {
+    //   this.setDirection(state.direction);
+    // }
   }
 
   getUpdateState() {

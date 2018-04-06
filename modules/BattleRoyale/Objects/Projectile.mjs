@@ -196,14 +196,14 @@ export default class Projectile extends GameObject {
     }
   }
 
-  // updateState(state) {
-  //   let oldPos = new Point(this.position);
-  //   _.merge(this, state);
-  //   this.position = new Point(this.position);
-  //   if (!this.position.equals(oldPos)) {
-  //     this.position = oldPos.plus(this.position.minus(oldPos).times(0.1));
-  //   }
-  // }
+  updateState(state) {
+    //let oldPos = new Point(this.position);
+    _.merge(this, _.omit(state, "position"));
+    // this.position = new Point(this.position);
+    // if (!this.position.equals(oldPos)) {
+    //   this.position = oldPos.plus(this.position.minus(oldPos).times(0.1));
+    // }
+  }
 
   getUpdateState() {
     return Object.assign(super.getUpdateState(), {

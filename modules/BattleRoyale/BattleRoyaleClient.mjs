@@ -207,7 +207,7 @@ export default class BattleRoyaleClient extends BattleRoyale {
           playerId: object.playerId
         });
         if (existing) {
-          existing.updateState(object);
+          existing.updateState(object, object.elapsedTime - (now - update.time));
           this.clearAndApplyUpdates(object);
         } else {
           let obj = this.createObject(object);
@@ -220,10 +220,11 @@ export default class BattleRoyaleClient extends BattleRoyale {
     this.objectUpdates.length = 0;
   }
 
-  updateObjects(objects) {
+  updateObjects(data) {
     this.objectUpdates.push({
-      objects: objects,
-      time: performance.now()
+      objects: data.objects,
+      time: performance.now(),
+      elapsedTime: data.elapsedTime
     });
   }
 

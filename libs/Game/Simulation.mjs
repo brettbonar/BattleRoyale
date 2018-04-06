@@ -52,6 +52,7 @@ export default class Simulation {
     });
     this.lastState = [];
     this.lastObjects = [];
+    this.lastElapsedTime = 0;
     this.removedObjects = [];
   }
 
@@ -72,7 +73,7 @@ export default class Simulation {
 
     if (this.lastState.length > 0) {
       for (const player of this.players) {
-        player.socket.emit("update", this.lastState);
+        player.socket.emit("update", { elapsedTime: this.lastElapsedTime, objects: this.lastState });
       }
       this.lastState.length = 0;
     }
@@ -84,6 +85,7 @@ export default class Simulation {
       this.removedObjects.length = 0;
     }
 
+    this.lastElapsedTime = elapsedTime;
     this.removedObjects = _.difference(this.lastObjects, this.game.gameState.objects)
       .map((obj) => obj.objectId);
     this.lastObjects = this.game.gameState.objects.slice();
