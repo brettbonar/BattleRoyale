@@ -1,7 +1,7 @@
 
 export default {
   blood: {
-    imageSource: "../../Assets/effects/blood-64.png",
+    imageSource: "/Assets/effects/blood-64.png",
     // offset: {
     //   x: 0,
     //   y: 80

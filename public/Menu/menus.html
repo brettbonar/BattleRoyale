@@ -33,7 +33,6 @@
 
 <gui-menu class="menu" id="CREATE_GAME">
   <h1 class="title">Battle Royale</h1>
-  
   <div class="sub-menu">
     <hr />
     <button class="control" gui-click="menus.transition('MAIN')">Back</button>
@@ -45,6 +44,7 @@
     <div class="sub-menu">
         <div id="lobby-list" class="ag-theme-balham-dark list-table"></div>
       <hr />
+      <button class="control" gui-click="ready()">Ready</button>
       <button class="control" gui-click="leaveGame()">Leave</button>
       <button class="control float-right" gui-click="menus.showLobby()">Refresh</button>
     </div>

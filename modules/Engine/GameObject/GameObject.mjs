@@ -51,7 +51,7 @@ export default class GameObject extends GameObjectProxy {
       zspeed: 0,
       collisionDimensions: [],
       functions: [],
-      visible: true,
+      hidden: false,
       direction: {
         x: 0,
         y: 0
@@ -177,7 +177,7 @@ export default class GameObject extends GameObjectProxy {
   update(elapsedTime) {}
 
   render(context, elapsedTime, clipping) {
-    if (this.visible && this.renderer) {
+    if (!this.hidden && this.renderer) {
       this.renderer.render(context, this, elapsedTime, clipping);
     }
   }
@@ -435,7 +435,7 @@ export default class GameObject extends GameObjectProxy {
     return _.pick(this, [
       "type",
       "dimensions",
-      //"visible",
+      //"hidden",
       "direction",
       "position",
       "acceleration",

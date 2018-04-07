@@ -72,7 +72,7 @@ class Game {
 
     _.defaults(this, {
       maxPlayers: 96,
-      startPlayers: 2,
+      //startPlayers: 2,
       status: STATUS.LOBBY
     });
 
@@ -108,14 +108,14 @@ class Game {
       console.log("Got ready");
       player.ready = true;
 
-      if (_.sumBy(this.players, "ready") >= this.startPlayers) {
+      if (_.sumBy(this.players, "ready") >= this.players.length) {
         console.log("Initializing");
         this.initialize();
       }
 
       player.socket.on("initialized", () => {
         player.initialized = true;
-        if (_.sumBy(this.players, "initialized") >= this.startPlayers) {
+        if (_.sumBy(this.players, "initialized") >= this.players.length) {
           console.log("Starting");
           this.start();
         }

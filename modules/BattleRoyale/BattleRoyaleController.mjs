@@ -90,6 +90,9 @@ export default class BattleRoyaleController extends GameController {
         });
       });
     });
+  }
+
+  ready() {
     this.socket.emit("ready", "ready");
   }
 

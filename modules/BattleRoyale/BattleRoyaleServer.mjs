@@ -22,7 +22,6 @@ import Building from "./Buildings/Building.mjs"
 import Magic from "./Magic/Magic.mjs"
 import StaticObject from "./Objects/StaticObject.mjs"
 import Item from "./Objects/Item.mjs"
-import AnimationEffect from "./Effects/AnimationEffect.mjs"
 import effects from "./Effects/effects.mjs"
 import attacks from "./Magic/attacks.mjs"
 import RenderObject from "./Objects/RenderObject.mjs"
@@ -176,16 +175,6 @@ export default class BattleRoyaleServer extends BattleRoyale {
         if (!collision.source.damagedTargets.includes(collision.target) && collision.source.damageReady) {
           collision.target.damage(collision.source);
           collision.source.damagedTargets.push(collision.target);
-          // TODO: add effect based on character
-          if (collision.target.damagedEffect && !this.simulation) {
-            // this.particleEngine.addEffect(new AnimationEffect({
-            //   position: {
-            //     x: collision.target.center.x,
-            //     y: collision.target.center.y
-            //   },
-            //   duration: 1000
-            // }, collision.target.damagedEffect));
-          }
         }
         // if (!character.dead && character.currentHealth <= 0) {
         //   character.kill();

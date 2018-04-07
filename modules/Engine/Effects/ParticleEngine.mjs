@@ -25,19 +25,19 @@ export default class EffectsEngine {
     return this.effects;
   }
 
-  render(elapsedTime, center) {
-    this.context.save();
+  // render(elapsedTime, center) {
+  //   this.context.save();
 
-    // if (center) {
-    //   this.context.translate(-(center.x - this.context.canvas.width / 2), -(center.y - this.context.canvas.height / 2));
-    // }
+  //   // if (center) {
+  //   //   this.context.translate(-(center.x - this.context.canvas.width / 2), -(center.y - this.context.canvas.height / 2));
+  //   // }
 
-    for (const effect of this.effects) {
-      effect.render(this.context, elapsedTime);
-    }
+  //   for (const effect of this.effects) {
+  //     effect.render(this.context, elapsedTime);
+  //   }
 
-    this.context.restore();
-  }
+  //   this.context.restore();
+  // }
 
   addEffect(effect) {
     this.effects.push(effect);

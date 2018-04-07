@@ -8,7 +8,6 @@ class Particle {
     this.image = ImageCache.get(this.particleInfo.imageSource);
     this.rotation = Math.atan2(this.direction.y - this.direction.z, this.direction.x ) * 180 / Math.PI;
     this.rotationDiff = 0;
-    this.visible = true;
 
     if (this.particleInfo.minDuration || this.particleInfo.maxDuration) {
       this.duration = _.random(this.particleInfo.minDuration, this.particleInfo.maxDuration);
@@ -136,7 +135,6 @@ export default class ParticleEffect {
     this.frequency = params.effect.frequency;
     this.radius = params.effect.radius;
     this.duration = params.effect.duration;
-    this.visible = true;
 
     if (params.effect.initialCount) {
       for (let i = 0; i < params.effect.initialCount; i++) {

@@ -10,6 +10,7 @@ import FloatingText from "../Graphics/FloatingText.mjs"
 import PhysicsEngine from "../Engine/Physics/PhysicsEngine.mjs"
 import PerspectiveRenderingEngine from "../Engine/Rendering/PerspectiveRenderingEngine.mjs"
 import ParticleEngine from "../Engine/Effects/ParticleEngine.mjs"
+import AnimationEffect from "../Engine/Effects/AnimationEffect.mjs"
 import { SURFACE_TYPE, MOVEMENT_TYPE } from "../Engine/Physics/PhysicsConstants.mjs"
 import { getDistance } from "../util.mjs"
 import GameSettings from "../Engine/GameSettings.mjs"
@@ -23,7 +24,6 @@ import Building from "./Buildings/Building.mjs"
 import Magic from "./Magic/Magic.mjs"
 import StaticObject from "./Objects/StaticObject.mjs"
 import Item from "./Objects/Item.mjs"
-import AnimationEffect from "./Effects/AnimationEffect.mjs"
 import effects from "./Effects/effects.mjs"
 import attacks from "./Magic/attacks.mjs"
 import RenderObject from "./Objects/RenderObject.mjs"
@@ -57,7 +57,7 @@ export default class BattleRoyaleClient extends BattleRoyale {
     }
 
     this.maps = params.maps;
-    this.physicsEngine = new PhysicsEngine(params.quadTrees);
+    this.physicsEngine = new PhysicsEngine();
 
     this.renderingEngine = new PerspectiveRenderingEngine({
       context: this.context
@@ -259,11 +259,20 @@ export default class BattleRoyaleClient extends BattleRoyale {
       if (collision.target && collision.source.actionId === collision.target.actionId && collision.source.effect.path === "stream") {
         return;
       }
+
+      if (collision.target && collision.target.damagedEffect) {
+        this.particleEngine.addEffect(new AnimationEffect({
+          position: {
+            x: collision.target.center.x,
+            y: collision.target.center.y
+          }
+        }, collision.target.damagedEffect));
+      }
       
       if (collision.source.rendering.hitEffect && !collision.source.collided) {
         collision.source.collided = true;
         if (collision.source.effect.path !== "beam") {
-          collision.source.visible = false;
+          collision.source.hidden = true;
         }
 
         if (collision.source.rendering.hitEffect.particleEffect) {

@@ -10,7 +10,6 @@ import equipment from "../../modules/BattleRoyale/Objects/equipment.mjs"
 import Building from "../../modules/BattleRoyale/Buildings/Building.mjs"
 import Magic from "../../modules/BattleRoyale/Magic/Magic.mjs"
 import StaticObject from "../../modules/BattleRoyale/Objects/StaticObject.mjs"
-import AnimationEffect from "../../modules/BattleRoyale/Effects/AnimationEffect.mjs"
 import effects from "../../modules/BattleRoyale/Effects/effects.mjs"
 import Item from "../../modules/BattleRoyale/Objects/Item.mjs"
 import scenes from "../../modules/BattleRoyale/Objects/Scenes.mjs"
@@ -142,7 +141,7 @@ function initGame(players, maps) {
       simulation: true,
       damagedEffect: effects.blood,
       loadout: {
-        weapon: equipment.staffMale,
+        weapon: equipment.bow,
         torso: equipment.leatherChestMale,
         legs: equipment.tealPantsMale,
         head: equipment.clothHoodMale,
@@ -155,13 +154,20 @@ function initGame(players, maps) {
         y: pos,
         z: 0
       },
+      // position: {
+      //   x: _.random(100, 6000),
+      //   y: _.random(100, 6000),
+      //   z: 0
+      // },
       direction: {
         x: 0,
         y: 0,
         z: 0
       }
     });
-    char.state.inventory.push("staffMale");
+    char.state.inventory.push("bow");
+    char.state.inventory.push("lightStaffMale");
+    char.state.inventory.push("fireStaffMale");
     gameObjects.push(char);
     pos += 100;
   }
@@ -182,30 +188,30 @@ function initGame(players, maps) {
   //   itemType: "healthPotion",
   //   simulation: true
   // }));
-  gameObjects.push(new Item({
-    position: {
-      x: 265,
-      y: 305
-    },
-    itemType: "fireStaffMale",
-    simulation: true
-  }));
-  gameObjects.push(new Item({
-    position: {
-      x: 235,
-      y: 305
-    },
-    itemType: "lightStaffMale",
-    simulation: true
-  }));
-  gameObjects.push(new Item({
-    position: {
-      x: 295,
-      y: 305
-    },
-    itemType: "bow",
-    simulation: true
-  }));
+  // gameObjects.push(new Item({
+  //   position: {
+  //     x: 265,
+  //     y: 305
+  //   },
+  //   itemType: "fireStaffMale",
+  //   simulation: true
+  // }));
+  // gameObjects.push(new Item({
+  //   position: {
+  //     x: 235,
+  //     y: 305
+  //   },
+  //   itemType: "lightStaffMale",
+  //   simulation: true
+  // }));
+  // gameObjects.push(new Item({
+  //   position: {
+  //     x: 295,
+  //     y: 305
+  //   },
+  //   itemType: "bow",
+  //   simulation: true
+  // }));
 
   gameObjects.push(new StaticObject({
     objectType: "plainTree",

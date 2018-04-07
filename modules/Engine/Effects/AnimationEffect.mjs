@@ -1,17 +1,10 @@
 //import Effect from "../../Engine/Effects/Effect.mjs";
 import ImageCache from "../../Engine/Rendering/ImageCache.mjs"
+import Effect from "./Effect.mjs"
 
-function getOffset(animation, frame, imageSize) {
-  let offset = ANIMATION_SETTINGS[animation].offset;
-  return {
-    x: offset.x + frame * imageSize,
-    y: offset.y * imageSize
-  };
-}
-
-export default class AnimationEffect {
+export default class AnimationEffect extends Effect {
   constructor(params, effect) {
-    //super(params);
+    super(params);
     _.merge(this, params);
     Object.assign(this, effect);
 
@@ -19,6 +12,10 @@ export default class AnimationEffect {
     this.frame = 0;
     this.currentTime = 0;
     this.totalTime = 0;
+    this.dimensions = {
+      width: effect.imageSize,
+      height: effect.imageSize
+    };
   }
 
   render(context, elapsedTime) {

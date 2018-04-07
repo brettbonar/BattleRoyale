@@ -225,7 +225,7 @@ export default class PerspectiveRenderingEngine extends RenderingEngine{
     for (const object of objects) {
       for (const renderObj of object.renderObjects) {
         // TODO: create new grid for rendering
-        if (renderObj.visible &&
+        if (!renderObj.hidden &&
             (renderObj.position.x + renderObj.width > center.x - this.context.canvas.width && renderObj.position.x + renderObj.width < center.x + this.context.canvas.width &&
              renderObj.position.y + renderObj.height > center.y - this.context.canvas.height && renderObj.position.y + renderObj.height < center.y + this.context.canvas.height ||
              renderObj.lastPosition.x + renderObj.width > center.x - this.context.canvas.width && renderObj.lastPosition.x + renderObj.width < center.x + this.context.canvas.width &&
