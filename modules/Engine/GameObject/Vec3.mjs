@@ -1,6 +1,6 @@
 import Dimensions from "./Dimensions.mjs";
 
-export default class Point {
+export default class Vec3 {
   constructor(params) {
     Object.assign(this, params);
     _.defaults(this, {
@@ -26,7 +26,7 @@ export default class Point {
   }
 
   normalize() {
-    return Object.assign(this, Point.normalize(this));
+    return Object.assign(this, Vec3.normalize(this));
   }
 
   distanceTo(point) {
@@ -55,7 +55,7 @@ export default class Point {
   }
 
   times(scale) {
-    return new Point({
+    return new Vec3({
       x: this.x * scale,
       y: this.y * scale,
       z: this.z * scale
@@ -63,7 +63,7 @@ export default class Point {
   }
 
   times2D(scale) {
-    return new Point({
+    return new Vec3({
       x: this.x * scale,
       y: this.y * scale,
       z: this.z
@@ -71,7 +71,7 @@ export default class Point {
   }
 
   copy() {
-    return new Point({
+    return new Vec3({
       x: this.x,
       y: this.y,
       z: this.z
@@ -98,31 +98,31 @@ export default class Point {
   
   plus(point) {
     if (point) {
-      if (point instanceof Point || !_.isUndefined(point.x) || !_.isUndefined(point.y) || !_.isUndefined(point.z)) {
-        return new Point({
+      if (point instanceof Vec3 || !_.isUndefined(point.x) || !_.isUndefined(point.y) || !_.isUndefined(point.z)) {
+        return new Vec3({
           x: this.x + (point.x || 0),
           y: this.y + (point.y || 0),
           z: this.z + (point.z || 0)
         });
       } else if (point instanceof Dimensions || !_.isUndefined(point.width) || !_.isUndefined(point.height) || !_.isUndefined(point.zheight)) {
-        return new Point({
+        return new Vec3({
           x: this.x + (point.width || 0),
           y: this.y + (point.height || 0),
           z: this.z + (point.zheight || 0)
         });
       }
     }
-    return new Point(this);
+    return new Vec3(this);
   }
   
   minus(point) {
     if (point) {
-      return new Point({
+      return new Vec3({
         x: this.x - (point.x || 0),
         y: this.y - (point.y || 0),
         z: this.z - (point.z || 0)
       });
     }
-    return new Point(this);
+    return new Vec3(this);
   }
 }

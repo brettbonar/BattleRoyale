@@ -1,5 +1,5 @@
 import { getAnimationOffset } from "../../Engine/Rendering/renderUtils.mjs"
-import Point from "../../Engine/GameObject/Point.mjs"
+import Vec3 from "../../Engine/GameObject/Vec3.mjs"
 import ImageCache from "../../Engine/Rendering/ImageCache.mjs";
 
 //import Renderer from "../../Engine/Rendering/Renderer.mjs"
@@ -66,7 +66,7 @@ export default class ObjectRenderer {
 
   draw(context, object, position, clipping) {
     if (clipping) {
-      let offset = new Point(clipping.offset);
+      let offset = new Vec3(clipping.offset);
       position = offset.plus(position);
       let imageOffset = offset.plus(this.imageDimensions);
       let imageDimensions = clipping.dimensions || this.imageDimensions;

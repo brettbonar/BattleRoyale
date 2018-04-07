@@ -1,7 +1,7 @@
 import RenderingEngine from "./RenderingEngine.mjs"
 import { SURFACE_TYPE } from "../Physics/PhysicsConstants.mjs"
 import Bounds from "../GameObject/Bounds.mjs"
-import Point from "../GameObject/Point.mjs"
+import Vec3 from "../GameObject/Vec3.mjs"
 import Dimensions from "../GameObject/Dimensions.mjs"
 
 export default class PerspectiveRenderingEngine extends RenderingEngine{
@@ -14,7 +14,7 @@ export default class PerspectiveRenderingEngine extends RenderingEngine{
       this.context.globalAlpha = 0.5;
       //object.render(this.context, elapsedTime);
       object.render(this.context, elapsedTime, object.fadeDimensions);
-      let offset = object.fadeDimensions.offset || new Point();
+      let offset = object.fadeDimensions.offset || new Vec3();
       let dimensions = object.fadeDimensions.dimensions || new Dimensions();
 
       this.context.globalAlpha = 1;
@@ -84,7 +84,7 @@ export default class PerspectiveRenderingEngine extends RenderingEngine{
 
           if (height > 0) {
             let clipping = {
-              offset: new Point({
+              offset: new Vec3({
                 x: 0,
                 y: clip.previousClip
               }),
@@ -109,7 +109,7 @@ export default class PerspectiveRenderingEngine extends RenderingEngine{
 
     for (const clip of clips) {
       let clipping = {
-        offset: new Point({
+        offset: new Vec3({
           x: 0,
           y: clip.previousClip
         }),

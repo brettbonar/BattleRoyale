@@ -1,7 +1,7 @@
 import GameObject from "../../Engine/GameObject/GameObject.mjs"
 import magicEffects from "./magicEffects.mjs"
 import MagicRenderer from "./MagicRenderer.mjs"
-import Point from "../../Engine/GameObject/Point.mjs"
+import Vec3 from "../../Engine/GameObject/Vec3.mjs"
 import Dimensions from "../../Engine/GameObject/Dimensions.mjs"
 import { SURFACE_TYPE } from "../../Engine/Physics/PhysicsConstants.mjs"
 import ObjectRenderer from "../Renderers/ObjectRenderer.mjs"
@@ -16,7 +16,7 @@ export default class Magic extends GameObject {
     this.collisionDimensions = this.magic.effect.collisionDimensions;
     this.effect = this.magic.effect;
     this.rendering = this.magic.rendering;
-    this.position = new Point(params.position);
+    this.position = new Vec3(params.position);
     this.physics.surfaceType = SURFACE_TYPE.GAS;
     this.damagedTargets = [];
 
@@ -74,7 +74,7 @@ export default class Magic extends GameObject {
   
   static create(params) {
     let magic = magicEffects[params.attackType];
-    let position = new Point(params.position).minus({
+    let position = new Vec3(params.position).minus({
       //x: magic.rendering.imageSize / 2,
       //y: magic.rendering.imageSize / 2
     });

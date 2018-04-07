@@ -1,4 +1,4 @@
-import Point from "./Point.mjs"
+import Vec3 from "./Vec3.mjs"
 
 const TYPE = {
   RECTANGLE: "rectangle",
@@ -25,7 +25,7 @@ export default class Bounds {
     } else if (!_.isUndefined(params.dimensions.radius)) {
       this.constructFromCircle(params);
     } else if (!_.isUndefined(params.position)) {
-      this.position = new Point(params.position);
+      this.position = new Vec3(params.position);
       this.type = TYPE.POINT;
     } else if (!_.isUndefined(params.ul)) {
       this.constructFromBox(params);
@@ -56,10 +56,10 @@ export default class Bounds {
     let z = Math.min(this.box.ul.z, box.box.ul.z);
     let zheight = Math.max(this.box.ul.z + this.zheight, box.box.ul.z + box.zheight) - z;
     return new Bounds({
-      ul: new Point({ x: Math.min(this.box.ul.x, box.box.ul.x), y: Math.min(this.box.ul.y, box.box.ul.y), z: z }),
-      ur: new Point({ x: Math.max(this.box.ur.x, box.box.ur.x), y: Math.min(this.box.ur.y, box.box.ur.y), z: z }),
-      lr: new Point({ x: Math.max(this.box.lr.x, box.box.lr.x), y: Math.max(this.box.lr.y, box.box.lr.y), z: z }),
-      ll: new Point({ x: Math.min(this.box.ll.x, box.box.ll.x), y: Math.max(this.box.ll.y, box.box.ll.y), z: z })
+      ul: new Vec3({ x: Math.min(this.box.ul.x, box.box.ul.x), y: Math.min(this.box.ul.y, box.box.ul.y), z: z }),
+      ur: new Vec3({ x: Math.max(this.box.ur.x, box.box.ur.x), y: Math.min(this.box.ur.y, box.box.ur.y), z: z }),
+      lr: new Vec3({ x: Math.max(this.box.lr.x, box.box.lr.x), y: Math.max(this.box.lr.y, box.box.lr.y), z: z }),
+      ll: new Vec3({ x: Math.min(this.box.ll.x, box.box.ll.x), y: Math.max(this.box.ll.y, box.box.ll.y), z: z })
     }, zheight);
   }
 
@@ -69,10 +69,10 @@ export default class Bounds {
     let z = Math.min(this.box.ul.z, box.box.ul.z);
     this.zheight = Math.max(this.box.ul.z + this.zheight, box.box.ul.z + box.zheight) - z;
     this.box = {
-      ul: new Point({ x: Math.min(this.box.ul.x, box.box.ul.x), y: Math.min(this.box.ul.y, box.box.ul.y), z: z }),
-      ur: new Point({ x: Math.max(this.box.ur.x, box.box.ur.x), y: Math.min(this.box.ur.y, box.box.ur.y), z: z }),
-      lr: new Point({ x: Math.max(this.box.lr.x, box.box.lr.x), y: Math.max(this.box.lr.y, box.box.lr.y), z: z }),
-      ll: new Point({ x: Math.min(this.box.ll.x, box.box.ll.x), y: Math.max(this.box.ll.y, box.box.ll.y), z: z })
+      ul: new Vec3({ x: Math.min(this.box.ul.x, box.box.ul.x), y: Math.min(this.box.ul.y, box.box.ul.y), z: z }),
+      ur: new Vec3({ x: Math.max(this.box.ur.x, box.box.ur.x), y: Math.min(this.box.ur.y, box.box.ur.y), z: z }),
+      lr: new Vec3({ x: Math.max(this.box.lr.x, box.box.lr.x), y: Math.max(this.box.lr.y, box.box.lr.y), z: z }),
+      ll: new Vec3({ x: Math.min(this.box.ll.x, box.box.ll.x), y: Math.max(this.box.ll.y, box.box.ll.y), z: z })
     };
 
     this.lines = {
@@ -92,10 +92,10 @@ export default class Bounds {
     let z = Math.min(params.dimensions.line[0].z, params.dimensions.line[1].z);
     this.zheight = z + Math.max(params.dimensions.line[0].z, params.dimensions.line[1].z);
     this.box = {
-      ul: new Point({ x: Math.min(A.x, B.x), y: Math.min(A.y, B.y), z: z}),
-      ur: new Point({ x: Math.max(A.x, B.x), y: Math.min(A.y, B.y), z: z}),
-      lr: new Point({ x: Math.max(A.x, B.x), y: Math.max(A.y, B.y), z: z}),
-      ll: new Point({ x: Math.min(A.x, B.x), y: Math.max(A.y, B.y), z: z})
+      ul: new Vec3({ x: Math.min(A.x, B.x), y: Math.min(A.y, B.y), z: z}),
+      ur: new Vec3({ x: Math.max(A.x, B.x), y: Math.min(A.y, B.y), z: z}),
+      lr: new Vec3({ x: Math.max(A.x, B.x), y: Math.max(A.y, B.y), z: z}),
+      ll: new Vec3({ x: Math.min(A.x, B.x), y: Math.max(A.y, B.y), z: z})
     };
   }
 
@@ -117,7 +117,7 @@ export default class Bounds {
 
   constructFromRectangle(params) {
     this.box = {
-      ul: new Point(params.position),
+      ul: new Vec3(params.position),
       ur: params.position.plus({ x: params.dimensions.width }),
       lr: params.position.plus({ x: params.dimensions.width, y: params.dimensions.height }),
       ll: params.position.plus({ y: params.dimensions.height })
@@ -183,7 +183,7 @@ export default class Bounds {
       }
     } else if (_.isArray(target)) { // Line [{ x, y }, { x, y }]
       return _.some(this.lines, (line) => this.intersectsLine(line, target));
-    } else if (!_.isUndefined(target.x) && !_.isUndefined(target.y)) { // Point { x, y }
+    } else if (!_.isUndefined(target.x) && !_.isUndefined(target.y)) { // Vec3 { x, y }
       return (!_.isNumber(this.box.ul.z) || !_.isNumber(target.z) || Math.floor(target.z) === Math.floor(this.box.ul.z)) &&
         target.x >= this.box.ul.x && target.x <= this.box.lr.x &&
         target.y >= this.box.ul.y && target.y <= this.box.lr.y;
@@ -230,7 +230,7 @@ export default class Bounds {
   }
 
   get center() {
-    return new Point({
+    return new Vec3({
       x: this.left.x + this.width / 2,
       y: this.top.y + this.height / 2,
       z: this.top.z
@@ -255,7 +255,7 @@ export default class Bounds {
   }
 
   get max() {
-    return new Point({
+    return new Vec3({
       x: this.box.lr.x,
       y: this.box.lr.y,
       z: this.box.lr.z + this.zheight
@@ -263,7 +263,7 @@ export default class Bounds {
   }
 
   get min() {
-    return new Point({
+    return new Vec3({
       x: this.box.ul.x,
       y: this.box.ul.y,
       z: this.box.ul.z

@@ -4,7 +4,7 @@ import BattleRoyaleInterface from "./BattleRoyaleInterface.mjs"
 import KEY_CODE from "../util/keyCodes.mjs"
 import Game from "../Engine/Game.mjs"
 import GameObject from "../Engine/GameObject/GameObject.mjs"
-import Point from "../Engine/GameObject/Point.mjs"
+import Vec3 from "../Engine/GameObject/Vec3.mjs"
 import Bounds from "../Engine/GameObject/Bounds.mjs"
 import FloatingText from "../Graphics/FloatingText.mjs"
 import PhysicsEngine from "../Engine/Physics/PhysicsEngine.mjs"
@@ -245,7 +245,7 @@ export default class BattleRoyaleClient extends BattleRoyale {
       this.handleCollision({
         source: this.getObject(collision.sourceId),
         target: this.getObject(collision.targetId),
-        position: new Point(collision.position),
+        position: new Vec3(collision.position),
         sourceBounds: collision.sourceBounds
       });
     }
@@ -338,7 +338,7 @@ export default class BattleRoyaleClient extends BattleRoyale {
   }
 
   getAbsoluteCursorPosition() {
-    return new Point({
+    return new Vec3({
       x: this.gameState.player.center.x + (this.gameState.cursor.position.x - this.canvas.width / 2),
       y: this.gameState.player.center.y + (this.gameState.cursor.position.y - this.canvas.height / 2),
     });
@@ -366,7 +366,7 @@ export default class BattleRoyaleClient extends BattleRoyale {
   }
 
   move(event) {
-    let direction = new Point({
+    let direction = new Vec3({
       x: 0,
       y: 0,
       z: this.gameState.player.direction.z || 0

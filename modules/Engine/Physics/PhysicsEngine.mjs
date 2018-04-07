@@ -1,6 +1,6 @@
 import GameObject from "../GameObject/GameObject.mjs"
 import { AXES, MOVEMENT_TYPE, SURFACE_TYPE } from "./PhysicsConstants.mjs";
-import Point from "../GameObject/Point.mjs";
+import Vec3 from "../GameObject/Vec3.mjs";
 import Bounds from "../GameObject/Bounds.mjs";
 
 export default class PhysicsEngine {
@@ -146,7 +146,7 @@ export default class PhysicsEngine {
     if (s >= 0 && s <= 1 && t >= 0 && t <= 1)
     {
       // Collision detected
-      return new Point({
+      return new Vec3({
         x: line1[0].x + (t * s1_x),
         y: line1[0].y + (t * s1_y)
       });
@@ -366,7 +366,7 @@ export default class PhysicsEngine {
       // }
 
       if (obj.speed && (obj.direction.x || obj.direction.y || obj.direction.z)) {
-        obj.lastPosition = new Point(obj.position);
+        obj.lastPosition = new Vec3(obj.position);
         obj.position.x = obj.position.x + obj.direction.x * obj.speed * (time / 1000);
         obj.position.y = obj.position.y + obj.direction.y * obj.speed * (time / 1000);
         // TODO: use zspeed so friction won't slow down falling
@@ -393,7 +393,7 @@ export default class PhysicsEngine {
         obj.rotation += obj.spin * (time / 1000);
       }
       if (obj.acceleration) {
-        obj.direction = new Point(obj.direction).add({
+        obj.direction = new Vec3(obj.direction).add({
           x: obj.acceleration.x * (time / 1000),
           y: obj.acceleration.y * (time / 1000),
           z: obj.acceleration.z * (time / 1000)

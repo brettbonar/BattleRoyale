@@ -1,5 +1,5 @@
 import GameObject from "../../Engine/GameObject/GameObject.mjs"
-import Point from "../../Engine/GameObject/Point.mjs"
+import Vec3 from "../../Engine/GameObject/Vec3.mjs"
 import Dimensions from "../../Engine/GameObject/Dimensions.mjs"
 import CharacterRenderer, { STATE } from "../Renderers/CharacterRenderer.mjs"
 import { SURFACE_TYPE } from "../../Engine/Physics/PhysicsConstants.mjs"
@@ -67,7 +67,7 @@ export default class Character extends GameObject {
 
     if (!params.attackOrigin) {
       this.attackOrigin = {
-        offset: new Point(this.collisionDimensions[0].offset).plus({
+        offset: new Vec3(this.collisionDimensions[0].offset).plus({
           y: this.collisionDimensions[0].dimensions.height,
           z: 20
         }),
@@ -286,9 +286,9 @@ export default class Character extends GameObject {
   }
 
   setTarget(target) {
-    this.state.target = new Point(target);
+    this.state.target = new Vec3(target);
     let center = this.center;
-    let direction = new Point(target).minus(center).normalize();
+    let direction = new Vec3(target).minus(center).normalize();
 
     if (target.x < center.x && Math.abs(direction.x) >= Math.abs(direction.y)) {
       this.state.characterDirection = "left";
@@ -350,7 +350,7 @@ export default class Character extends GameObject {
       if (dist <= 1 || !this.direction.sameAs(direction)) {
         this.position = this.moveToPosition;
         this.moveToPosition = null;
-        this.direction = new Point();
+        this.direction = new Vec3();
       } else {
         //this.position.add(direction);
       }
@@ -380,7 +380,7 @@ export default class Character extends GameObject {
     //   if (Math.abs(this.position.x - this.targetPosition.x) <= 15 && 
     //       Math.abs(this.position.y - this.targetPosition.y) <= 15) {
     //     this.targetPosition = null;
-    //     this.direction = new Point();
+    //     this.direction = new Vec3();
     //   } else {
     //     this.moveTo(this.targetPosition);
     //   }
@@ -403,7 +403,7 @@ export default class Character extends GameObject {
     }
     // TODO: interpolate target location
     // if (state.position) {
-    //   this.moveToPosition = new Point(state.position);
+    //   this.moveToPosition = new Vec3(state.position);
     // }
     if (!this.isThisPlayer) {
       // if (this.moveToPosition) {
@@ -418,23 +418,23 @@ export default class Character extends GameObject {
         this.setDirection(state.direction);
       }
       if (state.state.target) {
-        this.pointToTarget = new Point(state.state.target);
-        this.previousTarget = new Point(this.state.target);
+        this.pointToTarget = new Vec3(state.state.target);
+        this.previousTarget = new Vec3(this.state.target);
       }
 
       if (state.position && !this.position.equals(state.position)) {
         let dist = this.position.distanceTo(state.position);
         if (interpolateTime > 0 && dist >= 1) {
-          this.startPosition = new Point(this.position);
-          this.moveToPosition = new Point(state.position);
+          this.startPosition = new Vec3(this.position);
+          this.moveToPosition = new Vec3(state.position);
           this.setDirection(this.moveToPosition.minus(this.startPosition));
           //this.speed = dist * (1000 / interpolateTime);
           //this.targetDirection = state.direction;
         } else {
-          // this.position = new Point(state.position);
-          // this.lastPosition = new Point(this.position);
+          // this.position = new Vec3(state.position);
+          // this.lastPosition = new Vec3(this.position);
           this.speed = state.speed || this.baseSpeed;
-          this.direction = new Point(state.direction) || new Point();
+          this.direction = new Vec3(state.direction) || new Vec3();
         }
       }
     }

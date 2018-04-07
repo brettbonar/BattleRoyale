@@ -1,7 +1,7 @@
 import GameObject from "../../Engine/GameObject/GameObject.mjs"
 import ProjectileRenderer from "../Renderers/ProjectileRenderer.mjs"
 import attacks from "../Magic/attacks.mjs"
-import Point from "../../Engine/GameObject/Point.mjs"
+import Vec3 from "../../Engine/GameObject/Vec3.mjs"
 import Dimensions from "../../Engine/GameObject/Dimensions.mjs"
 import { getDistance } from "../../Engine/util.mjs"
 import { getRangeMap, smoothStop } from "../../Engine/Math.mjs"
@@ -43,7 +43,7 @@ export default class Projectile extends GameObject {
       this.renderClipped = true;
     }
 
-    this.startPosition = new Point(this.position);
+    this.startPosition = new Vec3(this.position);
     this.onCollision = this.attack.effect.onCollision;
 
     if (!params.simulation) {
@@ -87,7 +87,7 @@ export default class Projectile extends GameObject {
     if (s >= 0 && s <= 1 && t >= 0 && t <= 1)
     {
       // Collision detected
-      return new Point({
+      return new Vec3({
         x: line1[0].x + (t * s1_x),
         y: line1[0].y + (t * s1_y)
       });
@@ -200,9 +200,9 @@ export default class Projectile extends GameObject {
   }
 
   updateState(state) {
-    //let oldPos = new Point(this.position);
+    //let oldPos = new Vec3(this.position);
     _.merge(this, _.omit(state, "position"));
-    // this.position = new Point(this.position);
+    // this.position = new Vec3(this.position);
     // if (!this.position.equals(oldPos)) {
     //   this.position = oldPos.plus(this.position.minus(oldPos).times(0.1));
     // }
@@ -288,7 +288,7 @@ export default class Projectile extends GameObject {
 
     // TRICKY: given position will be relative to center, shift so its centered
     // this.position.subtract({ x: this.dimensions.width / 2, y: this.dimensions.height / 2});
-    let acceleration = new Point();
+    let acceleration = new Vec3();
     let speed = params.attack.effect.speed;
     if (params.modifiers && !_.isUndefined(params.modifiers.speed)) {
       speed *= params.modifiers.speed;
@@ -297,7 +297,7 @@ export default class Projectile extends GameObject {
     if (params.attack.effect.path === "arc") {
       // TODO: may need an offset to make this more accurate
       // TODO: put default gravity in settings somewhere
-      acceleration = new Point(params.attack.effect.arcGravity || { z: -1 });
+      acceleration = new Vec3(params.attack.effect.arcGravity || { z: -1 });
       direction.z = Projectile.getInitialArcSpeed(speed,
         acceleration, origin, params.target, params.attack.effect.arcHeight);
     }

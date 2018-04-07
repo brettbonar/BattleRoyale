@@ -1,6 +1,6 @@
 import { drawShadow, getAnimationOffset } from "../../Engine/Rendering/renderUtils.mjs"
 import ImageCache from "../../Engine/Rendering/ImageCache.mjs"
-import Point from "../../Engine/GameObject/Point.mjs"
+import Vec3 from "../../Engine/GameObject/Vec3.mjs"
 import Scratch from "../../Engine/Rendering/Scratch.mjs"
 
 export default class BeamRenderer {
@@ -16,7 +16,7 @@ export default class BeamRenderer {
   renderAt(context, image, imageParams, position, object) {
     context.save();
 
-    let offset = new Point();
+    let offset = new Vec3();
     if (imageParams.frames) {
       offset = getAnimationOffset(this.image, imageParams.dimensions, this.frame);
     }
@@ -54,7 +54,7 @@ export default class BeamRenderer {
     }
 
     let fullDimensions = { width: distance, height: dimensions.height };
-    Scratch.drawImageTo(context, new Point(), fullDimensions, start, fullDimensions);
+    Scratch.drawImageTo(context, new Vec3(), fullDimensions, start, fullDimensions);
 
     
     // context.drawImage(this.canvas, position.x, position.y, dimensions.width, dimensions.height,

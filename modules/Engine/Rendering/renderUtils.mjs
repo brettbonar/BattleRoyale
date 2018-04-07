@@ -1,4 +1,4 @@
-import Point from "../GameObject/Point.mjs"
+import Vec3 from "../GameObject/Vec3.mjs"
 
 const SHADOW_START = { z: 0, value: 0.5 };
 const SHADOW_END = { z: 160, value: 1 };
@@ -38,7 +38,7 @@ function getAnimationOffset(image, imageSize, frame) {
   let width = imageSize.width || imageSize || 0;
   let height = imageSize.height || imageSize || 0;
   let framesPerRow = image.width / width;
-  return new Point({
+  return new Vec3({
     x: (frame % framesPerRow) * width,
     y: height * Math.floor(frame / framesPerRow)
   });

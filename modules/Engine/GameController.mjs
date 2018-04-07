@@ -1,5 +1,3 @@
-//import io from "../lib/socket.io-client/dist/socket.io.mjs";
-
 let controllers = {};
 let activeControllers = [];
 

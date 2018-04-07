@@ -3,7 +3,7 @@ import BattleRoyale from "./BattleRoyale.mjs"
 import KEY_CODE from "../util/keyCodes.mjs"
 import Game from "../Engine/Game.mjs"
 import GameObject from "../Engine/GameObject/GameObject.mjs"
-import Point from "../Engine/GameObject/Point.mjs"
+import Vec3 from "../Engine/GameObject/Vec3.mjs"
 import Bounds from "../Engine/GameObject/Bounds.mjs"
 import FloatingText from "../Graphics/FloatingText.mjs"
 import PhysicsEngine from "../Engine/Physics/PhysicsEngine.mjs"
@@ -121,7 +121,7 @@ export default class BattleRoyaleServer extends BattleRoyale {
     if (object) {
       if (data.position) {
         // TODO: could remove this so players cant cheat
-        object.position = new Point(data.position);
+        object.position = new Vec3(data.position);
       }
       object.setDirection(data.direction);
       object.revision = data.source.revision;

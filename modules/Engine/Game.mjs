@@ -245,8 +245,4 @@ export default class Game {
       cb(this);
     }
   }
-
-  addObject(params) {
-    
-  }
 }

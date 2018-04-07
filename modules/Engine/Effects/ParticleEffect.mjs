@@ -1,4 +1,4 @@
-import Point from "../GameObject/Point.mjs"
+import Vec3 from "../GameObject/Vec3.mjs"
 import ImageCache from "../Rendering/ImageCache.mjs"
 
 class Particle {
@@ -24,7 +24,7 @@ class Particle {
     this.zspeed = this.particleInfo.zspeed || this.speed;
 
     if (this.particleInfo.acceleration) {
-      this.particleInfo.acceleration = new Point(this.particleInfo.acceleration);
+      this.particleInfo.acceleration = new Vec3(this.particleInfo.acceleration);
     }
   }
 
@@ -147,7 +147,7 @@ export default class ParticleEffect {
 
   createParticle() {
     let position = this.position.copy();
-    let direction = new Point();
+    let direction = new Vec3();
 
     if (this.particleInfo.momentum) {
       // TODO: vary this a bit

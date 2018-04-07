@@ -1,6 +1,5 @@
 import Bounds from "./Bounds.mjs"
-import Vector from "./Vector.mjs"
-import Point from "./Point.mjs"
+import Vec3 from "./Vec3.mjs"
 import Dimensions from "./Dimensions.mjs"
 import Renderer from "../Rendering/Renderers/Renderer.mjs"
 import { SURFACE_TYPE, MOVEMENT_TYPE } from "../../Engine/Physics/PhysicsConstants.mjs"
@@ -83,8 +82,8 @@ export default class GameObject extends GameObjectProxy {
       }
     });
 
-    this.position = new Point(this.position);    
-    this.lastPosition = new Point(this.position);
+    this.position = new Vec3(this.position);    
+    this.lastPosition = new Vec3(this.position);
     this.grids = [];
 
     if (this.static) {
@@ -96,7 +95,7 @@ export default class GameObject extends GameObjectProxy {
     }
 
     this.renderObjects = [this];
-    this.direction = new Point(this.direction).normalize();
+    this.direction = new Vec3(this.direction).normalize();
     this.updatePosition();
 
     // TODO: fix this hack
@@ -141,7 +140,7 @@ export default class GameObject extends GameObjectProxy {
   updatePosition() {
     let zheight = this.perspectiveDimensions ? 
       this.perspectiveDimensions.zheight : this.dimensions.zheight;
-    let position = new Point(this.position);
+    let position = new Vec3(this.position);
     if (this.perspectiveOffset) {
       position.add(this.perspectiveOffset);
     } else if (zheight > 0 && !this.renderClipped) {
@@ -184,7 +183,7 @@ export default class GameObject extends GameObjectProxy {
   }
 
   get left() {
-    return new Point({
+    return new Vec3({
       x: this.boundingBox.box.ul.x,
       y: this.center.y,
       z: this.position.z
@@ -192,7 +191,7 @@ export default class GameObject extends GameObjectProxy {
   }
 
   get right() {
-    return new Point({
+    return new Vec3({
       x: this.boundingBox.box.lr.x,
       y: this.center.y,
       z: this.position.z
@@ -200,7 +199,7 @@ export default class GameObject extends GameObjectProxy {
   }
 
   get top() {
-    return new Point({
+    return new Vec3({
       x: this.center.x,
       y: this.boundingBox.box.ul.y,
       z: this.position.z
@@ -208,7 +207,7 @@ export default class GameObject extends GameObjectProxy {
   }
 
   get bottom() {
-    return new Point({
+    return new Vec3({
       x: this.center.x,
       y: this.boundingBox.box.lr.y,
       z: this.position.z
@@ -290,7 +289,7 @@ export default class GameObject extends GameObjectProxy {
   }
   get fadeBounds() {
     if (this.fadeDimensions) {
-      let position = new Point(this.position);
+      let position = new Vec3(this.position);
       if (this.fadeDimensions.offset) {
         position.add(this.fadeDimensions.offset);
       }
@@ -428,7 +427,7 @@ export default class GameObject extends GameObjectProxy {
 
   moveTo(position) {
     this.targetPosition = position;
-    this.setDirection(new Point(position).minus(this.position));
+    this.setDirection(new Vec3(position).minus(this.position));
   }
   
   getUpdateState() {
