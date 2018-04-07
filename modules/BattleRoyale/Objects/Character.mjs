@@ -344,15 +344,26 @@ export default class Character extends GameObject {
     //   }
     // }
     // TODO: handle overshooting movetoposition
-    if (this.moveToPosition && !this.moveToPosition.equals(this.position)) {
+    if (this.moveToPosition) {
       let direction = this.moveToPosition.minus(this.position);
       let dist = this.position.distanceTo(this.moveToPosition);
-      if (dist <= 1) {
+      if (dist <= 1 || !this.direction.sameAs(direction)) {
         this.position = this.moveToPosition;
         this.moveToPosition = null;
         this.direction = new Point();
       } else {
         //this.position.add(direction);
+      }
+    }
+
+    if (this.pointToTarget) {
+      this.currentInterpolateTime += elapsedTime;
+      let time = Math.min(1.0, this.currentInterpolateTime / this.interpolateTime);
+      let target = this.previousTarget
+        .plus(this.pointToTarget.minus(this.previousTarget).times(time));
+      this.setTarget(target);
+      if (time >= 1.0) {
+        this.pointToTarget = null;
       }
     }
 
@@ -398,11 +409,17 @@ export default class Character extends GameObject {
       // if (this.moveToPosition) {
       //   this.position = this.moveToPosition;
       // }
-      if (state.state.target) {
-        this.setTarget(state.state.target);
-      }
+      // if (state.state.target) {
+      //   this.setTarget(state.state.target);
+      // }
+      this.currentInterpolateTime = 0;
+      this.interpolateTime = interpolateTime;
       if (state.direction) {
         this.setDirection(state.direction);
+      }
+      if (state.state.target) {
+        this.pointToTarget = new Point(state.state.target);
+        this.previousTarget = new Point(this.state.target);
       }
 
       if (state.position && !this.position.equals(state.position)) {
@@ -410,8 +427,6 @@ export default class Character extends GameObject {
         if (interpolateTime > 0 && dist >= 1) {
           this.startPosition = new Point(this.position);
           this.moveToPosition = new Point(state.position);
-          this.currentInterpolateTime = 0;
-          this.interpolateTime = interpolateTime;
           this.setDirection(this.moveToPosition.minus(this.startPosition));
           //this.speed = dist * (1000 / interpolateTime);
           //this.targetDirection = state.direction;

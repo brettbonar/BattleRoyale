@@ -50,7 +50,7 @@ export default class BattleRoyale extends Game {
     this.grid = new Grid(400);
     this.physicsEngine = new PhysicsEngine(this.grid);
     this.updates = [];
-    this.pendingUpdates = [];
+    this.collisions = [];
     // TODO: create grid for each level
 
     this.gameState = {
@@ -64,6 +64,10 @@ export default class BattleRoyale extends Game {
     }
 
     // TODO: create static objects for map boundaries. Also for ground?
+  }
+
+  getObject(objectId) {
+    return _.find(this.gameState.objects, { objectId: objectId });
   }
 
   addObject(object) {
@@ -161,75 +165,7 @@ export default class BattleRoyale extends Game {
     }
   }
 
-  handleCollision(collision) {
-    if (collision.source.physics.surfaceType === SURFACE_TYPE.PROJECTILE ||
-        collision.source.physics.surfaceType === SURFACE_TYPE.GAS) {
-      
-      // Don't let stream weapons interact with themselves
-      if (collision.source.actionId === collision.target.actionId && collision.source.effect.path === "stream") {
-        return;
-      }
-
-      if (_.get(collision.target, "physics.surfaceType") === SURFACE_TYPE.CHARACTER) {
-        // TODO: something else
-        if (!collision.source.damagedTargets.includes(collision.target) && collision.source.damageReady) {
-          collision.target.damage(collision.source);
-          collision.source.damagedTargets.push(collision.target);
-          // TODO: add effect based on character
-          if (collision.target.damagedEffect && !this.simulation) {
-            // this.particleEngine.addEffect(new AnimationEffect({
-            //   position: {
-            //     x: collision.target.center.x,
-            //     y: collision.target.center.y
-            //   },
-            //   duration: 1000
-            // }, collision.target.damagedEffect));
-          }
-        }
-        // if (!character.dead && character.currentHealth <= 0) {
-        //   character.kill();
-        // }
-        if (!collision.source.effect.punchThrough && collision.source.effect.path !== "beam") {
-          this.removeObject(collision.source);
-        }
-      } else {
-        if (collision.source.physics.surfaceType === SURFACE_TYPE.PROJECTILE &&
-            collision.source.physics.elasticity === 0 && collision.source.effect.path !== "beam") {
-          this.removeObject(collision.source);
-        }
-      }
-
-      if (!this.simulation && collision.source.rendering.hitEffect && collision.source.damageReady) {
-        if (collision.source.rendering.hitEffect.particleEffect) {
-          this.particleEngine.addEffect(new ParticleEffect({
-            position: collision.source.position.plus({
-              x: collision.sourceBounds.width / 2,
-              y: collision.sourceBounds.height / 2
-            }),
-            direction: collision.source.direction,
-            speed: collision.source.speed,
-            rotation: collision.source.rotation,
-            effect: effects[collision.source.rendering.hitEffect.particleEffect]
-          }));
-        } else {
-          this.addObject(new RenderObject({
-            position: collision.position,
-            //dimensions: collision.source.dimensions,
-            rotation: collision.source.rotation
-          }, collision.source.rendering.hitEffect));
-        }
-      }
-
-      if (collision.source.effect.path === "beam") collision.source.damageReady = false;
-    } else {
-      // collision.source.position.x = collision.source.lastPosition.x;
-      // collision.source.position.y = collision.source.lastPosition.y;
-    }
-
-    if (collision.source.onCollision) {
-      this.onCollision(collision.source.onCollision(collision));
-    }
-  }
+  handleCollision(collision) {}
 
   _update(elapsedTime) {
     for (const obj of this.gameState.objects) {
@@ -271,10 +207,10 @@ export default class BattleRoyale extends Game {
     this.physicsEngine.update(elapsedTime, this.getPhysicsObjects(), this.grid);
 
     // TODO: don't simulate projectile collisions on client. Send collision results to client instead.
-    let collisions = this.physicsEngine.getCollisions(this.getPhysicsObjects(), this.grid);
+    this.collisions = this.physicsEngine.getCollisions(this.getPhysicsObjects(), this.grid);
     // this.physicsEngine.getCollisions(_.map(collisions, "source"))
     //   .filter((obj) => !(obj instanceof Projectile && obj.effect.path === "beam"));
-    for (const collision of collisions) {
+    for (const collision of this.collisions) {
       this.handleCollision(collision);
     }
 

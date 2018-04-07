@@ -52,8 +52,25 @@ export default class Simulation {
     });
     this.lastState = [];
     this.lastObjects = [];
+    this.lastCollisions = [];
     this.lastElapsedTime = 0;
     this.removedObjects = [];
+  }
+
+  getCollision(collision) {
+    let sourceBounds;
+    if (collision.sourceBounds) {
+      sourceBounds = {
+        width: collision.sourceBounds.width,
+        height: collision.sourceBounds.height
+      }
+    };
+    return {
+      sourceId: collision.source.objectId,
+      targetId: collision.target.objectId,
+      position: collision.position,
+      sourceBounds: sourceBounds
+    };
   }
 
   updateState(data, elapsedTime) {
@@ -78,6 +95,13 @@ export default class Simulation {
       this.lastState.length = 0;
     }
 
+    if (this.lastCollisions.length > 0) {
+      for (const player of this.players) {
+        player.socket.emit("collision", this.lastCollisions.map(this.getCollision));
+      }
+      this.lastCollisions.length = 0;
+    }
+
     if (this.removedObjects.length > 0) {
       for (const player of this.players) {
         player.socket.emit("remove", this.removedObjects);
@@ -89,6 +113,7 @@ export default class Simulation {
     this.removedObjects = _.difference(this.lastObjects, this.game.gameState.objects)
       .map((obj) => obj.objectId);
     this.lastObjects = this.game.gameState.objects.slice();
+    this.lastCollisions = this.game.collisions;
     
     // TODO: do for each player
     this.lastState = this.game.gameState.objects

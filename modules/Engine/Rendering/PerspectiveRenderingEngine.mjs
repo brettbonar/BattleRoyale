@@ -224,8 +224,12 @@ export default class PerspectiveRenderingEngine extends RenderingEngine{
     let losBounds = [];
     for (const object of objects) {
       for (const renderObj of object.renderObjects) {
-        if (renderObj.position.x + renderObj.width > center.x - this.context.canvas.width && renderObj.position.x + renderObj.width < center.x + this.context.canvas.width &&
-            renderObj.position.y + renderObj.height > center.y - this.context.canvas.height && renderObj.position.y + renderObj.height < center.y + this.context.canvas.height)
+        // TODO: create new grid for rendering
+        if (renderObj.visible &&
+            (renderObj.position.x + renderObj.width > center.x - this.context.canvas.width && renderObj.position.x + renderObj.width < center.x + this.context.canvas.width &&
+             renderObj.position.y + renderObj.height > center.y - this.context.canvas.height && renderObj.position.y + renderObj.height < center.y + this.context.canvas.height ||
+             renderObj.lastPosition.x + renderObj.width > center.x - this.context.canvas.width && renderObj.lastPosition.x + renderObj.width < center.x + this.context.canvas.width &&
+             renderObj.lastPosition.y + renderObj.height > center.y - this.context.canvas.height && renderObj.lastPosition.y + renderObj.height < center.y + this.context.canvas.height))
         {
           let pos = Math.round(renderObj.perspectivePosition.y);
           if (!renderObjects[pos]) {

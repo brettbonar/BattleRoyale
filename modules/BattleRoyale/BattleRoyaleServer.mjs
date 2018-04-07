@@ -161,4 +161,52 @@ export default class BattleRoyaleServer extends BattleRoyale {
       release: event.release
     });
   }
+
+  handleCollision(collision) {
+    if (collision.source.physics.surfaceType === SURFACE_TYPE.PROJECTILE ||
+        collision.source.physics.surfaceType === SURFACE_TYPE.GAS) {
+      
+      // Don't let stream weapons interact with themselves
+      if (collision.source.actionId === collision.target.actionId && collision.source.effect.path === "stream") {
+        return;
+      }
+
+      if (_.get(collision.target, "physics.surfaceType") === SURFACE_TYPE.CHARACTER) {
+        // TODO: something else
+        if (!collision.source.damagedTargets.includes(collision.target) && collision.source.damageReady) {
+          collision.target.damage(collision.source);
+          collision.source.damagedTargets.push(collision.target);
+          // TODO: add effect based on character
+          if (collision.target.damagedEffect && !this.simulation) {
+            // this.particleEngine.addEffect(new AnimationEffect({
+            //   position: {
+            //     x: collision.target.center.x,
+            //     y: collision.target.center.y
+            //   },
+            //   duration: 1000
+            // }, collision.target.damagedEffect));
+          }
+        }
+        // if (!character.dead && character.currentHealth <= 0) {
+        //   character.kill();
+        // }
+        if (!collision.source.effect.punchThrough && collision.source.effect.path !== "beam") {
+          this.removeObject(collision.source);
+        }
+      } else {
+        if (collision.source.physics.surfaceType === SURFACE_TYPE.PROJECTILE &&
+            collision.source.physics.elasticity === 0 && collision.source.effect.path !== "beam") {
+          this.removeObject(collision.source);
+        }
+      }
+      if (collision.source.effect.path === "beam") collision.source.damageReady = false;
+    } else {
+      // collision.source.position.x = collision.source.lastPosition.x;
+      // collision.source.position.y = collision.source.lastPosition.y;
+    }
+
+    if (collision.source.onCollision) {
+      this.onCollision(collision.source.onCollision(collision));
+    }
+  }
 }

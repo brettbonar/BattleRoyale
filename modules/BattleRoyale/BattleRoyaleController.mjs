@@ -48,6 +48,10 @@ export default class BattleRoyaleController extends GameController {
       //console.log("Got update");
       this.game.removeObjects(data);
     });
+    this.socket.on("collision", (data) => {
+      //console.log("Got update");
+      this.game.onCollisions(data);
+    });
     this.socket.on("initialize", (data) => {
       console.log("Initializing");
 

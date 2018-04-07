@@ -436,7 +436,7 @@ export default class GameObject extends GameObjectProxy {
     return _.pick(this, [
       "type",
       "dimensions",
-      "visible",
+      //"visible",
       "direction",
       "position",
       "acceleration",

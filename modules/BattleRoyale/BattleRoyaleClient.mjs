@@ -240,6 +240,54 @@ export default class BattleRoyaleClient extends BattleRoyale {
     this.objectUpdates.length = 0;
   }
 
+  onCollisions(collisions) {
+    for (const collision of collisions) {
+      this.handleCollision({
+        source: this.getObject(collision.sourceId),
+        target: this.getObject(collision.targetId),
+        position: new Point(collision.position),
+        sourceBounds: collision.sourceBounds
+      });
+    }
+  }
+
+  handleCollision(collision) {
+    if (collision.source.physics.surfaceType === SURFACE_TYPE.PROJECTILE ||
+        collision.source.physics.surfaceType === SURFACE_TYPE.GAS) {
+
+      // Don't let stream weapons interact with themselves
+      if (collision.target && collision.source.actionId === collision.target.actionId && collision.source.effect.path === "stream") {
+        return;
+      }
+      
+      if (collision.source.rendering.hitEffect && !collision.source.collided) {
+        collision.source.collided = true;
+        if (collision.source.effect.path !== "beam") {
+          collision.source.visible = false;
+        }
+
+        if (collision.source.rendering.hitEffect.particleEffect) {
+          this.particleEngine.addEffect(new ParticleEffect({
+            position: collision.position.plus({
+              x: collision.sourceBounds.width / 2,
+              y: collision.sourceBounds.height / 2
+            }),
+            direction: collision.source.direction,
+            speed: collision.source.speed,
+            rotation: collision.source.rotation,
+            effect: effects[collision.source.rendering.hitEffect.particleEffect]
+          }));
+        } else {
+          this.addObject(new RenderObject({
+            position: collision.position,
+            //dimensions: collision.source.dimensions,
+            rotation: collision.source.rotation
+          }, collision.source.rendering.hitEffect));
+        }
+      }
+    }
+  }
+
   updateObjects(data) {
     this.objectUpdates.push({
       objects: data.objects,

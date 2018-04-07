@@ -36,6 +36,13 @@ export default class Point {
     return Math.sqrt(dx * dx + dy * dy + dz * dz);
   };
 
+  // Checks that all parts have the same sign
+  sameAs(point) {
+    return Math.sign(this.x) === Math.sign(point.x) &&
+      Math.sign(this.y) === Math.sign(point.y) &&
+      Math.sign(this.z) === Math.sign(point.z);
+  }
+
   equals(point) {
     return this.x === point.x && this.y === point.y && this.z === point.z;
   }

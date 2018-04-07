@@ -54,7 +54,9 @@ export default class Projectile extends GameObject {
       }
     }
     this.currentTime = 0;
-    this.maxTime = (this.attack.effect.range / this.attack.effect.speed) * 1000;
+    if (this.effect.path !== "arc" && this.effect.path !== "beam") {
+      this.maxTime = (this.attack.effect.range / this.attack.effect.speed) * 1000;
+    }
 
     this.rotation = Math.atan2(this.direction.y - this.direction.z, this.direction.x ) * 180 / Math.PI;
   }
@@ -137,11 +139,12 @@ export default class Projectile extends GameObject {
 
   update(elapsedTime) {
     this.currentTime += elapsedTime + this.elapsedTime;
-    if (this.currentTime >= this.maxTime) {
+    if (this.maxTime && this.currentTime >= this.maxTime) {
       this.done = true;
     }
 
     if (this.effect.path === "beam") {
+      this.collided = false;
       if (!this.source || !this.source.currentAction || this.source.currentAction.actionId !== this.actionId) {
         this.done = true;
       } else {
@@ -209,7 +212,8 @@ export default class Projectile extends GameObject {
     return Object.assign(super.getUpdateState(), {
       attackType: this.attack.name,
       ownerId: this.ownerId,
-      actionId: this.actionId
+      actionId: this.actionId,
+      damageReady: this.damageReady
     });
   }
   
