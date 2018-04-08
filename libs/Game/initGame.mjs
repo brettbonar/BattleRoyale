@@ -119,15 +119,15 @@ function initGame(players, maps) {
     //     z: 0
     //   }
     // }),
-    new Building({
-      buildingType: "house",
-      simulation: true,
-      position: {
-        x: 500,
-        y: 500,
-        z: 0
-      }
-    })
+    // new Building({
+    //   buildingType: "house",
+    //   simulation: true,
+    //   position: {
+    //     x: 500,
+    //     y: 500,
+    //     z: 0
+    //   }
+    // })
   ];
 
   let pos = 255;
@@ -303,7 +303,7 @@ function initGame(players, maps) {
   //   }
   // ));
 
-  //gameObjects = gameObjects.concat(addScenes(maps));
+  gameObjects = gameObjects.concat(addScenes(maps));
 
   return gameObjects;
 }

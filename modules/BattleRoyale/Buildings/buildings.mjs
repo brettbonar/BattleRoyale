@@ -201,7 +201,7 @@ export default {
       },
       dimensions: {
         width: 194,
-        height: 290,
+        height: 225,
         zheight: 128
       },
       // fadeEndOffset: {

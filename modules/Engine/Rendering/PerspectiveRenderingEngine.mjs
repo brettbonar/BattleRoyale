@@ -54,7 +54,7 @@ export default class PerspectiveRenderingEngine extends RenderingEngine{
 
   renderFaded(object, elapsedTime) {
     if (object.fadeDimensions) {
-      this.context.globalAlpha = 0.5;
+      this.context.globalAlpha = 0.3;
       //object.render(this.context, elapsedTime);
       object.render(this.context, elapsedTime, object.fadeDimensions);
       let offset = object.fadeDimensions.offset || new Vec3();
@@ -69,14 +69,18 @@ export default class PerspectiveRenderingEngine extends RenderingEngine{
         }
       });
     } else {
-      this.context.globalAlpha = 0.5;
+      this.context.globalAlpha = 0.3;
       object.render(this.context, elapsedTime);
     }
   }
 
-  renderObject(object, elapsedTime, center, clipping) {
+  isAnyObjectHidden(losHiddenObjects, fadeObject) {
+    return losHiddenObjects.some((obj) => obj.modelBounds.intersects(fadeObject.modelBounds));
+  }
+
+  renderObject(object, elapsedTime, losHiddenObjects, clipping) {
     this.context.save();
-    if (object.losFade && object.fadePosition.y > center.y - 20) {
+    if (object.losFade && this.isAnyObjectHidden(losHiddenObjects, object)) {
       this.renderFaded(object, elapsedTime, clipping);
     } else {
       object.render(this.context, elapsedTime, clipping);
@@ -121,7 +125,7 @@ export default class PerspectiveRenderingEngine extends RenderingEngine{
     let renderObjects = objsToRender.renderObjects;
 
     for (const groundObject of objsToRender.groundObjects) {
-      this.renderObject(groundObject, elapsedTime, center);
+      this.renderObject(groundObject, elapsedTime);
     }
 
     if (fov) {
@@ -167,7 +171,7 @@ export default class PerspectiveRenderingEngine extends RenderingEngine{
               })
             };
             // TODO: reset elapsed time after first render?
-            this.renderObject(clip.object, elapsedTime, center, clipping);
+            this.renderObject(clip.object, elapsedTime, objsToRender.losHiddenObjects, clipping);
 
             clip.previousClip += height;
             if (clip.previousClip >= clip.object.height) {
@@ -176,7 +180,7 @@ export default class PerspectiveRenderingEngine extends RenderingEngine{
           }
         }
 
-        this.renderObject(object, elapsedTime, center);
+        this.renderObject(object, elapsedTime, objsToRender.losHiddenObjects);
       }
     }
 
@@ -529,11 +533,15 @@ export default class PerspectiveRenderingEngine extends RenderingEngine{
     return bounds;
   }
 
-  isInView(object, fovBounds) {
+  isInView(object, fovBounds, losHiddenObjs) {
     // TODO: test if object is owned by player instead of if is player
-    if (object.losHidden && !object.isThisPlayer) {
+    if (object.losHidden) {
       let objBounds = object.modelBounds;
-      return fovBounds.some((bounds) => bounds.intersects(objBounds));
+      if (fovBounds.some((bounds) => bounds.intersects(objBounds))) {
+        losHiddenObjs.push(object);
+        return true;
+      }
+      return false;
     }
     return true;
   }
@@ -572,13 +580,13 @@ export default class PerspectiveRenderingEngine extends RenderingEngine{
   getRenderObjects(objects, center, fovBounds) {
     let renderObjects = [];
     let groundObjects = [];
-    let characters = [];
+    let losHiddenObjects = [];
     let losBounds = [];
 
     for (const object of objects) {
       for (const renderObj of object.renderObjects) {
         // TODO: create new grid for rendering
-        if (!renderObj.hidden && (!fovBounds || this.isInView(renderObj, fovBounds))) {
+        if (!renderObj.hidden && (!fovBounds || this.isInView(renderObj, fovBounds, losHiddenObjects))) {
           let pos = Math.round(renderObj.perspectivePosition.y);
 
           if (pos > 0) {
@@ -602,6 +610,6 @@ export default class PerspectiveRenderingEngine extends RenderingEngine{
 
     //return _.sortBy(renderObjects, this.sortByY, this.sortByZ);
     //return _.sortBy(renderObjects, this.sortByPerspective);
-    return { groundObjects: groundObjects, renderObjects: renderObjects };
+    return { groundObjects: groundObjects, renderObjects: renderObjects, losHiddenObjects: losHiddenObjects };
   }
 }

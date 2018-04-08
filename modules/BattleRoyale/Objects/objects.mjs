@@ -237,7 +237,7 @@ export default {
     objectType: "corn1",
     biome: "plain",
     group: "corn",
-    imageSource: "../../Assets/terrain_atlas.png",
+    imageSource: "/Assets/terrain_atlas.png",
     imageDimensions: {
       x: 481,
       y: 960,
@@ -269,7 +269,7 @@ export default {
     objectType: "corn2",
     biome: "plain",
     group: "corn",
-    imageSource: "../../Assets/terrain_atlas.png",
+    imageSource: "/Assets/terrain_atlas.png",
     imageDimensions: {
       x: 481,
       y: 896,
@@ -301,7 +301,7 @@ export default {
     objectType: "corn3",
     biome: "plain",
     group: "corn",
-    imageSource: "../../Assets/terrain_atlas.png",
+    imageSource: "/Assets/terrain_atlas.png",
     imageDimensions: {
       x: 481,
       y: 832,
@@ -334,12 +334,16 @@ export default {
     images: [
       {
         // Tree top
-        imageSource: "../../Assets/plants/plant repack-64.png",
+        imageSource: "/Assets/plants/plant repack-64.png",
         imageDimensions: {
           x: 165,
           y: 1034,
           width: 190,
           height: 178,
+        },
+        dimensions: {
+          width: 190,
+          height: 178
         },
         fadeEndOffset: {
           y: 64
@@ -352,7 +356,7 @@ export default {
       },
       {
         // Tree base
-        imageSource: "../../Assets/plants/plant repack-64.png",
+        imageSource: "/Assets/plants/plant repack-64.png",
         imageDimensions: {
           x: 20,
           y: 1128,
@@ -366,7 +370,7 @@ export default {
       },
       {
         // Tree shadow
-        imageSource: "../../Assets/plants/plant repack-64.png",
+        imageSource: "/Assets/plants/plant repack-64.png",
         imageDimensions: {
           x: 7,
           y: 1231,
@@ -403,12 +407,12 @@ export default {
       {
         offset: {
           x: 71,
-          y: 188,
+          y: 172,
           z: 0
         },
         dimensions: {
           width: 46,
-          height: 32,
+          height: 46,
           zheight: 128
         },
         opacity: 1.0
@@ -417,7 +421,7 @@ export default {
   },
   smallPlainTree: {
     biome: "plain",
-    imageSource: "../../Assets/terrain_atlas-64.png",
+    imageSource: "/Assets/terrain_atlas-64.png",
     imageDimensions: {
       x: 1734,
       y: 1862,
@@ -441,7 +445,7 @@ export default {
   },
   stump: {
     biome: "plain",
-    imageSource: "../../Assets/terrain_atlas-64.png",
+    imageSource: "/Assets/terrain_atlas-64.png",
     imageDimensions: {
       x: 782,
       y: 790,
@@ -461,7 +465,7 @@ export default {
     images: [
       {
         // Tree top
-        imageSource: "../../Assets/plants/plant repack-64.png",
+        imageSource: "/Assets/plants/plant repack-64.png",
         imageDimensions: {
           x: 370,
           y: 1030,
@@ -484,7 +488,7 @@ export default {
       },
       {
         // Tree base
-        imageSource: "../../Assets/plants/plant repack-64.png",
+        imageSource: "/Assets/plants/plant repack-64.png",
         imageDimensions: {
           x: 552,
           y: 1090,
@@ -506,7 +510,7 @@ export default {
       },
       {
         // Tree shadow
-        imageSource: "../../Assets/plants/plant repack-64.png",
+        imageSource: "/Assets/plants/plant repack-64.png",
         imageDimensions: {
           x: 685,
           y: 1158,
@@ -541,12 +545,12 @@ export default {
       {
         offset: {
           x: 73,
-          y: 256
+          y: 241
         },
         dimensions: {
           width: 32,
-          height: 12,
-          zheight: 196
+          height: 32,
+          zheight: 176
         },
         opacity: 1.0
       }
@@ -554,7 +558,7 @@ export default {
   },
   darkRock1: {
     biome: "darkRock",
-    imageSource: "../../Assets/terrain_atlas-64.png",
+    imageSource: "/Assets/terrain_atlas-64.png",
     imageDimensions: {
       x: 1732,
       y: 1506,
@@ -571,7 +575,7 @@ export default {
   },
   darkRock2: {
     biome: "darkRock",
-    imageSource: "../../Assets/terrain_atlas-64.png",
+    imageSource: "/Assets/terrain_atlas-64.png",
     imageDimensions: {
       x: 1732,
       y: 1704,
@@ -588,7 +592,7 @@ export default {
   },
   darkRock3: {
     biome: "darkRock",
-    imageSource: "../../Assets/terrain_atlas-64.png",
+    imageSource: "/Assets/terrain_atlas-64.png",
     imageDimensions: {
       x: 1860,
       y: 1692,
@@ -605,7 +609,7 @@ export default {
   },
   lightRock1: {
     biome: "lightRock",
-    imageSource: "../../Assets/terrain_atlas-64.png",
+    imageSource: "/Assets/terrain_atlas-64.png",
     imageDimensions: {
       x: 1668,
       y: 1378,
@@ -622,7 +626,7 @@ export default {
   },
   lightRock2: {
     biome: "lightRock",
-    imageSource: "../../Assets/terrain_atlas-64.png",
+    imageSource: "/Assets/terrain_atlas-64.png",
     imageDimensions: {
       x: 1796,
       y: 1384,
@@ -639,7 +643,7 @@ export default {
   },
   lightRock3: {
     biome: "lightRock",
-    imageSource: "../../Assets/terrain_atlas-64.png",
+    imageSource: "/Assets/terrain_atlas-64.png",
     imageDimensions: {
       x: 1924,
       y: 1372,
@@ -657,7 +661,7 @@ export default {
   pillar1: {
     // clean
     biome: "ruins",
-    imageSource: "../../Assets/terrain_atlas-64.png",
+    imageSource: "/Assets/terrain_atlas-64.png",
     imageDimensions: {
       x: 895,
       y: 769,
@@ -675,7 +679,7 @@ export default {
   pillar1Small: {
     // clean
     biome: "ruins",
-    imageSource: "../../Assets/terrain_atlas.png",
+    imageSource: "/Assets/terrain_atlas.png",
     imageDimensions: {
       x: 448,
       y: 384,
@@ -693,7 +697,7 @@ export default {
   pillar2: {
     // ivy, cracked
     biome: "ruins",
-    imageSource: "../../Assets/terrain_atlas-64.png",
+    imageSource: "/Assets/terrain_atlas-64.png",
     imageDimensions: {
       x: 1285,
       y: 769,
@@ -711,7 +715,7 @@ export default {
   pillar3: {
     // cracked
     biome: "ruins",
-    imageSource: "../../Assets/terrain_atlas-64.png",
+    imageSource: "/Assets/terrain_atlas-64.png",
     imageDimensions: {
       x: 1211,
       y: 970,
@@ -729,7 +733,7 @@ export default {
   pillar4: {
     // cracked, upside down
     biome: "ruins",
-    imageSource: "../../Assets/terrain_atlas-64.png",
+    imageSource: "/Assets/terrain_atlas-64.png",
     imageDimensions: {
       x: 1279,
       y: 965,
@@ -746,7 +750,7 @@ export default {
   },
   fountain: {
     biome: "ruins",
-    imageSource: "../../Assets/terrain_atlas-64.png",
+    imageSource: "/Assets/terrain_atlas-64.png",
     imageDimensions: {
       x: 1088,
       y: 788,
@@ -763,7 +767,7 @@ export default {
   },
   head: {
     biome: "ruins",
-    imageSource: "../../Assets/terrain_atlas-64.png",
+    imageSource: "/Assets/terrain_atlas-64.png",
     imageDimensions: {
       x: 968,
       y: 776,
@@ -780,7 +784,7 @@ export default {
   },
   brokenHead: {
     biome: "ruins",
-    imageSource: "../../Assets/terrain_atlas-64.png",
+    imageSource: "/Assets/terrain_atlas-64.png",
     imageDimensions: {
       x: 1156,
       y: 784,
@@ -798,7 +802,7 @@ export default {
   pillarBase1: {
     // cracked, ivy
     biome: "ruins",
-    imageSource: "../../Assets/terrain_atlas-64.png",
+    imageSource: "/Assets/terrain_atlas-64.png",
     imageDimensions: {
       x: 1152,
       y: 896,
@@ -816,7 +820,7 @@ export default {
   pillarBase2: {
     // cracked
     biome: "ruins",
-    imageSource: "../../Assets/terrain_atlas-64.png",
+    imageSource: "/Assets/terrain_atlas-64.png",
     imageDimensions: {
       x: 895,
       y: 962,
@@ -834,7 +838,7 @@ export default {
   pillarBase3: {
     // smooth
     biome: "ruins",
-    imageSource: "../../Assets/terrain_atlas-64.png",
+    imageSource: "/Assets/terrain_atlas-64.png",
     imageDimensions: {
       x: 1217,
       y: 896,
@@ -851,7 +855,7 @@ export default {
   },
   whiteRock: {
     biome: "ruins", // Other biomes?
-    imageSource: "../../Assets/terrain_atlas-64.png",
+    imageSource: "/Assets/terrain_atlas-64.png",
     imageDimensions: {
       x: 960,
       y: 960,
@@ -868,7 +872,7 @@ export default {
   },
   cactusBall: {
     biome: "desert",
-    imageSource: "../../Assets/terrain_atlas-64.png",
+    imageSource: "/Assets/terrain_atlas-64.png",
     imageDimensions: {
       x: 578,
       y: 896,
@@ -885,7 +889,7 @@ export default {
   },
   cactus: {
     biome: "desert",
-    imageSource: "../../Assets/terrain_atlas-64.png",
+    imageSource: "/Assets/terrain_atlas-64.png",
     imageDimensions: {
       x: 710,
       y: 898,
@@ -906,7 +910,7 @@ export default {
   brokenHeadstone: {
     biome: "death",
     group: "headstone",
-    imageSource: "../../Assets/terrain_atlas.png",
+    imageSource: "/Assets/terrain_atlas.png",
     imageDimensions: {
       x: 449,
       y: 678,
@@ -924,7 +928,7 @@ export default {
   headstone1: {
     biome: "death",
     group: "headstone",
-    imageSource: "../../Assets/obj_misk_atlas.png",
+    imageSource: "/Assets/obj_misk_atlas.png",
     imageDimensions: {
       x: 713,
       y: 851,
@@ -942,7 +946,7 @@ export default {
   headstone2: {
     biome: "death",
     group: "headstone",
-    imageSource: "../../Assets/obj_misk_atlas.png",
+    imageSource: "/Assets/obj_misk_atlas.png",
     imageDimensions: {
       x: 704,
       y: 801,
@@ -960,7 +964,7 @@ export default {
   headstone3: {
     biome: "death",
     group: "headstone",
-    imageSource: "../../Assets/obj_misk_atlas.png",
+    imageSource: "/Assets/obj_misk_atlas.png",
     imageDimensions: {
       x: 738,
       y: 803,
@@ -979,7 +983,7 @@ export default {
   grave: {
     biome: "death",
     group: "headstone",
-    imageSource: "../../Assets/obj_misk_atlas.png",
+    imageSource: "/Assets/obj_misk_atlas.png",
     imageDimensions: {
       x: 641,
       y: 801,
@@ -997,7 +1001,7 @@ export default {
   cross1: {
     biome: "death",
     group: "cross",
-    imageSource: "../../Assets/terrain_atlas.png",
+    imageSource: "/Assets/terrain_atlas.png",
     imageDimensions: {
       x: 481,
       y: 679,
@@ -1015,7 +1019,7 @@ export default {
   cross2: {
     biome: "death",
     group: "cross",
-    imageSource: "../../Assets/obj_misk_atlas.png",
+    imageSource: "/Assets/obj_misk_atlas.png",
     imageDimensions: {
       x: 741,
       y: 897,
@@ -1033,7 +1037,7 @@ export default {
   cross3: {
     biome: "death",
     group: "cross",
-    imageSource: "../../Assets/obj_misk_atlas.png",
+    imageSource: "/Assets/obj_misk_atlas.png",
     imageDimensions: {
       x: 739,
       y: 927,
@@ -1051,7 +1055,7 @@ export default {
   cross4: {
     biome: "death",
     group: "cross",
-    imageSource: "../../Assets/obj_misk_atlas.png",
+    imageSource: "/Assets/obj_misk_atlas.png",
     imageDimensions: {
       x: 734,
       y: 960,
@@ -1068,7 +1072,7 @@ export default {
   },
   darkFountain: {
     biome: "death",
-    imageSource: "../../Assets/terrain_atlas.png",
+    imageSource: "/Assets/terrain_atlas.png",
     imageDimensions: {
       x: 515,
       y: 674,
@@ -1085,7 +1089,7 @@ export default {
   },
   deadTree: {
     biome: "death",
-    imageSource: "../../Assets/obj_misk_atlas-64.png",
+    imageSource: "/Assets/obj_misk_atlas-64.png",
     imageDimensions: {
       x: 1043,
       y: 3,
@@ -1107,7 +1111,7 @@ export default {
   // TODO: automatically place exit at same location
   caveEntrance: {
     biome: "any",
-    imageSource: "../../Assets/terrain_atlas-64.png",
+    imageSource: "/Assets/terrain_atlas-64.png",
     imageDimensions: {
       x: 0,
       y: 320,
@@ -1143,7 +1147,7 @@ export default {
   },
   caveExit: {
     biome: "any",
-    imageSource: "../../Assets/terrain_atlas-64.png",
+    imageSource: "/Assets/terrain_atlas-64.png",
     imageDimensions: {
       x: 0,
       y: 320,

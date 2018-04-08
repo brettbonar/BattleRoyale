@@ -156,6 +156,14 @@ export default class GameObject extends GameObjectProxy {
       this.perspectivePosition = position.add({ y: this.position.z });
     }
 
+    if (this.static) {
+      this.staticBox = new Bounds({
+        position: this.position,
+        dimensions: this.dimensions,
+        boundsType: this.boundsType
+      });
+    }
+    
     //this.updateBounds();
   }
 
@@ -375,14 +383,21 @@ export default class GameObject extends GameObjectProxy {
   }
 
   get modelBounds() {
+    let position = this.position.copy();
+    position.y -= position.z;
+    position.z = 0;
     if (this.modelDimensions) {
       return new Bounds({
-        position: this.position.plus(this.modelDimensions.offset),
+        position: position.plus(this.modelDimensions.offset),
         dimensions: this.modelDimensions.dimensions,
         boundsType: this.boundsType
       });
     }
-    return this.bounds;
+    return new Bounds({
+      position: position,
+      dimensions: this.dimensions,
+      boundsType: this.boundsType
+    });
   }
 
   get boundingBox() {
