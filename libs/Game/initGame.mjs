@@ -168,6 +168,7 @@ function initGame(players, maps) {
     char.state.inventory.push("bow");
     char.state.inventory.push("lightStaffMale");
     char.state.inventory.push("fireStaffMale");
+    char.state.inventory.push("staffMale");
     gameObjects.push(char);
     pos += 100;
   }
@@ -302,7 +303,7 @@ function initGame(players, maps) {
   //   }
   // ));
 
-  gameObjects = gameObjects.concat(addScenes(maps));
+  //gameObjects = gameObjects.concat(addScenes(maps));
 
   return gameObjects;
 }

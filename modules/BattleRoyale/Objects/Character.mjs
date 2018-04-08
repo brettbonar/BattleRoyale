@@ -36,6 +36,22 @@ export default class Character extends GameObject {
     });
     this.speed = params.speed || 96;
     this.baseSpeed = this.speed;
+    this.losHidden = true;
+
+    // Dimensions of the actual model within the image
+    _.defaults(this, {
+      modelDimensions: {
+        offset: new Vec3({
+          x: 16,
+          y: 16
+        }),
+        dimensions: new Dimensions({
+          width: 32,
+          height: 44,
+          zheight: 44
+        })
+      }
+    });
 
     // actionDuration
     // actionRate

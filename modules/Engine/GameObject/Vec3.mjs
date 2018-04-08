@@ -29,6 +29,13 @@ export default class Vec3 {
     return Object.assign(this, Vec3.normalize(this));
   }
 
+  relativeDistanceTo(point) {
+    let dx = this.x - point.x;
+    let dy = this.y - point.y;
+    let dz = (this.z - point.z) || 0;
+    return dx * dx + dy * dy + dz * dz;
+  };
+
   distanceTo(point) {
     let dx = this.x - point.x;
     let dy = this.y - point.y;
@@ -45,6 +52,10 @@ export default class Vec3 {
 
   equals(point) {
     return this.x === point.x && this.y === point.y && this.z === point.z;
+  }
+
+  dot(vec) {
+    return this.x * vec.x + this.y * vec.y + this.z * vec.z;
   }
 
   scale(scale) {

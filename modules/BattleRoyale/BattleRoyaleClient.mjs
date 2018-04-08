@@ -438,7 +438,13 @@ export default class BattleRoyaleClient extends BattleRoyale {
     this.context.translate(-(this.gameState.player.center.x - this.context.canvas.width / 2),
     -(this.gameState.player.center.y - this.context.canvas.height / 2));
 
-    this.renderingEngine.render(this.getRenderObjects(), elapsedTime, this.gameState.player.center);
+    let fov = {
+      center: this.gameState.player.center,
+      target: this.gameState.player.state.target,
+      range: 1000,
+      angle: 45
+    }
+    this.renderingEngine.render(this.getRenderObjects(), elapsedTime, this.gameState.player.center, fov);
     //this.particleEngine.render(elapsedTime, this.gameState.player.center);
     this.renderInteractions();
     this.context.restore();

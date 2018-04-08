@@ -260,21 +260,6 @@ export default class CharacterRenderer {
     this.currentAnimationTime = 0;
     this.framesPerSec = 0;
     this.initBody(params);
-
-    // Dimensions of the actual model within the image
-    _.defaults(this, {
-      modelDimensions: {
-        offset: {
-          x: 16,
-          y: 16
-        },
-        dimensions: new Dimensions({
-          width: 32,
-          height: 44,
-          zheight: 44
-        })
-      }
-    });
   }
 
   initBody(params) {
@@ -348,7 +333,7 @@ export default class CharacterRenderer {
     let offset = getOffset(this.animation, this.frame, imageSize);
 
     //if (object.position.z > 0) {
-      //drawShadow(context, object, this.modelDimensions);
+      //drawShadow(context, object, object.modelDimensions);
     //}
 
     context.drawImage(this.body, offset.x, offset.y, imageSize, imageSize,

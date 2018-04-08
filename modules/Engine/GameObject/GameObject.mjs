@@ -363,6 +363,17 @@ export default class GameObject extends GameObjectProxy {
     return this.boundingBox;
   }
 
+  get modelBounds() {
+    if (this.modelDimensions) {
+      return new Bounds({
+        position: this.position.plus(this.modelDimensions.offset),
+        dimensions: this.modelDimensions.dimensions,
+        boundsType: this.boundsType
+      });
+    }
+    return this.bounds;
+  }
+
   get boundingBox() {
     return this.staticBox || 
       new Bounds({
