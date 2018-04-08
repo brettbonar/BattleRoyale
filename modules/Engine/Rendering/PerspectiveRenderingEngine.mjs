@@ -4,10 +4,52 @@ import Bounds from "../GameObject/Bounds.mjs"
 import Vec3 from "../GameObject/Vec3.mjs"
 import Dimensions from "../GameObject/Dimensions.mjs"
 import { getLineIntersection } from "../util.mjs"
+import ImageCache from "./ImageCache.mjs"
 
 export default class PerspectiveRenderingEngine extends RenderingEngine{
   constructor(params) {
     super(params);
+
+    this.fovImage = ImageCache.get("/Assets/fov.png");
+  }
+
+  renderFOV(center, fov, fovBounds) {
+    if (!this.fovImage.complete) return;
+    
+    this.context.save();
+
+    let dimensions = {
+      width: 2000,
+      height: 2000
+    };
+    let position = center.minus({
+      x: dimensions.width / 2,
+      y: dimensions.height / 2
+    });
+
+    this.context.beginPath();
+    //this.context.arc(center.x, center.y, fov.range, 0, 2 * Math.PI);
+
+    for (const triangle of fovBounds) {
+      this.context.moveTo(triangle.points[0].x, triangle.points[0].y);
+      this.context.lineTo(triangle.points[1].x, triangle.points[1].y);
+      this.context.lineTo(triangle.points[2].x, triangle.points[2].y);
+      this.context.lineTo(triangle.points[0].x, triangle.points[0].y);
+    }
+      this.context.clip();
+
+    this.context.drawImage(this.fovImage, position.x, position.y, dimensions.width, dimensions.height);
+
+    // if (clipping) {
+    //   position = clipping.offset.plus(position);
+    //   let imageDimensions = clipping.dimensions || dimensions;
+    //   this.context.drawImage(this.image, clipping.offset.x, clipping.offset.y, clipping.dimensions.width, clipping.dimensions.height,
+    //     position.x, position.y, imageDimensions.width, imageDimensions.height);
+    // } else {
+    //   this.context.drawImage(this.image, position.x, position.y, dimensions.width, dimensions.height);
+    // }
+
+    this.context.restore();
   }
 
   renderFaded(object, elapsedTime) {
@@ -47,15 +89,45 @@ export default class PerspectiveRenderingEngine extends RenderingEngine{
   }
 
   // Render highest to lowest y
-  render(objects, elapsedTime, center, fov) {
+  render(objects, elapsedTime, center, grid, fov) {
+    objects = grid.getRenderObjects(new Bounds({
+      position: center.minus({
+        x: this.context.canvas.width / 2,
+        y: this.context.canvas.height / 2
+      }),
+      dimensions: {
+        width: this.context.canvas.width,
+        height: this.context.canvas.height
+      }
+    }));
+
     //window.debug = true;
     this.context.save();
+
+    let fovBounds;
+    if (fov) {
+      fovBounds = this.getFovBounds(objects, fov);
+    }
+
+    if (window.debug) {
+      this.debugRays(fovBounds);
+    }
 
     // if (center) {
     //   this.context.translate(-(center.x - this.context.canvas.width / 2), -(center.y - this.context.canvas.height / 2));
     // }
 
-    let renderObjects = this.getRenderObjects(objects, center, fov);
+    let objsToRender = this.getRenderObjects(objects, center, fovBounds);
+    let renderObjects = objsToRender.renderObjects;
+
+    for (const groundObject of objsToRender.groundObjects) {
+      this.renderObject(groundObject, elapsedTime, center);
+    }
+
+    if (fov) {
+      this.renderFOV(center, fov, fovBounds);
+    }
+
     let clips = [];
     //for (const object of renderObjects) {
     let y, obj;
@@ -124,7 +196,6 @@ export default class PerspectiveRenderingEngine extends RenderingEngine{
     
     if (window.debug) {
       this.debugBoxes(renderObjects);
-      this.debugRays(objects, fov);
     }
 
     
@@ -184,20 +255,23 @@ export default class PerspectiveRenderingEngine extends RenderingEngine{
           this.context.strokeRect(box.ul.x, box.ul.y, box.width, box.height);
         }
           
-        for (const bounds of object.lastCollisionBounds) {
-          if (!bounds.box) continue; // TODO: render ray bounds
-          this.context.strokeStyle = "lawnGreen";
-          this.context.strokeRect(bounds.ul.x, bounds.ul.y - bounds.ul.z,
-            bounds.width, bounds.height);
+        if (object.lastCollisionBounds) {
+          for (const bounds of object.lastCollisionBounds) {
+            if (!bounds.box) continue; // TODO: render ray bounds
+            this.context.strokeStyle = "lawnGreen";
+            this.context.strokeRect(bounds.ul.x, bounds.ul.y - bounds.ul.z,
+              bounds.width, bounds.height);
+          }
         }
 
-        for (const bounds of object.collisionBounds) {
-          if (!bounds.box) continue; // TODO: render ray bounds
-          this.context.strokeStyle = "crimson";
-          this.context.strokeRect(bounds.ul.x, bounds.ul.y - bounds.ul.z,
-            bounds.width, bounds.height);
+        if (object.collisionBounds) {
+          for (const bounds of object.collisionBounds) {
+            if (!bounds.box) continue; // TODO: render ray bounds
+            this.context.strokeStyle = "crimson";
+            this.context.strokeRect(bounds.ul.x, bounds.ul.y - bounds.ul.z,
+              bounds.width, bounds.height);
+          }
         }
-
         // for (let i = 0; i < object.collisionBounds.length; i++) {
         //   this.context.strokeStyle = "blue";
         //   let bounds = object.lastCollisionBounds[i].plus(object.collisionBounds[i]);
@@ -228,40 +302,62 @@ export default class PerspectiveRenderingEngine extends RenderingEngine{
   }
   
   addRay(rays, fov, coneVector, end) {
-    let line = [fov.center, end];
     let distance = fov.center.distanceTo(end);
+    if (distance > fov.range) {
+      end = fov.center.plus(end.minus(fov.center).normalize().times(fov.range));
+    }
+    let line = [fov.center, end];
 
     // https://stackoverflow.com/questions/35056361/how-to-calculate-degree-between-two-line-with-integer-values-not-vectors
-    let dx1 = fov.target.x - fov.center.x;
-    let dx2 = end.x - fov.center.x;
-    let dy1 = fov.target.y - fov.center.y;
-    let dy2 = end.y - fov.center.y;
-    let len1  = Math.sqrt(dx1 * dx1 + dy1 * dy1);
-    let len2  = Math.sqrt(dx2 * dx2 + dy2 * dy2);
+    // let dx1 = fov.target.x - fov.center.x;
+    // let dx2 = end.x - fov.center.x;
+    // let dy1 = fov.target.y - fov.center.y;
+    // let dy2 = end.y - fov.center.y;
+    // let len1  = Math.sqrt(dx1 * dx1 + dy1 * dy1);
+    // let len2  = Math.sqrt(dx2 * dx2 + dy2 * dy2);
+    // let angle = Math.acos((dx1 * dx2 + dy1 * dy2) / (len1 * len2));
 
-    let angle = Math.acos((dx1 * dx2 + dy1 * dy2) / (len1 * len2));
+    // https://stackoverflow.com/questions/3612814/angle-between-two-line-start-at-the-same-point
+    // let angle1 = Math.atan2(coneVector.y, coneVector.x);
+    // let angle2 = Math.atan2(vector.y, vector.x);
+    // let angle = (angle2 - angle1) * 360 / (Math.PI * 2);
+    // if (angle < 0) {
+    //   angle += 360;
+    // }
+
+    // https://stackoverflow.com/questions/14066933/direct-way-of-computing-clockwise-angle-between-2-vectors/16544330#16544330
+    let vector = end.minus(fov.center).normalize();
+    let angle = Math.atan2(coneVector.det(vector), coneVector.dot(vector));
 
     let ray = {
       line: line,
       distance: distance,
       angle: angle
     };
+
+    rays.push(ray);
+
     return ray;
   }
 
   addWallFromPoints(rays, walls, fov, coneVector, points) {
     let extendedPoints = points.slice();
-    extendedPoints[0] = fov.center.plus(points[0].minus(fov.center).normalize().times(fov.range));
-    extendedPoints[points.length - 1] = fov.center.plus(points[points.length - 1].minus(fov.center).normalize().times(fov.range));
+    // extendedPoints[0] = fov.center.plus(points[0].minus(fov.center).normalize().times(fov.range));
+    // extendedPoints[points.length - 1] = fov.center.plus(points[points.length - 1].minus(fov.center).normalize().times(fov.range));
+    let leftRay = this.getRotatedRayEndpoint(fov.center, points[0], -0.1, fov.range);
+    let rightRay = this.getRotatedRayEndpoint(fov.center, points[points.length - 1], 0.1, fov.range);
+    this.addRay(rays, fov, coneVector, leftRay);
+    this.addRay(rays, fov, coneVector, rightRay);
 
     for (let i = 0; i < points.length - 1; i++) {
-      let ray1 = this.addRay(rays, fov, coneVector, extendedPoints[i]);
-      let ray2 = this.addRay(rays, fov, coneVector, extendedPoints[i + 1]);
-      rays.push(ray1);
-      rays.push(ray2);
+      let wallRays = [];
+      let ray1 = this.addRay(rays, fov, coneVector, points[i]);
+      let ray2 = this.addRay(rays, fov, coneVector, points[i + 1]);
+      wallRays.push(ray1);
+      wallRays.push(ray2);
 
       walls.push({
-        rays: [ray1, ray2],
+        rays: wallRays,
         line: [points[i], points[i + 1]],
         startAngle: ray1.angle,
         endAngle: ray2.angle
@@ -282,29 +378,42 @@ export default class PerspectiveRenderingEngine extends RenderingEngine{
     });
   }
 
+  getRotatedRayEndpoint(start, end, rotation, range) {
+    let angle = Math.cos((rotation / 2) * (Math.PI / 180));
+    let sinAngle = Math.sin((rotation / 2) * (Math.PI / 180));
+
+    return start.plus(new Vec3({
+      x: (end.x - start.x) * angle - (end.y - start.y) * sinAngle,
+      y: (end.x - start.x) * sinAngle + (end.y - start.y) * angle
+    }).normalize().times(range));
+
+  }
+
   getRays(objects, fov) {
     let rays = [];
     let walls = [];
-    let angle = Math.cos(fov.angle * (Math.PI / 180));
-    let sinAngle = Math.sin(fov.angle * (Math.PI / 180));
     let coneVector = new Vec3(fov.target).minus(fov.center).normalize();
 
     // https://stackoverflow.com/questions/4780119/2d-euclidean-vector-rotations
-    let leftEnd = fov.center.plus({
-      x: fov.target.x * angle + fov.target.y * sinAngle,
-      y: fov.target.x * sinAngle - fov.target.y * angle
-    }).normalize().times(fov.range);
-    let rightEnd = fov.center.plus({
-      x: fov.target.x * angle - fov.target.y * sinAngle,
-      y: fov.target.x * sinAngle + fov.target.y * angle
-    }).normalize().times(fov.range);
+    let leftEnd = this.getRotatedRayEndpoint(fov.center, fov.target, -fov.angle, fov.range);
+    let rightEnd = this.getRotatedRayEndpoint(fov.center, fov.target, fov.angle, fov.range);
     this.addRay(rays, fov, coneVector, leftEnd);
     this.addRay(rays, fov, coneVector, rightEnd);
 
+    for (let angle = -fov.angle + 5; angle <= fov.angle - 5; angle += 5) {
+      let end = this.getRotatedRayEndpoint(fov.center, fov.target, angle, fov.range);
+      this.addRay(rays, fov, coneVector, end);
+    }
+
+    let relativeRange = fov.range * fov.range;
     for (const object of objects) {
       let losBounds = object.losBounds;
       if (!losBounds) continue;
       for (const bounds of losBounds) {
+        if (bounds.points.every((point) => point.relativeDistanceTo(fov.center) > relativeRange)) {
+          continue;
+        }
+
         let points = [];
         if (fov.center.y >= bounds.bottom.y) {
           // FOV center is below bounds
@@ -321,7 +430,7 @@ export default class PerspectiveRenderingEngine extends RenderingEngine{
           // FOV center is between upper and lower bounds
           if (fov.center.x >= bounds.right.x) {
             //this.addWall(rays, walls, fov, coneVector, bounds.ur, bounds.lr);
-            points.push(bounds.ur, bounds.lr);
+            points.push(bounds.lr, bounds.ur);
           } else if (fov.center.x <= bounds.left.x) {
             //this.addWall(rays, walls, fov, coneVector, bounds.ul, bounds.ll);
             points.push(bounds.ul, bounds.ll);
@@ -331,13 +440,13 @@ export default class PerspectiveRenderingEngine extends RenderingEngine{
 
         } else {
           // FOV center is above bounds
-          points.push(bounds.ul, bounds.ur);
+          points.push(bounds.ur, bounds.ul);
           //this.addWall(rays, walls, fov, coneVector, bounds.ul, bounds.ur);
           if (fov.center.x >= bounds.right.x) {
-            points.push(bounds.lr);
+            points.unshift(bounds.lr);
             //this.addWall(rays, walls, fov, coneVector, bounds.ur, bounds.lr);
           } else if (fov.center.x <= bounds.left.x) {
-            points.unshift(bounds.ll);
+            points.push(bounds.ll);
             //this.addWall(rays, walls, fov, coneVector, bounds.ul, bounds.ll);
           }
         }
@@ -352,16 +461,35 @@ export default class PerspectiveRenderingEngine extends RenderingEngine{
   }
 
   // TODO: this function won't handle overlapping bounds very well, could fix this
-  refineRays(rays) {
+  refineRays(rays, fov) {
+    // Indexes 0 and 1 are the left and right edges of fov
+    // TODO: don't depend on indexes
+    let left = rays.rays[0];
+    let right = rays.rays[1];
+    let start = left;
+    let end = right;
+    // if (left.angle > right.angle) {
+    //   start = right;
+    //   end = left;
+    // }
     rays.rays = _.sortBy(rays.rays, "angle");
     rays.walls = _.sortBy(rays.walls, "startAngle");
 
-    for (const ray of rays.rays) {
+    let startIdx = rays.rays.indexOf(start);
+    let endIdx = rays.rays.indexOf(end);
+    let sortedRays = rays.rays;
+    sortedRays = rays.rays.slice(startIdx, endIdx + 1);
+    if (endIdx < startIdx) {
+      sortedRays = sortedRays.concat(rays.rays.slice(0, endIdx + 1));
+    }
+    rays.rays = sortedRays;
+
+    for (const ray of sortedRays) {
       let newEndpoints = [];
       for (const wall of rays.walls) {
         //if (ray.angle > wall.startAngle && ray.angle < wall.endAngle) {
           //if (wall.rays[0].distance < ray.distance || wall.rays[1].distance < ray.distance) {
-        if (ray !== wall.rays[0] && ray !== wall.rays[1]) {
+        if (!wall.rays.includes(ray)) {
           let intersection = getLineIntersection(ray.line, wall.line);
           if (intersection) {
             newEndpoints.push(intersection);
@@ -381,62 +509,85 @@ export default class PerspectiveRenderingEngine extends RenderingEngine{
   }
 
   // https://www.redblobgames.com/articles/visibility/
-  getFovCone(objects, fov) {
+  getFovBounds(objects, fov) {
     let rays = this.getRays(objects, fov);
-    this.refineRays(rays);
+    this.refineRays(rays, fov);
+
+    let bounds = [];
+    for (let i = 0; i < rays.rays.length - 1; i++) {
+      bounds.push(new Bounds({
+        dimensions: {
+          triangle: [
+            fov.center,
+            rays.rays[i].line[1],
+            rays.rays[i + 1].line[1]
+          ]
+        }
+      }));
+    }
+
+    return bounds;
   }
 
-  isInView(object, views) {
+  isInView(object, fovBounds) {
     // TODO: test if object is owned by player instead of if is player
     if (object.losHidden && !object.isThisPlayer) {
-      return false;
+      let objBounds = object.modelBounds;
+      return fovBounds.some((bounds) => bounds.intersects(objBounds));
     }
     return true;
   }
 
-  debugRays(objects, fov) {
-    let rays = this.getRays(objects, fov);
-    this.refineRays(rays);
+  debugRays(bounds) {
     this.context.strokeStyle = "yellow";
-    for (const ray of rays.rays) {
+    this.context.fillStyle = "goldenrod";
+    for (const triangle of bounds) {
       this.context.beginPath();
-      this.context.moveTo(ray.line[0].x, ray.line[0].y);
-      this.context.lineTo(ray.line[1].x, ray.line[1].y);
+      this.context.moveTo(triangle.points[0].x, triangle.points[0].y);
+      this.context.lineTo(triangle.points[1].x, triangle.points[1].y);
+      this.context.lineTo(triangle.points[2].x, triangle.points[2].y);
+      this.context.lineTo(triangle.points[0].x, triangle.points[0].y);
+      this.context.fill();
       this.context.stroke();
     }
-    this.context.strokeStyle = "green";
-    for (const wall of rays.walls) {
-      this.context.beginPath();
-      this.context.moveTo(wall.line[0].x, wall.line[0].y);
-      this.context.lineTo(wall.line[1].x, wall.line[1].y);
-      this.context.stroke();
-    }
+
+    // this.context.strokeStyle = "yellow";
+    // for (const triangle of bounds) {
+    //   this.context.beginPath();
+    //   this.context.moveTo(triangle.points[0].x, triangle.points[0].y);
+    //   this.context.lineTo(triangle.points[1].x, triangle.points[1].y);
+    //   this.context.moveTo(triangle.points[0].x, triangle.points[0].y);
+    //   this.context.lineTo(triangle.points[2].x, triangle.points[2].y);
+    //   this.context.stroke();
+    // }
+    // this.context.strokeStyle = "green";
+    // for (const wall of rays.walls) {
+    //   this.context.beginPath();
+    //   this.context.moveTo(wall.line[0].x, wall.line[0].y);
+    //   this.context.lineTo(wall.line[1].x, wall.line[1].y);
+    //   this.context.stroke();
+    // }
   }
 
-  getRenderObjects(objects, center, fov) {
+  getRenderObjects(objects, center, fovBounds) {
     let renderObjects = [];
+    let groundObjects = [];
     let characters = [];
     let losBounds = [];
-    let fovCone;
-    if (fov) {
-      fovCone = this.getFovCone(objects, fov);
-    }
 
     for (const object of objects) {
       for (const renderObj of object.renderObjects) {
         // TODO: create new grid for rendering
-        if (!renderObj.hidden && 
-            (renderObj.position.x + renderObj.width > center.x - this.context.canvas.width && renderObj.position.x + renderObj.width < center.x + this.context.canvas.width &&
-             renderObj.position.y + renderObj.height > center.y - this.context.canvas.height && renderObj.position.y + renderObj.height < center.y + this.context.canvas.height ||
-             renderObj.lastPosition.x + renderObj.width > center.x - this.context.canvas.width && renderObj.lastPosition.x + renderObj.width < center.x + this.context.canvas.width &&
-             renderObj.lastPosition.y + renderObj.height > center.y - this.context.canvas.height && renderObj.lastPosition.y + renderObj.height < center.y + this.context.canvas.height))
-        {
-          if (!fov || this.isInView(renderObj, fovCone)) {
-            let pos = Math.round(renderObj.perspectivePosition.y);
+        if (!renderObj.hidden && (!fovBounds || this.isInView(renderObj, fovBounds))) {
+          let pos = Math.round(renderObj.perspectivePosition.y);
+
+          if (pos > 0) {
             if (!renderObjects[pos]) {
               renderObjects[pos] = [];
             }
             renderObjects[pos].push(renderObj);
+          } else {
+            groundObjects.push(renderObj);
           }
         }
       }
@@ -451,58 +602,6 @@ export default class PerspectiveRenderingEngine extends RenderingEngine{
 
     //return _.sortBy(renderObjects, this.sortByY, this.sortByZ);
     //return _.sortBy(renderObjects, this.sortByPerspective);
-    return renderObjects;
-  }
-
-  getCharactersInFov(objects, center) {
-    let characters = [];
-    let centerBox = new Bounds({
-      position: center.plus({ y: 12, x: -16 }),
-      dimensions: {
-        width: 32,
-        height: 20
-      }
-    });
-    let losBounds = _.reduce(objects, (bounds, obj) => bounds.concat(obj.losBounds), []);
-    for (const obj of objects) {
-      if (obj.physics.surfaceType === SURFACE_TYPE.CHARACTER && !obj.isThisPlayer) {
-        let lines = [];
-
-        this.context.strokeStyle = "magenta";
-        // TODO: consider creating losDimensions instead of using collisionDimensions
-        for (const bounds of obj.collisionBounds) {
-          _.each(bounds.box, (point) => {
-            _.each(centerBox.box, (centerPoint) => {
-              lines.push([point, centerPoint]);
-
-              if (window.debug) {
-                // DEBUG
-                this.context.beginPath();
-                this.context.moveTo(point.x, point.y);
-                this.context.lineTo(centerPoint.x, centerPoint.y);
-                this.context.stroke();
-              }
-            });
-          });
-        }
-
-        let opacities = lines.map((line) => {
-          return losBounds.reduce(
-            (op, bounds) => bounds.intersects(line) ? op + (bounds.opacity || 0) : op, 0);
-        });
-
-        if (_.min(opacities) < 1) {
-          characters.push(obj);
-        }
-
-        // If not every los line is intersected (i.e. blocked) by a los bounding box then
-        // the character is in view
-        // if (!lines.every((line) => losBounds.some((bounds) => bounds.intersects(line)))) {
-        //   characters.push(obj);
-        // }
-      }
-    }
-
-    return characters;
+    return { groundObjects: groundObjects, renderObjects: renderObjects };
   }
 }

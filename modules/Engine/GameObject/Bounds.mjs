@@ -7,6 +7,7 @@ const TYPE = {
   CIRCLE: "circle",
   POINT: "point",
   LINE: "line",
+  TRIANGLE: "triangle",
   RAY: "ray"
 }
 
@@ -22,6 +23,9 @@ export default class Bounds {
     } else if (!_.isUndefined(params.dimensions.line)) {
       this.constructFromLine(params);
       this.type = TYPE.LINE;
+    } else if (!_.isUndefined(params.dimensions.triangle)) {
+      this.constructFromTriangle(params);
+      this.type = TYPE.TRIANGLE;
     } else if (!_.isUndefined(params.dimensions.radius)) {
       this.constructFromCircle(params);
     } else if (!_.isUndefined(params.position)) {
@@ -36,20 +40,98 @@ export default class Bounds {
 
   static get TYPE() { return TYPE; }
 
-  checkZ(z1, zheight1, z2, zheight2) {
+  static intersectsLine(first, second) {
+    //if (_.isNumber(first.z) && _.isNumber(second.z) && Math.floor(first.z) !== Math.floor(second.z)) return;
+    let firstZMin = Math.min(first[0].z, first[1].z);
+    let firstZMax = Math.max(first[0].z, first[1].z);
+    let secondZMin = Math.min(second[0].z, second[1].z);
+    let secondZMax = Math.max(second[0].z, second[1].z);
+    // Simple inaccurate check to see if Z axis of lines every intersect
+    if (!Bounds.checkZ(firstZMin, firstZMax - firstZMin, secondZMin, secondZMax - secondZMin)) return;
+    // https://stackoverflow.com/questions/9043805/test-if-two-lines-intersect-javascript-function
+    var det, gamma, lambda;
+    det = (first[1].x - first[0].x) * (second[1].y - second[0].y) - (second[1].x - second[0].x) * (first[1].y - first[0].y);
+    if (det === 0) {
+      return false;
+    } else {
+      lambda = ((second[1].y - second[0].y) * (second[1].x - first[0].x) + (second[0].x - second[1].x) * (second[1].y - first[0].y)) / det;
+      gamma = ((first[0].y - first[1].y) * (second[1].x - first[0].x) + (first[1].x - first[0].x) * (second[1].y - first[0].y)) / det;
+      return (0 < lambda && lambda < 1) && (0 < gamma && gamma < 1);
+    }
+  }
+
+  static isPointInAABB(point, aabb) {
+    return point.x <= aabb.right.x && point.x >= aabb.left.x &&
+      point.y >= aabb.top.y && point.y <= aabb.bottom.y;
+  }
+
+  // https://stackoverflow.com/questions/13300904/determine-whether-point-lies-inside-triangle
+  static isPointInTriangle(point, triangle) {
+    let alpha = ((triangle.points[1].y - triangle.points[2].y)*(point.x - triangle.points[2].x) + (triangle.points[2].x - triangle.points[1].x)*(point.y - triangle.points[2].y)) /
+      ((triangle.points[1].y - triangle.points[2].y)*(triangle.points[0].x - triangle.points[2].x) + (triangle.points[2].x - triangle.points[1].x)*(triangle.points[0].y - triangle.points[2].y));
+    let beta = ((triangle.points[2].y - triangle.points[0].y)*(point.x - triangle.points[2].x) + (triangle.points[0].x - triangle.points[2].x)*(point.y - triangle.points[2].y)) /
+      ((triangle.points[1].y - triangle.points[2].y)*(triangle.points[0].x - triangle.points[2].x) + (triangle.points[2].x - triangle.points[1].x)*(triangle.points[0].y - triangle.points[2].y));
+    let gamma = 1.0 - alpha - beta;
+
+    return alpha > 0 && beta > 0 && gamma > 0;
+  }
+
+  static intersectsAABB_Triangle(aabb, triangle) {
+    let triangleInBox = triangle.points.some((point) => Bounds.isPointInAABB(point, aabb));
+    if (triangleInBox) {
+      return true;
+    }
+
+    let boxInTriangle = aabb.points.some((point) => Bounds.isPointInTriangle(point, triangle));
+    if (boxInTriangle) {
+      return true;
+    }
+
+    return aabb.lines.some((boxLine) => {
+      return triangle.lines.some((triangleLine) => {
+        return Bounds.intersectsLine(boxLine, triangleLine);
+      });
+    });
+  }
+
+  static checkZ(z1, zheight1, z2, zheight2) {
     return !_.isNumber(z1) || !_.isNumber(z2) ||
       (z1 <= z2 && z1 + zheight1 >= z2) || (z2 <= z1 && z2 + zheight2 >= z1);
+  }
+
+  constructFromTriangle(params) {
+    this.points = params.dimensions.triangle;
+    this.lines = [];
+    for (let i = 0; i < this.points.length; i++) {
+      let next = i < this.points.length - 1 ? i + 1 : 0;
+      this.lines.push([
+        this.points[i],
+        this.points[next]
+      ]);
+    }
+
+    let minX = _.minBy(this.points, "x");
+    let maxX = _.maxBy(this.points, "x");
+    let minY = _.minBy(this.points, "y");
+    let maxY = _.maxBy(this.points, "y");
+    this.box = {
+      ul: new Vec3({ x: minX, y: minY }),
+      ur: new Vec3({ x: maxX, y: minY }),
+      lr: new Vec3({ x: maxX, y: maxY }),
+      ll: new Vec3({ x: minX, y: maxY })
+    };
   }
   
   constructFromBox(params) {
     this.box = params;
     this.zheight = params.zheight || 0;
-    this.lines = {
-      top: [this.box.ul, this.box.ur],
-      bottom: [this.box.lr, this.box.ll],
-      right: [this.box.ur, this.box.lr],
-      left: [this.box.ll, this.box.ul]
-    };
+    this.lines = [
+      [this.box.ul, this.box.ur],
+      [this.box.lr, this.box.ll],
+      [this.box.ur, this.box.lr],
+      [this.box.ll, this.box.ul]
+    ];
+    this.points = _.toArray(this.box);
   }
 
   plus(box) {
@@ -75,12 +157,12 @@ export default class Bounds {
       ll: new Vec3({ x: Math.min(this.box.ll.x, box.box.ll.x), y: Math.max(this.box.ll.y, box.box.ll.y), z: z })
     };
 
-    this.lines = {
-      top: [this.box.ul, this.box.ur],
-      bottom: [this.box.lr, this.box.ll],
-      right: [this.box.ur, this.box.lr],
-      left: [this.box.ll, this.box.ul]
-    };
+    this.lines = [
+      [this.box.ul, this.box.ur],
+      [this.box.lr, this.box.ll],
+      [this.box.ur, this.box.lr],
+      [this.box.ll, this.box.ul]
+    ];
 
     return this;
   }
@@ -89,6 +171,7 @@ export default class Bounds {
     this.lines = [params.dimensions.line];
     let A = params.dimensions.line[0];
     let B = params.dimensions.line[1];
+    this.points = [A, B];
     let z = Math.min(params.dimensions.line[0].z, params.dimensions.line[1].z);
     this.zheight = z + Math.max(params.dimensions.line[0].z, params.dimensions.line[1].z);
     this.box = {
@@ -100,6 +183,7 @@ export default class Bounds {
   }
 
   constructFromCircle(params) {
+    this.zheight = params.dimensions.zheight || 0;
     this.box = {
       ul: params.position.plus({ x: -params.dimensions.radius, y: -params.dimensions.radius }),
       ur: params.position.plus({ x: params.dimensions.radius, y: -params.dimensions.radius }),
@@ -107,12 +191,12 @@ export default class Bounds {
       ll: params.position.plus({ x: -params.dimensions.radius, y: params.dimensions.radius })
     };
 
-    this.lines = {
-      top: [this.box.ul, this.box.ur],
-      right: [this.box.ur, this.box.lr],
-      bottom: [this.box.lr, this.box.ll],
-      left: [this.box.ll, this.box.ul]
-    };
+    this.lines = [
+      [this.box.ul, this.box.ur],
+      [this.box.ur, this.box.lr],
+      [this.box.lr, this.box.ll],
+      [this.box.ll, this.box.ul]
+    ];
   }
 
   constructFromRectangle(params) {
@@ -124,32 +208,13 @@ export default class Bounds {
     };
     this.zheight = params.dimensions.zheight;
 
-    this.lines = {
-      top: [this.box.ul, this.box.ur],
-      bottom: [this.box.lr, this.box.ll],
-      right: [this.box.ur, this.box.lr],
-      left: [this.box.ll, this.box.ul]
-    };
-  }
-
-  intersectsLine(first, second) {
-    //if (_.isNumber(first.z) && _.isNumber(second.z) && Math.floor(first.z) !== Math.floor(second.z)) return;
-    let firstZMin = Math.min(first[0].z, first[1].z);
-    let firstZMax = Math.max(first[0].z, first[1].z);
-    let secondZMin = Math.min(second[0].z, second[1].z);
-    let secondZMax = Math.max(second[0].z, second[1].z);
-    // Simple inaccurate check to see if Z axis of lines every intersect
-    if (!this.checkZ(firstZMin, firstZMax - firstZMin, secondZMin, secondZMax - secondZMin)) return;
-    // https://stackoverflow.com/questions/9043805/test-if-two-lines-intersect-javascript-function
-    var det, gamma, lambda;
-    det = (first[1].x - first[0].x) * (second[1].y - second[0].y) - (second[1].x - second[0].x) * (first[1].y - first[0].y);
-    if (det === 0) {
-      return false;
-    } else {
-      lambda = ((second[1].y - second[0].y) * (second[1].x - first[0].x) + (second[0].x - second[1].x) * (second[1].y - first[0].y)) / det;
-      gamma = ((first[0].y - first[1].y) * (second[1].x - first[0].x) + (first[1].x - first[0].x) * (second[1].y - first[0].y)) / det;
-      return (0 < lambda && lambda < 1) && (0 < gamma && gamma < 1);
-    }
+    this.lines = [
+      [this.box.ul, this.box.ur],
+      [this.box.lr, this.box.ll],
+      [this.box.ur, this.box.lr],
+      [this.box.ll, this.box.ul]
+    ];
+    this.points = _.toArray(this.box);
   }
 
   getIntersections(target) {
@@ -172,17 +237,21 @@ export default class Bounds {
     if (target instanceof Bounds) {
       if (this.type === TYPE.AABB && target.type === TYPE.AABB) {
         let box = target.box;
-        return this.checkZ(this.box.ul.z, this.zheight, box.ul.z, target.zheight) &&
+        return Bounds.checkZ(this.box.ul.z, this.zheight, box.ul.z, target.zheight) &&
           this.box.ul.x < box.lr.x &&
           this.box.lr.x > box.ul.x &&
           this.box.ul.y < box.lr.y &&
           this.box.lr.y > box.ul.y;
+      } else if (this.type === TYPE.AABB && target.type === TYPE.TRIANGLE) {
+        return Bounds.intersectsAABB_Triangle(this, target);
+      } else if (target.type === TYPE.AABB && this.type === TYPE.TRIANGLE) {
+        return Bounds.intersectsAABB_Triangle(target, this);
       } else {
         // TODO: do better check
-        return _.some(this.lines, (line) => _.some((target.lines), (targetLine) => this.intersectsLine(line, targetLine)));
+        return _.some(this.lines, (line) => _.some((target.lines), (targetLine) => Bounds.intersectsLine(line, targetLine)));
       }
     } else if (_.isArray(target)) { // Line [{ x, y }, { x, y }]
-      return _.some(this.lines, (line) => this.intersectsLine(line, target));
+      return _.some(this.lines, (line) => Bounds.intersectsLine(line, target));
     } else if (!_.isUndefined(target.x) && !_.isUndefined(target.y)) { // Vec3 { x, y }
       return (!_.isNumber(this.box.ul.z) || !_.isNumber(target.z) || Math.floor(target.z) === Math.floor(this.box.ul.z)) &&
         target.x >= this.box.ul.x && target.x <= this.box.lr.x &&

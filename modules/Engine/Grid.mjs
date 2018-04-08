@@ -1,46 +1,62 @@
 export default class Grid {
   constructor(size) {
     this.size = size;
-    this.grid = [];
+    this.collisionGrid = [];
+    this.renderGrid = [];
   }
 
-  setGrid(object, x, y) {
-    if (!this.grid[x]) {
-      this.grid[x] = [];
+  setGrid(grid, object, x, y) {
+    if (!grid[x]) {
+      grid[x] = [];
     }
-    if (!this.grid[x][y]) {
-      this.grid[x][y] = [];
+    if (!grid[x][y]) {
+      grid[x][y] = [];
     }
 
-    this.grid[x][y].push(object);
-    object.grids.push({
-      x: x,
-      y: y
-    });
+    grid[x][y].push(object);
+  }
+
+  addToGrid(grid, object, extents) {
+    let grids = [];
+
+    let xstart = Math.floor(extents.ul.x / this.size);
+    let xend = Math.floor(extents.lr.x / this.size);
+    let ystart = Math.floor(extents.ul.y / this.size);
+    let yend = Math.floor(extents.lr.y / this.size);
+
+    for (let x = xstart; x <= xend; x++) {
+      for (let y = ystart; y <= yend; y++) {
+        this.setGrid(grid, object, x, y);
+        grids.push({
+          x: x,
+          y: y
+        });
+      }
+    }
+
+    return grids;
   }
 
   add(object) {
-    let extents = object.collisionExtents;
-
-    if (extents) {
-      let xstart = Math.floor(extents.ul.x / this.size);
-      let xend = Math.floor(extents.lr.x / this.size);
-      let ystart = Math.floor(extents.ul.y / this.size);
-      let yend = Math.floor(extents.lr.y / this.size);
-
-      object.grids = [];
-      for (let x = xstart; x <= xend; x++) {
-        for (let y = ystart; y <= yend; y++) {
-          this.setGrid(object, x, y);
-        }
-      }
+    let collisionExtents = object.collisionExtents;
+    if (collisionExtents) {
+      object.collisionGrids = this.addToGrid(this.collisionGrid, object, collisionExtents);
+    }
+    let modelBounds = object.modelBounds;
+    if (modelBounds) {
+      object.renderGrids = this.addToGrid(this.renderGrid, object, modelBounds);
     }
   }
 
   remove(object) {
-    if (object.grids) {
-      for (const grid of object.grids) {
-        _.pull(this.grid[grid.x][grid.y], object);
+    if (object.collisionGrids) {
+      for (const grid of object.collisionGrids) {
+        _.pull(this.collisionGrid[grid.x][grid.y], object);
+      }
+    }
+    if (object.renderGrids) {
+      for (const grid of object.renderGrids) {
+        _.pull(this.renderGrid[grid.x][grid.y], object);
       }
     }
   }
@@ -50,12 +66,31 @@ export default class Grid {
     this.add(object);
   }
 
-  getAdjacent(object) {
-    if (object.grids) {
-      return object.grids.reduce((objs, grid) => {
-        return objs.concat(this.grid[grid.x][grid.y]);
+  getAdjacentCollision(object) {
+    if (object.collisionGrids) {
+      return object.collisionGrids.reduce((objs, grid) => {
+        return objs.concat(this.collisionGrid[grid.x][grid.y]);
       }, []);
     }
     return [];
+  }
+  
+  getRenderObjects(bounds) {
+    let objs = [];
+
+    let xstart = Math.floor(bounds.ul.x / this.size);
+    let xend = Math.floor(bounds.lr.x / this.size);
+    let ystart = Math.floor(bounds.ul.y / this.size);
+    let yend = Math.floor(bounds.lr.y / this.size);
+
+    for (let x = xstart; x <= xend; x++) {
+      for (let y = ystart; y <= yend; y++) {
+        if (this.renderGrid[x] && this.renderGrid[x][y]) {
+          objs = objs.concat(this.renderGrid[x][y]);
+        }
+      }
+    }
+
+    return _.uniq(objs);
   }
 }

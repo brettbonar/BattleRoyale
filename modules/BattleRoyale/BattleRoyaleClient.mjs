@@ -29,6 +29,7 @@ import attacks from "./Magic/attacks.mjs"
 import RenderObject from "./Objects/RenderObject.mjs"
 import ImageCache from "../Engine/Rendering/ImageCache.mjs"
 import ParticleEffect from "../Engine/Effects/ParticleEffect.mjs";
+import FOV from "./Objects/FOV.mjs";
 
 const EVENTS = {
   MOVE_UP: "moveUp",
@@ -64,7 +65,7 @@ export default class BattleRoyaleClient extends BattleRoyale {
     });
     this.particleEngine = new ParticleEngine({
       context: this.context
-    });
+    }, this.grid);
     this.menus = params.menus;
     this.updates = [];
     this.pendingUpdates = [];
@@ -169,6 +170,7 @@ export default class BattleRoyaleClient extends BattleRoyale {
       if (character.playerId === this.player.playerId) {
         this.gameState.player = character;
         character.isThisPlayer = true;
+        //this.addObject(new FOV(character));
       } else if (character.isPlayer) {
         character.isOtherPlayer = true;
       }
@@ -438,13 +440,8 @@ export default class BattleRoyaleClient extends BattleRoyale {
     this.context.translate(-(this.gameState.player.center.x - this.context.canvas.width / 2),
     -(this.gameState.player.center.y - this.context.canvas.height / 2));
 
-    let fov = {
-      center: this.gameState.player.center,
-      target: this.gameState.player.state.target,
-      range: 1000,
-      angle: 45
-    }
-    this.renderingEngine.render(this.getRenderObjects(), elapsedTime, this.gameState.player.center, fov);
+    this.renderingEngine.render(this.getRenderObjects(), elapsedTime,
+      this.gameState.player.center, this.grid, this.gameState.player.fov);
     //this.particleEngine.render(elapsedTime, this.gameState.player.center);
     this.renderInteractions();
     this.context.restore();

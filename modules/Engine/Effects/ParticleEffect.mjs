@@ -1,5 +1,6 @@
 import Vec3 from "../GameObject/Vec3.mjs"
 import ImageCache from "../Rendering/ImageCache.mjs"
+import Effect from "./Effect.mjs"
 
 class Particle {
   constructor(params) {
@@ -123,8 +124,10 @@ class Particle {
   }
 }
 
-export default class ParticleEffect {
+export default class ParticleEffect extends Effect {
   constructor(params) {
+    super(params);
+
     this.currentTime = 0;
     this.particleTime = 0;
     this.particles = [];

@@ -321,7 +321,7 @@ export default class PhysicsEngine {
       if (obj.physics.surfaceType === SURFACE_TYPE.CHARACTER || 
           obj.physics.surfaceType === SURFACE_TYPE.PROJECTILE ||
           obj.physics.surfaceType === SURFACE_TYPE.GAS) {
-        let collisionObjects = grid.getAdjacent(obj);
+        let collisionObjects = grid.getAdjacentCollision(obj);
         collisions = collisions.concat(this.detectCollisions(obj, collisionObjects, collisions));
         // Do twice to capture additional collisions after movement
         //collisions = collisions.concat(this.detectCollisions(obj, objects));

@@ -72,10 +72,8 @@ export default class BattleRoyale extends Game {
   addObject(object) {
     this.gameState.objects.push(object);
     // TODO: move objects between quad trees when level changes
-    if (object.collisionDimensions.length > 0) {
-      //this.quadTrees[object.level].push(object);
-      this.grid.add(object);
-    }
+    //this.quadTrees[object.level].push(object);
+    this.grid.add(object);
   }
 
   removeObject(object) {

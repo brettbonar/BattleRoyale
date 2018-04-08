@@ -140,15 +140,23 @@ export default class GameObject extends GameObjectProxy {
   updatePosition() {
     let zheight = this.perspectiveDimensions ? 
       this.perspectiveDimensions.zheight : this.dimensions.zheight;
-    let position = new Vec3(this.position);
-    if (this.perspectiveOffset) {
-      position.add(this.perspectiveOffset);
-    } else if (zheight > 0 && !this.renderClipped) {
-      position.add({ y: this.height });
-    }
-    this.perspectivePosition = position.add({ y: this.position.z });
 
-    this.updateBounds();
+    // Anything with a z position and zheight of 0 should be rendered as ground
+    if (this.position.z <= 0 && !zheight) {
+      this.perspectivePosition = new Vec3({
+        y: 0
+      });
+    } else {
+      let position = new Vec3(this.position);
+      if (this.perspectiveOffset) {
+        position.add(this.perspectiveOffset);
+      } else if (zheight > 0 && !this.renderClipped) {
+        position.add({ y: this.height });
+      }
+      this.perspectivePosition = position.add({ y: this.position.z });
+    }
+
+    //this.updateBounds();
   }
 
   getCenterOfPoints(points) {
@@ -335,10 +343,13 @@ export default class GameObject extends GameObjectProxy {
   }
 
   get collisionExtents() {
-    let bounds = this.collisionBounds.concat(this.lastCollisionBounds);
-    return bounds.reduce((prev, current) => {
-      return prev.plus(current);
-    }, bounds[0]);
+    if (this.collisionDimensions) {
+      let bounds = this.collisionBounds.concat(this.lastCollisionBounds);
+      return bounds.reduce((prev, current) => {
+        return prev.plus(current);
+      }, bounds[0]);
+    }
+    return [];
   }
   
   get lastLosBounds() {
@@ -429,11 +440,11 @@ export default class GameObject extends GameObjectProxy {
   }
 
   get height() {
-    return this.dimensions.height;
+    return this.dimensions.height || this.dimensions.radius * 2;
   }
 
   get width() {
-    return this.dimensions.width;
+    return this.dimensions.width || this.dimensions.radius * 2;
   }
 
   moveTo(position) {

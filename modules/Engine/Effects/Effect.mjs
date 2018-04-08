@@ -1,5 +1,6 @@
 import Vec3 from "../GameObject/Vec3.mjs"
 import ImageCache from "../Rendering/ImageCache.mjs"
+import Bounds from "../GameObject/Bounds.mjs";
 
 export default class Effect {
   constructor(params) {
@@ -9,7 +10,19 @@ export default class Effect {
     this.direction = params.direction;
     this.speed = params.speed;
     this.duration = params.duration;
-    this.dimensions = params.dimensions;
+    
+    if (params.dimensions) {
+      this.dimensions = params.dimensions;
+    } else if (params.effect && params.effect.radius) {
+      this.dimensions = { radius: params.effect.radius };
+    }
+  }
+
+  get modelBounds() {
+    return new Bounds({
+      position: this.position,
+      dimensions: this.dimensions
+    });
   }
 
   get perspectivePosition() {

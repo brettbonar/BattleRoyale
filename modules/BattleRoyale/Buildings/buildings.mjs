@@ -155,7 +155,8 @@ export default {
     interior: {
       dimensions: {
         width: 194,
-        height: 226
+        height: 226,
+        zheight: 0
       },
       imageSource: "../../Assets/Buildings/house1.png",
       imageDimensions: {
@@ -203,18 +204,18 @@ export default {
         height: 290,
         zheight: 128
       },
-      fadeEndOffset: {
-        y: 142
-      },
-      fadeDimensions: {
-        dimensions: {
-          width: 194,
-          height: 135
-        }
-      },
-      perspectiveDimensions: {
-        zheight: 128
-      }
+      // fadeEndOffset: {
+      //   y: 142
+      // },
+      // fadeDimensions: {
+      //   dimensions: {
+      //     width: 194,
+      //     height: 135
+      //   }
+      // },
+      // perspectiveDimensions: {
+      //   zheight: 128
+      // }
     }
   }
 }

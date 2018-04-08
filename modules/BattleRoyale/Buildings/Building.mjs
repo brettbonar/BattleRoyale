@@ -24,7 +24,6 @@ export default class Building extends GameObject {
           y: 0
         }
       }, params, this.building), this.building.interior);
-      this.interior.position.z -= 1;
     }
 
     this.exteriorDoors = [];

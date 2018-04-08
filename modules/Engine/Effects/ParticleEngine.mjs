@@ -1,7 +1,8 @@
 export default class EffectsEngine {
-  constructor(params) {
+  constructor(params, grid) {
     _.merge(this, params);
     this.effects = [];
+    this.grid = grid;
   }
 
   update(elapsedTime) {
@@ -9,6 +10,7 @@ export default class EffectsEngine {
       effect.update(elapsedTime);
       if (effect.done && _.isFunction(effect.onDone)) {
         effect.onDone(this);
+        this.grid.remove(effect);
       }
     }
 
@@ -41,5 +43,6 @@ export default class EffectsEngine {
 
   addEffect(effect) {
     this.effects.push(effect);
+    this.grid.add(effect);
   }
 }

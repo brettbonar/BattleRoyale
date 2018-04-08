@@ -112,6 +112,18 @@ export default class Character extends GameObject {
     }
   }
 
+  get fov() {
+    return {
+      center: this.position.plus({
+        x: this.dimensions.width / 2,
+        y: this.dimensions.height - 10
+      }),
+      target: this.state.target,
+      range: 1000,
+      angle: 90
+    };
+  }
+
   isWeapon(item) {
     return equipment[item].type === "weapon";
   }
@@ -165,6 +177,7 @@ export default class Character extends GameObject {
 
   kill(source) {
     this.state.dead = true;
+    this.losHidden = false;
     this.dimensions.zheight = 0;
     this.physics.surfaceType = SURFACE_TYPE.NONE;
     this.updatePosition();
