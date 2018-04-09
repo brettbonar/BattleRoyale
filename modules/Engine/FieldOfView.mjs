@@ -1,12 +1,12 @@
 import Vec3 from "./GameObject/Vec3.mjs"
 import Bounds from "./GameObject/Bounds.mjs"
 import ImageCache from "./Rendering/ImageCache.mjs"
-import { getLineIntersection } from "./util.mjs"
+import { getLineIntersection, normalize } from "./util.mjs"
 
 const DEG_TO_RAD = Math.PI / 180;
 const X_AXIS = 0;
 const Y_AXIS = 1;
-const MAX_ANGLE = 10 * DEG_TO_RAD;
+const SPREAD_ANGLE = 10 * DEG_TO_RAD;
 
 export default class FieldOfView {
   constructor(fov, objects) {
@@ -57,12 +57,27 @@ export default class FieldOfView {
   getRay(rays, fov, coneVector, end) {
     let distance = fov.center.distanceTo(end);
     if (distance > fov.range) {
-      end = fov.center.plus(end.minus(fov.center).normalize().times(fov.range));
+      //end = fov.center.plus(end.minus(fov.center).normalize().times(fov.range));
+
+      let point = normalize({
+        x: end.x - fov.center.x,
+        y: end.y - fov.center.y
+      });
+      point.x *= fov.range;
+      point.y *= fov.range;
+      end = new Vec3({
+        x: fov.center.x + point.x,
+        y: fov.center.y + point.y
+      });
     }
     let line = [fov.center, end];
 
     // https://stackoverflow.com/questions/14066933/direct-way-of-computing-clockwise-angle-between-2-vectors/16544330#16544330
     let vector = end.minus(fov.center).normalize();
+    // let vector = normalize({
+    //   x: end.x - fov.center.x,
+    //   y: end.y - fov.center.y
+    // });
     let angle = Math.atan2(coneVector.det(vector), coneVector.dot(vector));
 
     let ray = {
@@ -124,7 +139,7 @@ export default class FieldOfView {
     return start.plus(new Vec3({
       x: (end.x - start.x) * angle - (end.y - start.y) * sinAngle,
       y: (end.x - start.x) * sinAngle + (end.y - start.y) * angle
-    }).normalize().times(range));
+    }).normalize().scale(range));
   }
 
   getRotatedRayEndpoint(start, end, rotation, range) {
@@ -143,10 +158,10 @@ export default class FieldOfView {
     rays.push(this.getRay(rays, fov, coneVector, leftEnd));
     rays.push(this.getRay(rays, fov, coneVector, rightEnd));
 
-    // for (let angle = -fov.angle + 5; angle <= fov.angle - 5; angle += 5) {
-    //   let end = this.getRotatedRayEndpoint(fov.center, fov.target, angle, fov.range);
-    //   rays.push(this.getRay(rays, fov, coneVector, end));
-    // }
+    for (let angle = -fov.angle + SPREAD_ANGLE; angle <= fov.angle - SPREAD_ANGLE; angle += SPREAD_ANGLE) {
+      let end = this.getRotatedRayEndpoint(fov.center, fov.target, angle, fov.range);
+      rays.push(this.getRay(rays, fov, coneVector, end));
+    }
 
     let relativeRange = fov.range * fov.range;
     for (const object of objects) {
