@@ -111,6 +111,7 @@ class Map {
       mapHeight: 200,
       tileSize: 32,
       map: [],
+      objects: [],
       seeds: {
         "forest": 4,
         "desert": 3,
@@ -128,7 +129,7 @@ class Map {
         "fire": 1
       }
     });
-
+    
     if (params && _.isArray(params.map)) {
       this.buildMap(params.map);
     } else {
@@ -139,6 +140,10 @@ class Map {
 
   static get BIOMES() { return BIOMES; }
   static get BIOME_PARAMS() { return BIOME_PARAMS; }
+
+  setObjects(objects) {
+    this.objects = objects;
+  }
 
   buildMap(map) {
     this.map = [];
@@ -313,6 +318,16 @@ class Map {
     return null;
   }
 
+  createMinimap(renderingEngine) {
+    if (this.minimapCanvas) {
+      this.minimapContext.drawImage(this.canvas, 0, 0, this.canvas.width, this.canvas.height,
+        0, 0, this.minimapCanvas.width, this.minimapCanvas.height);
+      renderingEngine.render(this.minimapContext, this.objects, 0, { x: 0, y: 0 });    
+    } else {
+      this.renderingEngine = renderingEngine;
+    }
+  }
+
   renderTile(tile, offset, position) {
     let size = this.tileSize;
     offset = offset || Object.assign({}, TERRAIN_OFFSETS[tile.type]);
@@ -464,7 +479,8 @@ class Map {
       mapWidth: this.mapWidth,
       mapHeight: this.mapHeight,
       tileSize: this.tileSize,
-      map: this.serializeMap(this.map)
+      map: this.serializeMap(this.map),
+      objects: this.objects.map((obj) => obj.getUpdateState())
     };
   }
 
@@ -483,24 +499,41 @@ class Map {
           this.drawTile(tile);
         }
       }
+
+      this.minimapCanvas = $("<canvas>", {
+        class: "game-canvas map-save-canvas"
+      }).appendTo(document.getElementById("canvas-group"))[0];
+      this.minimapCanvas.width = this.tileSize * this.mapWidth;
+      this.minimapCanvas.height = this.tileSize * this.mapHeight;
+      this.minimapContext = this.minimapCanvas.getContext("2d");
+
+      if (this.renderingEngine) {
+        this.createMinimap(this.renderingEngine);
+      }
     }
   }
 
-  render(context, position, location, dimensions) {
-    if (this.canvas) {
-      if (location) {
-        if (dimensions) {
-          context.drawImage(this.canvas, 
-            position.x - dimensions.width / 2, position.y - dimensions.height / 2, dimensions.width, dimensions.height,
-            location.position.x, location.position.y, location.dimensions.width, location.dimensions.height);  
-        } else {
-          context.drawImage(this.canvas, location.position.x, location.position.y, location.dimensions.width, location.dimensions.height);  
-        }
+  renderMinimap(context, position, location, dimensions) {
+    if (this.minimapCanvas) {
+      if (dimensions) {
+        // context.drawImage(this.canvas, 
+        //   position.x - dimensions.width / 2, position.y - dimensions.height / 2, dimensions.width, dimensions.height,
+        //   location.position.x, location.position.y, location.dimensions.width, location.dimensions.height);
+        context.drawImage(this.minimapCanvas, 
+          position.x - dimensions.width / 2, position.y - dimensions.height / 2, dimensions.width, dimensions.height,
+          location.position.x, location.position.y, location.dimensions.width, location.dimensions.height);
       } else {
-        context.drawImage(this.canvas, position.x - context.canvas.width / 2, position.y - context.canvas.height / 2,
-          context.canvas.width, context.canvas.height, 0, 0, context.canvas.width, context.canvas.height);
-        //context.drawImage(this.canvas, 0, 0, context.canvas.width, context.canvas.height);
+        //context.drawImage(this.canvas, location.position.x, location.position.y, location.dimensions.width, location.dimensions.height);
+        context.drawImage(this.minimapCanvas, location.position.x, location.position.y, location.dimensions.width, location.dimensions.height);  
       }
+    }
+  }
+
+  render(context, position) {
+    if (this.canvas) {
+      context.drawImage(this.canvas, position.x - context.canvas.width / 2, position.y - context.canvas.height / 2,
+        context.canvas.width, context.canvas.height, 0, 0, context.canvas.width, context.canvas.height);
+      //context.drawImage(this.canvas, 0, 0, context.canvas.width, context.canvas.height);
     }
   }
 

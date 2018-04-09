@@ -35,7 +35,7 @@ export default class BattleRoyaleInterface {
         height: this.minimapSize * 2
       }
     };
-    maps[player.level].render(context, player.center, location, {
+    maps[player.level].renderMinimap(context, player.center, location, {
       width: context.canvas.width * 3,
       height: context.canvas.width * 3
     });
@@ -69,7 +69,7 @@ export default class BattleRoyaleInterface {
     
     context.drawImage(this.mapBackground, position.x, position.y,
       this.mapBackground.width, this.mapBackground.height);
-    maps[player.level].render(context, { x: 0, y: 0 }, location);
+    maps[player.level].renderMinimap(context, { x: 0, y: 0 }, location);
     context.drawImage(this.mapCompass, position.x, position.y,
       this.mapCompass.width, this.mapCompass.height);
   }

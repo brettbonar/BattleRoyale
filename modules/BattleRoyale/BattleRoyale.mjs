@@ -50,19 +50,26 @@ export default class BattleRoyale extends Game {
     this.physicsEngine = new PhysicsEngine(this.grid);
     this.updates = [];
     this.collisions = [];
+    this.maps = params.maps;
     // TODO: create grid for each level
 
     this.gameState = {
       objects: []
     };
 
-    if (params.objects) {
-      for (const obj of params.objects) {
-        this.addObject(obj);
-      }
-    }
-
+    this.initObjects(params.objects);
     // TODO: create static objects for map boundaries. Also for ground?
+  }
+
+  initObjects(objects) {
+    objects = objects || [];
+    _.each(this.maps, (map) => {
+      objects = objects.concat(map.objects);
+    });
+
+    for (const obj of objects) {
+      this.addObject(obj);
+    }
   }
 
   getObject(objectId) {
@@ -125,15 +132,7 @@ export default class BattleRoyale extends Game {
       release: event.release
     });
   }
-
-  getRenderObjects() {
-    return this.gameState.objects.concat(this.particleEngine.getRenderObjects());
-    // return this.gameState.staticObjects
-    //   .concat(this.gameState.dynamicObjects)
-    //   .concat(this.gameState.characters)
-    //   .concat(this.gameState.projectiles);
-  }
-
+  
   getPhysicsObjects() {
     return this.gameState.objects;
     // return this.gameState.staticObjects

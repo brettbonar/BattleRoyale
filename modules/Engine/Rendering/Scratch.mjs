@@ -2,8 +2,8 @@ class Scratch {
   constructor() {
     if (typeof document !== "undefined") {
       this.canvas = document.createElement("canvas");
-      this.canvas.width = 2048;
-      this.canvas.height = 2048;
+      this.canvas.width = 512;
+      this.canvas.height = 512;
       this.context = this.canvas.getContext("2d");
     }
   }

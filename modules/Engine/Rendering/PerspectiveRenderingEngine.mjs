@@ -6,6 +6,8 @@ import Dimensions from "../GameObject/Dimensions.mjs"
 import { getLineIntersection } from "../util.mjs"
 import ImageCache from "./ImageCache.mjs"
 
+const DEG_TO_RAD = Math.PI / 180;
+
 export default class PerspectiveRenderingEngine extends RenderingEngine{
   constructor(params) {
     super(params);
@@ -13,10 +15,10 @@ export default class PerspectiveRenderingEngine extends RenderingEngine{
     this.fovImage = ImageCache.get("/Assets/fov.png");
   }
 
-  renderFOV(center, fov, fovBounds) {
+  renderFOV(context, center, fov, fovBounds) {
     if (!this.fovImage.complete) return;
     
-    this.context.save();
+    context.save();
 
     let dimensions = {
       width: 2000,
@@ -27,41 +29,41 @@ export default class PerspectiveRenderingEngine extends RenderingEngine{
       y: dimensions.height / 2
     });
 
-    this.context.beginPath();
-    //this.context.arc(center.x, center.y, fov.range, 0, 2 * Math.PI);
+    context.beginPath();
+    //context.arc(center.x, center.y, fov.range, 0, 2 * Math.PI);
 
     for (const triangle of fovBounds) {
-      this.context.moveTo(triangle.points[0].x, triangle.points[0].y);
-      this.context.lineTo(triangle.points[1].x, triangle.points[1].y);
-      this.context.lineTo(triangle.points[2].x, triangle.points[2].y);
-      this.context.lineTo(triangle.points[0].x, triangle.points[0].y);
+      context.moveTo(triangle.points[0].x, triangle.points[0].y);
+      context.lineTo(triangle.points[1].x, triangle.points[1].y);
+      context.lineTo(triangle.points[2].x, triangle.points[2].y);
+      context.lineTo(triangle.points[0].x, triangle.points[0].y);
     }
-      this.context.clip();
+    context.clip();
 
-    this.context.drawImage(this.fovImage, position.x, position.y, dimensions.width, dimensions.height);
+    context.drawImage(this.fovImage, position.x, position.y, dimensions.width, dimensions.height);
 
     // if (clipping) {
     //   position = clipping.offset.plus(position);
     //   let imageDimensions = clipping.dimensions || dimensions;
-    //   this.context.drawImage(this.image, clipping.offset.x, clipping.offset.y, clipping.dimensions.width, clipping.dimensions.height,
+    //   context.drawImage(this.image, clipping.offset.x, clipping.offset.y, clipping.dimensions.width, clipping.dimensions.height,
     //     position.x, position.y, imageDimensions.width, imageDimensions.height);
     // } else {
-    //   this.context.drawImage(this.image, position.x, position.y, dimensions.width, dimensions.height);
+    //   context.drawImage(this.image, position.x, position.y, dimensions.width, dimensions.height);
     // }
 
-    this.context.restore();
+    context.restore();
   }
 
-  renderFaded(object, elapsedTime) {
+  renderFaded(context, object, elapsedTime) {
     if (object.fadeDimensions) {
-      this.context.globalAlpha = 0.3;
-      //object.render(this.context, elapsedTime);
-      object.render(this.context, elapsedTime, object.fadeDimensions);
+      context.globalAlpha = 0.3;
+      //object.render(context, elapsedTime);
+      object.render(context, elapsedTime, object.fadeDimensions);
       let offset = object.fadeDimensions.offset || new Vec3();
       let dimensions = object.fadeDimensions.dimensions || new Dimensions();
 
-      this.context.globalAlpha = 1;
-      object.render(this.context, 0, {
+      context.globalAlpha = 1;
+      object.render(context, 0, {
         offset: offset.plus({ y: dimensions.height }),
         dimensions: {
           width: object.dimensions.width,
@@ -69,8 +71,8 @@ export default class PerspectiveRenderingEngine extends RenderingEngine{
         }
       });
     } else {
-      this.context.globalAlpha = 0.3;
-      object.render(this.context, elapsedTime);
+      context.globalAlpha = 0.3;
+      object.render(context, elapsedTime);
     }
   }
 
@@ -78,14 +80,14 @@ export default class PerspectiveRenderingEngine extends RenderingEngine{
     return losHiddenObjects.some((obj) => obj.modelBounds.intersects(fadeObject.modelBounds));
   }
 
-  renderObject(object, elapsedTime, losHiddenObjects, clipping) {
-    this.context.save();
+  renderObject(context, object, elapsedTime, losHiddenObjects, clipping) {
+    context.save();
     if (object.losFade && this.isAnyObjectHidden(losHiddenObjects, object)) {
-      this.renderFaded(object, elapsedTime, clipping);
+      this.renderFaded(context, object, elapsedTime, clipping);
     } else {
-      object.render(this.context, elapsedTime, clipping);
+      object.render(context, elapsedTime, clipping);
     }
-    this.context.restore();
+    context.restore();
   }
 
   sortClips(clip) {
@@ -93,20 +95,9 @@ export default class PerspectiveRenderingEngine extends RenderingEngine{
   }
 
   // Render highest to lowest y
-  render(objects, elapsedTime, center, grid, fov) {
-    objects = grid.getRenderObjects(new Bounds({
-      position: center.minus({
-        x: this.context.canvas.width / 2,
-        y: this.context.canvas.height / 2
-      }),
-      dimensions: {
-        width: this.context.canvas.width,
-        height: this.context.canvas.height
-      }
-    }));
-
+  render(context, objects, elapsedTime, center, fov) {
     //window.debug = true;
-    this.context.save();
+    context.save();
 
     let fovBounds;
     if (fov) {
@@ -114,26 +105,25 @@ export default class PerspectiveRenderingEngine extends RenderingEngine{
     }
 
     if (window.debug) {
-      this.debugRays(fovBounds);
+      this.debugRays(context, fovBounds);
     }
 
     // if (center) {
-    //   this.context.translate(-(center.x - this.context.canvas.width / 2), -(center.y - this.context.canvas.height / 2));
+    //   context.translate(-(center.x - context.canvas.width / 2), -(center.y - context.canvas.height / 2));
     // }
 
     let objsToRender = this.getRenderObjects(objects, center, fovBounds);
     let renderObjects = objsToRender.renderObjects;
 
     for (const groundObject of objsToRender.groundObjects) {
-      this.renderObject(groundObject, elapsedTime);
+      this.renderObject(context, groundObject, elapsedTime, objsToRender.losHiddenObjects);
     }
 
     if (fov) {
-      this.renderFOV(center, fov, fovBounds);
+      this.renderFOV(context, center, fov, fovBounds);
     }
 
     let clips = [];
-    //for (const object of renderObjects) {
     let y, obj;
     for (y = 0; y < renderObjects.length; y++) {
       if (!renderObjects[y]) continue;
@@ -150,6 +140,7 @@ export default class PerspectiveRenderingEngine extends RenderingEngine{
           continue;
         }
 
+        // TODO: ignore small things like particles when clipping
         for (const clip of clips) {
           let height = 0;
           if (y >= clip.bottom) {
@@ -171,7 +162,7 @@ export default class PerspectiveRenderingEngine extends RenderingEngine{
               })
             };
             // TODO: reset elapsed time after first render?
-            this.renderObject(clip.object, elapsedTime, objsToRender.losHiddenObjects, clipping);
+            this.renderObject(context, clip.object, elapsedTime, objsToRender.losHiddenObjects, clipping);
 
             clip.previousClip += height;
             if (clip.previousClip >= clip.object.height) {
@@ -180,7 +171,7 @@ export default class PerspectiveRenderingEngine extends RenderingEngine{
           }
         }
 
-        this.renderObject(object, elapsedTime, objsToRender.losHiddenObjects);
+        this.renderObject(context, object, elapsedTime, objsToRender.losHiddenObjects);
       }
     }
 
@@ -195,11 +186,11 @@ export default class PerspectiveRenderingEngine extends RenderingEngine{
           height: clip.object.height - clip.previousClip
         })
       };
-      this.renderObject(clip.object, elapsedTime, center, clipping);
+      this.renderObject(context, clip.object, elapsedTime, center, clipping);
     }
     
     if (window.debug) {
-      this.debugBoxes(renderObjects);
+      this.debugBoxes(context, renderObjects);
     }
 
     
@@ -208,62 +199,62 @@ export default class PerspectiveRenderingEngine extends RenderingEngine{
     //   y: 600
     // };
     // let radius = 1000;
-    // //this.context.globalCompositeOperation='difference';
+    // //context.globalCompositeOperation='difference';
 
-    // this.context.globalCompositeOperation='saturation';
-    // this.context.fillStyle = "hsl(0, 100%, 1%)";
-    // // let gradient2 = this.context.createRadialGradient(pos.x, pos.x, radius,
+    // context.globalCompositeOperation='saturation';
+    // context.fillStyle = "hsl(0, 100%, 1%)";
+    // // let gradient2 = context.createRadialGradient(pos.x, pos.x, radius,
     // //   pos.x, pos.y, 0);
-    // // this.context.globalAlpha = 1;
+    // // context.globalAlpha = 1;
     // // gradient2.addColorStop(0.5, "transparent");
     // // gradient2.addColorStop(0.25, "white");
-    // // this.context.fillStyle = gradient2;
-    // this.context.fillRect(pos.x - radius, pos.y - radius,
+    // // context.fillStyle = gradient2;
+    // context.fillRect(pos.x - radius, pos.y - radius,
     //   radius * 2, radius * 2);
 
-    this.context.restore();
+    context.restore();
   }
   
   sortByPerspective(obj) {
     return obj.perspectivePosition.y;
   }
 
-  debugBoxes(objects) {
+  debugBoxes(context, objects) {
     for (const objSets of objects) {
       if (!objSets) continue;
       for (const object of objSets) {
         if (object.particles) continue;
 
-        this.context.fillStyle = "black";
-        this.context.beginPath();
-        this.context.arc(object.position.x, object.position.y, 2, 0, 2 * Math.PI);
-        this.context.closePath();
-        this.context.fill();
+        context.fillStyle = "black";
+        context.beginPath();
+        context.arc(object.position.x, object.position.y, 2, 0, 2 * Math.PI);
+        context.closePath();
+        context.fill();
 
-        // this.context.fillStyle = "purple";
-        // this.context.beginPath();
-        // this.context.arc(object.perspectivePosition.x, object.perspectivePosition.y, 5, 0, 2 * Math.PI);
-        // this.context.closePath();
-        // this.context.fill();
+        // context.fillStyle = "purple";
+        // context.beginPath();
+        // context.arc(object.perspectivePosition.x, object.perspectivePosition.y, 5, 0, 2 * Math.PI);
+        // context.closePath();
+        // context.fill();
 
         let perspectivePosition = object.perspectivePosition;
         if (perspectivePosition) {
-          this.context.strokeStyle = "purple";
-          this.context.strokeRect(perspectivePosition.x, perspectivePosition.y,
+          context.strokeStyle = "purple";
+          context.strokeRect(perspectivePosition.x, perspectivePosition.y,
             object.width, object.height);
         }
 
         let box = object.boundingBox;
         if (box) {
-          this.context.strokeStyle = "yellow";
-          this.context.strokeRect(box.ul.x, box.ul.y, box.width, box.height);
+          context.strokeStyle = "yellow";
+          context.strokeRect(box.ul.x, box.ul.y, box.width, box.height);
         }
           
         if (object.lastCollisionBounds) {
           for (const bounds of object.lastCollisionBounds) {
             if (!bounds.box) continue; // TODO: render ray bounds
-            this.context.strokeStyle = "lawnGreen";
-            this.context.strokeRect(bounds.ul.x, bounds.ul.y - bounds.ul.z,
+            context.strokeStyle = "lawnGreen";
+            context.strokeRect(bounds.ul.x, bounds.ul.y - bounds.ul.z,
               bounds.width, bounds.height);
           }
         }
@@ -271,28 +262,28 @@ export default class PerspectiveRenderingEngine extends RenderingEngine{
         if (object.collisionBounds) {
           for (const bounds of object.collisionBounds) {
             if (!bounds.box) continue; // TODO: render ray bounds
-            this.context.strokeStyle = "crimson";
-            this.context.strokeRect(bounds.ul.x, bounds.ul.y - bounds.ul.z,
+            context.strokeStyle = "crimson";
+            context.strokeRect(bounds.ul.x, bounds.ul.y - bounds.ul.z,
               bounds.width, bounds.height);
           }
         }
         // for (let i = 0; i < object.collisionBounds.length; i++) {
-        //   this.context.strokeStyle = "blue";
+        //   context.strokeStyle = "blue";
         //   let bounds = object.lastCollisionBounds[i].plus(object.collisionBounds[i]);
-        //   this.context.strokeRect(bounds.ul.x, bounds.ul.y - bounds.ul.z,
+        //   context.strokeRect(bounds.ul.x, bounds.ul.y - bounds.ul.z,
         //     bounds.width, bounds.height);
         // }
         // for (const terrainBox of object.terrainBoundingBox) {
-        //   this.context.strokeStyle = "lawnGreen";
-        //   this.context.strokeRect(terrainBox.ul.x, terrainBox.ul.y, terrainBox.width, terrainBox.height);
+        //   context.strokeStyle = "lawnGreen";
+        //   context.strokeRect(terrainBox.ul.x, terrainBox.ul.y, terrainBox.width, terrainBox.height);
         // }
         // for (const hitbox of object.hitbox) {
-        //   this.context.strokeStyle = "crimson";
-        //   this.context.strokeRect(hitbox.ul.x, hitbox.ul.y, hitbox.width, hitbox.height);
+        //   context.strokeStyle = "crimson";
+        //   context.strokeRect(hitbox.ul.x, hitbox.ul.y, hitbox.width, hitbox.height);
         // }
         // for (const losBox of object.losBoundingBox) {
-        //   this.context.strokeStyle = "aqua";
-        //   this.context.strokeRect(losBox.ul.x, losBox.ul.y, losBox.width, losBox.height);
+        //   context.strokeStyle = "aqua";
+        //   context.strokeRect(losBox.ul.x, losBox.ul.y, losBox.width, losBox.height);
         // }
       }
     }
@@ -305,7 +296,7 @@ export default class PerspectiveRenderingEngine extends RenderingEngine{
     return dot > angle;
   }
   
-  addRay(rays, fov, coneVector, end) {
+  getRay(rays, fov, coneVector, end) {
     let distance = fov.center.distanceTo(end);
     if (distance > fov.range) {
       end = fov.center.plus(end.minus(fov.center).normalize().times(fov.range));
@@ -339,26 +330,34 @@ export default class PerspectiveRenderingEngine extends RenderingEngine{
       angle: angle
     };
 
-    rays.push(ray);
-
     return ray;
   }
 
-  addWallFromPoints(rays, walls, fov, coneVector, points) {
+  addWallFromPoints(rays, walls, fov, fovAngle, maxAngle, coneVector, points) {
     let extendedPoints = points.slice();
     // extendedPoints[0] = fov.center.plus(points[0].minus(fov.center).normalize().times(fov.range));
     // extendedPoints[points.length - 1] = fov.center.plus(points[points.length - 1].minus(fov.center).normalize().times(fov.range));
-    let leftRay = this.getRotatedRayEndpoint(fov.center, points[0], -0.1, fov.range);
-    let rightRay = this.getRotatedRayEndpoint(fov.center, points[points.length - 1], 0.1, fov.range);
-    this.addRay(rays, fov, coneVector, leftRay);
-    this.addRay(rays, fov, coneVector, rightRay);
+
 
     for (let i = 0; i < points.length - 1; i++) {
       let wallRays = [];
-      let ray1 = this.addRay(rays, fov, coneVector, points[i]);
-      let ray2 = this.addRay(rays, fov, coneVector, points[i + 1]);
-      wallRays.push(ray1);
-      wallRays.push(ray2);
+      let ray1 = this.getRay(rays, fov, coneVector, points[i]);
+      // Don't bother adding walls or rays that are behind field of view
+      if (ray1.angle > maxAngle || ray1.angle < -maxAngle) {
+        return;
+      } else if (ray1.angle > -fovAngle && ray1.angle < fovAngle) {
+        rays.push(ray1);
+      }
+
+      let ray2 = this.getRay(rays, fov, coneVector, points[i + 1]);
+      // Don't bother adding walls or rays that are behind field of view
+      if (ray2.angle > maxAngle || ray2.angle < -maxAngle) {
+        return;
+      } else if (ray2.angle > -fovAngle && ray2.angle < fovAngle) {
+        rays.push(ray2);
+      }
+
+      wallRays.push(ray1, ray2);
 
       walls.push({
         rays: wallRays,
@@ -367,46 +366,39 @@ export default class PerspectiveRenderingEngine extends RenderingEngine{
         endAngle: ray2.angle
       });
     }
-  }
 
-  addWall(rays, walls, fov, coneVector, end1, end2) {
-    let ray1 = this.addRay(rays, fov, coneVector, end1);
-    let ray2 = this.addRay(rays, fov, coneVector, end2);
-    rays.push(ray1);
-    rays.push(ray2);
-    walls.push({
-      rays: [ray1, ray2],
-      line: [end1, end2],
-      startAngle: ray1.angle,
-      endAngle: ray2.angle
-    });
+    let leftEndpoint = this.getRotatedRayEndpoint(fov.center, points[0], -0.1, fov.range);
+    let rightEndpoint = this.getRotatedRayEndpoint(fov.center, points[points.length - 1], 0.1, fov.range);
+    rays.push(this.getRay(rays, fov, coneVector, leftEndpoint));
+    rays.push(this.getRay(rays, fov, coneVector, rightEndpoint));
   }
 
   getRotatedRayEndpoint(start, end, rotation, range) {
-    let angle = Math.cos((rotation / 2) * (Math.PI / 180));
-    let sinAngle = Math.sin((rotation / 2) * (Math.PI / 180));
+    let angle = Math.cos(rotation * DEG_TO_RAD);
+    let sinAngle = Math.sin(rotation * DEG_TO_RAD);
 
     return start.plus(new Vec3({
       x: (end.x - start.x) * angle - (end.y - start.y) * sinAngle,
       y: (end.x - start.x) * sinAngle + (end.y - start.y) * angle
     }).normalize().times(range));
-
   }
 
   getRays(objects, fov) {
     let rays = [];
     let walls = [];
     let coneVector = new Vec3(fov.target).minus(fov.center).normalize();
+    let fovAngle = (fov.angle / 2) * DEG_TO_RAD;
+    let maxAngle = 90 * DEG_TO_RAD;
 
     // https://stackoverflow.com/questions/4780119/2d-euclidean-vector-rotations
-    let leftEnd = this.getRotatedRayEndpoint(fov.center, fov.target, -fov.angle, fov.range);
-    let rightEnd = this.getRotatedRayEndpoint(fov.center, fov.target, fov.angle, fov.range);
-    this.addRay(rays, fov, coneVector, leftEnd);
-    this.addRay(rays, fov, coneVector, rightEnd);
+    let leftEnd = this.getRotatedRayEndpoint(fov.center, fov.target, -(fov.angle / 2), fov.range);
+    let rightEnd = this.getRotatedRayEndpoint(fov.center, fov.target, fov.angle / 2, fov.range);
+    rays.push(this.getRay(rays, fov, coneVector, leftEnd));
+    rays.push(this.getRay(rays, fov, coneVector, rightEnd));
 
     for (let angle = -fov.angle + 5; angle <= fov.angle - 5; angle += 5) {
       let end = this.getRotatedRayEndpoint(fov.center, fov.target, angle, fov.range);
-      this.addRay(rays, fov, coneVector, end);
+      rays.push(this.getRay(rays, fov, coneVector, end));
     }
 
     let relativeRange = fov.range * fov.range;
@@ -421,22 +413,17 @@ export default class PerspectiveRenderingEngine extends RenderingEngine{
         let points = [];
         if (fov.center.y >= bounds.bottom.y) {
           // FOV center is below bounds
-          //this.addWall(rays, walls, fov, coneVector, bounds.ll, bounds.lr);
           points.push(bounds.ll, bounds.lr);
           if (fov.center.x >= bounds.right.x) {
-            //this.addWall(rays, walls, fov, coneVector, bounds.lr, bounds.ur);
             points.push(bounds.ur);
           } else if (fov.center.x <= bounds.left.x) {
-            //this.addWall(rays, walls, fov, coneVector, bounds.ul, bounds.ll);
             points.unshift(bounds.ul);
           }
         } else if (fov.center.y > bounds.top.y) {
           // FOV center is between upper and lower bounds
           if (fov.center.x >= bounds.right.x) {
-            //this.addWall(rays, walls, fov, coneVector, bounds.ur, bounds.lr);
             points.push(bounds.lr, bounds.ur);
           } else if (fov.center.x <= bounds.left.x) {
-            //this.addWall(rays, walls, fov, coneVector, bounds.ul, bounds.ll);
             points.push(bounds.ul, bounds.ll);
           } else {
             // TODO: handle case where center is inside bounds
@@ -445,18 +432,15 @@ export default class PerspectiveRenderingEngine extends RenderingEngine{
         } else {
           // FOV center is above bounds
           points.push(bounds.ur, bounds.ul);
-          //this.addWall(rays, walls, fov, coneVector, bounds.ul, bounds.ur);
           if (fov.center.x >= bounds.right.x) {
             points.unshift(bounds.lr);
-            //this.addWall(rays, walls, fov, coneVector, bounds.ur, bounds.lr);
           } else if (fov.center.x <= bounds.left.x) {
             points.push(bounds.ll);
-            //this.addWall(rays, walls, fov, coneVector, bounds.ul, bounds.ll);
           }
         }
 
         if (points.length > 0) {
-          this.addWallFromPoints(rays, walls, fov, coneVector, points);
+          this.addWallFromPoints(rays, walls, fov, fovAngle, maxAngle, coneVector, points);
         }
       }
     }
@@ -546,34 +530,34 @@ export default class PerspectiveRenderingEngine extends RenderingEngine{
     return true;
   }
 
-  debugRays(bounds) {
-    this.context.strokeStyle = "yellow";
-    this.context.fillStyle = "goldenrod";
+  debugRays(context, bounds) {
+    context.strokeStyle = "yellow";
+    context.fillStyle = "goldenrod";
     for (const triangle of bounds) {
-      this.context.beginPath();
-      this.context.moveTo(triangle.points[0].x, triangle.points[0].y);
-      this.context.lineTo(triangle.points[1].x, triangle.points[1].y);
-      this.context.lineTo(triangle.points[2].x, triangle.points[2].y);
-      this.context.lineTo(triangle.points[0].x, triangle.points[0].y);
-      this.context.fill();
-      this.context.stroke();
+      context.beginPath();
+      context.moveTo(triangle.points[0].x, triangle.points[0].y);
+      context.lineTo(triangle.points[1].x, triangle.points[1].y);
+      context.lineTo(triangle.points[2].x, triangle.points[2].y);
+      context.lineTo(triangle.points[0].x, triangle.points[0].y);
+      context.fill();
+      context.stroke();
     }
 
-    // this.context.strokeStyle = "yellow";
+    // context.strokeStyle = "yellow";
     // for (const triangle of bounds) {
-    //   this.context.beginPath();
-    //   this.context.moveTo(triangle.points[0].x, triangle.points[0].y);
-    //   this.context.lineTo(triangle.points[1].x, triangle.points[1].y);
-    //   this.context.moveTo(triangle.points[0].x, triangle.points[0].y);
-    //   this.context.lineTo(triangle.points[2].x, triangle.points[2].y);
-    //   this.context.stroke();
+    //   context.beginPath();
+    //   context.moveTo(triangle.points[0].x, triangle.points[0].y);
+    //   context.lineTo(triangle.points[1].x, triangle.points[1].y);
+    //   context.moveTo(triangle.points[0].x, triangle.points[0].y);
+    //   context.lineTo(triangle.points[2].x, triangle.points[2].y);
+    //   context.stroke();
     // }
-    // this.context.strokeStyle = "green";
+    // context.strokeStyle = "green";
     // for (const wall of rays.walls) {
-    //   this.context.beginPath();
-    //   this.context.moveTo(wall.line[0].x, wall.line[0].y);
-    //   this.context.lineTo(wall.line[1].x, wall.line[1].y);
-    //   this.context.stroke();
+    //   context.beginPath();
+    //   context.moveTo(wall.line[0].x, wall.line[0].y);
+    //   context.lineTo(wall.line[1].x, wall.line[1].y);
+    //   context.stroke();
     // }
   }
 

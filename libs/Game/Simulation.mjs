@@ -31,14 +31,6 @@ export default class Simulation {
         }
       })
     };
-    let quadTrees = {};
-    _.each(maps, (map, level) => {
-      quadTrees[level] = new Quadtree({
-        width: map.mapWidth * map.tileSize,
-        height: map.mapHeight * map.tileSize,
-        maxElements: 5
-      });
-    });
     this.game = new BattleRoyaleServer({
       isServer: true,
       simulation: true,
@@ -47,7 +39,6 @@ export default class Simulation {
         height: 2048
       },
       maps: maps,
-      quadTrees: quadTrees,
       objects: initGame(params.players, maps)
     });
     this.lastState = [];

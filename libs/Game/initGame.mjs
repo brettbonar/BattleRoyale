@@ -1,6 +1,7 @@
 import Game from "../../modules/Engine/Game.mjs"
 import GameObject from "../../modules/Engine/GameObject/GameObject.mjs"
 import Bounds from "../../modules/Engine/GameObject/Bounds.mjs"
+import Vec3 from "../../modules/Engine/GameObject/Vec3.mjs"
 import { MOVEMENT_TYPE } from "../../modules/Engine/Physics/PhysicsConstants.mjs"
 
 import Character from "../../modules/BattleRoyale/Objects/Character.mjs"
@@ -15,6 +16,42 @@ import Item from "../../modules/BattleRoyale/Objects/Item.mjs"
 import scenes from "../../modules/BattleRoyale/Objects/Scenes.mjs"
 import Map from "../../modules/Map.mjs"
 
+function canPlaceScene(scene, occupiedTiles) {
+  if (!occupiedTiles || occupiedTiles.length === 0) {
+    return false;
+  }
+  
+  return occupiedTiles.every((tile) => {
+    return (!tile.objects || tile.objects.length === 0) && scene.biomes.includes(tile.type);
+  });
+}
+
+function getOccupiedTiles(bounds, tiles, tileSize) {
+  let occupiedTiles = [];
+  let width = tiles.length;
+  let height = tiles[0].length;
+
+  let xstart = Math.floor(bounds.ul.x / tileSize);
+  let xend = Math.floor(bounds.lr.x / tileSize);
+  let ystart = Math.floor(bounds.ul.y / tileSize);
+  let yend = Math.floor(bounds.lr.y / tileSize);
+
+  for (let x = xstart; x <= xend; x++) {
+    if (x < 0 || x >= width) {
+      return [];
+    }
+    for (let y = ystart; y <= yend; y++) {
+      if (y < 0 || y >= height) {
+        return [];
+      }
+      
+      occupiedTiles.push(tiles[x][y]);
+    }
+  }
+
+  return occupiedTiles;
+}
+
 function addScenes(maps) {
   let objects = [];
   let sceneTiles = {};
@@ -25,6 +62,8 @@ function addScenes(maps) {
     });
     for (const scene of biomeScenes) {
       let weight = scene.weight || 1;
+      let sceneInstance = _.clone(scene);
+      sceneInstance.count = 0;
       for (let i = 0; i < weight; i++) {
         sceneTiles[biome].push(scene);
       }
@@ -35,6 +74,7 @@ function addScenes(maps) {
   _.each(maps, (map) => {
     let tiles = map.map;
     let width = tiles.length;
+    let mapObjects = [];
     for (let x = 0; x < width; x++) {
       let height = tiles[x].length;
       for (let y = 0; y < height; y++) {
@@ -42,15 +82,31 @@ function addScenes(maps) {
         if (Math.random() <= Map.BIOME_PARAMS[tile.type].sceneDensity) {
           let scene = _.sample(sceneTiles[tile.type]);
           if (scene) {
-            objects = objects.concat(scene.getObjects({
+            let position = new Vec3({
               x: tile.position.x * map.tileSize + _.random(map.tileSize),
               y: tile.position.y * map.tileSize + _.random(map.tileSize)
-            }));
+            });
+            let bounds = new Bounds({
+              position: position,
+              dimensions: scene.size
+            });
+            let occupiedTiles = getOccupiedTiles(bounds, tiles, map.tileSize);
+            if (canPlaceScene(scene, occupiedTiles)) {
+              let sceneObjects = scene.getObjects(position);
+              mapObjects = mapObjects.concat(sceneObjects);
+              for (const tile of occupiedTiles) {
+                tile.objects = sceneObjects;
+              }
+            }
           }
-          //objects = objects.concat
         }
       }
     }
+
+    // TODO: refine bounds, remove objects that break rules, ensure min/max counts are held
+    map.setObjects(mapObjects);
+
+    objects = objects.concat(mapObjects);
   });
 
   return objects;
@@ -303,7 +359,8 @@ function initGame(players, maps) {
   //   }
   // ));
 
-  gameObjects = gameObjects.concat(addScenes(maps));
+  addScenes(maps);
+  //gameObjects = gameObjects.concat(addScenes(maps));
 
   return gameObjects;
 }

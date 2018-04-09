@@ -363,6 +363,11 @@ export default {
           width: 104,
           height: 83
         },
+        dimensions: {
+          width: 104,
+          height: 83,
+          zheight: 64
+        },
         offset: {
           x: 41,
           y: 156
@@ -377,6 +382,10 @@ export default {
           width: 130,
           height: 64
         },
+        dimensions: {
+          width: 130,
+          height: 64
+        },
         offset: {
           x: 28,
           y: 181
@@ -386,21 +395,20 @@ export default {
     physics: {
       surfaceType: "terrain"
     },
-    // TODO: fix
     dimensions: {
-      width: 103,
-      height: 50,
+      width: 190,
+      height: 234,
       zheight: 128
     },
     collisionDimensions: [
       {
         offset: {
           x: 45,
-          y: 188
+          y: 172
         },
         dimensions: {
           width: 96,
-          height: 44,
+          height: 60,
           zheight: 0
         }
       },
@@ -421,44 +429,144 @@ export default {
   },
   smallPlainTree: {
     biome: "plain",
-    imageSource: "/Assets/terrain_atlas-64.png",
-    imageDimensions: {
-      x: 1734,
-      y: 1862,
-      width: 120,
-      height: 180,
-      offset: {
-        x: 56
+    images: [
+      {
+        // Tree top
+        imageSource: "/Assets/plants/plant repack-64.png",
+        imageDimensions: {
+          x: 165,
+          y: 1034,
+          width: 190,
+          height: 178,
+        },
+        dimensions: {
+          width: 190,
+          height: 178
+        },
+        fadeEndOffset: {
+          y: 64
+        },
+        offset: {
+          z: 156,
+          y: 156
+        },
+        losFade: true
+      },
+      {
+        // Tree base
+        imageSource: "/Assets/plants/plant repack-64.png",
+        imageDimensions: {
+          x: 20,
+          y: 1128,
+          width: 104,
+          height: 83
+        },
+        dimensions: {
+          width: 104,
+          height: 83,
+          zheight: 64
+        },
+        offset: {
+          x: 41,
+          y: 156
+        }
+      },
+      {
+        // Tree shadow
+        imageSource: "/Assets/plants/plant repack-64.png",
+        imageDimensions: {
+          x: 7,
+          y: 1231,
+          width: 130,
+          height: 64
+        },
+        dimensions: {
+          width: 130,
+          height: 64
+        },
+        offset: {
+          x: 28,
+          y: 181
+        }
       }
+    ],
+    physics: {
+      surfaceType: "terrain"
+    },
+    dimensions: {
+      width: 190,
+      height: 234,
+      zheight: 128
+    },
+    collisionDimensions: [
+      {
+        offset: {
+          x: 45,
+          y: 172
+        },
+        dimensions: {
+          width: 96,
+          height: 60,
+          zheight: 0
+        }
+      },
+      {
+        offset: {
+          x: 71,
+          y: 172,
+          z: 0
+        },
+        dimensions: {
+          width: 46,
+          height: 46,
+          zheight: 128
+        },
+        opacity: 1.0
+      }
+    ]
+  },
+  plainStump: {
+    biome: "plain",
+    imageSource: "/Assets/plants/plant repack-64.png",
+    imageDimensions: {
+      x: 717,
+      y: 349,
+      width: 102,
+      height: 84
     },
     physics: {
       surfaceType: "terrain"
     },
     dimensions: {
-      width: 35,
-      height: 20
+      width: 102,
+      height: 84,
+      zheight: 60
     },
-    losDimensions: {
-      width: 35,
-      height: 20
-    }
-  },
-  stump: {
-    biome: "plain",
-    imageSource: "/Assets/terrain_atlas-64.png",
-    imageDimensions: {
-      x: 782,
-      y: 790,
-      width: 100,
-      height: 82
-    },
-    physics: {
-      surfaceType: "ground"
-    },
-    dimensions: {
-      width: 100,
-      height: 58
-    }
+    collisionDimensions: [
+      {
+        offset: {
+          x: 0,
+          y: 24
+        },
+        dimensions: {
+          width: 102,
+          height: 60,
+          zheight: 0
+        }
+      },
+      {
+        offset: {
+          x: 29,
+          y: 28,
+          z: 0
+        },
+        dimensions: {
+          width: 46,
+          height: 32,
+          zheight: 32
+        }
+      }
+    ]
   },
   forestTree: {
     biome: "forest",
@@ -476,9 +584,6 @@ export default {
           width: 170,
           height: 184,
           zheight: 184
-        },
-        fadeEndOffset: {
-          y: 64
         },
         offset: {
           z: 164,

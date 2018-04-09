@@ -110,16 +110,16 @@ export default class Bounds {
       ]);
     }
 
-    let minX = _.minBy(this.points, "x");
-    let maxX = _.maxBy(this.points, "x");
-    let minY = _.minBy(this.points, "y");
-    let maxY = _.maxBy(this.points, "y");
-    this.box = {
-      ul: new Vec3({ x: minX, y: minY }),
-      ur: new Vec3({ x: maxX, y: minY }),
-      lr: new Vec3({ x: maxX, y: maxY }),
-      ll: new Vec3({ x: minX, y: maxY })
-    };
+    // let minX = _.minBy(this.points, "x");
+    // let maxX = _.maxBy(this.points, "x");
+    // let minY = _.minBy(this.points, "y");
+    // let maxY = _.maxBy(this.points, "y");
+    // this.box = {
+    //   ul: new Vec3({ x: minX, y: minY }),
+    //   ur: new Vec3({ x: maxX, y: minY }),
+    //   lr: new Vec3({ x: maxX, y: maxY }),
+    //   ll: new Vec3({ x: minX, y: maxY })
+    // };
   }
   
   constructFromBox(params) {

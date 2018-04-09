@@ -6,6 +6,7 @@ const scenes = {};
 
 scenes.plainTree = {
   biomes: ["plain"],
+  type: "tree",
   size: {
     width: 96,
     height: 44
@@ -29,11 +30,34 @@ scenes.plainTree = {
   }
 }
 
+scenes.plainStump = {
+  biomes: ["plain"],
+  type: "tree",
+  size: {
+    width: 96,
+    height: 44
+  },
+  weight: 25,
+  getObjects: function (position, dimensions) {
+    return [
+      new StaticObject({
+        objectType: "plainStump",
+        position: {
+          x: position.x,
+          y: position.y
+        },
+        simulation: true
+      })
+    ];
+  }
+}
+
 scenes.forestTree = {
   biomes: ["forest"],
+  type: "tree",
   size: {
-    width: 200,
-    height: 400
+    width: 100,
+    height: 100
   },
   weight: 1,
   getObjects: function (position, dimensions) {
@@ -56,6 +80,7 @@ scenes.forestTree = {
 
 scenes.house = {
   biomes: ["plain"],
+  type: "building",
   minCount: 1,
   maxCount: 2,
   size: {
@@ -79,6 +104,10 @@ scenes.corn = {
   minCount: 2,
   maxCount: 4,
   // 10x5
+  size: {
+    width: 440,
+    height: 220
+  },
   minSize: {
     width: 220,
     height: 110

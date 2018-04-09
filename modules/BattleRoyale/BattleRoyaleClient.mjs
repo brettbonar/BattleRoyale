@@ -57,12 +57,14 @@ export default class BattleRoyaleClient extends BattleRoyale {
       this.mapContext = params.mapCanvas.getContext("2d");
     }
 
-    this.maps = params.maps;
-    this.physicsEngine = new PhysicsEngine();
-
     this.renderingEngine = new PerspectiveRenderingEngine({
       context: this.context
     });
+
+    _.each(this.maps, (map) => {
+      map.createMinimap(this.renderingEngine);
+    });
+
     this.particleEngine = new ParticleEngine({
       context: this.context
     }, this.grid);
@@ -71,21 +73,13 @@ export default class BattleRoyaleClient extends BattleRoyale {
     this.pendingUpdates = [];
     this.objectUpdates = [];
 
-    this.gameState = {
-      cursor: {
-        position: {
-          x: params.canvas.width / 2 + 64,
-          y: params.canvas.height / 2 + 64
-        }
-      },
-      objects: []
+    this.gameState.cursor = {
+      position: {
+        x: params.canvas.width / 2 + 64,
+        y: params.canvas.height / 2 + 64
+      }
     };
 
-    if (params.objects) {
-      for (const obj of params.objects) {
-        this.addObject(obj);
-      }
-    }
     this.interface = new BattleRoyaleInterface();
 
     //this.addEventHandler(Game.EVENT.PAUSE, () => this.pause());
@@ -122,6 +116,18 @@ export default class BattleRoyaleClient extends BattleRoyale {
 
     this.stateFunctions[Game.STATE.PLAYING].update = (elapsedTime) => this._update(elapsedTime);
     this.stateFunctions[Game.STATE.PLAYING].render = (elapsedTime) => this._render(elapsedTime);
+  }
+
+  initObjects(objects) {
+    objects = objects || [];
+    _.each(this.maps, (map) => {
+      map.objects = map.objects.map((obj) => this.createObject(obj));
+      objects = objects.concat(map.objects);
+    });
+
+    for (const obj of objects) {
+      this.addObject(obj);
+    }
   }
 
   showMap(event) {
@@ -254,8 +260,9 @@ export default class BattleRoyaleClient extends BattleRoyale {
   }
 
   handleCollision(collision) {
-    if (collision.source.physics.surfaceType === SURFACE_TYPE.PROJECTILE ||
-        collision.source.physics.surfaceType === SURFACE_TYPE.GAS) {
+    if (collision.source && 
+        (collision.source.physics.surfaceType === SURFACE_TYPE.PROJECTILE ||
+        collision.source.physics.surfaceType === SURFACE_TYPE.GAS)) {
 
       // Don't let stream weapons interact with themselves
       if (collision.target && collision.source.actionId === collision.target.actionId && collision.source.effect.path === "stream") {
@@ -414,6 +421,19 @@ export default class BattleRoyaleClient extends BattleRoyale {
     });
   }
 
+  getRenderObjects() {
+    return this.grid.getRenderObjects(new Bounds({
+      position: this.gameState.player.center.minus({
+        x: this.context.canvas.width / 2,
+        y: this.context.canvas.height / 2
+      }),
+      dimensions: {
+        width: this.context.canvas.width,
+        height: this.context.canvas.height
+      }
+    }));
+  }
+
   renderInteractions() {
     if (this.interaction) {
       this.context.save();
@@ -440,8 +460,8 @@ export default class BattleRoyaleClient extends BattleRoyale {
     this.context.translate(-(this.gameState.player.center.x - this.context.canvas.width / 2),
     -(this.gameState.player.center.y - this.context.canvas.height / 2));
 
-    this.renderingEngine.render(this.getRenderObjects(), elapsedTime,
-      this.gameState.player.center, this.grid, this.gameState.player.fov);
+    this.renderingEngine.render(this.context, this.getRenderObjects(), elapsedTime,
+      this.gameState.player.center, this.gameState.player.fov);
     //this.particleEngine.render(elapsedTime, this.gameState.player.center);
     this.renderInteractions();
     this.context.restore();

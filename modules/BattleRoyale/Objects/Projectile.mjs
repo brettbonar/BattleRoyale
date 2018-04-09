@@ -31,7 +31,7 @@ export default class Projectile extends GameObject {
     //   height: 8
     // };
     _.merge(this, this.attack.effect);
-    this.dimensions = new Dimensions(this.attack.effect.collisionDimensions[0].dimensions);
+    this.dimensions = new Dimensions(this.attack.dimensions || this.attack.effect.collisionDimensions[0].dimensions);
     this.collisionDimensions = this.attack.effect.collisionDimensions;
     this.speed = params.speed || this.attack.effect.speed || 0;
     this.zspeed = params.zspeed || this.attack.effect.zspeed || this.speed;
@@ -126,8 +126,8 @@ export default class Projectile extends GameObject {
 
   updatePosition() {
     if (this.lastPosition && this.effect && this.effect.path === "beam") {
-      this.dimensions.width = Math.abs(this.position.x - this.lastPosition.x);
-      this.dimensions.height = Math.abs(this.position.y - this.lastPosition.y);
+      this.dimensions.width = Math.max(this.attack.dimensions.width, Math.abs(this.position.x - this.lastPosition.x));
+      this.dimensions.height = Math.max(this.attack.dimensions.height, Math.abs(this.position.y - this.lastPosition.y));
       this.perspectiveOffset = {
         x: Math.min(this.position.x, this.lastPosition.x) - this.position.x,
         y: Math.min(this.position.y, this.lastPosition.y) - this.position.y
