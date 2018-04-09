@@ -3,55 +3,11 @@ import { SURFACE_TYPE } from "../Physics/PhysicsConstants.mjs"
 import Bounds from "../GameObject/Bounds.mjs"
 import Vec3 from "../GameObject/Vec3.mjs"
 import Dimensions from "../GameObject/Dimensions.mjs"
-import { getLineIntersection } from "../util.mjs"
 import ImageCache from "./ImageCache.mjs"
-
-const DEG_TO_RAD = Math.PI / 180;
 
 export default class PerspectiveRenderingEngine extends RenderingEngine{
   constructor(params) {
     super(params);
-
-    this.fovImage = ImageCache.get("/Assets/fov.png");
-  }
-
-  renderFOV(context, center, fov, fovBounds) {
-    if (!this.fovImage.complete) return;
-    
-    context.save();
-
-    let dimensions = {
-      width: 2000,
-      height: 2000
-    };
-    let position = center.minus({
-      x: dimensions.width / 2,
-      y: dimensions.height / 2
-    });
-
-    context.beginPath();
-    //context.arc(center.x, center.y, fov.range, 0, 2 * Math.PI);
-
-    for (const triangle of fovBounds) {
-      context.moveTo(triangle.points[0].x, triangle.points[0].y);
-      context.lineTo(triangle.points[1].x, triangle.points[1].y);
-      context.lineTo(triangle.points[2].x, triangle.points[2].y);
-      context.lineTo(triangle.points[0].x, triangle.points[0].y);
-    }
-    context.clip();
-
-    context.drawImage(this.fovImage, position.x, position.y, dimensions.width, dimensions.height);
-
-    // if (clipping) {
-    //   position = clipping.offset.plus(position);
-    //   let imageDimensions = clipping.dimensions || dimensions;
-    //   context.drawImage(this.image, clipping.offset.x, clipping.offset.y, clipping.dimensions.width, clipping.dimensions.height,
-    //     position.x, position.y, imageDimensions.width, imageDimensions.height);
-    // } else {
-    //   context.drawImage(this.image, position.x, position.y, dimensions.width, dimensions.height);
-    // }
-
-    context.restore();
   }
 
   renderFaded(context, object, elapsedTime) {
@@ -99,20 +55,15 @@ export default class PerspectiveRenderingEngine extends RenderingEngine{
     //window.debug = true;
     context.save();
 
-    let fovBounds;
-    if (fov) {
-      fovBounds = this.getFovBounds(objects, fov);
-    }
-
     if (window.debug) {
-      this.debugRays(context, fovBounds);
+      fov.debugRays(context);
     }
 
     // if (center) {
     //   context.translate(-(center.x - context.canvas.width / 2), -(center.y - context.canvas.height / 2));
     // }
 
-    let objsToRender = this.getRenderObjects(objects, center, fovBounds);
+    let objsToRender = this.getRenderObjects(objects, center, fov);
     let renderObjects = objsToRender.renderObjects;
 
     for (const groundObject of objsToRender.groundObjects) {
@@ -120,7 +71,7 @@ export default class PerspectiveRenderingEngine extends RenderingEngine{
     }
 
     if (fov) {
-      this.renderFOV(context, center, fov, fovBounds);
+      fov.render(context, center);
     }
 
     let clips = [];
@@ -289,274 +240,7 @@ export default class PerspectiveRenderingEngine extends RenderingEngine{
     }
   }
 
-
-  isWithinAngle(end, start, coneVector, angle) {
-    let testVector = end.minus(start).normalize();
-    let dot = coneVector.dot(testVector);
-    return dot > angle;
-  }
-  
-  getRay(rays, fov, coneVector, end) {
-    let distance = fov.center.distanceTo(end);
-    if (distance > fov.range) {
-      end = fov.center.plus(end.minus(fov.center).normalize().times(fov.range));
-    }
-    let line = [fov.center, end];
-
-    // https://stackoverflow.com/questions/35056361/how-to-calculate-degree-between-two-line-with-integer-values-not-vectors
-    // let dx1 = fov.target.x - fov.center.x;
-    // let dx2 = end.x - fov.center.x;
-    // let dy1 = fov.target.y - fov.center.y;
-    // let dy2 = end.y - fov.center.y;
-    // let len1  = Math.sqrt(dx1 * dx1 + dy1 * dy1);
-    // let len2  = Math.sqrt(dx2 * dx2 + dy2 * dy2);
-    // let angle = Math.acos((dx1 * dx2 + dy1 * dy2) / (len1 * len2));
-
-    // https://stackoverflow.com/questions/3612814/angle-between-two-line-start-at-the-same-point
-    // let angle1 = Math.atan2(coneVector.y, coneVector.x);
-    // let angle2 = Math.atan2(vector.y, vector.x);
-    // let angle = (angle2 - angle1) * 360 / (Math.PI * 2);
-    // if (angle < 0) {
-    //   angle += 360;
-    // }
-
-    // https://stackoverflow.com/questions/14066933/direct-way-of-computing-clockwise-angle-between-2-vectors/16544330#16544330
-    let vector = end.minus(fov.center).normalize();
-    let angle = Math.atan2(coneVector.det(vector), coneVector.dot(vector));
-
-    let ray = {
-      line: line,
-      distance: distance,
-      angle: angle
-    };
-
-    return ray;
-  }
-
-  addWallFromPoints(rays, walls, fov, fovAngle, maxAngle, coneVector, points) {
-    let extendedPoints = points.slice();
-    // extendedPoints[0] = fov.center.plus(points[0].minus(fov.center).normalize().times(fov.range));
-    // extendedPoints[points.length - 1] = fov.center.plus(points[points.length - 1].minus(fov.center).normalize().times(fov.range));
-
-
-    for (let i = 0; i < points.length - 1; i++) {
-      let wallRays = [];
-      // Don't add rays that are outside of field of view
-      let ray1 = this.getRay(rays, fov, coneVector, points[i]);
-      if (ray1.angle > -fovAngle && ray1.angle < fovAngle) {
-        rays.push(ray1);
-      }
-
-      let ray2 = this.getRay(rays, fov, coneVector, points[i + 1]);
-      if (ray2.angle > -fovAngle && ray2.angle < fovAngle) {
-        rays.push(ray2);
-      }
-
-      wallRays.push(ray1, ray2);
-
-      walls.push({
-        rays: wallRays,
-        line: [points[i], points[i + 1]],
-        startAngle: ray1.angle,
-        endAngle: ray2.angle
-      });
-    }
-
-    let leftEndpoint = this.getRotatedRayEndpoint(fov.center, points[0], -0.1, fov.range);
-    let rightEndpoint = this.getRotatedRayEndpoint(fov.center, points[points.length - 1], 0.1, fov.range);
-    rays.push(this.getRay(rays, fov, coneVector, leftEndpoint));
-    rays.push(this.getRay(rays, fov, coneVector, rightEndpoint));
-  }
-
-  getRotatedRayEndpoint(start, end, rotation, range) {
-    let angle = Math.cos(rotation * DEG_TO_RAD);
-    let sinAngle = Math.sin(rotation * DEG_TO_RAD);
-
-    return start.plus(new Vec3({
-      x: (end.x - start.x) * angle - (end.y - start.y) * sinAngle,
-      y: (end.x - start.x) * sinAngle + (end.y - start.y) * angle
-    }).normalize().times(range));
-  }
-
-  getRays(objects, fov) {
-    let rays = [];
-    let walls = [];
-    let coneVector = new Vec3(fov.target).minus(fov.center).normalize();
-    let fovAngle = (fov.angle / 2) * DEG_TO_RAD;
-    let maxAngle = 90 * DEG_TO_RAD;
-
-    // https://stackoverflow.com/questions/4780119/2d-euclidean-vector-rotations
-    let leftEnd = this.getRotatedRayEndpoint(fov.center, fov.target, -(fov.angle / 2), fov.range);
-    let rightEnd = this.getRotatedRayEndpoint(fov.center, fov.target, fov.angle / 2, fov.range);
-    rays.push(this.getRay(rays, fov, coneVector, leftEnd));
-    rays.push(this.getRay(rays, fov, coneVector, rightEnd));
-
-    for (let angle = -fov.angle + 5; angle <= fov.angle - 5; angle += 5) {
-      let end = this.getRotatedRayEndpoint(fov.center, fov.target, angle, fov.range);
-      rays.push(this.getRay(rays, fov, coneVector, end));
-    }
-
-    let relativeRange = fov.range * fov.range;
-    for (const object of objects) {
-      let losBounds = object.losBounds;
-      if (!losBounds) continue;
-      for (const bounds of losBounds) {
-        if (bounds.points.every((point) => point.relativeDistanceTo(fov.center) > relativeRange)) {
-          continue;
-        }
-
-        let points = [];
-        if (fov.center.y >= bounds.bottom.y) {
-          // FOV center is below bounds
-          points.push(bounds.ll, bounds.lr);
-          if (fov.center.x >= bounds.right.x) {
-            points.push(bounds.ur);
-          } else if (fov.center.x <= bounds.left.x) {
-            points.unshift(bounds.ul);
-          }
-        } else if (fov.center.y > bounds.top.y) {
-          // FOV center is between upper and lower bounds
-          if (fov.center.x >= bounds.right.x) {
-            points.push(bounds.lr, bounds.ur);
-          } else if (fov.center.x <= bounds.left.x) {
-            points.push(bounds.ul, bounds.ll);
-          } else {
-            // TODO: handle case where center is inside bounds
-          }
-
-        } else {
-          // FOV center is above bounds
-          points.push(bounds.ur, bounds.ul);
-          if (fov.center.x >= bounds.right.x) {
-            points.unshift(bounds.lr);
-          } else if (fov.center.x <= bounds.left.x) {
-            points.push(bounds.ll);
-          }
-        }
-
-        if (points.length > 0) {
-          this.addWallFromPoints(rays, walls, fov, fovAngle, maxAngle, coneVector, points);
-        }
-      }
-    }
-
-    return { rays: rays, walls: walls };
-  }
-
-  // TODO: this function won't handle overlapping bounds very well, could fix this
-  refineRays(rays, fov) {
-    // Indexes 0 and 1 are the left and right edges of fov
-    // TODO: don't depend on indexes
-    let left = rays.rays[0];
-    let right = rays.rays[1];
-    let start = left;
-    let end = right;
-    // if (left.angle > right.angle) {
-    //   start = right;
-    //   end = left;
-    // }
-    rays.rays = _.sortBy(rays.rays, "angle");
-    rays.walls = _.sortBy(rays.walls, "startAngle");
-
-    let startIdx = rays.rays.indexOf(start);
-    let endIdx = rays.rays.indexOf(end);
-    let sortedRays = rays.rays;
-    sortedRays = rays.rays.slice(startIdx, endIdx + 1);
-    if (endIdx < startIdx) {
-      sortedRays = sortedRays.concat(rays.rays.slice(0, endIdx + 1));
-    }
-    rays.rays = sortedRays;
-
-    for (const ray of sortedRays) {
-      let newEndpoints = [];
-      for (const wall of rays.walls) {
-        //if (ray.angle > wall.startAngle && ray.angle < wall.endAngle) {
-          //if (wall.rays[0].distance < ray.distance || wall.rays[1].distance < ray.distance) {
-        if (!wall.rays.includes(ray)) {
-          let intersection = getLineIntersection(ray.line, wall.line);
-          if (intersection) {
-            newEndpoints.push(intersection);
-          }
-        }
-          //}
-        //}
-      }
-
-      if (newEndpoints.length > 0) {
-        let newEndpoint = _.minBy(newEndpoints, (point) => {
-          return point.relativeDistanceTo(ray.line[0]);
-        });
-        ray.line[1] = newEndpoint.copy();
-      }
-    }
-  }
-
-  // https://www.redblobgames.com/articles/visibility/
-  getFovBounds(objects, fov) {
-    let rays = this.getRays(objects, fov);
-    this.refineRays(rays, fov);
-
-    let bounds = [];
-    for (let i = 0; i < rays.rays.length - 1; i++) {
-      bounds.push(new Bounds({
-        dimensions: {
-          triangle: [
-            fov.center,
-            rays.rays[i].line[1],
-            rays.rays[i + 1].line[1]
-          ]
-        }
-      }));
-    }
-
-    return bounds;
-  }
-
-  isInView(object, fovBounds, losHiddenObjs) {
-    // TODO: test if object is owned by player instead of if is player
-    if (object.losHidden) {
-      let objBounds = object.modelBounds;
-      if (fovBounds.some((bounds) => bounds.intersects(objBounds))) {
-        losHiddenObjs.push(object);
-        return true;
-      }
-      return false;
-    }
-    return true;
-  }
-
-  debugRays(context, bounds) {
-    context.strokeStyle = "yellow";
-    context.fillStyle = "goldenrod";
-    for (const triangle of bounds) {
-      context.beginPath();
-      context.moveTo(triangle.points[0].x, triangle.points[0].y);
-      context.lineTo(triangle.points[1].x, triangle.points[1].y);
-      context.lineTo(triangle.points[2].x, triangle.points[2].y);
-      context.lineTo(triangle.points[0].x, triangle.points[0].y);
-      context.fill();
-      context.stroke();
-    }
-
-    // context.strokeStyle = "yellow";
-    // for (const triangle of bounds) {
-    //   context.beginPath();
-    //   context.moveTo(triangle.points[0].x, triangle.points[0].y);
-    //   context.lineTo(triangle.points[1].x, triangle.points[1].y);
-    //   context.moveTo(triangle.points[0].x, triangle.points[0].y);
-    //   context.lineTo(triangle.points[2].x, triangle.points[2].y);
-    //   context.stroke();
-    // }
-    // context.strokeStyle = "green";
-    // for (const wall of rays.walls) {
-    //   context.beginPath();
-    //   context.moveTo(wall.line[0].x, wall.line[0].y);
-    //   context.lineTo(wall.line[1].x, wall.line[1].y);
-    //   context.stroke();
-    // }
-  }
-
-  getRenderObjects(objects, center, fovBounds) {
+  getRenderObjects(objects, center, fov) {
     let renderObjects = [];
     let groundObjects = [];
     let losHiddenObjects = [];
@@ -565,7 +249,7 @@ export default class PerspectiveRenderingEngine extends RenderingEngine{
     for (const object of objects) {
       for (const renderObj of object.renderObjects) {
         // TODO: create new grid for rendering
-        if (!renderObj.hidden && (!fovBounds || this.isInView(renderObj, fovBounds, losHiddenObjects))) {
+        if (!renderObj.hidden && (!fov || fov.isInView(renderObj, losHiddenObjects))) {
           let pos = Math.round(renderObj.perspectivePosition.y);
 
           if (pos > 0) {

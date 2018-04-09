@@ -29,7 +29,7 @@ import attacks from "./Magic/attacks.mjs"
 import RenderObject from "./Objects/RenderObject.mjs"
 import ImageCache from "../Engine/Rendering/ImageCache.mjs"
 import ParticleEffect from "../Engine/Effects/ParticleEffect.mjs";
-import FOV from "./Objects/FOV.mjs";
+import FieldOfView from "../Engine/FieldOfView.mjs";
 
 const EVENTS = {
   MOVE_UP: "moveUp",
@@ -460,8 +460,9 @@ export default class BattleRoyaleClient extends BattleRoyale {
     this.context.translate(-(this.gameState.player.center.x - this.context.canvas.width / 2),
     -(this.gameState.player.center.y - this.context.canvas.height / 2));
 
+    let fov = new FieldOfView(this.gameState.player.fov, this.getRenderObjects());
     this.renderingEngine.render(this.context, this.getRenderObjects(), elapsedTime,
-      this.gameState.player.center, this.gameState.player.fov);
+      this.gameState.player.center, fov);
     //this.particleEngine.render(elapsedTime, this.gameState.player.center);
     this.renderInteractions();
     this.context.restore();

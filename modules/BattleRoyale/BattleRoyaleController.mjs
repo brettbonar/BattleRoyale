@@ -7,6 +7,7 @@ import * as API from "./API.mjs"
 import GameSettings from "../Engine/GameSettings.mjs"
 import ImageCache from "../Engine/Rendering/ImageCache.mjs"
 import BattleRoyaleClient from "./BattleRoyaleClient.mjs"
+import objects from "./Objects/objects.mjs"
 //import { initialize } from "../Engine/Rendering/Scratch.mjs"
 
 export default class BattleRoyaleController extends GameController {
@@ -17,6 +18,14 @@ export default class BattleRoyaleController extends GameController {
 
     //initialize();
     ImageCache.put("/Assets/terrain_atlas.png");
+
+    _.each(objects, (obj) => {
+      if (obj.imageSource) {
+        ImageCache.put(obj.imageSource);
+      } else if (obj.images) {
+        obj.images.forEach((image) => ImageCache.put(image.imageSource));
+      }
+    });
   }
 
   showCharacterCreation() {
