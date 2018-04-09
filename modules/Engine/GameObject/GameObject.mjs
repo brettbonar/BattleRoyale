@@ -142,6 +142,7 @@ export default class GameObject extends GameObjectProxy {
       this.perspectiveDimensions.zheight : this.dimensions.zheight;
 
     // TODO: add or subtract zheight for perspective?
+    // TODO: ***try subtracting zheight from Y position by default***
 
     // Anything with a z position and zheight of 0 should be rendered as ground
     if (this.position.z <= 0 && !zheight) {
