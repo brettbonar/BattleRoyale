@@ -273,7 +273,7 @@ function initGame(players, maps) {
   // gameObjects.push(new StaticObject({
   //   objectType: "plainTree",
   //   position: {
-  //     x: 350,
+  //     x: 500,
   //     y: 250
   //   },
   //   simulation: true
@@ -358,6 +358,14 @@ function initGame(players, maps) {
   //     height: 220
   //   }
   // ));
+
+
+  gameObjects = gameObjects.concat(scenes.house.getObjects(
+    {
+      x: 300,
+      y: 300
+    }
+  ));
 
   addScenes(maps);
   //gameObjects = gameObjects.concat(addScenes(maps));

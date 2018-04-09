@@ -1,0 +1,3 @@
+TODO:
+
+* Load all assets before rendering minimap, otherwise some things won't show up

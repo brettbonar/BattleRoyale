@@ -37,7 +37,7 @@ const caveEntranceDimensions = [
   }
 ];
 
-export default {
+let objects = {
   // WHEAT
   wheat: {
     objectType: "wheat",
@@ -345,9 +345,6 @@ export default {
           width: 190,
           height: 178
         },
-        fadeEndOffset: {
-          y: 64
-        },
         offset: {
           z: 156,
           y: 156
@@ -362,6 +359,9 @@ export default {
           y: 1128,
           width: 104,
           height: 83
+        },
+        perspectiveOffset: {
+          y: 60
         },
         dimensions: {
           width: 104,
@@ -536,6 +536,9 @@ export default {
     },
     physics: {
       surfaceType: "terrain"
+    },
+    perspectiveOffset: {
+      y: 60
     },
     dimensions: {
       width: 102,
@@ -1287,3 +1290,133 @@ export default {
     ]
   }
 }
+
+// BUILDING INTERIOR
+objects.bed1 = {
+  imageSource: "/Assets/Tilesets/Inside_B.png",
+  imageDimensions: {
+    x: 199,
+    y: 302,
+    width: 50,
+    height: 83
+  },
+  dimensions: {
+    width: 50,
+    height: 83,
+    zheight: 14
+  },
+  physics: {
+    surfaceType: "terrain",
+  },
+  perspectiveOffset: {
+    y: 14
+  },
+  collisionDimensions: [
+    {
+      offset: {
+        x: 1,
+        y: 14
+      },
+      dimensions: {
+        width: 48,
+        height: 69,
+        zheight: 14
+      }
+    }
+  ]
+};
+
+objects.cardTable = {
+  imageSource: "/Assets/Tilesets/Inside_B.png",
+  imageDimensions: {
+    x: 447,
+    y: 319,
+    width: 34,
+    height: 32
+  },
+  dimensions: {
+    width: 34,
+    height: 32,
+    zheight: 10
+  },
+  physics: {
+    surfaceType: "terrain",
+  },
+  collisionDimensions: [
+    {
+      offset: {
+        x: 1,
+        y: 6
+      },
+      dimensions: {
+        width: 32,
+        height: 24,
+        zheight: 10
+      }
+    }
+  ]
+};
+
+objects.chairDown = {
+  imageSource: "/Assets/Tilesets/Inside_B.png",
+  imageDimensions: {
+    x: 419,
+    y: 285,
+    width: 26,
+    height: 34
+  },
+  dimensions: {
+    width: 26,
+    height: 34,
+    zheight: 20
+  },
+  physics: {
+    surfaceType: "terrain",
+  },
+  collisionDimensions: [
+    {
+      offset: {
+        x: 1,
+        y: 15
+      },
+      dimensions: {
+        width: 24,
+        height: 18,
+        zheight: 20
+      }
+    }
+  ]
+};
+
+objects.chairUp = {
+  imageSource: "/Assets/Tilesets/Inside_B.png",
+  imageDimensions: {
+    x: 482,
+    y: 291,
+    width: 27,
+    height: 26
+  },
+  dimensions: {
+    width: 27,
+    height: 26,
+    zheight: 20
+  },
+  physics: {
+    surfaceType: "terrain",
+  },
+  collisionDimensions: [
+    {
+      offset: {
+        x: 1,
+        y: 7
+      },
+      dimensions: {
+        width: 24,
+        height: 18,
+        zheight: 20
+      }
+    }
+  ]
+};
+
+export default objects;

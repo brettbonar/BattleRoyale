@@ -141,6 +141,8 @@ export default class GameObject extends GameObjectProxy {
     let zheight = this.perspectiveDimensions ? 
       this.perspectiveDimensions.zheight : this.dimensions.zheight;
 
+    // TODO: add or subtract zheight for perspective?
+
     // Anything with a z position and zheight of 0 should be rendered as ground
     if (this.position.z <= 0 && !zheight) {
       this.perspectivePosition = new Vec3({
@@ -285,7 +287,8 @@ export default class GameObject extends GameObjectProxy {
 
   getBoundsFromDimens(position, dimens) {
     let bounds = [];
-    for (const dimensions of _.castArray(dimens)) {
+    dimens = _.castArray(dimens);
+    for (const dimensions of dimens) {
       if (dimensions.type === Bounds.TYPE.RAY) {
         bounds.push(this.getRayBounds(dimensions));
       } else {

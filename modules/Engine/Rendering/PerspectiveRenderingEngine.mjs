@@ -341,19 +341,14 @@ export default class PerspectiveRenderingEngine extends RenderingEngine{
 
     for (let i = 0; i < points.length - 1; i++) {
       let wallRays = [];
+      // Don't add rays that are outside of field of view
       let ray1 = this.getRay(rays, fov, coneVector, points[i]);
-      // Don't bother adding walls or rays that are behind field of view
-      if (ray1.angle > maxAngle || ray1.angle < -maxAngle) {
-        return;
-      } else if (ray1.angle > -fovAngle && ray1.angle < fovAngle) {
+      if (ray1.angle > -fovAngle && ray1.angle < fovAngle) {
         rays.push(ray1);
       }
 
       let ray2 = this.getRay(rays, fov, coneVector, points[i + 1]);
-      // Don't bother adding walls or rays that are behind field of view
-      if (ray2.angle > maxAngle || ray2.angle < -maxAngle) {
-        return;
-      } else if (ray2.angle > -fovAngle && ray2.angle < fovAngle) {
+      if (ray2.angle > -fovAngle && ray2.angle < fovAngle) {
         rays.push(ray2);
       }
 

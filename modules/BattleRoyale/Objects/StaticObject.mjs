@@ -24,6 +24,8 @@ export default class StaticObject extends GameObject {
         });
       }
     }
+
+    this.updatePosition();
   }
 
   getUpdateState() {

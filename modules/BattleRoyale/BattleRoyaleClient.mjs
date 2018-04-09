@@ -424,12 +424,12 @@ export default class BattleRoyaleClient extends BattleRoyale {
   getRenderObjects() {
     return this.grid.getRenderObjects(new Bounds({
       position: this.gameState.player.center.minus({
-        x: this.context.canvas.width / 2,
-        y: this.context.canvas.height / 2
+        x: this.context.canvas.width / 2 + 250,
+        y: this.context.canvas.height / 2 + 250
       }),
       dimensions: {
-        width: this.context.canvas.width,
-        height: this.context.canvas.height
+        width: this.context.canvas.width + 500,
+        height: this.context.canvas.height + 500
       }
     }));
   }

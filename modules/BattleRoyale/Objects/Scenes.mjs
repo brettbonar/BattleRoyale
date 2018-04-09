@@ -37,7 +37,7 @@ scenes.plainStump = {
     width: 96,
     height: 44
   },
-  weight: 25,
+  weight: 5,
   getObjects: function (position, dimensions) {
     return [
       new StaticObject({
@@ -94,6 +94,38 @@ scenes.house = {
         buildingType: "house",
         simulation: true,
         position: position
+      }),
+      new StaticObject({
+        objectType: "bed1",
+        position: {
+          x: position.x + 131,
+          y: position.y + 68
+        },
+        simulation: true        
+      }),
+      new StaticObject({
+        objectType: "chairDown",
+        position: {
+          x: position.x + 13,
+          y: position.y + 47
+        },
+        simulation: true        
+      }),
+      new StaticObject({
+        objectType: "cardTable",
+        position: {
+          x: position.x + 9,
+          y: position.y + 76
+        },
+        simulation: true        
+      }),
+      new StaticObject({
+        objectType: "chairUp",
+        position: {
+          x: position.x + 12,
+          y: position.y + 104
+        },
+        simulation: true        
       })
     ];
   }
