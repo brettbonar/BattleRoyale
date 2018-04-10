@@ -8,6 +8,7 @@ import GameSettings from "../Engine/GameSettings.mjs"
 import ImageCache from "../Engine/Rendering/ImageCache.mjs"
 import BattleRoyaleClient from "./BattleRoyaleClient.mjs"
 import objects from "./Objects/objects.mjs"
+import buildings from "./Buildings/buildings.mjs"
 //import { initialize } from "../Engine/Rendering/Scratch.mjs"
 
 export default class BattleRoyaleController extends GameController {
@@ -17,6 +18,8 @@ export default class BattleRoyaleController extends GameController {
     });
 
     //initialize();
+
+    // TODO: put asset initialization in a function somewhere else
     ImageCache.put("/Assets/terrain_atlas.png");
 
     _.each(objects, (obj) => {
@@ -25,6 +28,11 @@ export default class BattleRoyaleController extends GameController {
       } else if (obj.images) {
         obj.images.forEach((image) => ImageCache.put(image.imageSource));
       }
+    });
+
+    _.each(buildings, (obj) => {
+      ImageCache.put(obj.exterior.imageSource);
+      ImageCache.put(obj.interior.imageSource);
     });
   }
 

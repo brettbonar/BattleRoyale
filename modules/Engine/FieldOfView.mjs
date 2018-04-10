@@ -16,7 +16,7 @@ export default class FieldOfView {
   }
   
   render(context) {
-    if (!this.fovImage.complete) return;
+    if (!this.fovImage.complete || this.fovBounds.length === 0) return;
     
     context.save();
 
@@ -95,17 +95,13 @@ export default class FieldOfView {
     let wallRays = [];
     for (let i = 0; i < points.length - 1; i++) {
       // Don't add rays that are outside of field of view
-      // Only add wall if at least one edge is within fov
-      let good = false;
-
       let ray1 = this.getRay(rays, fov, coneVector, points[i]);
       if (ray1.angle > -fovAngle && ray1.angle < fovAngle) {
-        good = true;
         wallRays.push(ray1);
 
         if (ray1.distance <= fov.range + 10) {
           if (i === 0) {
-            let leftEndpoint = this.getRotatedRayEndpoint(fov.center, points[i], 0, fov.range);
+            let leftEndpoint = this.getRotatedRayEndpoint(fov.center, points[i], -0.01, fov.range);
             //let leftEndpoint = this.getExtendedEndpoint(fov.center, points[i], fov.range);
             let leftRay = this.getRay(rays, fov, coneVector, leftEndpoint);
             leftRay.angle = ray1.angle;
@@ -119,14 +115,13 @@ export default class FieldOfView {
 
       let ray2 = this.getRay(rays, fov, coneVector, points[i + 1]);
       if (ray2.angle > -fovAngle && ray2.angle < fovAngle) {
-        good = true;
         wallRays.push(ray2);
 
         if (ray2.distance <= fov.range + 10) {
           rays.push(ray2);
 
           if (i === points.length - 2) {
-            let rightEndpoint = this.getRotatedRayEndpoint(fov.center, points[i + 1], 0, fov.range);
+            let rightEndpoint = this.getRotatedRayEndpoint(fov.center, points[i + 1], 0.01, fov.range);
             //let rightEndpoint = this.getExtendedEndpoint(fov.center, points[i + 1], fov.range);
             let rightRay = this.getRay(rays, fov, coneVector, rightEndpoint);
             rightRay.angle = ray2.angle;
@@ -136,14 +131,12 @@ export default class FieldOfView {
         }
       }
 
-      if (good) {
-        walls.push({
-          rays: wallRays,
-          line: [points[i], points[i + 1]],
-          startAngle: Math.min(ray1.angle, ray2.angle),
-          endAngle: Math.max(ray1.angle, ray2.angle)
-        });
-      }
+      walls.push({
+        rays: wallRays,
+        line: [points[i], points[i + 1]],
+        startAngle: Math.min(ray1.angle, ray2.angle),
+        endAngle: Math.max(ray1.angle, ray2.angle)
+      });
     }
   }
 
@@ -208,7 +201,8 @@ export default class FieldOfView {
           } else if (fov.center.x <= bounds.left.x) {
             points.push(bounds.ul, bounds.ll);
           } else {
-            // TODO: handle case where center is inside bounds
+            // FOV center is inside bounds, show nothing
+            return { rays: [], walls: [] };
           }
         } else {
           // FOV center is above bounds

@@ -5,6 +5,8 @@ import flavor from "./BattleRoyale/Objects/flavor.mjs"
 import ImageCache from "./Engine/Rendering/ImageCache.mjs"
 import SimplexNoise from "../shared/SimplexNoise.mjs"
 
+const MAX_CANVAS_SIZE = 8192;
+
 const BIOMES = {
   FOREST: "forest",
   DESERT: "desert",
@@ -107,8 +109,8 @@ class Map {
   constructor(params) {
     _.merge(this, params);
     _.defaults(this, {
-      mapWidth: 200,
-      mapHeight: 200,
+      mapWidth: 256,
+      mapHeight: 256,
       tileSize: 32,
       map: [],
       objects: [],
@@ -129,6 +131,33 @@ class Map {
         "fire": 1
       }
     });
+
+    let totalMapWidth = this.mapWidth * this.tileSize;
+    let totalMapHeight = this.mapHeight * this.tileSize;
+    let numColumns = Math.ceil(totalMapWidth / MAX_CANVAS_SIZE);
+    let numRows = Math.ceil(totalMapHeight / MAX_CANVAS_SIZE);
+    // TRICKY: extend dimensions a little to avoid rendering artifacts
+    let mapWidth = Math.ceil(totalMapWidth / numColumns);
+    let mapHeight = Math.ceil(totalMapHeight / numRows);
+
+    let mapCanvasWidth = mapWidth + 5;
+    let mapCanvasHeight = mapHeight + 5;
+
+    let mapTileWidth = Math.ceil(mapCanvasWidth / this.tileSize);
+    let mapTileHeight = Math.ceil(mapCanvasHeight / this.tileSize);
+
+    this.mapParams = {
+      totalMapWidth: totalMapWidth,
+      totalMapHeight: totalMapHeight,
+      numColumns: numColumns,
+      numRows: numRows,
+      mapWidth: mapWidth,
+      mapHeight: mapHeight,
+      mapCanvasWidth: mapCanvasWidth,
+      mapCanvasHeight: mapCanvasHeight,
+      mapTileWidth: mapTileWidth,
+      mapTileHeight: mapTileHeight
+    };
     
     if (params && _.isArray(params.map)) {
       this.buildMap(params.map);
@@ -318,29 +347,42 @@ class Map {
     return null;
   }
 
+  renderFullMapToMinimap(renderingEngine) {
+    for (let x = 0; x < this.mapParams.numColumns; x++) {
+      for (let y = 0; y < this.mapParams.numRows; y++) {
+        let minimap = this.minimapCanvases[x][y];
+        minimap.context.drawImage(this.mapCanvases[x][y].canvas, 0, 0, minimap.canvas.width, minimap.canvas.height);
+        minimap.context.save();
+        minimap.context.translate(minimap.offset.x, minimap.offset.y);
+        renderingEngine.render(minimap.context, this.objects, 0, { x: 0, y: 0 });
+        minimap.context.restore();
+      }
+    }
+  }
+
   createMinimap(renderingEngine) {
-    if (this.minimapCanvas) {
-      this.minimapContext.drawImage(this.canvas, 0, 0, this.canvas.width, this.canvas.height,
-        0, 0, this.minimapCanvas.width, this.minimapCanvas.height);
-      renderingEngine.render(this.minimapContext, this.objects, 0, { x: 0, y: 0 });    
+    if (this.minimapCanvases && this.minimapCanvases.length > 0) {
+      this.renderFullMapToMinimap(renderingEngine);
+      // this.minimapContext.drawImage(this.canvas, 0, 0, this.canvas.width, this.canvas.height,
+      //   0, 0, this.minimapCanvas.width, this.minimapCanvas.height);
     } else {
       this.renderingEngine = renderingEngine;
     }
   }
 
-  renderTile(tile, offset, position) {
+  renderTile(context, positionOffset, tile, offset, position) {
     let size = this.tileSize;
     offset = offset || Object.assign({}, TERRAIN_OFFSETS[tile.type]);
     position = position || tile.position;
 
-    this.context.drawImage(this.terrain, offset.x, offset.y, size, size,
-      position.x * size, position.y * size, size, size);
+    context.drawImage(this.terrain, offset.x, offset.y, size, size,
+      position.x * size + positionOffset.x, position.y * size + positionOffset.y, size, size);
     if (tile.flavor) {
       let imageParams = _.find(flavor, { name: tile.flavor });
       let dimensions = imageParams.imageDimensions;
       let image = ImageCache.get(imageParams.imageSource);
-      this.context.drawImage(image, dimensions.x, dimensions.y, dimensions.width, dimensions.height,
-      position.x * size, position.y * size, size, size);
+      context.drawImage(image, dimensions.x, dimensions.y, dimensions.width, dimensions.height,
+      position.x * size + positionOffset.x, position.y * size + positionOffset.y, size, size);
     }
     //this.context.strokeRect(position.x * size, position.y * size, size, size);
   }
@@ -438,7 +480,7 @@ class Map {
     return { offset: offset, neighbor: neighbor };
   }
 
-  drawTile(tile) {
+  drawTile(context, tile, positionOffset) {
     let size = this.tileSize;
     let offset = Object.assign({}, TERRAIN_OFFSETS[tile.type]);
     let priority = TERRAIN_PRIORITY[tile.type];
@@ -458,10 +500,10 @@ class Map {
       });
       neighborTile.neighbors = tile.neighbors;
       neighborTile.type = result.neighbor.type;
-      this.renderTile(neighborTile, null, tile.position);
+      this.renderTile(context, positionOffset, neighborTile, null, tile.position);
     }
     
-    this.renderTile(tile, result.offset);
+    this.renderTile(context, positionOffset, tile, result.offset);
   }
 
   serializeMap(map) {
@@ -484,28 +526,70 @@ class Map {
     };
   }
 
+  preRenderMap() {
+    let totalMapWidth = this.mapParams.totalMapWidth;
+    let totalMapHeight = this.mapParams.totalMapHeight;
+    let numColumns = this.mapParams.numColumns;
+    let numRows = this.mapParams.numRows;
+    let mapWidth = this.mapParams.mapWidth;
+    let mapHeight = this.mapParams.mapHeight;
+    let mapTileWidth = this.mapParams.mapTileWidth;
+    let mapTileHeight = this.mapParams.mapTileHeight;
+
+    this.mapCanvases = new Array(numColumns);
+    this.minimapCanvases = new Array(numColumns);
+
+    for (let x = 0; x < numColumns; x++) {
+      this.mapCanvases[x] = new Array(numRows);
+      this.minimapCanvases[x] = new Array(numRows);
+      for (let y = 0; y < numRows; y++) {
+        let canvas = $("<canvas>", {
+          class: "game-canvas map-save-canvas"
+        }).appendTo(document.getElementById("canvas-group"))[0];
+        canvas.width = this.mapParams.mapCanvasWidth;
+        canvas.height = this.mapParams.mapCanvasHeight;
+
+        let minimapCanvas = $("<canvas>", {
+          class: "game-canvas map-save-canvas"
+        }).appendTo(document.getElementById("canvas-group"))[0];
+        minimapCanvas.width = this.mapParams.mapCanvasWidth;
+        minimapCanvas.height = this.mapParams.mapCanvasHeight;
+
+        let context = canvas.getContext("2d");
+        let minimapContext = minimapCanvas.getContext("2d");
+        let offset = {
+          x: -x * mapWidth,
+          y: -y * mapHeight
+        };
+
+        let maxX = Math.min(this.mapWidth - 1, x * mapTileWidth + mapTileWidth);
+        let maxY = Math.min(this.mapHeight - 1, y * mapTileHeight + mapTileHeight);
+        for (let tileX = x * (mapTileWidth - 1); tileX < maxX; tileX++) {
+          for (let tileY = y * (mapTileHeight - 1); tileY < maxY; tileY++) {
+            this.drawTile(context, this.map[tileX][tileY], offset);
+          }
+        }
+
+        this.mapCanvases[x][y] = {
+          canvas: canvas,
+          context: context,
+          offset: offset
+        };
+
+        this.minimapCanvases[x][y] = {
+          canvas: minimapCanvas,
+          context: minimapContext,
+          offset: offset
+        };
+      }
+    }
+  }
+
   saveMap() {
     this.terrain = new Image();
     this.terrain.src = "/Assets/terrain.png";
     this.terrain.onload = () => {
-      this.canvas = $("<canvas>", {
-        class: "game-canvas map-save-canvas"
-      }).appendTo(document.getElementById("canvas-group"))[0];
-      this.canvas.width = this.tileSize * this.mapWidth;
-      this.canvas.height = this.tileSize * this.mapHeight;
-      this.context = this.canvas.getContext("2d");
-      for (const column of this.map) {
-        for (const tile of column) {
-          this.drawTile(tile);
-        }
-      }
-
-      this.minimapCanvas = $("<canvas>", {
-        class: "game-canvas map-save-canvas"
-      }).appendTo(document.getElementById("canvas-group"))[0];
-      this.minimapCanvas.width = this.tileSize * this.mapWidth;
-      this.minimapCanvas.height = this.tileSize * this.mapHeight;
-      this.minimapContext = this.minimapCanvas.getContext("2d");
+      this.preRenderMap();
 
       if (this.renderingEngine) {
         this.createMinimap(this.renderingEngine);
@@ -513,27 +597,82 @@ class Map {
     }
   }
 
-  renderMinimap(context, position, location, dimensions) {
-    if (this.minimapCanvas) {
-      if (dimensions) {
-        // context.drawImage(this.canvas, 
+  renderImpl(canvases, context, position, location, dimensions) {
+    if (!dimensions) {
+      dimensions = {
+        width: context.canvas.width,
+        height: context.canvas.height
+      };
+    }
+
+    let ul = {
+      x: position.x - dimensions.width / 2,
+      y: position.y - dimensions.height / 2
+    };
+    let lr = {
+      x: ul.x + dimensions.width,
+      y: ul.y + dimensions.height
+    };
+
+    let xstart = _.clamp(Math.floor(ul.x / this.mapParams.mapWidth), 0, canvases.length - 1);
+    let xend = _.clamp(Math.floor(lr.x / this.mapParams.mapWidth), 0, canvases.length - 1);
+    let ystart = _.clamp(Math.floor(ul.y / this.mapParams.mapHeight), 0, canvases[0].length - 1);
+    let yend = _.clamp(Math.floor(lr.y / this.mapParams.mapHeight), 0, canvases[0].length - 1);
+
+    if (!location) {
+      location = {
+        position: {
+          x: 0,
+          y: 0,
+        },
+        dimensions: {
+          width: context.canvas.width,
+          height: context.canvas.height
+        }
+      };
+    }
+
+    for (let x = xstart; x <= xend; x++) {
+      for (let y = ystart; y <= yend; y++) {
+        let map = canvases[x][y];
+        context.drawImage(map.canvas,
+          position.x - dimensions.width / 2 + map.offset.x, position.y - dimensions.height / 2 + map.offset.y,
+          dimensions.width, dimensions.height,
+          location.position.x, location.position.y, location.dimensions.width, location.dimensions.height);
+      }
+    }
+  }
+
+  renderMinimapFull(context, location) {
+    let minimapGridWidth = location.dimensions.width / this.mapParams.numColumns;
+    let minimapGridHeight = location.dimensions.height / this.mapParams.numRows;
+
+    for (let x = 0; x < this.mapParams.numColumns; x++) {
+      for (let y = 0; y < this.mapParams.numRows; y++) {
+        let map = this.minimapCanvases[x][y];
+        context.drawImage(map.canvas,
+          location.position.x + x * minimapGridWidth, location.position.y + y * minimapGridHeight,
+          minimapGridWidth, minimapGridHeight);
+      }
+    }
+  }
+
+  renderMinimap(context, location, position, dimensions) {
+    if (this.minimapCanvases && this.minimapCanvases.length > 0) {
+      if (position && dimensions) {
+        this.renderImpl(this.minimapCanvases, context, position, location, dimensions);
+        // context.drawImage(this.minimapCanvas, 
         //   position.x - dimensions.width / 2, position.y - dimensions.height / 2, dimensions.width, dimensions.height,
         //   location.position.x, location.position.y, location.dimensions.width, location.dimensions.height);
-        context.drawImage(this.minimapCanvas, 
-          position.x - dimensions.width / 2, position.y - dimensions.height / 2, dimensions.width, dimensions.height,
-          location.position.x, location.position.y, location.dimensions.width, location.dimensions.height);
       } else {
-        //context.drawImage(this.canvas, location.position.x, location.position.y, location.dimensions.width, location.dimensions.height);
-        context.drawImage(this.minimapCanvas, location.position.x, location.position.y, location.dimensions.width, location.dimensions.height);  
+        this.renderMinimapFull(context, location);
       }
     }
   }
 
   render(context, position) {
-    if (this.canvas) {
-      context.drawImage(this.canvas, position.x - context.canvas.width / 2, position.y - context.canvas.height / 2,
-        context.canvas.width, context.canvas.height, 0, 0, context.canvas.width, context.canvas.height);
-      //context.drawImage(this.canvas, 0, 0, context.canvas.width, context.canvas.height);
+    if (this.mapCanvases && this.mapCanvases.length > 0) {
+      this.renderImpl(this.mapCanvases, context, position);
     }
   }
 
@@ -542,53 +681,6 @@ class Map {
     if (Math.random() <= BIOME_PARAMS[type].flavorDensity) {
       tile.flavor = _.sample(_.filter(flavor, { biome: type })).name;
     }
-  }
-
-  growVoronoi(seeds) {
-    // let box = {
-    //   xl: 0,
-    //   xr: this.mapSize * this.tileSize - 1,
-    //   yt: 0,
-    //   yb: this.mapSize * this.tileSize - 1
-    // };
-
-    // let voronoi = new Voronoi();
-    // voronoi.compute(_.map(seeds, "position"), box).tiles;
-    
-    for (const column of this.map) {
-      for (const tile of column) {
-        let seed = _.minBy(seeds, (seed) => {
-          return getDistance(seed.position, tile.position);
-        });
-        this.initTile(tile, seed.type); 
-      }
-    }
-  }
-
-  generateVoronoi() {
-    let seeds = [];
-
-    _.each(BIOMES, (type) => {
-      for (let i = 0; i < this.seeds[type]; i++) {
-        let position = {
-          x: _.random(this.map.length - 1),
-          y: _.random(this.map.length - 1)
-        };
-        // TODO: make sure they're some distance apart
-        while (seeds.some((tile) => _.isEqual(tile.position, position))) {
-          let position = {
-            x: _.random(this.map.length - 1),
-            y: _.random(this.map.length - 1)
-          };
-        }
-
-        let tile = this.map[position.x][position.y];
-        this.initTile(tile, type);
-        seeds.push(tile);
-      }
-    });
-
-    this.growVoronoi(seeds);
   }
 
   getTileType(noise) {
@@ -617,7 +709,8 @@ class Map {
     for (let x = 0; x < width; x++) {
       let height = this.map[x].length;
       for (let y = 0; y < height; y++) {
-        let noise = simplexNoise.noise2D(x / width - 0.5, y / height - 0.5)
+        let noise = simplexNoise.noise2D(x / 256 - 0.5, y / 256 - 0.5)
+        //let noise = simplexNoise.noise2D(x / width - 0.5, y / height - 0.5)
         this.initTileSimplex(this.map[x][y], noise);
       }
     }    

@@ -141,7 +141,7 @@ export default class PerspectiveRenderingEngine extends RenderingEngine{
     }
     
     if (window.debug) {
-      this.debugBoxes(context, renderObjects);
+      this.debugBoxes(context, objects);
     }
 
     
@@ -170,72 +170,88 @@ export default class PerspectiveRenderingEngine extends RenderingEngine{
     return obj.perspectivePosition.y;
   }
 
+  drawDebugBoxes(context, object) {
+    context.fillStyle = "black";
+    context.beginPath();
+    context.arc(object.position.x, object.position.y, 2, 0, 2 * Math.PI);
+    context.closePath();
+    context.fill();
+
+    // context.fillStyle = "purple";
+    // context.beginPath();
+    // context.arc(object.perspectivePosition.x, object.perspectivePosition.y, 5, 0, 2 * Math.PI);
+    // context.closePath();
+    // context.fill();
+
+    // let perspectivePosition = object.perspectivePosition;
+    // if (perspectivePosition) {
+    //   context.strokeStyle = "purple";
+    //   context.strokeRect(perspectivePosition.x, perspectivePosition.y,
+    //     object.width, object.height);
+    // }
+
+    // let box = object.boundingBox;
+    // if (box) {
+    //   context.strokeStyle = "yellow";
+    //   context.strokeRect(box.ul.x, box.ul.y, box.width, box.height);
+    // }
+      
+    if (object.lastCollisionBounds) {
+      for (const bounds of object.lastCollisionBounds) {
+        if (!bounds.box) continue; // TODO: render ray bounds
+        context.strokeStyle = "lawnGreen";
+        context.strokeRect(bounds.ul.x, bounds.ul.y - bounds.ul.z,
+          bounds.width, bounds.height);
+      }
+    }
+
+    if (object.collisionBounds) {
+      for (const bounds of object.collisionBounds) {
+        if (!bounds.box) continue; // TODO: render ray bounds
+        context.strokeStyle = "crimson";
+        context.strokeRect(bounds.ul.x, bounds.ul.y - bounds.ul.z,
+          bounds.width, bounds.height);
+      }
+    }
+    // for (let i = 0; i < object.collisionBounds.length; i++) {
+    //   context.strokeStyle = "blue";
+    //   let bounds = object.lastCollisionBounds[i].plus(object.collisionBounds[i]);
+    //   context.strokeRect(bounds.ul.x, bounds.ul.y - bounds.ul.z,
+    //     bounds.width, bounds.height);
+    // }
+    // for (const terrainBox of object.terrainBoundingBox) {
+    //   context.strokeStyle = "lawnGreen";
+    //   context.strokeRect(terrainBox.ul.x, terrainBox.ul.y, terrainBox.width, terrainBox.height);
+    // }
+    // for (const hitbox of object.hitbox) {
+    //   context.strokeStyle = "crimson";
+    //   context.strokeRect(hitbox.ul.x, hitbox.ul.y, hitbox.width, hitbox.height);
+    // }
+    // for (const losBox of object.losBoundingBox) {
+    //   context.strokeStyle = "aqua";
+    //   context.strokeRect(losBox.ul.x, losBox.ul.y, losBox.width, losBox.height);
+    // }
+  }
+
   debugBoxes(context, objects) {
-    for (const objSets of objects) {
-      if (!objSets) continue;
-      for (const object of objSets) {
-        if (object.particles) continue;
+    // for (const objSets of objsToRender.renderObjects) {
+    //   if (!objSets) continue;
+    //   for (const object of objSets) {
+    //     if (!object.particles) {
+    //       this.drawDebugBoxes(context, object);
+    //     }
+    //   }
+    // }
 
-        context.fillStyle = "black";
-        context.beginPath();
-        context.arc(object.position.x, object.position.y, 2, 0, 2 * Math.PI);
-        context.closePath();
-        context.fill();
+    // for (const object of objsToRender.groundObjects) {
+    //   if (!object.particles) {
+    //     this.drawDebugBoxes(context, object);
+    //   }
+    // }
 
-        // context.fillStyle = "purple";
-        // context.beginPath();
-        // context.arc(object.perspectivePosition.x, object.perspectivePosition.y, 5, 0, 2 * Math.PI);
-        // context.closePath();
-        // context.fill();
-
-        let perspectivePosition = object.perspectivePosition;
-        if (perspectivePosition) {
-          context.strokeStyle = "purple";
-          context.strokeRect(perspectivePosition.x, perspectivePosition.y,
-            object.width, object.height);
-        }
-
-        let box = object.boundingBox;
-        if (box) {
-          context.strokeStyle = "yellow";
-          context.strokeRect(box.ul.x, box.ul.y, box.width, box.height);
-        }
-          
-        if (object.lastCollisionBounds) {
-          for (const bounds of object.lastCollisionBounds) {
-            if (!bounds.box) continue; // TODO: render ray bounds
-            context.strokeStyle = "lawnGreen";
-            context.strokeRect(bounds.ul.x, bounds.ul.y - bounds.ul.z,
-              bounds.width, bounds.height);
-          }
-        }
-
-        if (object.collisionBounds) {
-          for (const bounds of object.collisionBounds) {
-            if (!bounds.box) continue; // TODO: render ray bounds
-            context.strokeStyle = "crimson";
-            context.strokeRect(bounds.ul.x, bounds.ul.y - bounds.ul.z,
-              bounds.width, bounds.height);
-          }
-        }
-        // for (let i = 0; i < object.collisionBounds.length; i++) {
-        //   context.strokeStyle = "blue";
-        //   let bounds = object.lastCollisionBounds[i].plus(object.collisionBounds[i]);
-        //   context.strokeRect(bounds.ul.x, bounds.ul.y - bounds.ul.z,
-        //     bounds.width, bounds.height);
-        // }
-        // for (const terrainBox of object.terrainBoundingBox) {
-        //   context.strokeStyle = "lawnGreen";
-        //   context.strokeRect(terrainBox.ul.x, terrainBox.ul.y, terrainBox.width, terrainBox.height);
-        // }
-        // for (const hitbox of object.hitbox) {
-        //   context.strokeStyle = "crimson";
-        //   context.strokeRect(hitbox.ul.x, hitbox.ul.y, hitbox.width, hitbox.height);
-        // }
-        // for (const losBox of object.losBoundingBox) {
-        //   context.strokeStyle = "aqua";
-        //   context.strokeRect(losBox.ul.x, losBox.ul.y, losBox.width, losBox.height);
-        // }
+    for (const object of objects) {
+      if (!object.particles) {
+        this.drawDebugBoxes(context, object);
       }
     }
   }

@@ -25,7 +25,7 @@ class GameController {
     if (params.template) {
       let template = $("<div>");
       template.load(params.template, (el) => {
-        this.element.append(template[0]);
+        this.element.appendChild(template[0]);
         this.parseElement(template);
       });
     } else {

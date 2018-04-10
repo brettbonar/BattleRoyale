@@ -341,13 +341,6 @@ function initGame(players, maps) {
   //   simulation: true
   // }));
 
-  // gameObjects = gameObjects.concat(scenes.house.getObjects(
-  //   {
-  //     x: 500,
-  //     y: 500
-  //   }
-  // ));
-
   // gameObjects = gameObjects.concat(scenes.corn.getObjects(
   //   {
   //     x: 250,
