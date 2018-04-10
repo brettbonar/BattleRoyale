@@ -108,7 +108,7 @@ export default class BattleRoyaleServer extends BattleRoyale {
       //object.target = data.target;
       object.setTarget(data.target);
       object.revision = data.source.revision;
-      object.elapsedTime = elapsedTime || 0;
+      //object.elapsedTime = elapsedTime || 0;
     }
   }
 
@@ -124,7 +124,7 @@ export default class BattleRoyaleServer extends BattleRoyale {
       }
       object.setDirection(data.direction);
       object.revision = data.source.revision;
-      object.elapsedTime = elapsedTime || 0;
+      //object.elapsedTime = elapsedTime || 0;
     }
   }
 
