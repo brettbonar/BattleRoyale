@@ -6,6 +6,7 @@ import ImageCache from "./Engine/Rendering/ImageCache.mjs"
 import SimplexNoise from "../shared/SimplexNoise.mjs"
 
 const MAX_CANVAS_SIZE = 8192;
+const MINIMAP_CANVAS_SIZE = 2048;
 
 const BIOMES = {
   FOREST: "forest",
@@ -358,6 +359,15 @@ class Map {
         minimap.context.restore();
       }
     }
+
+    this.minimapCanvas = $("<canvas>", {
+      class: "game-canvas map-save-canvas"
+    }).appendTo(document.getElementById("canvas-group"))[0];
+    this.minimapCanvas.width = MINIMAP_CANVAS_SIZE;
+    this.minimapCanvas.height = MINIMAP_CANVAS_SIZE;
+    this.minimapContext = this.minimapCanvas.getContext("2d");
+
+    this.renderMinimapFull(this.minimapContext, location);
   }
 
   createMinimap(renderingEngine) {
@@ -643,29 +653,32 @@ class Map {
     }
   }
 
-  renderMinimapFull(context, location) {
-    let minimapGridWidth = location.dimensions.width / this.mapParams.numColumns;
-    let minimapGridHeight = location.dimensions.height / this.mapParams.numRows;
+  renderMinimapFull(context) {
+    let minimapGridWidth = context.canvas.width / this.mapParams.numColumns;
+    let minimapGridHeight = context.canvas.height / this.mapParams.numRows;
 
     for (let x = 0; x < this.mapParams.numColumns; x++) {
       for (let y = 0; y < this.mapParams.numRows; y++) {
         let map = this.minimapCanvases[x][y];
         context.drawImage(map.canvas,
-          location.position.x + x * minimapGridWidth, location.position.y + y * minimapGridHeight,
+          x * minimapGridWidth, y * minimapGridHeight,
           minimapGridWidth, minimapGridHeight);
       }
     }
   }
 
   renderMinimap(context, location, position, dimensions) {
-    if (this.minimapCanvases && this.minimapCanvases.length > 0) {
+    if (this.minimapCanvas) {
       if (position && dimensions) {
-        this.renderImpl(this.minimapCanvases, context, position, location, dimensions);
-        // context.drawImage(this.minimapCanvas, 
-        //   position.x - dimensions.width / 2, position.y - dimensions.height / 2, dimensions.width, dimensions.height,
-        //   location.position.x, location.position.y, location.dimensions.width, location.dimensions.height);
+        //this.renderImpl(this.minimapCanvases, context, position, location, dimensions);
+        let xscale = this.minimapCanvas.width / this.mapParams.totalMapWidth;
+        let yscale = this.minimapCanvas.height / this.mapParams.totalMapHeight;
+        context.drawImage(this.minimapCanvas, 
+          position.x * xscale - dimensions.width * xscale / 2, position.y * yscale - dimensions.height * yscale / 2,
+          dimensions.width * xscale, dimensions.height * yscale,
+          location.position.x, location.position.y, location.dimensions.width, location.dimensions.height);
       } else {
-        this.renderMinimapFull(context, location);
+        context.drawImage(this.minimapCanvas, location.position.x, location.position.y, location.dimensions.width, location.dimensions.height);
       }
     }
   }
