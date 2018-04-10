@@ -57,7 +57,7 @@ export default {
           height: 24
         }
       },
-      shadow: true
+      shadow: "/Assets/shadows/shadow32.png"
     },
     effect: {
       damage: 15,
@@ -140,8 +140,7 @@ export default {
       // TODO: maybe attach a single effect to each projectile and move it with projectile?
       hitEffect: {
         particleEffect: "lightSmall"
-      },
-      //shadow: true
+      }
     },
     effect: {
       path: "beam",
@@ -223,7 +222,7 @@ export default {
         }
       },
       shadowColor: "white",
-      shadow: true,
+      //shadow: "/Assets/shadows/shadow16white.png",
       hitEffect: {
         particleEffect: "light"
       }
@@ -291,7 +290,7 @@ export default {
       hitEffect: {
         imageSource: "../../Assets/projectiles/Arrow2.png",
         imageDimensions: {
-          width: 32,
+          width: 24,
           height: 32,
           x: 0,
           y: 0
@@ -302,7 +301,7 @@ export default {
         // },
         //duration: 5000
       },
-      shadow: true
+      shadow: "/Assets/shadows/shadow24x4.png"
     },
     effect: {
       path: "arc",
@@ -477,7 +476,7 @@ export default {
         }
       },
       shadowColor: "rgba(230, 140, 100, 1)",
-      shadow: true
+      shadow: "/Assets/shadows/shadow16orange.png"
     },
     effect: {
       path: "arc",

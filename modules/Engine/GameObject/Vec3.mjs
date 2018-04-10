@@ -55,7 +55,7 @@ export default class Vec3 {
   }
 
   dot(vec) {
-    return this.x * vec.x + this.y * vec.y + this.z * vec.z;
+    return this.x * vec.x + this.y * vec.y;// + this.z * vec.z;
   }
   det(vec) {
     return this.x * vec.y - this.y * vec.x;

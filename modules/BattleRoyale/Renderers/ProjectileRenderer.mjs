@@ -7,17 +7,16 @@ export default class ProjectileRenderer {
     this.image = ImageCache.get(projectile.imageSource);
     this.frame = 0;
     this.currentTime = 0;
+    if (projectile.shadow) {
+      this.shadowImage = ImageCache.get(projectile.shadow);
+    }
   }
 
   render(context, object, elapsedTime) {
-    if (!this.image.complete) {
+    if (!this.image.complete || (this.shadowImage && !this.shadowImage.complete)) {
       return;
     }
     let offset = getAnimationOffset(this.image, this.projectile.dimensions, this.frame);
-
-    if (this.projectile.shadow) {
-      //drawShadow(context, object, this.projectile.modelDimensions, this.projectile.shadowColor);
-    }
 
     let position = object.position.minus({ y: object.position.z });
     let center = position.plus({
@@ -25,6 +24,28 @@ export default class ProjectileRenderer {
       y: this.projectile.dimensions.height / 2
     });
     position.add(this.projectile.renderOffset)
+
+    if (this.shadowImage) {
+      context.save();
+
+      let shadowPos = {
+        x: object.position.x + object.width / 2 - this.shadowImage.width / 2,
+        y: object.position.y + object.height - this.shadowImage.height / 2
+      };
+      if (object.groundRotation) {
+        let translatePosX = shadowPos.x + + this.shadowImage.width / 2;
+        let translatePosY = shadowPos.y + this.shadowImage.height / 2;
+        context.translate(translatePosX, translatePosY);
+        context.rotate((object.groundRotation * Math.PI) / 180);
+        context.translate(-translatePosX, -translatePosY);    
+      }
+      context.drawImage(this.shadowImage,
+        object.position.x + object.width / 2 - this.shadowImage.width / 2,
+        object.position.y + object.height - this.shadowImage.height / 2);
+
+      context.restore();
+      //drawShadow(context, object, this.projectile.modelDimensions, this.projectile.shadowColor);
+    }
 
     context.save();
     

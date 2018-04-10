@@ -154,7 +154,7 @@ export default {
     ],
     interior: {
       dimensions: {
-        width: 194,
+        width: 198,
         height: 226,
         zheight: 0
       },
@@ -162,7 +162,7 @@ export default {
       imageDimensions: {
         x: 196,
         y: 0,
-        width: 194,
+        width: 198,
         height: 226
       },
       bounds: [

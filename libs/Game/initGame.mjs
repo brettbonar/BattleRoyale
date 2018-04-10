@@ -282,7 +282,7 @@ function initGame(players, maps) {
   // gameObjects.push(new StaticObject({
   //   objectType: "forestTree",
   //   position: {
-  //     x: 500,
+  //     x: 600,
   //     y: 250
   //   },
   //   simulation: true
@@ -360,12 +360,12 @@ function initGame(players, maps) {
   // ));
 
 
-  gameObjects = gameObjects.concat(scenes.house.getObjects(
-    {
-      x: 300,
-      y: 300
-    }
-  ));
+  // gameObjects = gameObjects.concat(scenes.house.getObjects(
+  //   {
+  //     x: 300,
+  //     y: 300
+  //   }
+  // ));
 
   addScenes(maps);
   //gameObjects = gameObjects.concat(addScenes(maps));

@@ -59,6 +59,7 @@ export default class Projectile extends GameObject {
     }
 
     this.rotation = Math.atan2(this.direction.y - this.direction.z, this.direction.x ) * 180 / Math.PI;
+    this.groundRotation = Math.atan2(this.direction.y, this.direction.x ) * 180 / Math.PI;
   }
 
   get distanceTravelled() {
@@ -186,7 +187,8 @@ export default class Projectile extends GameObject {
     }
 
     this.rotation = Math.atan2(this.direction.y - this.direction.z, this.direction.x ) * 180 / Math.PI;
-
+    this.groundRotation = Math.atan2(this.direction.y, this.direction.x ) * 180 / Math.PI;
+    
     this.renderer.update(elapsedTime + this.elapsedTime);
 
     if (!this.done && this.effect.doTriggerCollision && this.effect.doTriggerCollision(this)) {

@@ -260,6 +260,7 @@ export default class CharacterRenderer {
     this.currentAnimationTime = 0;
     this.framesPerSec = 0;
     this.initBody(params);
+    this.shadowImage = ImageCache.get("/Assets/shadows/shadow24.png");
   }
 
   initBody(params) {
@@ -328,13 +329,16 @@ export default class CharacterRenderer {
   }
 
   render(context, object, elapsedTime, center) {
-    if (!this.body.complete) return;
+    if (!this.body.complete || !this.shadowImage.complete) return;
 
     let offset = getOffset(this.animation, this.frame, imageSize);
 
     //if (object.position.z > 0) {
       //drawShadow(context, object, object.modelDimensions);
     //}
+    context.drawImage(this.shadowImage,
+      object.position.x + object.width / 2 - this.shadowImage.width / 2,
+      object.position.y + object.height - this.shadowImage.height / 2 - 5);
 
     context.drawImage(this.body, offset.x, offset.y, imageSize, imageSize,
       object.position.x, object.position.y - object.position.z, imageSize, imageSize);
