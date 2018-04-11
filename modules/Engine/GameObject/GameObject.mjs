@@ -388,6 +388,13 @@ export default class GameObject extends GameObjectProxy {
     return this.boundingBox;
   }
 
+  get visibleBounds() {
+    if (this.visibleDimensions) {
+      return this.getBoundsFromDimens(this.position, this.visibleDimensions);
+    }
+    return this.modelBounds;
+  }
+
   get modelBounds() {
     let position = this.position.copy();
     position.y -= position.z;

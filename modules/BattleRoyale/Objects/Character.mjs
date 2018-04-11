@@ -1,5 +1,6 @@
 import GameObject from "../../Engine/GameObject/GameObject.mjs"
 import Vec3 from "../../Engine/GameObject/Vec3.mjs"
+import Bounds from "../../Engine/GameObject/Bounds.mjs"
 import Dimensions from "../../Engine/GameObject/Dimensions.mjs"
 import CharacterRenderer, { STATE } from "../Renderers/CharacterRenderer.mjs"
 import { SURFACE_TYPE } from "../../Engine/Physics/PhysicsConstants.mjs"
@@ -81,6 +82,9 @@ export default class Character extends GameObject {
       ];
     }
 
+    // Dimensions indicating what part of the character is visible. Used for FOV checks.
+    this.visibleDimensions = params.visibleDimensions || this.collisionDimensions;
+
     if (!params.attackOrigin) {
       this.attackOrigin = {
         offset: new Vec3(this.collisionDimensions[0].offset).plus({
@@ -121,6 +125,21 @@ export default class Character extends GameObject {
       range: 1100,
       angle: 90
     };
+  }
+
+  // TODO: should probably put somewhere else, but could be adjusted for each character
+  // Also don't hard code the numbers
+  get viewBounds() {
+    return new Bounds({
+      position: this.center.minus({
+        x: 2048,
+        y: 1200
+      }),
+      dimensions: {
+        width: 4096,
+        height: 2400
+      }
+    });
   }
 
   isWeapon(item) {
@@ -430,8 +449,12 @@ export default class Character extends GameObject {
       // if (this.currentAction) {
       //   this.currentAction.currentTime = 0;
       // }
-      this.actionStack.unshift(state.latestAction);
-      this.startAction(state.latestAction);
+
+      // TODO: set a timeout for the current action in case the player really shouldn't be able to do it
+      if (!this.isThisPlayer) {
+        this.actionStack.unshift(state.latestAction);
+        this.startAction(state.latestAction);
+      }
     } else if (!state.latestAction) {
       this.actionStack.length = 0;
     }

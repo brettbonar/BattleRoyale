@@ -81,6 +81,8 @@ export default class BattleRoyaleClient extends BattleRoyale {
     };
 
     this.interface = new BattleRoyaleInterface();
+    this.pendingCollisions = [];
+    this.pendingRemoves = [];
 
     //this.addEventHandler(Game.EVENT.PAUSE, () => this.pause());
     this.keyBindings[KEY_CODE.W] = EVENTS.MOVE_UP;
@@ -240,9 +242,12 @@ export default class BattleRoyaleClient extends BattleRoyale {
           //}
           this.clearAndApplyUpdates(object);
         } else {
-          let obj = this.createObject(object);
-          obj.elapsedTime = (now - update.time) - elapsedTime;
-          this.addObject(obj);
+          // Don't recreate an object that has been removed
+          if (!this.pendingRemoves.includes(object.objectId)) {
+            let obj = this.createObject(object);
+            obj.elapsedTime = (now - update.time) - elapsedTime;
+            this.addObject(obj);
+          }
         }
       }
     }
@@ -252,26 +257,33 @@ export default class BattleRoyaleClient extends BattleRoyale {
 
   onCollisions(collisions) {
     for (const collision of collisions) {
-      this.handleCollision({
-        source: this.getObject(collision.sourceId),
-        target: this.getObject(collision.targetId),
-        position: new Vec3(collision.position),
-        sourceBounds: collision.sourceBounds
+
+      let pending = this.pendingCollisions.find((col) => {
+        return col.source.objectId === collision.sourceId && col.target.objectId === collision.targetId;
       });
+      if (pending) {
+        _.pull(this.pendingCollisions, pending);
+      } else {
+        this.handleCollision({
+          source: this.getObject(collision.sourceId),
+          target: this.getObject(collision.targetId),
+          position: new Vec3(collision.position),
+          sourceBounds: collision.sourceBounds
+        }, true);
+      }
     }
   }
 
-  handleCollision(collision) {
+  handleCollision(collision, fromServer) {
     if (collision.source && 
         (collision.source.physics.surfaceType === SURFACE_TYPE.PROJECTILE ||
         collision.source.physics.surfaceType === SURFACE_TYPE.GAS)) {
-
       // Don't let stream weapons interact with themselves
       if (collision.target && collision.source.actionId === collision.target.actionId && collision.source.effect.path === "stream") {
         return;
       }
 
-      if (collision.target && collision.target.damagedEffect) {
+      if (collision.target && collision.target.damagedEffect && collision.source.effect.triggerDamagedEffect) {
         this.particleEngine.addEffect(new AnimationEffect({
           position: {
             x: collision.target.center.x,
@@ -283,7 +295,7 @@ export default class BattleRoyaleClient extends BattleRoyale {
       if (collision.source.rendering.hitEffect && !collision.source.collided) {
         collision.source.collided = true;
         if (collision.source.effect.path !== "beam") {
-          collision.source.hidden = true;
+          collision.source.done = true;
         }
 
         if (collision.source.rendering.hitEffect.particleEffect) {
@@ -305,6 +317,10 @@ export default class BattleRoyaleClient extends BattleRoyale {
           }, collision.source.rendering.hitEffect));
         }
       }
+
+      if (!fromServer) {
+        this.pendingCollisions.push(collision);
+      }
     }
   }
 
@@ -322,6 +338,7 @@ export default class BattleRoyaleClient extends BattleRoyale {
       if (objects.includes(obj.objectId)) {
         this.removeObject(obj);
       }
+      _.pull(this.pendingRemoves, obj.objectId);
     }
   }
 

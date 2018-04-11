@@ -3,7 +3,7 @@ import ProjectileRenderer from "../Renderers/ProjectileRenderer.mjs"
 import attacks from "../Magic/attacks.mjs"
 import Vec3 from "../../Engine/GameObject/Vec3.mjs"
 import Dimensions from "../../Engine/GameObject/Dimensions.mjs"
-import { getDistance } from "../../Engine/util.mjs"
+import { getDistance, getRotatedEndpoint } from "../../Engine/util.mjs"
 import { getRangeMap, smoothStop } from "../../Engine/Math.mjs"
 import BeamRenderer from "../Renderers/BeamRenderer.mjs"
 
@@ -202,12 +202,12 @@ export default class Projectile extends GameObject {
   }
 
   updateState(state) {
-    //let oldPos = new Vec3(this.position);
     _.merge(this, _.omit(state, "position"));
-    // this.position = new Vec3(this.position);
-    // if (!this.position.equals(oldPos)) {
-    //   this.position = oldPos.plus(this.position.minus(oldPos).times(0.1));
-    // }
+
+    // TODO: smarter interpolation
+    if (this.position.distanceTo(state.position) > 50) {
+      this.position = new Vec3(state.position);
+    }
   }
 
   getUpdateState() {
@@ -227,13 +227,21 @@ export default class Projectile extends GameObject {
   }
   
   static getAttackDirection(source, attack, origin) {
-    let direction = source.state.target.minus(origin || source.attackCenter);
+    let target = source.state.target;
+
+    if (attack.effect.spread) {
+      target = new Vec3(getRotatedEndpoint(origin || source.attackCenter, source.state.target,
+        _.random(-attack.effect.spread / 2, attack.effect.spread / 2)));
+    }
+
+    let direction = target.minus(origin || source.attackCenter);
     //if (attack.effect.path !== "arc") {
     direction.y -= direction.z;
     //}
     direction.z = 0;
-    direction.normalize();
-    return direction;
+
+
+    return direction.normalize();
   }
 
   static getAttackOrigin(source, attack, direction) {

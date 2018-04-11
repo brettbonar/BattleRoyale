@@ -212,11 +212,12 @@ function initGame(players, maps) {
         z: 0
       }
     });
-    // char.state.inventory.push("bow");
-    // char.state.inventory.push("lightStaffMale");
-    // char.state.inventory.push("fireStaffMale");
+    char.state.inventory.push("bow");
+    char.state.inventory.push("lightStaffMale");
+    char.state.inventory.push("fireStaffMale");
     char.state.inventory.push("staffMale");
     gameObjects.push(char);
+    player.character = char;
     pos += 100;
   }
 

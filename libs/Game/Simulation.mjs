@@ -39,7 +39,7 @@ export default class Simulation {
         height: 2048
       },
       maps: maps,
-      objects: initGame(params.players, maps)
+      objects: initGame(this.players, maps)
     });
     this.lastState = [];
     this.lastObjects = [];
@@ -71,6 +71,17 @@ export default class Simulation {
   getMaps() { return this.game.maps }
   getObjects() { return this.game.gameState.objects.map((obj) => obj.getUpdateState()) }
 
+  getPlayerViewObjects(player) {
+    //return _.intersectionBy(this.lastState, this.game.grid.getRenderObjects(player.character.viewBounds), "objectId");
+    return this.lastState;
+  }
+
+  getPlayerViewCollisions(player) {
+    // let viewBounds = player.character.viewBounds;
+    // return this.lastCollisions.filter((collision) => viewBounds.intersects(collision.position));
+    return this.lastCollisions;
+  }
+
   update() {
     let currentTime = now();
     let elapsedTime = currentTime - this.previousTime;
@@ -81,20 +92,24 @@ export default class Simulation {
 
     if (this.lastState.length > 0) {
       for (const player of this.players) {
-        player.socket.emit("update", { elapsedTime: this.lastElapsedTime, objects: this.lastState });
+        player.socket.emit("update", {
+          elapsedTime: this.lastElapsedTime,
+          objects: this.getPlayerViewObjects(player)
+        });
       }
       this.lastState.length = 0;
     }
 
     if (this.lastCollisions.length > 0) {
       for (const player of this.players) {
-        player.socket.emit("collision", this.lastCollisions.map(this.getCollision));
+        player.socket.emit("collision", this.getPlayerViewCollisions(player));
       }
       this.lastCollisions.length = 0;
     }
 
     if (this.removedObjects.length > 0) {
       for (const player of this.players) {
+        // TODO: also filter this by player position - do when it is removed?
         player.socket.emit("remove", this.removedObjects);
       }
       this.removedObjects.length = 0;
@@ -104,9 +119,8 @@ export default class Simulation {
     this.removedObjects = _.difference(this.lastObjects, this.game.gameState.objects)
       .map((obj) => obj.objectId);
     this.lastObjects = this.game.gameState.objects.slice();
-    this.lastCollisions = this.game.collisions;
+    this.lastCollisions = this.game.collisions.map(this.getCollision);
     
-    // TODO: do for each player
     this.lastState = this.game.gameState.objects
       .filter((obj) => obj._modified)
       .map(obj => {

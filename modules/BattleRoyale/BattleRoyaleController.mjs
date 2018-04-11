@@ -19,21 +19,28 @@ export default class BattleRoyaleController extends GameController {
 
     //initialize();
 
+
+    this.initializedDeferred = Q.defer();
+    this.initialized = this.initializedDeferred.promise;
+
     // TODO: put asset initialization in a function somewhere else
-    ImageCache.put("/Assets/terrain_atlas.png");
+    let imagePromises = [];
+    imagePromises.push(ImageCache.put("/Assets/terrain_atlas.png"));
 
     _.each(objects, (obj) => {
       if (obj.imageSource) {
-        ImageCache.put(obj.imageSource);
+        imagePromises.push(ImageCache.put(obj.imageSource));
       } else if (obj.images) {
-        _.each(obj.images, (image) => ImageCache.put(image.imageSource));
+        _.each(obj.images, (image) => imagePromises.push(ImageCache.put(image.imageSource)));
       }
     });
 
     _.each(buildings, (obj) => {
-      ImageCache.put(obj.exterior.imageSource);
-      ImageCache.put(obj.interior.imageSource);
+      imagePromises.push(ImageCache.put(obj.exterior.imageSource));
+      imagePromises.push(ImageCache.put(obj.interior.imageSource));
     });
+
+    Q.all(imagePromises).then(this.initializedDeferred.resolve());
   }
 
   showCharacterCreation() {
@@ -99,7 +106,7 @@ export default class BattleRoyaleController extends GameController {
           quadTrees: quadTrees
         });
         this.game.updateObjects({ objects: objectsData[0], elapsedTime: 0 });
-        this.socket.emit("initialized", "initialized");
+        this.initialized.then(() => this.socket.emit("initialized", "initialized"));
 
         this.socket.on("start", (data) => {
           console.log("Starting");

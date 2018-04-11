@@ -6,8 +6,11 @@ Graphics.ImageCache = (function () {
 
     put(key, src) {
       if (!this.images[key]) {
+        let deferred = Q.defer();
         this.images[key] = new Image();
         this.images[key].src = src;
+        this.images[key].onload = () => deferred.resolve();
+        return deferred.promise;
       }
     }
 

@@ -165,21 +165,26 @@ export default class BattleRoyale extends Game {
   handleCollision(collision) {}
 
   _update(elapsedTime) {
-    for (const obj of this.gameState.objects) {
-      //obj.elapsedTime = 0;
-      if (obj.done && (this.simulation || obj.type === "RenderObject")) {
-        this.removeObject(obj);
-      }
-    }
+    // for (const obj of this.gameState.objects) {
+    //   //obj.elapsedTime = 0;
+    //   if (obj.done && (this.simulation || obj.type === "RenderObject")) {
+    //     this.removeObject(obj);
+    //   }
+    // }
 
     // TODO: move above physics?
     let updates = [];
-    for (const obj of this.getPhysicsObjects()) {
+    for (const obj of this.gameState.objects) {
       //obj.elapsedTime = 0;
       // TODO: fix this hack
       // TODO: remove objects outside of game bounds
-      if (obj.done && (this.simulation || obj.type === "RenderObject")) {
+      if (obj.done) {
         this.removeObject(obj);
+
+        // TODO: remove this hack
+        if (!this.simulation) {
+          this.pendingRemoves.push(obj.objectId);
+        }
       } else {
         let update = obj.update(elapsedTime);
         if (!obj.position.equals(obj.lastPosition)) {

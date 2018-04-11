@@ -1,6 +1,8 @@
 
 import Vec3 from "./GameObject/Vec3.mjs"
 
+const DEG_TO_RAD = Math.PI / 180;
+
 function getDistance(a, b) {
   let dx = a.x - b.x;
   let dy = a.y - b.y;
@@ -52,4 +54,43 @@ function getLineIntersection(line1, line2) {
   return false;
 }
 
-export { getDistance, normalize, getLineIntersection }
+function getRotatedEndpointRad(start, end, rotation, range) {
+  let angle = Math.cos(rotation);
+  let sinAngle = Math.sin(rotation);
+
+  let endpoint = normalize({
+    x: (end.x - start.x) * angle - (end.y - start.y) * sinAngle,
+    y: (end.x - start.x) * sinAngle + (end.y - start.y) * angle
+  });
+
+  if (!range) {
+    range = getDistance(start, end);
+  }
+
+  return {
+    x: start.x + endpoint.x * range,
+    y: start.y + endpoint.y * range
+  };
+}
+
+function getRotatedEndpoint(start, end, rotation, range) {
+  return getRotatedEndpointRad(start, end, rotation * DEG_TO_RAD, range);
+}
+
+function boundsIntersectsBounds(first, second) {
+  return first.some((firstBounds) => second.some((secondBounds) => firstBounds.intersects(secondBounds)));
+}
+
+function boundsIntersectsBounds2D(first, second) {
+  return first.some((firstBounds) => second.some((secondBounds) => firstBounds.intersects2D(secondBounds)));  
+}
+
+export {
+  getDistance,
+  normalize,
+  getLineIntersection,
+  getRotatedEndpoint,
+  boundsIntersectsBounds,
+  boundsIntersectsBounds2D,
+  DEG_TO_RAD
+}

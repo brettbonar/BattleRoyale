@@ -1,7 +1,7 @@
 import Vec3 from "./GameObject/Vec3.mjs"
 import Bounds from "./GameObject/Bounds.mjs"
 import ImageCache from "./Rendering/ImageCache.mjs"
-import { getLineIntersection, normalize } from "./util.mjs"
+import { getLineIntersection, normalize, getRotatedEndpoint, boundsIntersectsBounds2D } from "./util.mjs"
 
 const DEG_TO_RAD = Math.PI / 180;
 const X_AXIS = 0;
@@ -111,7 +111,7 @@ export default class FieldOfView {
 
         if (ray1.distance <= fov.range + 10) {
           if (i === 0) {
-            let leftEndpoint = this.getRotatedRayEndpoint(fov.center, points[i], -0.01, fov.range);
+            let leftEndpoint = getRotatedEndpoint(fov.center, points[i], -0.01, fov.range);
             //let leftEndpoint = this.getExtendedEndpoint(fov.center, points[i], fov.range);
             let leftRay = this.getRay(rays, fov, coneVector, leftEndpoint);
             leftRay.angle = ray1.angle;
@@ -131,7 +131,7 @@ export default class FieldOfView {
           rays.push(ray2);
 
           if (i === points.length - 2) {
-            let rightEndpoint = this.getRotatedRayEndpoint(fov.center, points[i + 1], 0.01, fov.range);
+            let rightEndpoint = getRotatedEndpoint(fov.center, points[i + 1], 0.01, fov.range);
             //let rightEndpoint = this.getExtendedEndpoint(fov.center, points[i + 1], fov.range);
             let rightRay = this.getRay(rays, fov, coneVector, rightEndpoint);
             rightRay.angle = ray2.angle;
@@ -150,43 +150,24 @@ export default class FieldOfView {
     }
   }
 
-  getRotatedRayEndpointRad(start, end, rotation, range) {
-    let angle = Math.cos(rotation);
-    let sinAngle = Math.sin(rotation);
-
-    let endpoint = normalize({
-      x: (end.x - start.x) * angle - (end.y - start.y) * sinAngle,
-      y: (end.x - start.x) * sinAngle + (end.y - start.y) * angle
-    });
-
-    return {
-      x: start.x + endpoint.x * range,
-      y: start.y + endpoint.y * range
-    };
-  }
-
-  getRotatedRayEndpoint(start, end, rotation, range) {
-    return this.getRotatedRayEndpointRad(start, end, rotation * DEG_TO_RAD, range);
-  }
-
   getRays(objects, fov, coneVector) {
     let rays = [];
     let walls = [];
     let fovAngle = (fov.angle / 2) * DEG_TO_RAD;
 
     // https://stackoverflow.com/questions/4780119/2d-euclidean-vector-rotations
-    let leftEnd = this.getRotatedRayEndpoint(fov.center, fov.target, -(fov.angle / 2), fov.range);
+    let leftEnd = getRotatedEndpoint(fov.center, fov.target, -(fov.angle / 2), fov.range);
     rays.push(this.getRay(rays, fov, coneVector, leftEnd));
 
     if (fov.angle < FULL_FOV) {
-      let rightEnd = this.getRotatedRayEndpoint(fov.center, fov.target, fov.angle / 2, fov.range);
+      let rightEnd = getRotatedEndpoint(fov.center, fov.target, fov.angle / 2, fov.range);
       rays.push(this.getRay(rays, fov, coneVector, rightEnd));
     }
     
     let startAngle = -fov.angle / 2 + SPREAD_ANGLE;
     let endAngle = fov.angle / 2 - SPREAD_ANGLE;
     for (let angle = startAngle; angle <= endAngle; angle += SPREAD_ANGLE) {
-      let end = this.getRotatedRayEndpoint(fov.center, fov.target, angle, fov.range);
+      let end = getRotatedEndpoint(fov.center, fov.target, angle, fov.range);
       rays.push(this.getRay(rays, fov, coneVector, end));
     }
 
@@ -367,7 +348,7 @@ export default class FieldOfView {
       //     let angle = spread / newRays;
       //     if (newRays > 0) {
       //       for (let j = 0; j < newRays; j++) {
-      //         let end = this.getRotatedRayEndpointRad(ray.line[0], ray.line[1], angle + angle * j, fov.range);
+      //         let end = getRotatedEndpointRad(ray.line[0], ray.line[1], angle + angle * j, fov.range);
       //         rays.rays.splice(i + j, 0, this.getRay(rays, fov, coneVector, end));
       //       }
       //     }
@@ -406,8 +387,8 @@ export default class FieldOfView {
   isInView(object, losHiddenObjs) {
     // TODO: test if object is owned by player instead of if is player
     if (object.losHidden) {
-      let objBounds = object.modelBounds;
-      if (object.isThisPlayer || this.fovBounds.some((bounds) => bounds.intersects2D(objBounds))) {
+      let objBounds = object.visibleBounds;
+      if (object.isThisPlayer || boundsIntersectsBounds2D(this.fovBounds, objBounds)) {
         losHiddenObjs.push(object);
         return true;
       }

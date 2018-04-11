@@ -57,7 +57,7 @@ export default {
     // TODO: spread: angle of direction
   },
   light: {
-    initialCount: 10,
+    initialCount: 15,
     radius: 10,
     duration: 0,
     particles: {
@@ -71,7 +71,7 @@ export default {
       //speed: 20,
       zspeed: 20,
       minDuration: 1000,
-      maxDuration: 3000,
+      maxDuration: 2000,
       //duration: 2000,
       acceleration: {
         z: -1

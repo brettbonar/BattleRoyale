@@ -2,7 +2,7 @@
 export default {
   magicBall: {
     rendering: {
-      imageSource: "../../Assets/magic/magic-ball.png",
+      imageSource: "/Assets/magic/magic-ball.png",
       dimensions: {
         width: 32,
         height: 32
@@ -42,7 +42,7 @@ export default {
       },
     },
     rendering: {
-      imageSource: "../../Assets/projectiles/boulder2.png",
+      imageSource: "/Assets/projectiles/boulder2.png",
       dimensions: {
         width: 32,
         height: 32
@@ -106,7 +106,7 @@ export default {
     },
     rendering: {
       start: {
-        imageSource: "../../Assets/projectiles/lightBeamStart.png",
+        imageSource: "/Assets/projectiles/lightBeamStart.png",
         dimensions: {
           width: 32,
           height: 32
@@ -122,7 +122,7 @@ export default {
         // },
       },
       end: {
-        imageSource: "../../Assets/projectiles/lightBeamEnd.png",
+        imageSource: "/Assets/projectiles/lightBeamEnd.png",
         dimensions: {
           width: 32,
           height: 32
@@ -201,7 +201,7 @@ export default {
       manaCostPerSec: 0
     },
     rendering: {
-      imageSource: "../../Assets/projectiles/lightMote.png",
+      imageSource: "/Assets/projectiles/lightMote.png",
       dimensions: {
         width: 32,
         height: 32
@@ -269,7 +269,7 @@ export default {
       manaCost: 0
     },
     rendering: {
-      imageSource: "../../Assets/projectiles/Arrow2.png",
+      imageSource: "/Assets/projectiles/Arrow2.png",
       dimensions: {
         width: 32,
         height: 32
@@ -288,7 +288,7 @@ export default {
         }
       },
       hitEffect: {
-        imageSource: "../../Assets/projectiles/Arrow2.png",
+        imageSource: "/Assets/projectiles/Arrow2.png",
         imageDimensions: {
           width: 24,
           height: 32,
@@ -306,6 +306,7 @@ export default {
     effect: {
       path: "arc",
       damage: 5,
+      triggerDamagedEffect: true,
       // TODO: more shapes
       collisionDimensions: [{
         offset: {
@@ -335,7 +336,7 @@ export default {
       manaCost: 0
     },
     rendering: {
-      imageSource: "../../Assets/magic/plasmaball.png",
+      imageSource: "/Assets/magic/plasmaball.png",
       dimensions: {
         width: 32,
         height: 32
@@ -354,7 +355,7 @@ export default {
         }
       },
       hitEffect: {
-        imageSource: "../../Assets/magic/plasmaBallHit.png",
+        imageSource: "/Assets/magic/plasmaBallHit.png",
         dimensions: {
           width: 32,
           height: 32
@@ -402,12 +403,19 @@ export default {
     type: "projectile",
     name: "flamethrower",
     rendering: {
-      imageSource: "../../Assets/projectiles/flame.png",
+      imageSource: "/Assets/projectiles/flame.png",
       dimensions: {
         width: 64,
-        height: 48
+        height: 32
       },
-      shadow: false
+      frames: 4,
+      framesPerSec: 8,
+      repeat: true,
+      // dimensions: {
+      //   width: 64,
+      //   height: 32
+      // },
+      // shadow: false
     },
     action: {
       name: "flamethrower",
@@ -433,6 +441,7 @@ export default {
         }
       }],
       range: 220,
+      spread: 15,
       attackTime: 1000,
       automatic: true,
       punchThrough: false,
@@ -457,7 +466,7 @@ export default {
       },
     },
     rendering: {
-      imageSource: "../../Assets/magic/flare.png",
+      imageSource: "/Assets/magic/flare.png",
       dimensions: {
         width: 32,
         height: 32
