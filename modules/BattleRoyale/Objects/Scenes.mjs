@@ -8,8 +8,8 @@ scenes.plainTree = {
   biomes: ["plain"],
   type: "tree",
   size: {
-    width: 96,
-    height: 44
+    width: 200,
+    height: 200
   },
   weight: 25,
   getObjects: function (position, dimensions) {

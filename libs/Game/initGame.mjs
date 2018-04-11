@@ -236,48 +236,48 @@ function initGame(players, maps) {
   //   itemType: "healthPotion",
   //   simulation: true
   // }));
-  gameObjects.push(new Item({
-    position: {
-      x: 265,
-      y: 305
-    },
-    itemType: "fireStaffMale",
-    simulation: true
-  }));
-  gameObjects.push(new Item({
-    position: {
-      x: 235,
-      y: 305
-    },
-    itemType: "lightStaffMale",
-    simulation: true
-  }));
-  gameObjects.push(new Item({
-    position: {
-      x: 295,
-      y: 305
-    },
-    itemType: "bow",
-    simulation: true
-  }));
+  // gameObjects.push(new Item({
+  //   position: {
+  //     x: 265,
+  //     y: 305
+  //   },
+  //   itemType: "fireStaffMale",
+  //   simulation: true
+  // }));
+  // gameObjects.push(new Item({
+  //   position: {
+  //     x: 235,
+  //     y: 305
+  //   },
+  //   itemType: "lightStaffMale",
+  //   simulation: true
+  // }));
+  // gameObjects.push(new Item({
+  //   position: {
+  //     x: 295,
+  //     y: 305
+  //   },
+  //   itemType: "bow",
+  //   simulation: true
+  // }));
 
-  gameObjects.push(new StaticObject({
-    objectType: "plainTree",
-    position: {
-      x: 500,
-      y: 250
-    },
-    simulation: true
-  }));
+  // gameObjects.push(new StaticObject({
+  //   objectType: "plainTree",
+  //   position: {
+  //     x: 500,
+  //     y: 250
+  //   },
+  //   simulation: true
+  // }));
 
-  gameObjects.push(new StaticObject({
-    objectType: "forestTree",
-    position: {
-      x: 600,
-      y: 250
-    },
-    simulation: true
-  }));
+  // gameObjects.push(new StaticObject({
+  //   objectType: "forestTree",
+  //   position: {
+  //     x: 600,
+  //     y: 250
+  //   },
+  //   simulation: true
+  // }));
 
   // for (let i = 0; i < 10; i++) {
   //   //let type = _.sample(_.filter(objects, { biome: "plain" }));
@@ -344,14 +344,14 @@ function initGame(players, maps) {
   // ));
 
 
-  gameObjects = gameObjects.concat(scenes.house.getObjects(
-    {
-      x: 300,
-      y: 300
-    }
-  ));
+  // gameObjects = gameObjects.concat(scenes.house.getObjects(
+  //   {
+  //     x: 300,
+  //     y: 300
+  //   }
+  // ));
 
-  //addScenes(maps);
+  addScenes(maps);
   //gameObjects = gameObjects.concat(addScenes(maps));
 
   return gameObjects;
