@@ -120,7 +120,7 @@ export default class Character extends GameObject {
       }),
       target: this.state.target,
       range: 1100,
-      angle: 90
+      angle: 360
     };
   }
 

@@ -7,12 +7,15 @@ const DEG_TO_RAD = Math.PI / 180;
 const X_AXIS = 0;
 const Y_AXIS = 1;
 const SPREAD_ANGLE = 5;
+const HALF_FOV = 180;
+const FULL_FOV = 360;
 
 export default class FieldOfView {
   constructor(fov, objects) {
     this.fov = fov;
     this.fovBounds = this.getFovBounds(objects, fov);
     this.fovImage = ImageCache.get("/Assets/fov.png");
+    this.fullFov = false;
   }
   
   render(context) {
@@ -36,7 +39,14 @@ export default class FieldOfView {
     for (const triangle of this.fovBounds) {
       context.lineTo(triangle.points[2].x, triangle.points[2].y);
     }
+    // Make sure we close the circle if FOV is 360
+    if (this.fov.angle >= FULL_FOV) {
+      context.lineTo(this.fovBounds[0].points[2].x, this.fovBounds[0].points[2].y);
+    }
     context.lineTo(this.fovBounds[0].points[0].x, this.fovBounds[0].points[0].y);
+
+    
+    context.closePath();
     context.clip();
 
     context.drawImage(this.fovImage, position.x, position.y, dimensions.width, dimensions.height);
@@ -91,7 +101,7 @@ export default class FieldOfView {
     return ray;
   }
 
-  addWallFromPoints(rays, walls, fov, fovAngle, maxAngle, coneVector, points) {
+  addWallFromPoints(rays, walls, fov, fovAngle, coneVector, points) {
     let wallRays = [];
     for (let i = 0; i < points.length - 1; i++) {
       // Don't add rays that are outside of field of view
@@ -134,8 +144,8 @@ export default class FieldOfView {
       walls.push({
         rays: wallRays,
         line: [points[i], points[i + 1]],
-        startAngle: Math.min(ray1.angle, ray2.angle),
-        endAngle: Math.max(ray1.angle, ray2.angle)
+        startAngle: ray1.angle,
+        endAngle: ray2.angle
       });
     }
   }
@@ -163,15 +173,19 @@ export default class FieldOfView {
     let rays = [];
     let walls = [];
     let fovAngle = (fov.angle / 2) * DEG_TO_RAD;
-    let maxAngle = 90 * DEG_TO_RAD;
 
     // https://stackoverflow.com/questions/4780119/2d-euclidean-vector-rotations
     let leftEnd = this.getRotatedRayEndpoint(fov.center, fov.target, -(fov.angle / 2), fov.range);
-    let rightEnd = this.getRotatedRayEndpoint(fov.center, fov.target, fov.angle / 2, fov.range);
     rays.push(this.getRay(rays, fov, coneVector, leftEnd));
-    rays.push(this.getRay(rays, fov, coneVector, rightEnd));
 
-    for (let angle = -fov.angle + SPREAD_ANGLE; angle <= fov.angle - SPREAD_ANGLE; angle += SPREAD_ANGLE) {
+    if (fov.angle < FULL_FOV) {
+      let rightEnd = this.getRotatedRayEndpoint(fov.center, fov.target, fov.angle / 2, fov.range);
+      rays.push(this.getRay(rays, fov, coneVector, rightEnd));
+    }
+    
+    let startAngle = -fov.angle / 2 + SPREAD_ANGLE;
+    let endAngle = fov.angle / 2 - SPREAD_ANGLE;
+    for (let angle = startAngle; angle <= endAngle; angle += SPREAD_ANGLE) {
       let end = this.getRotatedRayEndpoint(fov.center, fov.target, angle, fov.range);
       rays.push(this.getRay(rays, fov, coneVector, end));
     }
@@ -182,6 +196,9 @@ export default class FieldOfView {
       if (!losBounds) continue;
       for (const bounds of losBounds) {
         if (bounds.points.every((point) => point.relativeDistanceTo(fov.center) > relativeRange)) {
+          continue;
+        }
+        if (bounds.top.z < fov.center.z) {
           continue;
         }
 
@@ -215,7 +232,7 @@ export default class FieldOfView {
         }
 
         if (points.length > 0) {
-          this.addWallFromPoints(rays, walls, fov, fovAngle, maxAngle, coneVector, points);
+          this.addWallFromPoints(rays, walls, fov, fovAngle, coneVector, points);
         }
       }
     }
@@ -238,26 +255,38 @@ export default class FieldOfView {
     let startIdx = rays.rays.indexOf(start);
     let endIdx = rays.rays.indexOf(end);
     let sortedRays = rays.rays;
-    sortedRays = rays.rays.slice(startIdx, endIdx + 1);
-    if (endIdx < startIdx) {
-      sortedRays = sortedRays.concat(rays.rays.slice(0, endIdx + 1));
+    
+    let fullFov = fov.angle >= FULL_FOV;
+    let halfFov = fov.angle >= HALF_FOV;
+    if (!fullFov) {
+      sortedRays = rays.rays.slice(startIdx, endIdx + 1);
+      if (endIdx < startIdx) {
+        sortedRays = sortedRays.concat(rays.rays.slice(0, endIdx + 1));
+      }
     }
     rays.rays = sortedRays;
 
     let wallIdx = 0;
     let nearWalls = [];
+    if (halfFov) {
+      nearWalls = rays.walls;
+    }
     for (const ray of sortedRays) {
       let newEndpoints = [];
-      // Add all walls to near walls list that start before the ray
-      while (wallIdx < rays.walls.length && rays.walls[wallIdx].startAngle <= ray.angle) {
-        if (rays.walls[wallIdx].endAngle >= ray.angle) {
-          nearWalls.push(rays.walls[wallIdx]);
+
+      // TRICKY: this optimization fails if FOV is > 180 and due to angles wrapping from
+      // -3.14 to 3.14. Should find a way around this.
+      if (!halfFov) {
+        // Add all walls to near walls list that start before the ray
+        while (wallIdx < rays.walls.length && rays.walls[wallIdx].startAngle <= ray.angle) {
+          if (rays.walls[wallIdx].endAngle >= ray.angle) {
+            nearWalls.push(rays.walls[wallIdx]);
+          }
+          wallIdx++;
         }
-        wallIdx++;
+        // Remove any walls that have gone out of range
+        _.remove(nearWalls, (wall) => wall.endAngle < ray.angle);
       }
-      
-      // Remove any walls that have gone out of range
-      _.remove(nearWalls, (wall) => wall.endAngle < ray.angle);
 
       for (const wall of nearWalls) {
         if (!wall.rays.includes(ray)) {
@@ -353,8 +382,19 @@ export default class FieldOfView {
             fov.center,
             rays.rays[i].line[1],
             rays.rays[i + 1].line[1]
-            // this.getRotatedRayEndpoint(fov.center, rays.rays[i].line[1], -0.1, rays.rays[i].distance),
-            // this.getRotatedRayEndpoint(fov.center, rays.rays[i + 1].line[1], 0.1, rays.rays[i + 1].distance)            
+          ]
+        }
+      }));
+    }
+
+    // Come full circle
+    if (fov.angle >= FULL_FOV) {
+      bounds.push(new Bounds({
+        dimensions: {
+          triangle: [
+            fov.center,
+            rays.rays[rays.rays.length - 1].line[1],
+            rays.rays[0].line[1]
           ]
         }
       }));
@@ -365,9 +405,9 @@ export default class FieldOfView {
 
   isInView(object, losHiddenObjs) {
     // TODO: test if object is owned by player instead of if is player
-    if (object.losHidden) {
+    if (object.losHidden && !object.isThisPlayer) {
       let objBounds = object.modelBounds;
-      if (this.fovBounds.some((bounds) => bounds.intersects(objBounds))) {
+      if (this.fovBounds.some((bounds) => bounds.intersects2D(objBounds))) {
         losHiddenObjs.push(object);
         return true;
       }

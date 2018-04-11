@@ -40,14 +40,16 @@ export default class Bounds {
 
   static get TYPE() { return TYPE; }
 
-  static intersectsLine(first, second) {
+  static intersectsLine(first, second, check2D) {
     //if (_.isNumber(first.z) && _.isNumber(second.z) && Math.floor(first.z) !== Math.floor(second.z)) return;
-    let firstZMin = Math.min(first[0].z, first[1].z);
-    let firstZMax = Math.max(first[0].z, first[1].z);
-    let secondZMin = Math.min(second[0].z, second[1].z);
-    let secondZMax = Math.max(second[0].z, second[1].z);
-    // Simple inaccurate check to see if Z axis of lines every intersect
-    if (!Bounds.checkZ(firstZMin, firstZMax - firstZMin, secondZMin, secondZMax - secondZMin)) return;
+    if (!check2D) {
+      let firstZMin = Math.min(first[0].z, first[1].z);
+      let firstZMax = Math.max(first[0].z, first[1].z);
+      let secondZMin = Math.min(second[0].z, second[1].z);
+      let secondZMax = Math.max(second[0].z, second[1].z);
+      // Simple inaccurate check to see if Z axis of lines every intersect
+      if (!Bounds.checkZ(firstZMin, firstZMax - firstZMin, secondZMin, secondZMax - secondZMin)) return;
+    }
     // https://stackoverflow.com/questions/9043805/test-if-two-lines-intersect-javascript-function
     var det, gamma, lambda;
     det = (first[1].x - first[0].x) * (second[1].y - second[0].y) - (second[1].x - second[0].x) * (first[1].y - first[0].y);
@@ -89,7 +91,7 @@ export default class Bounds {
 
     return aabb.lines.some((boxLine) => {
       return triangle.lines.some((triangleLine) => {
-        return Bounds.intersectsLine(boxLine, triangleLine);
+        return Bounds.intersectsLine(boxLine, triangleLine, true);
       });
     });
   }
@@ -232,6 +234,34 @@ export default class Bounds {
     return this.min[axis] < target.max[axis] && this.max[axis] > target.min[axis];
   }
 
+  intersects2D(target) {
+    if (target instanceof Bounds) {
+      if (this.type === TYPE.AABB && target.type === TYPE.AABB) {
+        let box = target.box;
+        return this.box.ul.x < box.lr.x &&
+          this.box.lr.x > box.ul.x &&
+          this.box.ul.y < box.lr.y &&
+          this.box.lr.y > box.ul.y;
+      } else if (this.type === TYPE.AABB && target.type === TYPE.TRIANGLE) {
+        return Bounds.intersectsAABB_Triangle(this, target);
+      } else if (target.type === TYPE.AABB && this.type === TYPE.TRIANGLE) {
+        return Bounds.intersectsAABB_Triangle(target, this);
+      } else {
+        // TODO: do better check
+        return _.some(this.lines, (line) => _.some((target.lines), (targetLine) => Bounds.intersectsLine(line, targetLine, true)));
+      }
+    } else if (_.isArray(target)) { // Line [{ x, y }, { x, y }]
+      return _.some(this.lines, (line) => Bounds.intersectsLine(line, target, true));
+    } else if (!_.isUndefined(target.x) && !_.isUndefined(target.y)) { // Vec3 { x, y }
+      return (!_.isNumber(this.box.ul.z) || !_.isNumber(target.z) || Math.floor(target.z) === Math.floor(this.box.ul.z)) &&
+        target.x >= this.box.ul.x && target.x <= this.box.lr.x &&
+        target.y >= this.box.ul.y && target.y <= this.box.lr.y;
+    }
+
+    return false;
+
+  }
+
   intersects(target) {
     // TODO: add circle intersection tests
     if (target instanceof Bounds) {
@@ -279,14 +309,8 @@ export default class Bounds {
     return this.box.ll;
   }
 
-  get ztop() {
-    return this.box.ul.plus({ z: this.zheight });
-  }
-  get zbottom() {
-    return this.box.lr;
-  }
   get top() {
-    return this.box.ul;
+    return this.box.ul.plus({ z: this.zheight });;
   }
   get bottom() {
     return this.box.lr;
