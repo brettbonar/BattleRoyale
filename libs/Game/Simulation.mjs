@@ -78,8 +78,9 @@ export default class Simulation {
 
   getPlayerViewCollisions(player) {
     let viewBounds = player.character.viewBounds;
-    return this.lastCollisions.filter((collision) => viewBounds.intersects(collision.position));
-    //return this.lastCollisions;
+    // TODO: find out why this check doesn't work
+    //return this.lastCollisions.filter((collision) => viewBounds.intersects(collision.position));
+    return this.lastCollisions;
   }
 
   update() {

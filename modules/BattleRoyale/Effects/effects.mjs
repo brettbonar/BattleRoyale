@@ -1,3 +1,5 @@
+import ImageCache from "../../Engine/Rendering/ImageCache.mjs"
+import Vec3 from "../../Engine/GameObject/Vec3.mjs"
 
 export default {
   blood: {
@@ -55,6 +57,52 @@ export default {
     }
     // acceleration
     // TODO: spread: angle of direction
+  },
+  splash: {
+    initialCount: 15,
+    radius: 10,
+    duration: 0,
+    particles: {
+      imageSource: "/Assets/effects/water_drop.png",
+      dimensions: {
+        width: 5,
+        height: 5
+      },
+      minSpeed: 20,
+      maxSpeed: 80,
+      //speed: 20,
+      zspeed: 20,
+      minDuration: 1000,
+      maxDuration: 2000,
+      //duration: 2000,
+      baseDirection: {
+        min: {
+          x: -1,
+          y: -1,
+          z: 1
+        },
+        max: {
+          x: 1,
+          y: 1,
+          z: 1
+        }
+      },
+      acceleration: {
+        z: -0.75
+      },
+      stickiness: 1.0,
+      onCollision: (particle) => {
+        particle.image = ImageCache.get("/Assets/effects/puddle.png");
+        particle.dimensions = {
+          width: 16,
+          height: 16
+        };
+        particle.rotation = 0;
+        particle.direction = new Vec3();
+        particle.speed = 0;
+        particle.zspeed = 0;
+      }
+    }
   },
   light: {
     initialCount: 15,

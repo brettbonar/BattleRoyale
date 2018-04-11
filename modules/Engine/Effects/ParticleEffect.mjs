@@ -9,6 +9,7 @@ class Particle {
     this.image = ImageCache.get(this.particleInfo.imageSource);
     this.rotation = Math.atan2(this.direction.y - this.direction.z, this.direction.x ) * 180 / Math.PI;
     this.rotationDiff = 0;
+    this.dimensions = this.particleInfo.dimensions;
 
     if (this.particleInfo.minDuration || this.particleInfo.maxDuration) {
       this.duration = _.random(this.particleInfo.minDuration, this.particleInfo.maxDuration);
@@ -29,11 +30,11 @@ class Particle {
   }
 
   get width() {
-    return this.particleInfo.dimensions.width;
+    return this.dimensions.width;
   }
 
   get height() {
-    return this.particleInfo.dimensions.height;
+    return this.dimensions.height;
   }
 
   get perspectivePosition() { return this.position; }
@@ -42,15 +43,18 @@ class Particle {
     let timestep = elapsedTime / 1000;
     this.currentTime += elapsedTime;
 
-    let groundSpeed = this.speed * timestep;
     if (this.direction) {
       this.position.add({
-        x: this.direction.x * groundSpeed,
-        y: this.direction.y * groundSpeed,
+        x: this.direction.x * this.speed * timestep,
+        y: this.direction.y * this.speed * timestep,
         z: this.direction.z * this.zspeed * timestep
       });
       if (this.position.z <= 0) {
         this.position.z = 0;
+
+        if (this.particleInfo.onCollision) {
+          this.particleInfo.onCollision(this);
+        }
 
         if (this.particleInfo.elasticity) {
           this.direction.z = -this.direction.z * this.particleInfo.elasticity;
@@ -77,8 +81,8 @@ class Particle {
 
     if (this.particleInfo.acceleration) {
       this.direction.add({
-        x: this.particleInfo.acceleration.x * groundSpeed,
-        y: this.particleInfo.acceleration.y * groundSpeed,
+        x: this.particleInfo.acceleration.x * this.speed * timestep,
+        y: this.particleInfo.acceleration.y * this.speed * timestep,
         z: this.particleInfo.acceleration.z * this.zspeed * timestep
       });
       //this.direction.add(this.particleInfo.acceleration.times(this.speed * timestep));
@@ -111,14 +115,14 @@ class Particle {
     context.save();
     
     if (this.rotation) {
-      let center = position.plus({ x: this.particleInfo.dimensions.width / 2, y: this.particleInfo.dimensions.height / 2 });
+      let center = position.plus({ x: this.dimensions.width / 2, y: this.dimensions.height / 2 });
       context.translate(center.x, center.y);
       context.rotate((this.rotation * Math.PI) / 180);
       context.translate(-center.x, -center.y);        
     }
     
     context.drawImage(this.image, position.x, position.y,
-      this.particleInfo.dimensions.width, this.particleInfo.dimensions.height);
+      this.dimensions.width, this.dimensions.height);
 
     context.restore();
   }
