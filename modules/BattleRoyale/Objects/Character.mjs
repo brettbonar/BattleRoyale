@@ -450,12 +450,9 @@ export default class Character extends GameObject {
       //   this.currentAction.currentTime = 0;
       // }
 
-      // TODO: set a timeout for the current action in case the player really shouldn't be able to do it
-      if (!this.isThisPlayer) {
-        this.actionStack.unshift(state.latestAction);
-        this.startAction(state.latestAction);
-      }
-    } else if (!state.latestAction) {
+      this.actionStack.unshift(state.latestAction);
+      this.startAction(state.latestAction);
+    } else if (!state.latestAction && !this.isThisPlayer) { // TODO: set a timeout for the current action in case the player really shouldn't be able to do it
       this.actionStack.length = 0;
     }
     // TODO: interpolate target location

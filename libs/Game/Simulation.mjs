@@ -72,14 +72,14 @@ export default class Simulation {
   getObjects() { return this.game.gameState.objects.map((obj) => obj.getUpdateState()) }
 
   getPlayerViewObjects(player) {
-    //return _.intersectionBy(this.lastState, this.game.grid.getRenderObjects(player.character.viewBounds), "objectId");
-    return this.lastState;
+    return _.intersectionBy(this.lastState, this.game.grid.getRenderObjects(player.character.viewBounds), "objectId");
+    //return this.lastState;
   }
 
   getPlayerViewCollisions(player) {
-    // let viewBounds = player.character.viewBounds;
-    // return this.lastCollisions.filter((collision) => viewBounds.intersects(collision.position));
-    return this.lastCollisions;
+    let viewBounds = player.character.viewBounds;
+    return this.lastCollisions.filter((collision) => viewBounds.intersects(collision.position));
+    //return this.lastCollisions;
   }
 
   update() {
