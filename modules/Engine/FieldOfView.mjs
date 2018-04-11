@@ -405,9 +405,9 @@ export default class FieldOfView {
 
   isInView(object, losHiddenObjs) {
     // TODO: test if object is owned by player instead of if is player
-    if (object.losHidden && !object.isThisPlayer) {
+    if (object.losHidden) {
       let objBounds = object.modelBounds;
-      if (this.fovBounds.some((bounds) => bounds.intersects2D(objBounds))) {
+      if (object.isThisPlayer || this.fovBounds.some((bounds) => bounds.intersects2D(objBounds))) {
         losHiddenObjs.push(object);
         return true;
       }

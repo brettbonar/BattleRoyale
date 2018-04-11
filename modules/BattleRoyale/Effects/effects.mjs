@@ -63,8 +63,8 @@ export default {
     particles: {
       imageSource: "/Assets/effects/light.png",
       dimensions: {
-        width: 5,
-        height: 5
+        width: 8,
+        height: 8
       },
       minSpeed: 20,
       maxSpeed: 80,

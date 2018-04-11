@@ -19,7 +19,7 @@ export default class Character extends GameObject {
     _.defaults(this, {
       type: "Character",
       state: {
-        target: this.position.plus({ x: 100 }),
+        target: this.position,
         inventory: [],
         loadout: params.loadout,
         characterDirection: "down",
@@ -84,7 +84,6 @@ export default class Character extends GameObject {
     if (!params.attackOrigin) {
       this.attackOrigin = {
         offset: new Vec3(this.collisionDimensions[0].offset).plus({
-          y: this.collisionDimensions[0].dimensions.height,
           z: 20
         }),
         dimensions: new Dimensions({
@@ -120,7 +119,7 @@ export default class Character extends GameObject {
       }),
       target: this.state.target,
       range: 1100,
-      angle: 360
+      angle: 90
     };
   }
 
@@ -220,6 +219,12 @@ export default class Character extends GameObject {
     // TODO: add elapsedTime to cooldown here?
     let cooldown = _.find(this.cooldowns, { actionName: action.name });
     return this.canQueueAction(action) && this.state.currentMana >= manaCost && this.state.currentHealth >= healthCost && !cooldown;
+  }
+
+  addItem(itemType) {
+    if (!this.state.inventory.includes(itemType)) {
+      this.state.inventory.push(itemType);
+    }
   }
 
   canQueueAction(action) {

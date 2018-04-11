@@ -17,6 +17,7 @@ export default class Item extends GameObject {
     _.merge(this, item);
     this.type = "Item";
     this.itemType = params.itemType;
+    this.isInteractable = true;
 
     if (item.imageSource) {
       if (!params.simulation) {
@@ -31,7 +32,7 @@ export default class Item extends GameObject {
 
     this.interact = (target) => {
       if (!this.done) {
-        target.state.inventory.push(this.itemType);
+        target.addItem(this.itemType);
         this.done = true;
       }
     };

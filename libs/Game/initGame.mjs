@@ -175,15 +175,6 @@ function initGame(players, maps) {
     //     z: 0
     //   }
     // }),
-    // new Building({
-    //   buildingType: "house",
-    //   simulation: true,
-    //   position: {
-    //     x: 500,
-    //     y: 500,
-    //     z: 0
-    //   }
-    // })
   ];
 
   let pos = 255;
@@ -197,7 +188,7 @@ function initGame(players, maps) {
       simulation: true,
       damagedEffect: effects.blood,
       loadout: {
-        weapon: equipment.bow,
+        weapon: equipment.staffMale,
         torso: equipment.leatherChestMale,
         legs: equipment.tealPantsMale,
         head: equipment.clothHoodMale,
@@ -221,9 +212,9 @@ function initGame(players, maps) {
         z: 0
       }
     });
-    char.state.inventory.push("bow");
-    char.state.inventory.push("lightStaffMale");
-    char.state.inventory.push("fireStaffMale");
+    // char.state.inventory.push("bow");
+    // char.state.inventory.push("lightStaffMale");
+    // char.state.inventory.push("fireStaffMale");
     char.state.inventory.push("staffMale");
     gameObjects.push(char);
     pos += 100;
@@ -245,48 +236,48 @@ function initGame(players, maps) {
   //   itemType: "healthPotion",
   //   simulation: true
   // }));
-  // gameObjects.push(new Item({
-  //   position: {
-  //     x: 265,
-  //     y: 305
-  //   },
-  //   itemType: "fireStaffMale",
-  //   simulation: true
-  // }));
-  // gameObjects.push(new Item({
-  //   position: {
-  //     x: 235,
-  //     y: 305
-  //   },
-  //   itemType: "lightStaffMale",
-  //   simulation: true
-  // }));
-  // gameObjects.push(new Item({
-  //   position: {
-  //     x: 295,
-  //     y: 305
-  //   },
-  //   itemType: "bow",
-  //   simulation: true
-  // }));
+  gameObjects.push(new Item({
+    position: {
+      x: 265,
+      y: 305
+    },
+    itemType: "fireStaffMale",
+    simulation: true
+  }));
+  gameObjects.push(new Item({
+    position: {
+      x: 235,
+      y: 305
+    },
+    itemType: "lightStaffMale",
+    simulation: true
+  }));
+  gameObjects.push(new Item({
+    position: {
+      x: 295,
+      y: 305
+    },
+    itemType: "bow",
+    simulation: true
+  }));
 
-  // gameObjects.push(new StaticObject({
-  //   objectType: "plainTree",
-  //   position: {
-  //     x: 500,
-  //     y: 250
-  //   },
-  //   simulation: true
-  // }));
+  gameObjects.push(new StaticObject({
+    objectType: "plainTree",
+    position: {
+      x: 500,
+      y: 250
+    },
+    simulation: true
+  }));
 
-  // gameObjects.push(new StaticObject({
-  //   objectType: "forestTree",
-  //   position: {
-  //     x: 600,
-  //     y: 250
-  //   },
-  //   simulation: true
-  // }));
+  gameObjects.push(new StaticObject({
+    objectType: "forestTree",
+    position: {
+      x: 600,
+      y: 250
+    },
+    simulation: true
+  }));
 
   // for (let i = 0; i < 10; i++) {
   //   //let type = _.sample(_.filter(objects, { biome: "plain" }));
@@ -353,14 +344,14 @@ function initGame(players, maps) {
   // ));
 
 
-  // gameObjects = gameObjects.concat(scenes.house.getObjects(
-  //   {
-  //     x: 300,
-  //     y: 300
-  //   }
-  // ));
+  gameObjects = gameObjects.concat(scenes.house.getObjects(
+    {
+      x: 300,
+      y: 300
+    }
+  ));
 
-  addScenes(maps);
+  //addScenes(maps);
   //gameObjects = gameObjects.concat(addScenes(maps));
 
   return gameObjects;

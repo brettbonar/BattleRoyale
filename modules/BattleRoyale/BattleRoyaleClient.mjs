@@ -75,8 +75,8 @@ export default class BattleRoyaleClient extends BattleRoyale {
 
     this.gameState.cursor = {
       position: {
-        x: params.canvas.width / 2 + 64,
-        y: params.canvas.height / 2 + 64
+        x: params.canvas.width / 2,
+        y: params.canvas.height / 2 + 256
       }
     };
 
@@ -138,6 +138,7 @@ export default class BattleRoyaleClient extends BattleRoyale {
 
   previousWeapon(event) {
     if (event.release) return;
+    this.gameState.player.previousWeapon();
     this.sendEvent({
       type: "previousWeapon",
       source: {
@@ -149,6 +150,7 @@ export default class BattleRoyaleClient extends BattleRoyale {
 
   nextWeapon(event) {
     if (event.release) return;
+    this.gameState.player.nextWeapon();
     this.sendEvent({
       type: "nextWeapon",
       source: {
@@ -483,16 +485,6 @@ export default class BattleRoyaleClient extends BattleRoyale {
     //     this.context.canvas.height - 104, 1024, 104);
     // }
     this.interface.render(this.context, this.gameState.player, this.maps);
-  }
-
-  getInteraction(target) {
-    let interactions = _.filter(this.gameState.objects, (obj) => {
-      return obj.interactionsBoundingBox.some((box) => box.intersects(target.boundingBox));
-    });
-    return _.minBy(interactions, (interaction) => {
-      // TODO: may want to consider interaction dimensions offset
-      return getDistance(target.position, interaction.position);
-    });
   }
 
   sendEvent(params) {

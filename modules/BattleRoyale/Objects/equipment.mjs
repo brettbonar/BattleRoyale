@@ -9,7 +9,7 @@ let items = {
     equipmentType: "bow",
     name: "Bow",
     biome: "any",
-    imageSource: "../../Assets/items/bow.png",
+    imageSource: "/Assets/items/bow.png",
     imageDimensions: {
       x: 0,
       y: 0,
@@ -21,14 +21,16 @@ let items = {
     },
     dimensions: {
       width: 64,
-      height: 64
+      height: 64,
+      zheight: 16
     },
+    isInteractable: true,
     interactionDimensions: [
       {
         dimensions: {
-          radius: 15
-        },
-        boundsType: Bounds.TYPE.CIRCLE
+          width: 64,
+          height: 64
+        }
       }
     ]
   },
@@ -38,7 +40,7 @@ let items = {
     equipmentType: "fireStaff",
     name: "Fire Orb",
     biome: "any",
-    imageSource: "../../Assets/items/fireOrb.png",
+    imageSource: "/Assets/items/fireOrb.png",
     imageDimensions: {
       x: 0,
       y: 0,
@@ -50,14 +52,16 @@ let items = {
     },
     dimensions: {
       width: 32,
-      height: 32
+      height: 32,
+      zheight: 8
     },
+    isInteractable: true,
     interactionDimensions: [
       {
         dimensions: {
-          radius: 10
-        },
-        boundsType: Bounds.TYPE.CIRCLE
+          width: 32,
+          height: 32
+        }
       }
     ]
   },
@@ -67,7 +71,7 @@ let items = {
     equipmentType: "lightStaff",
     name: "Light Orb",
     biome: "any",
-    imageSource: "../../Assets/items/lightOrb.png",
+    imageSource: "/Assets/items/lightOrb.png",
     imageDimensions: {
       x: 0,
       y: 0,
@@ -79,14 +83,16 @@ let items = {
     },
     dimensions: {
       width: 32,
-      height: 32
+      height: 32,
+      zheight: 8
     },
+    isInteractable: true,
     interactionDimensions: [
       {
         dimensions: {
-          radius: 10
-        },
-        boundsType: Bounds.TYPE.CIRCLE
+          width: 32,
+          height: 32
+        }
       }
     ]
   }

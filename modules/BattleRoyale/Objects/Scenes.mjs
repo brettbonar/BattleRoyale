@@ -126,6 +126,14 @@ scenes.house = {
           y: position.y + 104
         },
         simulation: true        
+      }),
+      new StaticObject({
+        objectType: "chest2",
+        position: {
+          x: position.x + 142,
+          y: position.y + 140
+        },
+        simulation: true        
       })
     ];
   }

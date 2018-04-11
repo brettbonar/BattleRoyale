@@ -20,6 +20,7 @@ export default {
       width: 19,
       height: 29
     },
+    isInteractable: true,
     interactionDimensions: [
       {
         offset: {
@@ -57,6 +58,7 @@ export default {
       width: 32,
       height: 32
     },
+    isInteractable: true,
     interactionDimensions: [
       {
         dimensions: {

@@ -320,27 +320,6 @@ class Map {
 
   }
 
-  growSmooth(tiles, used) {
-    let tile;
-    while (!tile && tiles.length > 0) {
-      tile = tiles[0];
-      let neighbors = _.shuffle(tile.growNeighbors);
-      let next;
-      for (const neighbor of neighbors) {
-        if (neighbor && !used.includes(neighbor)) {
-          next = neighbor;
-          next.type = tile.type;
-          tiles.push(next);
-          used.push(next);
-          break;
-        }
-      }
-
-      if (!next) {
-        tiles.shift();
-      }
-    }
-  }
   getTile(x, y) {
     if (x >= 0 && x < this.map.length && y >= 0 && y < this.map.length) {
       return this.map[x][y];
@@ -700,6 +679,10 @@ class Map {
     return _.findKey(BIOME_PARAMS, (params, type) => {
       return params.noise && noise < params.noise.max && noise >= params.noise.min;
     });
+  }
+
+  getTileAtPos(position) {
+    return this.map[Math.floor(position.x / this.tileSize)][Math.floor(position.y / this.tileSize)];
   }
 
   initTileSimplex(tile, noise) {

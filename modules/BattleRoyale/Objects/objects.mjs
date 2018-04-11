@@ -1419,4 +1419,121 @@ objects.chairUp = {
   ]
 };
 
+objects.chest1 = {
+  imageSource: "/Assets/chests.png",
+  interactionType: "treasure",
+  images: {
+    closed: {
+      imageSource: "/Assets/chests.png",
+      imageDimensions: {
+        x: 0,
+        y: 0,
+        width: 34,
+        height: 34
+      }
+    },
+    opened: {
+      imageSource: "/Assets/chests.png",
+      imageDimensions: {
+        x: 68,
+        y: 0,
+        width: 34,
+        height: 34
+      }      
+    }    
+  },
+  dimensions: {
+    width: 34,
+    height: 34,
+    zheight: 9
+  },
+  physics: {
+    surfaceType: "terrain",
+  },
+  collisionDimensions: [
+    {
+      offset: {
+        x: 1,
+        y: 17
+      },
+      dimensions: {
+        width: 32,
+        height: 16,
+        zheight: 9
+      }
+    }
+  ],
+  isInteractable: true,
+  interactionDimensions: [
+    {
+      offset: {
+        x: -8,
+        y: 24
+      },
+      dimensions: {
+        width: 48,
+        height: 24
+      }
+    }
+  ]
+};
+
+objects.chest2 = {
+  interactionType: "treasure",
+  images: {
+    closed: {
+      imageSource: "/Assets/chests.png",
+      imageDimensions: {
+        x: 0,
+        y: 34,
+        width: 34,
+        height: 34
+      }      
+    },
+    opened: {
+      imageSource: "/Assets/chests.png",
+      imageDimensions: {
+        x: 68,
+        y: 34,
+        width: 34,
+        height: 34
+      }
+    }
+  },
+  dimensions: {
+    width: 34,
+    height: 34,
+    zheight: 9
+  },
+  physics: {
+    surfaceType: "terrain",
+  },
+  collisionDimensions: [
+    {
+      offset: {
+        x: 1,
+        y: 17
+      },
+      dimensions: {
+        width: 32,
+        height: 16,
+        zheight: 9
+      }
+    }
+  ],
+  isInteractable: true,
+  interactionDimensions: [
+    {
+      offset: {
+        x: -8,
+        y: 24
+      },
+      dimensions: {
+        width: 48,
+        height: 24
+      }
+    }
+  ]
+};
+
 export default objects;

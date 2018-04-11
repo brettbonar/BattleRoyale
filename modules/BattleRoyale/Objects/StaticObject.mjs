@@ -18,10 +18,12 @@ export default class StaticObject extends GameObject {
     if (!params.simulation) {
       if (object.imageSource) {
         this.renderer = new ObjectRenderer(object);
-      } else if (object.images) {
+      } else if (_.isArray(object.images)) {
         this.renderObjects = _.map(object.images, (part) => {
           return new RenderObject(params, part);
         });
+      } else if (_.isObject(object.images)) {
+        this.renderer = new ObjectRenderer(object, object.images);
       }
     }
 
@@ -30,7 +32,9 @@ export default class StaticObject extends GameObject {
 
   getUpdateState() {
     return Object.assign(super.getUpdateState(), _.pick(this, [
-      "objectType"
+      "objectType",
+      "state",
+      "isInteractable"
     ]));
   }
 }

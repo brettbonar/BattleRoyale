@@ -143,11 +143,12 @@ export default class BattleRoyale extends Game {
 
   getInteraction(target) {
     let interactions = _.filter(this.gameState.objects, (obj) => {
-      return obj.interactionsBoundingBox.some((box) => box.intersects(target.boundingBox));
+      return obj.isInteractable && obj.interactionsBoundingBox.some((box) => 
+        target.collisionBounds.some((targetBounds) => box.intersects(targetBounds)));
     });
     return _.minBy(interactions, (interaction) => {
       // TODO: may want to consider interaction dimensions offset
-      return getDistance(target.position, interaction.position);
+      return getDistance(target.center, interaction.position);
     });
   }
 

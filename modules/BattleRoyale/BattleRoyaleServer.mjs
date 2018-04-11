@@ -25,6 +25,7 @@ import Item from "./Objects/Item.mjs"
 import effects from "./Effects/effects.mjs"
 import attacks from "./Magic/attacks.mjs"
 import RenderObject from "./Objects/RenderObject.mjs"
+import lootTable from "./Objects/lootTable.mjs";
 
 export default class BattleRoyaleServer extends BattleRoyale {
   constructor(params) {
@@ -38,6 +39,43 @@ export default class BattleRoyaleServer extends BattleRoyale {
       nextWeapon: (data, elapsedTime) => this.nextWeaponEvent(data, elapsedTime),
       previousWeapon: (data, elapsedTime) => this.previousWeaponEvent(data, elapsedTime)
     };
+    this.initTreasure();
+  }
+
+  spawnTreasure(source, tileType) {
+    let treasure = _.sample(lootTable[tileType]);
+    let item = equipment[treasure.itemType].world;
+
+    let collisionBounds = source.collisionBounds;
+    let minY = _.minBy(collisionBounds, (bounds) => bounds.bottom.y).y;
+    let maxY = minY + 16;
+    let middleX = _.sumBy(collisionBounds, (bounds) => bounds.center.x) / collisionBounds.length;
+    middleX -= item.dimensions.width / 2;
+    let minX = middleX - 16;
+    let maxX = middleX + 16;
+
+    // TODO: use weight
+    this.addObject(new Item({
+      itemType: treasure.itemType,
+      position: {
+        x: _.random(minX, maxX),
+        y: _.random(minY, maxY)
+      },
+      simulation: true
+    }));
+    source.state = "opened";
+    source.isInteractable = false;
+    source._modified = true;
+  }
+
+  initTreasure() {
+    for (const obj of this.gameState.objects) {
+      if (obj.interactionType === "treasure") {
+        let tileType = this.maps[obj.level].getTileAtPos(obj.position).type;
+        obj.state = "closed";
+        obj.interact = () => this.spawnTreasure(obj, tileType);
+      }
+    }
   }
 
   updateState(data, elapsedTime, eventTime) {
@@ -93,7 +131,7 @@ export default class BattleRoyaleServer extends BattleRoyale {
     });
     if (object) {
       let target = this.getInteraction(object);
-      if (target) {
+      if (target && target.isInteractable) {
         target.interact(object);
       }
     }

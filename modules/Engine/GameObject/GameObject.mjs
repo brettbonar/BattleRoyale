@@ -104,6 +104,8 @@ export default class GameObject extends GameObjectProxy {
     } else {
       objectId--;
     }
+
+    this._modified = true;
   }
 
   get x() { return this.position.x }

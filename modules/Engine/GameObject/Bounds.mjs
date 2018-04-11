@@ -326,7 +326,7 @@ export default class Bounds {
     return new Vec3({
       x: this.left.x + this.width / 2,
       y: this.top.y + this.height / 2,
-      z: this.top.z
+      z: this.z
     });
   }
 

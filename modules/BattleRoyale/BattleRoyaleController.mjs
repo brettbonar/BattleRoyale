@@ -26,7 +26,7 @@ export default class BattleRoyaleController extends GameController {
       if (obj.imageSource) {
         ImageCache.put(obj.imageSource);
       } else if (obj.images) {
-        obj.images.forEach((image) => ImageCache.put(image.imageSource));
+        _.each(obj.images, (image) => ImageCache.put(image.imageSource));
       }
     });
 

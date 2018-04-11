@@ -5,9 +5,13 @@ import ImageCache from "../../Engine/Rendering/ImageCache.mjs";
 //import Renderer from "../../Engine/Rendering/Renderer.mjs"
 
 export default class ObjectRenderer {
-  constructor(params, imageParams) {
-    _.merge(this, params, imageParams);
-    this.image = ImageCache.get(params.imageSource);
+  constructor(params, images) {
+    _.merge(this, params);
+    if (images) {
+      this.images = images;
+    } else {
+      this.image = ImageCache.get(params.imageSource);
+    }
     this.totalTime = 0;
 
     // TODO: come up with a more robust check for animations
@@ -45,8 +49,8 @@ export default class ObjectRenderer {
     }
   }
 
-  renderAnimation(context, object, elapsedTime) {
-    if (!this.image.complete || this.done) return;
+  renderAnimation(context, object, elapsedTime) {    
+    if (!this.image || !this.image.complete || this.done) return;
 
     let frameOffset = getAnimationOffset(this.image, this.imageSize || this.dimensions, this.frame)
     // if (this.rotation) {
@@ -79,7 +83,17 @@ export default class ObjectRenderer {
   }
 
   renderStatic(context, object, elapsedTime, clipping) {
-    if (!this.image.complete) return;
+    if (this.images) {
+      let img = this.images[object.state];
+      if (img) {
+        this.image = ImageCache.get(img.imageSource);
+        this.imageDimensions = img.imageDimensions;
+      } else {
+        this.image = null;
+      }
+    }
+
+    if (!this.image || !this.image.complete) return;
     
     let position = object.position;
     if (this.imageDimensions.offset) {
