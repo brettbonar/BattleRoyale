@@ -25,11 +25,13 @@ export default class Building extends GameObject {
         }
       }, params, this.building), this.building.interior);
     }
-
+    
     this.exteriorDoors = [];
     this.interiorDoors = [];
     // this.openDoors = [];
     // this.closedDoors = [];
+    
+    this.renderObjects = [this.exterior, this.interior].concat(this.exteriorDoors);
   }
 
   insideCb(target) {

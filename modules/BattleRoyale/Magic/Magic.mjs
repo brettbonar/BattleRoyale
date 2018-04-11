@@ -19,6 +19,7 @@ export default class Magic extends GameObject {
     this.position = new Vec3(params.position);
     this.physics.surfaceType = SURFACE_TYPE.GAS;
     this.damagedTargets = [];
+    this.damageReady = true;
 
     if (!params.simulation) {
       let image = this.magic.rendering.image;

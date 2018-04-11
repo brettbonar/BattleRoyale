@@ -505,7 +505,7 @@ export default {
       //attackTime: 1000,
       automatic: false,
       punchThrough: false,
-      speed: 200,
+      speed: 400,
       doTriggerCollision: function (object) {
         return object.direction.z < 0 && object.position.z <= 32;
       },
@@ -519,7 +519,7 @@ export default {
             y: collision.source.effect.collisionDimensions[0].dimensions.height / 2
           });
           //.add(collision.source.direction.times(collision.source.speed / 5));
-        position.z = Math.max(0, position.z);
+        position.z = Math.max(0, position.z - 32);
         collision.source.done = true;
         return {
           create: {
