@@ -261,6 +261,7 @@ export default class CharacterRenderer {
     this.framesPerSec = 0;
     this.initBody(params);
     this.shadowImage = ImageCache.get("/Assets/shadows/shadow24.png");
+    this.directionMarkerImage = ImageCache.get("/Assets/direction_marker.png");
   }
 
   initBody(params) {
@@ -328,6 +329,28 @@ export default class CharacterRenderer {
     }
   }
 
+  drawDirectionMarker(context, object) {
+    context.save();
+
+    let position = {
+      x: object.attackCenter.x - this.directionMarkerImage.width / 2,
+      y: object.attackCenter.y - this.directionMarkerImage.height / 2
+    };
+    let center = {
+      x: position.x + this.directionMarkerImage.width / 2,
+      y: position.y + this.directionMarkerImage.height / 2
+    };
+    if (object.targetRotation) {
+      context.translate(center.x, center.y);
+      context.rotate((object.targetRotation * Math.PI) / 180);
+      context.translate(-center.x, -center.y);    
+    }
+    
+    context.drawImage(this.directionMarkerImage, position.x, position.y);
+
+    context.restore();
+  }
+
   render(context, object, elapsedTime, center) {
     if (!this.body.complete || !this.shadowImage.complete) return;
 
@@ -336,6 +359,8 @@ export default class CharacterRenderer {
     //if (object.position.z > 0) {
       //drawShadow(context, object, object.modelDimensions);
     //}
+    this.drawDirectionMarker(context, object);
+
     context.drawImage(this.shadowImage,
       object.position.x + object.width / 2 - this.shadowImage.width / 2,
       object.position.y + object.height - this.shadowImage.height / 2 - 5);

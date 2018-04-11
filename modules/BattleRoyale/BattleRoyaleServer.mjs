@@ -40,6 +40,7 @@ export default class BattleRoyaleServer extends BattleRoyale {
       previousWeapon: (data, elapsedTime) => this.previousWeaponEvent(data, elapsedTime)
     };
     this.initTreasure();
+    this.broadcastEvents = [];
   }
 
   spawnTreasure(source, tileType) {
@@ -97,7 +98,7 @@ export default class BattleRoyaleServer extends BattleRoyale {
       playerId: data.source.playerId,
       objectId: data.source.objectId
     });
-    if (object) {
+    if (object && !object.state.dead) {
       object.nextWeapon();
     }
   }
@@ -107,7 +108,7 @@ export default class BattleRoyaleServer extends BattleRoyale {
       playerId: data.source.playerId,
       objectId: data.source.objectId
     });
-    if (object) {
+    if (object && !object.state.dead) {
       object.previousWeapon();
     }
   }
@@ -129,7 +130,7 @@ export default class BattleRoyaleServer extends BattleRoyale {
       playerId: data.source.playerId,
       objectId: data.source.objectId
     });
-    if (object) {
+    if (object && !object.state.dead) {
       let target = this.getInteraction(object);
       if (target && target.isInteractable) {
         target.interact(object);
@@ -142,7 +143,7 @@ export default class BattleRoyaleServer extends BattleRoyale {
       playerId: data.source.playerId,
       objectId: data.source.objectId
     });
-    if (object) {
+    if (object && !object.state.dead) {
       //object.target = data.target;
       object.setTarget(data.target);
       object.revision = data.source.revision;
@@ -155,7 +156,7 @@ export default class BattleRoyaleServer extends BattleRoyale {
       playerId: data.source.playerId,
       objectId: data.source.objectId
     });
-    if (object) {
+    if (object && !object.state.dead) {
       if (data.position) {
         // TODO: could remove this so players cant cheat
         object.position = new Vec3(data.position);
@@ -171,7 +172,7 @@ export default class BattleRoyaleServer extends BattleRoyale {
       playerId: data.source.playerId,
       objectId: data.source.objectId
     });
-    if (object) {
+    if (object && !object.state.dead) {
       object.revision = data.source.revision;
       this.doAttack(object, data, elapsedTime);
     }
@@ -197,6 +198,16 @@ export default class BattleRoyaleServer extends BattleRoyale {
       attackType: attackType,
       release: event.release
     });
+  }
+
+  onKill(character) {
+    if (character.isPlayer) {
+      this.broadcastEvents.push({
+        eventType: "kill",
+        killed: character.playerId,
+        killedBy: character.killedBy
+      })
+    }
   }
 
   handleCollision(collision) {

@@ -196,8 +196,12 @@ export default class Character extends GameObject {
   kill(source) {
     this.state.dead = true;
     this.losHidden = false;
-    this.dimensions.zheight = 0;
+    this.dimensions.zheight = 5;
     this.physics.surfaceType = SURFACE_TYPE.NONE;
+    this.killedBy = source.ownerId;
+    this.speed = 0;
+    this.direction.x = 0;
+    this.direction.y = 0;
     this.updatePosition();
   }
 
@@ -340,7 +344,7 @@ export default class Character extends GameObject {
 
   setTarget(target) {
     this.state.target = new Vec3(target);
-    let center = this.center;
+    let center = this.attackCenter;
     let direction = new Vec3(target).minus(center).normalize();
 
     if (target.x < center.x && Math.abs(direction.x) >= Math.abs(direction.y)) {
@@ -352,6 +356,8 @@ export default class Character extends GameObject {
     } else if (target.y < center.y && Math.abs(direction.y) >= Math.abs(direction.x)) {
       this.state.characterDirection = "up";
     }
+
+    this.targetRotation = Math.atan2(direction.y, direction.x ) * 180 / Math.PI;
   }
 
   updateAction(action, elapsedTime) {
@@ -521,6 +527,7 @@ export default class Character extends GameObject {
       "body",
       "gender",
       "isPlayer",
+      "killedBy",
       // TODO: make this part of character type, or just part of weapon
       "damagedEffect"
     ]), {

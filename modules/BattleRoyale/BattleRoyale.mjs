@@ -222,6 +222,9 @@ export default class BattleRoyale extends Game {
       }
       if (obj instanceof Character && !obj.dead && obj.currentHealth <= 0) {
         obj.kill();
+        if (this.onKill) {
+          this.onKill(obj);
+        }
       }
     }
   }

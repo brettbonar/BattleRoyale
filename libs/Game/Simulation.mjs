@@ -83,6 +83,49 @@ export default class Simulation {
     return this.lastCollisions;
   }
 
+  getPlayerIdFromObjectId(objectId) {
+    return this.players.find((player) => player.character.objectId === objectId).playerId;
+  }
+
+  getEvent(event) {
+    if (event.eventType === "kill") {
+      return {
+        eventType: event.eventType,
+        killed: event.killed,
+        killedBy: this.getPlayerIdFromObjectId(event.killedBy)
+      };
+    }
+    return event;
+  }
+
+  sendUpdates() {
+    let broadcastEvents = this.game.broadcastEvents.map((event) => this.getEvent(event));
+
+
+    for (const player of this.players) {
+      if (this.lastState.length > 0) {
+        player.socket.emit("update", {
+          elapsedTime: this.lastElapsedTime,
+          objects: this.getPlayerViewObjects(player)
+        });
+      }
+      if (this.lastCollisions.length > 0) {
+        player.socket.emit("collision", this.getPlayerViewCollisions(player));
+      }
+      if (this.removedObjects.length > 0) {
+        // TODO: also filter this by player position - do when it is removed?
+        player.socket.emit("remove", this.removedObjects);
+      }
+      if (this.game.broadcastEvents.length > 0) {
+        player.socket.emit("event", )
+      }
+    }
+
+    this.lastState.length = 0;
+    this.lastCollisions.length = 0;
+    this.removedObjects.length = 0;
+  }
+
   update() {
     let currentTime = now();
     let elapsedTime = currentTime - this.previousTime;
@@ -91,30 +134,7 @@ export default class Simulation {
     this.game.processUpdates(elapsedTime, currentTime);
     this.game._update(elapsedTime);
 
-    if (this.lastState.length > 0) {
-      for (const player of this.players) {
-        player.socket.emit("update", {
-          elapsedTime: this.lastElapsedTime,
-          objects: this.getPlayerViewObjects(player)
-        });
-      }
-      this.lastState.length = 0;
-    }
-
-    if (this.lastCollisions.length > 0) {
-      for (const player of this.players) {
-        player.socket.emit("collision", this.getPlayerViewCollisions(player));
-      }
-      this.lastCollisions.length = 0;
-    }
-
-    if (this.removedObjects.length > 0) {
-      for (const player of this.players) {
-        // TODO: also filter this by player position - do when it is removed?
-        player.socket.emit("remove", this.removedObjects);
-      }
-      this.removedObjects.length = 0;
-    }
+    this.sendUpdates();
 
     this.lastElapsedTime = elapsedTime;
     this.removedObjects = _.difference(this.lastObjects, this.game.gameState.objects)
