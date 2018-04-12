@@ -95,6 +95,37 @@ let items = {
         }
       }
     ]
+  },
+  waterOrb: {
+    type: "item",
+    itemType: "waterStaff",
+    equipmentType: "waterStaff",
+    name: "Water Orb",
+    biome: "any",
+    imageSource: "/Assets/items/waterOrb.png",
+    imageDimensions: {
+      x: 0,
+      y: 0,
+      width: 32,
+      height: 32
+    },
+    physics: {
+      surfaceType: "none",
+    },
+    dimensions: {
+      width: 32,
+      height: 32,
+      zheight: 8
+    },
+    isInteractable: true,
+    interactionDimensions: [
+      {
+        dimensions: {
+          width: 32,
+          height: 32
+        }
+      }
+    ]
   }
 };
 
@@ -200,6 +231,20 @@ export default {
       2: "lightMote"
     },
     world: items.lightOrb
+  },
+  waterStaffMale: {
+    imageSource: "/Assets/character/weapons/right hand/male/waterStaff_male.png",
+    imageSize: 64,
+    itemType: "waterStaffMale",
+    type: "weapon",
+    attackType: "thrust",
+    hands: 1,
+    gender: "male",
+    attacks: {
+      1: "waterJet",
+      2: "torrentacle"
+    },
+    world: items.waterOrb
   },
   axe: {
     imageSource: "/Assets/character/weapons/right hand/either/axe.png",

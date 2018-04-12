@@ -30,7 +30,7 @@ import RenderObject from "./Objects/RenderObject.mjs"
 import ImageCache from "../Engine/Rendering/ImageCache.mjs"
 import ParticleEffect from "../Engine/Effects/ParticleEffect.mjs";
 import FieldOfView from "../Engine/FieldOfView.mjs";
-import StartMap from "./StartArea/StartMap.mjs"
+import SpawnMap from "./StartArea/SpawnMap.mjs"
 
 const EVENTS = {
   MOVE_UP: "moveUp",
@@ -197,8 +197,8 @@ export default class BattleRoyaleClient extends BattleRoyale {
       return new Projectile(object);
     } else if (object.type === "Item") {
       return new Item(object);
-    } else if (object.type === "StartMap") {
-      return new StartMap(object, this.maps[object.mapLevel]);
+    } else if (object.type === "SpawnMap") {
+      return new SpawnMap(object, this.maps[object.mapLevel]);
     } else {
       console.log("Unsupported object type in createObject: " + object.type);
     }

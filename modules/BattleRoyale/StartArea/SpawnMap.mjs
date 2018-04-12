@@ -1,10 +1,10 @@
 import GameObject from "../../Engine/GameObject/GameObject.mjs"
-import StartMapRenderer from "./StartMapRenderer.mjs";
+import SpawnMapRenderer from "./SpawnMapRenderer.mjs";
 
-export default class StartMap extends GameObject {
+export default class SpawnMap extends GameObject {
   constructor(params, map) {
     super(params);
-    this.type = "StartMap";
+    this.type = "SpawnMap";
     this.map = map;
     this.elapsedTime = 0;
     this.portalDuration = params.portalDuration;
@@ -12,7 +12,7 @@ export default class StartMap extends GameObject {
 
 
     if (!params.simulation) {
-      this.renderer = new StartMapRenderer(map, params.mapDimensions);
+      this.renderer = new SpawnMapRenderer(map, params.mapDimensions);
     }
   }
 

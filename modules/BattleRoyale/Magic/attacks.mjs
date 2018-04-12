@@ -533,5 +533,190 @@ export default {
       }
       //zspeed: 5000
     }
-  }
+  },
+  waterJet: {
+    type: "projectile",
+    name: "waterJet",
+    dimensions: {
+      width: 32,
+      height: 32,
+      zheight: 16
+    },
+    action: {
+      name: "waterJet",
+      actionDuration: 0,
+      actionRate: 4,
+      actionType: "channeling",
+      automatic: false,
+      manaCost: 0,
+      manaCostPerSec: 0
+    },
+    rendering: {
+      start: {
+        imageSource: "/Assets/projectiles/water_jet_start.png",
+        dimensions: {
+          width: 32,
+          height: 32
+        },
+        // frames: 4,
+        // framesPerSec: 4,
+        // repeat: true,
+        // modelDimensions: {
+        //   dimensions: {
+        //     width: 32,
+        //     height: 32
+        //   }
+        // },
+      },
+      end: {
+        imageSource: "/Assets/projectiles/water_jet_end.png",
+        dimensions: {
+          width: 32,
+          height: 32
+        },
+      },
+      body: {
+        imageSource: "/Assets/projectiles/water_jet_body.png",
+        dimensions: {
+          width: 64,
+          height: 32
+        },
+        frames: 9,
+        framesPerSec: 54,
+        repeat: true,
+      },
+      // TODO: may need a maximum rate at which hit effects are added
+      // Right now a new hit effect is created each frame
+      // TODO: maybe attach a single effect to each projectile and move it with projectile?
+      hitEffect: {
+        particleEffect: "splash"
+      }
+    },
+    effect: {
+      path: "beam",
+      damage: 2,
+      damageRate: 8,
+      // TODO: more shapes
+      collisionDimensions: [{
+        offset: {
+          x: 8,
+          y: 8
+        },
+        dimensions: {
+          width: 16,
+          height: 16,
+          zheight: 16
+        }
+      },
+      {
+        type: "ray",
+        offset: {
+          x: 8,
+          y: 8
+        },
+        dimensions: {
+          // Perpendicular distance from object position + offset
+          rayDistance: 11
+        }
+      },
+      {
+        type: "ray",
+        offset: {
+          x: 8,
+          y: 8
+        },
+        dimensions: {
+          rayDistance: -11
+        }
+      }],
+      range: 500,
+      punchThrough: false
+    }
+  },
+  lionFlare: {
+    type: "projectile",
+    name: "lionFlare",
+    action: {
+      name: "lionFlare",
+      actionDuration: 0,
+      actionRate: .75,
+      actionType: "exclusive",
+      automatic: false,
+      manaCost: 0,
+      charge: {
+        speed: {
+          maxTime: 1000,
+          maxMult: 2.0
+        }
+      },
+    },
+    rendering: {
+      imageSource: "/Assets/magic/flare.png",
+      dimensions: {
+        width: 32,
+        height: 32
+      },
+      frames: 4,
+      framesPerSec: 8,
+      repeat: true,
+      modelDimensions: {
+        offset: {
+          x: 8,
+          y: 8
+        },
+        dimensions: {
+          width: 16,
+          height: 16
+        }
+      },
+      shadowColor: "rgba(230, 140, 100, 1)",
+      shadow: "/Assets/shadows/shadow16orange.png"
+    },
+    effect: {
+      path: "arc",
+      damage: 5,
+      collisionDimensions: [{
+        offset: {
+          x: 8,
+          y: 8
+        },
+        dimensions: {
+          width: 16,
+          height: 16,
+          zheight: 16
+        }
+      }],
+      range: 1000,
+      //attackTime: 1000,
+      automatic: false,
+      punchThrough: false,
+      speed: 400,
+      doTriggerCollision: function (object) {
+        return object.direction.z < 0 && object.position.z <= 32;
+      },
+      onCollision: function (collision) {
+        // TODO: change collisionDimensions to attackDimensions
+        let position = collision.position
+          .plus(collision.source.effect.collisionDimensions[0].offset)
+          .subtract({ x: 64, y: 96, z: 32 })
+          .add({
+            x: collision.source.effect.collisionDimensions[0].dimensions.width / 2,
+            y: collision.source.effect.collisionDimensions[0].dimensions.height / 2
+          });
+          //.add(collision.source.direction.times(collision.source.speed / 5));
+        position.z = Math.max(0, position.z - 32);
+        collision.source.done = true;
+        return {
+          create: {
+            type: "Magic",
+            attackType: "fireLion",
+            position: position,
+            direction: collision.source.direction
+          },
+          remove: collision.source
+        };
+      }
+      //zspeed: 5000
+    }
+  },
 }

@@ -27,6 +27,7 @@ import ImageCache from "../Engine/Rendering/ImageCache.mjs"
 import ParticleEffect from "../Engine/Effects/ParticleEffect.mjs"
 import Grid from "../Engine/Grid.mjs"
 import LevelGrids from "../Engine/LevelGrids.mjs";
+import magicEffects from "./Magic/magicEffects.mjs";
 
 const EVENTS = {
   MOVE_UP: "moveUp",
@@ -91,7 +92,7 @@ export default class BattleRoyale extends Game {
     _.pull(this.gameState.objects, object);
   }
 
-  createProjectile(character, params, attack, timeDiff, mods, action) {
+  createAttack(character, params, attack, timeDiff, mods, action) {
     if (attack.type === "projectile") {
       // let direction = character.state.target.minus(character.attackCenter).normalize();
       // direction.z = 0;
@@ -107,15 +108,26 @@ export default class BattleRoyale extends Game {
         ownerId: params.source.objectId,
         //elapsedTime: timeDiff
       }));
+    } else if (attack.type === "magic") {
+      this.addObject(Magic.create({
+        type: "Magic",
+        attackType: attack.name,
+        position: character.state.target,
+        direction: character.state.target.minus(character.attackCenter),
+        simulation: this.simulation
+      }));
     }
   }
 
   doAttack(character, params, elapsedTime) {
     let attack = attacks[character.state.loadout.weapon.attacks[params.attackType]];
+    if (!attack) {
+      attack = magicEffects[character.state.loadout.weapon.attacks[params.attackType]];
+    }
     if (attack) {
       character.doAction("attack", params.release, attack.action, elapsedTime,
         (timeDiff, mods, action) => {
-          this.createProjectile(character, params, attack, timeDiff, mods, action);
+          this.createAttack(character, params, attack, timeDiff, mods, action);
         });
     }
   }

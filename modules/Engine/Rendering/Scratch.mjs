@@ -8,13 +8,19 @@ class Scratch {
     }
   }
 
-  put(image, position, dimensions) {
-    this.context.drawImage(image, position.x, position.y, dimensions.width, dimensions.height);
+  put(image, position, dimensions, offset) {
+    if (offset) {
+      this.context.drawImage(image, offset.x, offset.y, dimensions.width, dimensions.height,
+        position.x, position.y, dimensions.width, dimensions.height);
+    } else {
+      this.context.drawImage(image, position.x, position.y, dimensions.width, dimensions.height);
+    }
   }
 
   drawImageTo(context, position, dimensions, targetPosition, targetDimensions) {
     context.drawImage(this.canvas, position.x, position.y, dimensions.width, dimensions.height,
       targetPosition.x, targetPosition.y, targetDimensions.width, targetDimensions.height);
+      this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
   }
 }
 

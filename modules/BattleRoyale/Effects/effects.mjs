@@ -59,7 +59,7 @@ export default {
     // TODO: spread: angle of direction
   },
   splash: {
-    initialCount: 15,
+    initialCount: 10,
     radius: 10,
     duration: 0,
     particles: {

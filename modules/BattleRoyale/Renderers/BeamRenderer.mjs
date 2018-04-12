@@ -11,6 +11,10 @@ export default class BeamRenderer {
     this.imageBody = ImageCache.get(rendering.body.imageSource);
     this.frame = 0;
     this.currentTime = 0;
+
+    if (this.rendering.body.frames) {
+      this.animating = true;
+    }
   }
 
   renderAt(context, image, imageParams, position, object) {
@@ -47,9 +51,13 @@ export default class BeamRenderer {
       y: -object.lastPosition.z
     });
 
+    let frameOffset;
     let distance = Math.ceil(object.lastPosition.distanceTo(object.position));
     for (let i = 0; i < distance; i += dimensions.width) {
-      Scratch.put(this.imageBody, { x: i, y: 0 }, dimensions);
+      if (this.animating) {
+        frameOffset = getAnimationOffset(this.imageBody, this.rendering.body.dimensions, (this.frame + i) % this.rendering.body.frames);
+      };
+      Scratch.put(this.imageBody, { x: i, y: 0 }, dimensions, frameOffset);
       //context.drawImage(this.imageBody, start.x + i, start.y, dimensions.width + 1, dimensions.height);
     }
 
@@ -107,16 +115,18 @@ export default class BeamRenderer {
 
   update(elapsedTime) {
     this.currentTime += elapsedTime;
-    // while (this.currentTime > 1000 / this.rendering.framesPerSec) {
-    //   this.currentTime -= 1000 / this.rendering.framesPerSec;
-    //   this.frame++;
-    //   if (this.frame >= this.rendering.frames) {
-    //     if (this.rendering.repeat) {
-    //       this.frame = this.rendering.cycleStart || 0;
-    //     } else {
-    //       this.frame = this.rendering.frames - 1;
-    //     }
-    //   }
-    // }
+    if (this.animating) {
+      while (this.currentTime > 1000 / this.rendering.body.framesPerSec) {
+        this.currentTime -= 1000 / this.rendering.body.framesPerSec;
+        this.frame++;
+        if (this.frame >= this.rendering.body.frames) {
+          if (this.rendering.body.repeat) {
+            this.frame = this.rendering.body.cycleStart || 0;
+          } else {
+            this.frame = this.rendering.body.frames - 1;
+          }
+        }
+      }
+    }
   }
 }

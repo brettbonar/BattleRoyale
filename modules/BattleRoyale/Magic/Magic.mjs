@@ -75,10 +75,7 @@ export default class Magic extends GameObject {
   
   static create(params) {
     let magic = magicEffects[params.attackType];
-    let position = new Vec3(params.position).minus({
-      //x: magic.rendering.imageSize / 2,
-      //y: magic.rendering.imageSize / 2
-    });
+    let position = new Vec3(params.position).minus(magic.positionOffset);
 
     return new Magic({
       position: position,

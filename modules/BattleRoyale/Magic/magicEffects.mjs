@@ -11,16 +11,16 @@ export default {
     rendering: {
       images: {
         up: {
-          imageSource: "../../Assets/magic/firelion_up.png"
+          imageSource: "/Assets/magic/firelion_up.png"
         },
         down: {
-          imageSource: "../../Assets/magic/firelion_down.png"
+          imageSource: "/Assets/magic/firelion_down.png"
         },
         left: {
-          imageSource: "../../Assets/magic/firelion_left.png"
+          imageSource: "/Assets/magic/firelion_left.png"
         },
         right: {
-          imageSource: "../../Assets/magic/firelion_right.png"
+          imageSource: "/Assets/magic/firelion_right.png"
         }
       },
       imageSize: 128,
@@ -55,28 +55,28 @@ export default {
     rendering: {
       images: {
         up: {
-          imageSource: "../../Assets/magic/snakebite_up.png",
+          imageSource: "/Assets/magic/snakebite_up.png",
           offset: {
             x: 8,
             y: 48
           }
         },
         down: {
-          imageSource: "../../Assets/magic/snakebite_down.png",
+          imageSource: "/Assets/magic/snakebite_down.png",
           offset: {
             x: 8,
             y: 48
           }
         },
         left: {
-          imageSource: "../../Assets/magic/snakebite_side.png",
+          imageSource: "/Assets/magic/snakebite_side.png",
           offset: {
             x: -24,
             y: 48
           }
         },
         right: {
-          imageSource: "../../Assets/magic/snake_right.png",
+          imageSource: "/Assets/magic/snake_right.png",
           offset: {
             x: 24,
             y: 48
@@ -99,7 +99,7 @@ export default {
   icetacle: {
     rendering: {
       image: {
-        imageSource: "../../Assets/magic/icetacle.png",
+        imageSource: "/Assets/magic/icetacle.png",
         offset: {
           x: 10,
           y: 38
@@ -113,15 +113,29 @@ export default {
       renderingDelay: 0,
       damageDelay: 1000,
       duration: 1000,
-      aoe: 32,
-      damage: 20
-      // additional status effects
+      damage: 20,
+      collisionDimensions: [{
+        offset: {
+          x: 32,
+          y: 32
+        },
+        dimensions: {
+          width: 96,
+          height: 96,
+          zheight: 96
+        }
+      }],
+      physics: {
+        solidity: 0
+      }
     }
   },
   torrentacle: {
+    type: "magic",
+    name: "torrentacle",
     rendering: {
       image: {
-        imageSource: "../../Assets/magic/torrentacle.png",
+        imageSource: "/Assets/magic/torrentacle.png",
         offset: {
           x: 10,
           y: 38
@@ -131,19 +145,48 @@ export default {
       frames: 16,
       framesPerSec: 16
     },
+    dimensions: {
+      width: 128,
+      height: 128,
+      zheight: 128
+    },
+    action: {
+      name: "torrentacle",
+      actionDuration: 0,
+      actionRate: 1,
+      actionType: "exclusive",
+      automatic: false,
+      manaCost: 0
+    },
+    positionOffset: {
+      x: 64,
+      y: 64
+    },
     effect: {
       renderingDelay: 0,
       damageDelay: 1000,
       duration: 1000,
-      aoe: 32,
-      damage: 20
-      // additional status effects
+      damage: 20,
+      collisionDimensions: [{
+        offset: {
+          x: 32,
+          y: 32
+        },
+        dimensions: {
+          width: 96,
+          height: 96,
+          zheight: 96
+        }
+      }],
+      physics: {
+        solidity: 0
+      }
     }
   },
   lightningclaw: {
     rendering: {
       image: {
-        imageSource: "../../Assets/magic/lightningclaw.png",
+        imageSource: "/Assets/magic/lightningclaw.png",
         offset: {
           x: 10,
           y: 38
@@ -165,7 +208,7 @@ export default {
   tornado: {
     rendering: {
       image: {
-        imageSource: "../../Assets/magic/tornado.png",
+        imageSource: "/Assets/magic/tornado.png",
         offset: {
           x: 10,
           y: 8

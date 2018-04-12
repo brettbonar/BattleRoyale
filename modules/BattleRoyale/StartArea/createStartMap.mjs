@@ -1,5 +1,5 @@
 import Map from "../../Map.mjs"
-import StartMap from "./StartMap.mjs";
+import SpawnMap from "./SpawnMap.mjs";
 
 function createStartMap(maps, players) {
   let size = 100;
@@ -19,7 +19,7 @@ function createStartMap(maps, players) {
     }
   }
 
-  startMap.objects.push(new StartMap({
+  startMap.objects.push(new SpawnMap({
     position: {
       x: 100,
       y: 100

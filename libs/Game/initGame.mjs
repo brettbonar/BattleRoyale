@@ -216,6 +216,7 @@ function initGame(players, maps) {
     char.state.inventory.push("bow");
     char.state.inventory.push("lightStaffMale");
     char.state.inventory.push("fireStaffMale");
+    char.state.inventory.push("waterStaffMale");
     char.state.inventory.push("staffMale");
     gameObjects.push(char);
     player.character = char;
