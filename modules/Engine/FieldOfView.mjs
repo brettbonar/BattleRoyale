@@ -110,46 +110,56 @@ export default class FieldOfView {
 
   addWallFromPoints(rays, walls, fov, fovAngle, coneVector, points) {
     let wallRays = [];
+    let leftEndIdx = 0;
+    let rightEndIdx = points.length - 2;
     for (let i = 0; i < points.length - 1; i++) {
       // Don't add rays that are outside of field of view
       let ray1 = this.getRay(fov, coneVector, points[i]);
       let ray2 = this.getRay(fov, coneVector, points[i + 1]);
 
-      // TRICKY: add both rays if just one is within range to avoid artifacts
-      let ray1InRange = ray1.distance <= fov.range && ray1.angle > -fovAngle && ray1.angle < fovAngle;
-      let ray2InRange = ray2.distance <= fov.range && ray2.angle > -fovAngle && ray2.angle < fovAngle;
+      let ray1InAngle = ray1.angle > -fovAngle && ray1.angle < fovAngle;
+      let ray2InAngle = ray2.angle > -fovAngle && ray2.angle < fovAngle;
+      let ray1InRange = ray1.distance <= fov.range;
+      let ray2InRange = ray2.distance <= fov.range;
 
-      if (ray1InRange || ray2InRange) {
-        if (!ray1InRange) {
-          // Move ray along the wall until it is at FOV range
-          ray1 = this.getRay(fov, coneVector, this.getFovRangeIntersection(fov, points[i], points[i + 1]));
-        } else if (i === 0) {
-          let leftEndpoint = getRotatedEndpoint(fov.center, points[i], -0.01, fov.range);
-          //let leftEndpoint = this.getExtendedEndpoint(fov.center, points[i], fov.range);
-          let leftRay = this.getRay(fov, coneVector, leftEndpoint);
-          leftRay.angle = ray1.angle;
-          rays.push(leftRay);
-          wallRays.push(leftRay);
-        }
+      if (ray1InRange && !ray2InRange) {
+        ray2 = this.getRay(fov, coneVector, this.getFovRangeIntersection(fov, points[i], points[i + 1]));
+      } else if (ray2InRange && !ray1InRange) {
+        ray1 = this.getRay(fov, coneVector, this.getFovRangeIntersection(fov, points[i], points[i + 1]));
+      }
 
-        rays.push(ray1);
+      if (ray1.angle > -fovAngle && ray1.angle < fovAngle) {
         wallRays.push(ray1);
 
-        if (!ray2InRange) {
-          // Move ray along the wall until it is at FOV range
-          ray2 = this.getRay(fov, coneVector, this.getFovRangeIntersection(fov, points[i], points[i + 1]));
-          rays.push(ray2);
-        } else if (i === points.length - 2) {
-          rays.push(ray2);
-          let rightEndpoint = getRotatedEndpoint(fov.center, points[i + 1], 0.01, fov.range);
-          //let rightEndpoint = this.getExtendedEndpoint(fov.center, points[i + 1], fov.range);
-          let rightRay = this.getRay(fov, coneVector, rightEndpoint);
-          rightRay.angle = ray2.angle;
-          rays.push(rightRay);
-          wallRays.push(rightRay);
-        }
+        if (ray1.distance <= fov.range) {
+          if (ray1InRange && ray1InAngle && i === 0) {
+            let leftEndpoint = getRotatedEndpoint(fov.center, points[i], -0.01, fov.range);
+            //let leftEndpoint = this.getExtendedEndpoint(fov.center, points[i], fov.range);
+            let leftRay = this.getRay(fov, coneVector, leftEndpoint);
+            leftRay.angle = ray1.angle;
+            rays.push(leftRay);
+            wallRays.push(leftRay);
+          }
 
+          rays.push(ray1);
+        }
+      }
+
+      if (ray2.angle > -fovAngle && ray2.angle < fovAngle) {
         wallRays.push(ray2);
+
+        if (ray2.distance <= fov.range) {
+          rays.push(ray2);
+
+          if (ray2InRange && ray2InAngle && i === points.length - 2) {
+            let rightEndpoint = getRotatedEndpoint(fov.center, points[i + 1], 0.01, fov.range);
+            //let rightEndpoint = this.getExtendedEndpoint(fov.center, points[i + 1], fov.range);
+            let rightRay = this.getRay(fov, coneVector, rightEndpoint);
+            rightRay.angle = ray2.angle;
+            rays.push(rightRay);
+            wallRays.push(rightRay);
+          }
+        }
       }
 
       walls.push({
@@ -342,6 +352,10 @@ export default class FieldOfView {
     let coneVector = new Vec3(fov.target).minus(fov.center).normalize();
     let rays = this.getRays(objects, fov, coneVector);
     this.refineRays(rays, fov);
+
+    if (window.debug) {
+      this.walls = rays.walls;
+    }
     //this.pruneRays(rays.rays);
 
     let bounds = [];
@@ -431,12 +445,14 @@ export default class FieldOfView {
     //   context.lineTo(triangle.points[2].x, triangle.points[2].y);
     //   context.stroke();
     // }
-    // context.strokeStyle = "green";
-    // for (const wall of rays.walls) {
-    //   context.beginPath();
-    //   context.moveTo(wall.line[0].x, wall.line[0].y);
-    //   context.lineTo(wall.line[1].x, wall.line[1].y);
-    //   context.stroke();
-    // }
+    context.strokeStyle = "green";
+    if (this.walls) {
+    for (const wall of this.walls) {
+        context.beginPath();
+        context.moveTo(wall.line[0].x, wall.line[0].y);
+        context.lineTo(wall.line[1].x, wall.line[1].y);
+        context.stroke();
+      }
+    }
   }
 }

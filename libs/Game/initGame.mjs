@@ -353,7 +353,7 @@ function initGame(players, maps) {
     }
   ));
 
-  //addScenes(maps);
+  addScenes(maps);
   //gameObjects = gameObjects.concat(addScenes(maps));
 
   return gameObjects;

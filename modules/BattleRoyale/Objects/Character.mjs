@@ -122,7 +122,7 @@ export default class Character extends GameObject {
         y: this.dimensions.height - 10
       }),
       target: this.state.target,
-      range: 500,
+      range: 1100,
       angle: 90
     };
   }
