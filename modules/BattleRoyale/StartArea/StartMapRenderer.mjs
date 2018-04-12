@@ -5,16 +5,15 @@ import ImageCache from "../../Engine/Rendering/ImageCache.mjs"
 //import Renderer from "../../Engine/Rendering/Renderer.mjs"
 
 export default class StartMapRenderer {
-  constructor(params) {
-    _.merge(this, params);
-    if (images) {
-      this.images = images;
-    } else {
-      this.image = ImageCache.get(params.imageSource);
-    }
+  constructor(map, mapDimensions) {
+    this.map = map;
+    this.mapDimensions = mapDimensions;
   }
 
   render(context, object, elapsedTime) {
-    this.map.renderMinimap(context, object.position.x, object.position.y, object.width, object.height);
+    this.map.renderMinimap(context, {
+      position: object.position,
+      dimensions: this.mapDimensions
+    });
   }
 }

@@ -8,6 +8,7 @@ import StaticObject from "../../modules/BattleRoyale/Objects/StaticObject.mjs"
 import GameSettings from "../../modules/Engine/GameSettings.mjs"
 import Quadtree from "quadtree-lib"
 import BattleRoyaleServer from "../../modules/BattleRoyale/BattleRoyaleServer.mjs"
+import createStartMap from "../../modules/BattleRoyale/StartArea/createStartMap.mjs"
 
 const TICK_RATE = 20;
 const SIMULATION_TIME = 1000 / TICK_RATE;
@@ -17,20 +18,12 @@ GameSettings.isServer = true;
 export default class Simulation {
   constructor(params) {
     _.merge(this, params);
-    let maps = {
-      // "-1": new Map({
-      //   seeds: {
-      //     death: 5,
-      //     water: 5
-      //   }
-      // }),
-      "0": new Map({
-        seeds: {
-          plain: 5,
-          forest: 5
-        }
-      })
-    };
+    let maps = {};
+    maps[0] = new Map();
+    maps[0].generateSimplex();
+
+    maps["start"] = createStartMap(maps, params.players);
+
     this.game = new BattleRoyaleServer({
       isServer: true,
       simulation: true,
@@ -72,7 +65,7 @@ export default class Simulation {
   getObjects() { return this.game.gameState.objects.map((obj) => obj.getUpdateState()) }
 
   getPlayerViewObjects(player) {
-    return _.intersectionBy(this.lastState, this.game.grid.getRenderObjects(player.character.viewBounds), "objectId");
+    return _.intersectionBy(this.lastState, this.game.grid.getRenderObjects(player.character.viewBounds, player.character.level), "objectId");
     //return this.lastState;
   }
 

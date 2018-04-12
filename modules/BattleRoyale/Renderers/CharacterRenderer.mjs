@@ -359,7 +359,9 @@ export default class CharacterRenderer {
     //if (object.position.z > 0) {
       //drawShadow(context, object, object.modelDimensions);
     //}
-    this.drawDirectionMarker(context, object);
+    if (!object.state.dead) {
+      this.drawDirectionMarker(context, object);
+    }
 
     context.drawImage(this.shadowImage,
       object.position.x + object.width / 2 - this.shadowImage.width / 2,

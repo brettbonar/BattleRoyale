@@ -106,6 +106,7 @@ export default class BattleRoyaleController extends GameController {
           quadTrees: quadTrees
         });
         this.game.updateObjects({ objects: objectsData[0], elapsedTime: 0 });
+        this.game.processUpdates(0);
         this.initialized.then(() => this.socket.emit("initialized", "initialized"));
 
         this.socket.on("start", (data) => {

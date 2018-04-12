@@ -104,9 +104,9 @@ function addScenes(maps) {
     }
 
     // TODO: refine bounds, remove objects that break rules, ensure min/max counts are held
-    map.setObjects(mapObjects);
+    map.objects = map.objects.concat(mapObjects);
 
-    objects = objects.concat(mapObjects);
+    objects = objects.concat(map.objects);
   });
 
   return objects;
@@ -181,6 +181,7 @@ function initGame(players, maps) {
   //players.push({ playerId: 1, socket: { emit: _.noop } });
   for (const player of players) {
     let char = new Character({
+      //level: "start",
       body: "tanned",
       gender: "male",
       isPlayer: true,
@@ -345,14 +346,14 @@ function initGame(players, maps) {
   // ));
 
 
-  // gameObjects = gameObjects.concat(scenes.house.getObjects(
-  //   {
-  //     x: 300,
-  //     y: 300
-  //   }
-  // ));
+  gameObjects = gameObjects.concat(scenes.house.getObjects(
+    {
+      x: 300,
+      y: 300
+    }
+  ));
 
-  addScenes(maps);
+  //addScenes(maps);
   //gameObjects = gameObjects.concat(addScenes(maps));
 
   return gameObjects;

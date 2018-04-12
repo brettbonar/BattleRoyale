@@ -10,6 +10,7 @@ export default class Effect {
     this.direction = params.direction;
     this.speed = params.speed;
     this.duration = params.duration;
+    this.level = params.level;
     
     if (params.dimensions) {
       this.dimensions = params.dimensions;

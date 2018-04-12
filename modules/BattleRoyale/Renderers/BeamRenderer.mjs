@@ -70,7 +70,6 @@ export default class BeamRenderer {
 
     if (clipping) {
       let clipStart = object.bounds.ul
-        .add(object.perspectiveOffset)
         .add(clipping.offset)
         .subtract({ y: object.position.z });
       

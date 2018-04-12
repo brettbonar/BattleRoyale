@@ -10,6 +10,7 @@ class Particle {
     this.rotation = Math.atan2(this.direction.y - this.direction.z, this.direction.x ) * 180 / Math.PI;
     this.rotationDiff = 0;
     this.dimensions = this.particleInfo.dimensions;
+    this.level = params.level;
 
     if (this.particleInfo.minDuration || this.particleInfo.maxDuration) {
       this.duration = _.random(this.particleInfo.minDuration, this.particleInfo.maxDuration);
@@ -27,6 +28,13 @@ class Particle {
     if (this.particleInfo.acceleration) {
       this.particleInfo.acceleration = new Vec3(this.particleInfo.acceleration);
     }
+  }
+
+  get modelBounds() {
+    return {
+      position: this.position,
+      dimensions: this.dimensions
+    };
   }
 
   get width() {
@@ -180,7 +188,8 @@ export default class ParticleEffect extends Effect {
     this.particles.push(new Particle({
       position: position,
       direction: direction,
-      particleInfo: this.particleInfo
+      particleInfo: this.particleInfo,
+      level: this.level
     }));
   }
 

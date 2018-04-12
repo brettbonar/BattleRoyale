@@ -26,6 +26,7 @@ import RenderObject from "./Objects/RenderObject.mjs"
 import ImageCache from "../Engine/Rendering/ImageCache.mjs"
 import ParticleEffect from "../Engine/Effects/ParticleEffect.mjs"
 import Grid from "../Engine/Grid.mjs"
+import LevelGrids from "../Engine/LevelGrids.mjs";
 
 const EVENTS = {
   MOVE_UP: "moveUp",
@@ -46,7 +47,7 @@ export default class BattleRoyale extends Game {
     super(params);
     
     // TODO: create a separate render grid?
-    this.grid = new Grid(400);
+    this.grid = new LevelGrids(400);
     this.physicsEngine = new PhysicsEngine(this.grid);
     this.updates = [];
     this.collisions = [];

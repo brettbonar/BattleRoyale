@@ -14,7 +14,8 @@ const BIOMES = {
   DEATH: "death",
   PLAIN: "plain",
   WATER: "water",
-  FIRE: "fire"
+  FIRE: "fire",
+  STONE: "stone"
 };
 
 const BIOME_PARAMS = {
@@ -39,18 +40,26 @@ const BIOME_PARAMS = {
     flavorDensity: 0.1,
     sceneDensity: 0.025,
     noise: {
-      min: 0.25,
-      max: 1.0
+      min: -0.5,
+      max: 0.25
     }
   },
   [BIOMES.PLAIN]: {
     flavorDensity: 0.1,
     sceneDensity: 0.005,
     noise: {
-      min: -0.5,
-      max: 0.25
+      min: 0.25,
+      max: 1.0
     }
   },
+  [BIOMES.STONE]: {
+    flavorDensity: 0.1
+    //sceneDensity: 0.005,
+    // noise: {
+    //   min: -0.5,
+    //   max: 0.25
+    // }
+  }
 };
 
 const GROWTH_TYPE = {
@@ -76,7 +85,8 @@ const TERRAIN_PRIORITY = {
   [BIOMES.WATER]: -1,
   [BIOMES.DESERT]: 2,
   [BIOMES.FOREST]: 3,
-  [BIOMES.PLAIN]: 4
+  [BIOMES.PLAIN]: 4,
+  [BIOMES.STONE]: 5
 };
 
 const TERRAIN_OFFSETS = {
@@ -103,6 +113,10 @@ const TERRAIN_OFFSETS = {
   [BIOMES.PLAIN]: {
     x: 32,
     y: 32 * 9
+  },
+  [BIOMES.STONE]: {
+    x: 128,
+    y: 480
   }
 };
 
@@ -164,16 +178,11 @@ class Map {
       this.buildMap(params.map);
     } else {
       this.initializeMap();
-      this.generateSimplex();
     }    
   }
 
   static get BIOMES() { return BIOMES; }
   static get BIOME_PARAMS() { return BIOME_PARAMS; }
-
-  setObjects(objects) {
-    this.objects = objects;
-  }
 
   buildMap(map) {
     this.map = [];
@@ -668,13 +677,6 @@ class Map {
     }
   }
 
-  initTile(tile, type) {
-    tile.type = type;
-    if (Math.random() <= BIOME_PARAMS[type].flavorDensity) {
-      tile.flavor = _.sample(_.filter(flavor, { biome: type })).name;
-    }
-  }
-
   getTileType(noise) {
     return _.findKey(BIOME_PARAMS, (params, type) => {
       return params.noise && noise < params.noise.max && noise >= params.noise.min;
@@ -685,11 +687,8 @@ class Map {
     return this.map[Math.floor(position.x / this.tileSize)][Math.floor(position.y / this.tileSize)];
   }
 
-  initTileSimplex(tile, noise) {
-    let type = this.getTileType(noise);
+  initTile(tile, type) {
     tile.type = type;
-    // Get noise in 0-1 range
-    tile.noise = (noise - BIOME_PARAMS[type].noise.min) / (BIOME_PARAMS[type].noise.max - BIOME_PARAMS[type].noise.min);
     if (Math.random() <= BIOME_PARAMS[type].flavorDensity) {
       let tileFlavor = _.sample(_.filter(flavor, { biome: type }));
       if (tileFlavor) {
@@ -706,8 +705,10 @@ class Map {
       let height = this.map[x].length;
       for (let y = 0; y < height; y++) {
         let noise = simplexNoise.noise2D(x / 256 - 0.5, y / 256 - 0.5)
-        //let noise = simplexNoise.noise2D(x / width - 0.5, y / height - 0.5)
-        this.initTileSimplex(this.map[x][y], noise);
+        let type = this.getTileType(noise);
+        // Get noise in 0-1 range
+        //tile.noise = (noise - BIOME_PARAMS[type].noise.min) / (BIOME_PARAMS[type].noise.max - BIOME_PARAMS[type].noise.min);
+        this.initTile(this.map[x][y], type);
       }
     }    
   }

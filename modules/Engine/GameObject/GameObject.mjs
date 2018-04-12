@@ -496,7 +496,8 @@ export default class GameObject extends GameObjectProxy {
       "elapsedTime",
       "physics",
       "speed",
-      "zspeed"
+      "zspeed",
+      "level"
     ]);
   }
 

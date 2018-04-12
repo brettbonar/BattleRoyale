@@ -2,6 +2,7 @@ import GameObject from "../../Engine/GameObject/GameObject.mjs"
 import ProjectileRenderer from "../Renderers/ProjectileRenderer.mjs"
 import attacks from "../Magic/attacks.mjs"
 import Vec3 from "../../Engine/GameObject/Vec3.mjs"
+import Bounds from "../../Engine/GameObject/Bounds.mjs"
 import Dimensions from "../../Engine/GameObject/Dimensions.mjs"
 import { getDistance, getRotatedEndpoint } from "../../Engine/util.mjs"
 import { getRangeMap, smoothStop } from "../../Engine/Math.mjs"
@@ -15,6 +16,7 @@ export default class Projectile extends GameObject {
     this.boundsType = "circle";
     this.damagedTargets = [];
     this.source = params.source;
+    this.level = params.source.level;
     // TODO: action IDs?
     this.action = params.action;
     this.damageReady = true;
@@ -127,15 +129,38 @@ export default class Projectile extends GameObject {
 
   updatePosition() {
     if (this.lastPosition && this.effect && this.effect.path === "beam") {
-      this.dimensions.width = Math.max(this.attack.dimensions.width, Math.abs(this.position.x - this.lastPosition.x));
-      this.dimensions.height = Math.max(this.attack.dimensions.height, Math.abs(this.position.y - this.lastPosition.y));
+      this.dimensions.width = Math.abs(this.position.x - this.lastPosition.x) + this.attack.dimensions.height;
+      this.dimensions.height = Math.abs(this.position.y - this.lastPosition.y) + this.attack.dimensions.height;
+
       this.perspectiveOffset = {
         x: Math.min(this.position.x, this.lastPosition.x) - this.position.x,
         y: Math.min(this.position.y, this.lastPosition.y) - this.position.y
       };
+      
+      // let offset = new Vec3({
+      //   x: Math.min(this.position.x, this.lastPosition.x),
+      //   y: Math.min(this.position.y, this.lastPosition.y)
+      // }).minus(this.position);
+      this.modelDimensions = {
+        offset: this.perspectiveOffset,
+        dimensions: this.dimensions
+      };
     }
 
     super.updatePosition();
+  }
+
+  get bounds() {
+    if (this.effect.path === "beam") {
+      return new Bounds({
+        position: new Vec3({
+          x: Math.min(this.position.x, this.lastPosition.x),
+          y: Math.min(this.position.y, this.lastPosition.y)
+        }),
+        dimensions: this.dimensions
+      });
+    }
+    return super.bounds;
   }
 
   update(elapsedTime) {
@@ -145,7 +170,6 @@ export default class Projectile extends GameObject {
     }
 
     if (this.effect.path === "beam") {
-      this.collided = false;
       if (!this.source || !this.source.currentAction || this.source.currentAction.actionId !== this.actionId) {
         this.done = true;
       } else {
@@ -158,6 +182,7 @@ export default class Projectile extends GameObject {
         if (this.currentTime >= this.damageInterval) {
           this.damagedTargets.length = 0;
           this.damageReady = true;
+          this.collided = false;
           this.currentTime = this.currentTime - this.damageInterval;
         }
       }

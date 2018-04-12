@@ -122,7 +122,7 @@ export default class Character extends GameObject {
         y: this.dimensions.height - 10
       }),
       target: this.state.target,
-      range: 1100,
+      range: 500,
       angle: 90
     };
   }
@@ -347,6 +347,7 @@ export default class Character extends GameObject {
     let center = this.attackCenter;
     let direction = new Vec3(target).minus(center).normalize();
 
+    // TODO: slow down character if target direction doesn't match movement direction
     if (target.x < center.x && Math.abs(direction.x) >= Math.abs(direction.y)) {
       this.state.characterDirection = "left";
     } else if (target.x > center.x && Math.abs(direction.x) >= Math.abs(direction.y)) {

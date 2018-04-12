@@ -30,6 +30,7 @@ import RenderObject from "./Objects/RenderObject.mjs"
 import ImageCache from "../Engine/Rendering/ImageCache.mjs"
 import ParticleEffect from "../Engine/Effects/ParticleEffect.mjs";
 import FieldOfView from "../Engine/FieldOfView.mjs";
+import StartMap from "./StartArea/StartMap.mjs"
 
 const EVENTS = {
   MOVE_UP: "moveUp",
@@ -196,6 +197,8 @@ export default class BattleRoyaleClient extends BattleRoyale {
       return new Projectile(object);
     } else if (object.type === "Item") {
       return new Item(object);
+    } else if (object.type === "StartMap") {
+      return new StartMap(object, this.maps[object.mapLevel]);
     } else {
       console.log("Unsupported object type in createObject: " + object.type);
     }
@@ -288,7 +291,8 @@ export default class BattleRoyaleClient extends BattleRoyale {
           position: {
             x: collision.target.center.x,
             y: collision.target.center.y
-          }
+          },
+          level: collision.target.level
         }, collision.target.damagedEffect));
       }
       
@@ -304,6 +308,7 @@ export default class BattleRoyaleClient extends BattleRoyale {
               x: collision.sourceBounds.width / 2,
               y: collision.sourceBounds.height / 2
             }),
+            level: collision.source.level,
             direction: collision.source.direction,
             speed: collision.source.speed,
             rotation: collision.source.rotation,
@@ -313,7 +318,8 @@ export default class BattleRoyaleClient extends BattleRoyale {
           this.addObject(new RenderObject({
             position: collision.position,
             //dimensions: collision.source.dimensions,
-            rotation: collision.source.rotation
+            rotation: collision.source.rotation,
+            level: collision.source.level
           }, collision.source.rendering.hitEffect));
         }
       }
@@ -450,7 +456,8 @@ export default class BattleRoyaleClient extends BattleRoyale {
         width: this.context.canvas.width + 500,
         height: this.context.canvas.height + 500
       }
-    }));
+    }),
+    this.gameState.player.level);
   }
 
   renderInteractions() {
@@ -464,7 +471,7 @@ export default class BattleRoyaleClient extends BattleRoyale {
     }
   }
 
-  _render(elapsedTime) {
+  _render(elapsedTime) {    
     this.context.save();
     this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
     //this.context.fillRect(0, 0, this.canvas.width, this.canvas.height);
@@ -479,7 +486,10 @@ export default class BattleRoyaleClient extends BattleRoyale {
     this.context.translate(-(this.gameState.player.center.x - this.context.canvas.width / 2),
     -(this.gameState.player.center.y - this.context.canvas.height / 2));
 
-    let fov = new FieldOfView(this.gameState.player.fov, this.getRenderObjects());
+    let fov;
+    if (!this.gameState.player.state.dead) {
+      fov = new FieldOfView(this.gameState.player.fov, this.getRenderObjects());
+    }
     this.renderingEngine.render(this.context, this.getRenderObjects(), elapsedTime,
       this.gameState.player.center, fov);
     //this.particleEngine.render(elapsedTime, this.gameState.player.center);

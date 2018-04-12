@@ -33,7 +33,7 @@ export default class PerspectiveRenderingEngine extends RenderingEngine{
   }
 
   isAnyObjectHidden(losHiddenObjects, fadeObject) {
-    return losHiddenObjects.some((obj) => obj.modelBounds.intersects(fadeObject.modelBounds));
+    return losHiddenObjects.some((obj) => obj.modelBounds.intersects2D(fadeObject.modelBounds));
   }
 
   renderObject(context, object, elapsedTime, losHiddenObjects, clipping) {
@@ -48,6 +48,39 @@ export default class PerspectiveRenderingEngine extends RenderingEngine{
 
   sortClips(clip) {
     return clip.object.position.z + clip.object.dimensions.zheight;
+  }
+
+  renderClips(context, y, clips, elapsedTime, objsToRender) {
+    // TODO: ignore small things like particles when clipping
+    for (const clip of clips) {
+      let height = 0;
+      if (y >= clip.bottom) {
+        height = clip.object.height - clip.previousClip;
+      } else {
+        height = Math.round(Math.min(clip.object.height - clip.previousClip,
+          (y - clip.top - clip.previousClip) - clip.object.zheight));
+      }
+
+      if (height > 0) {
+        let clipping = {
+          offset: new Vec3({
+            x: 0,
+            y: clip.previousClip
+          }),
+          dimensions: new Dimensions({
+            width: clip.object.width,
+            height: height + 1 // TRICKY: add 1 to prevent one off rendering artifacts
+          })
+        };
+        // TODO: reset elapsed time after first render?
+        this.renderObject(context, clip.object, elapsedTime, objsToRender.losHiddenObjects, clipping);
+
+        clip.previousClip += height;
+        if (clip.previousClip >= clip.object.height) {
+          _.pull(clips, clip);
+        }
+      }
+    }
   }
 
   // Render highest to lowest y
@@ -91,54 +124,27 @@ export default class PerspectiveRenderingEngine extends RenderingEngine{
           continue;
         }
 
-        // TODO: ignore small things like particles when clipping
-        for (const clip of clips) {
-          let height = 0;
-          if (y >= clip.bottom) {
-            height = clip.object.height - clip.previousClip;
-          } else {
-            height = Math.round(Math.min(clip.object.height - clip.previousClip,
-              (y - clip.top - clip.previousClip) - clip.object.zheight));
-          }
-
-          if (height > 0) {
-            let clipping = {
-              offset: new Vec3({
-                x: 0,
-                y: clip.previousClip
-              }),
-              dimensions: new Dimensions({
-                width: clip.object.width,
-                height: height + 1 // TRICKY: add 1 to prevent one off rendering artifacts
-              })
-            };
-            // TODO: reset elapsed time after first render?
-            this.renderObject(context, clip.object, elapsedTime, objsToRender.losHiddenObjects, clipping);
-
-            clip.previousClip += height;
-            if (clip.previousClip >= clip.object.height) {
-              _.pull(clips, clip);
-            }
-          }
+        if (clips.some((clip) => clip.object.modelBounds.intersects2D(object.modelBounds))) {
+          this.renderClips(context, y, clips, elapsedTime, objsToRender);
         }
-
         this.renderObject(context, object, elapsedTime, objsToRender.losHiddenObjects);
       }
     }
 
-    for (const clip of clips) {
-      let clipping = {
-        offset: new Vec3({
-          x: 0,
-          y: clip.previousClip
-        }),
-        dimensions: new Dimensions({
-          width: clip.object.width,
-          height: clip.object.height - clip.previousClip
-        })
-      };
-      this.renderObject(context, clip.object, elapsedTime, center, clipping);
-    }
+    this.renderClips(context, Number.MAX_SAFE_INTEGER, clips, elapsedTime, objsToRender);
+    // for (const clip of clips) {
+    //   let clipping = {
+    //     offset: new Vec3({
+    //       x: 0,
+    //       y: clip.previousClip
+    //     }),
+    //     dimensions: new Dimensions({
+    //       width: clip.object.width,
+    //       height: clip.object.height - clip.previousClip
+    //     })
+    //   };
+    //   this.renderObject(context, clip.object, elapsedTime, center, clipping);
+    // }
     
     if (window.debug) {
       this.debugBoxes(context, objects);
@@ -190,29 +196,29 @@ export default class PerspectiveRenderingEngine extends RenderingEngine{
     //     object.width, object.height);
     // }
 
-    // let box = object.boundingBox;
-    // if (box) {
-    //   context.strokeStyle = "yellow";
-    //   context.strokeRect(box.ul.x, box.ul.y, box.width, box.height);
-    // }
+    let box = object.modelBounds;
+    if (box) {
+      context.strokeStyle = "yellow";
+      context.strokeRect(box.ul.x, box.ul.y, box.width, box.height);
+    }
       
-    if (object.lastCollisionBounds) {
-      for (const bounds of object.lastCollisionBounds) {
-        if (!bounds.box) continue; // TODO: render ray bounds
-        context.strokeStyle = "lawnGreen";
-        context.strokeRect(bounds.ul.x, bounds.ul.y - bounds.ul.z,
-          bounds.width, bounds.height);
-      }
-    }
+    // if (object.lastCollisionBounds) {
+    //   for (const bounds of object.lastCollisionBounds) {
+    //     if (!bounds.box) continue; // TODO: render ray bounds
+    //     context.strokeStyle = "lawnGreen";
+    //     context.strokeRect(bounds.ul.x, bounds.ul.y - bounds.ul.z,
+    //       bounds.width, bounds.height);
+    //   }
+    // }
 
-    if (object.collisionBounds) {
-      for (const bounds of object.collisionBounds) {
-        if (!bounds.box) continue; // TODO: render ray bounds
-        context.strokeStyle = "crimson";
-        context.strokeRect(bounds.ul.x, bounds.ul.y - bounds.ul.z,
-          bounds.width, bounds.height);
-      }
-    }
+    // if (object.collisionBounds) {
+    //   for (const bounds of object.collisionBounds) {
+    //     if (!bounds.box) continue; // TODO: render ray bounds
+    //     context.strokeStyle = "crimson";
+    //     context.strokeRect(bounds.ul.x, bounds.ul.y - bounds.ul.z,
+    //       bounds.width, bounds.height);
+    //   }
+    // }
     // for (let i = 0; i < object.collisionBounds.length; i++) {
     //   context.strokeStyle = "blue";
     //   let bounds = object.lastCollisionBounds[i].plus(object.collisionBounds[i]);

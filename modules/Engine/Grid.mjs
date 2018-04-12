@@ -51,12 +51,16 @@ export default class Grid {
   remove(object) {
     if (object.collisionGrids) {
       for (const grid of object.collisionGrids) {
-        _.pull(this.collisionGrid[grid.x][grid.y], object);
+        if (this.collisionGrid[grid.x] && this.collisionGrid[grid.x][grid.y]) {
+          _.pull(this.collisionGrid[grid.x][grid.y], object);
+        }
       }
     }
     if (object.renderGrids) {
       for (const grid of object.renderGrids) {
-        _.pull(this.renderGrid[grid.x][grid.y], object);
+        if (this.renderGrid[grid.x] && this.renderGrid[grid.x][grid.y]) {
+          _.pull(this.renderGrid[grid.x][grid.y], object);
+        }
       }
     }
   }
