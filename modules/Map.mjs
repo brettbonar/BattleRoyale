@@ -124,8 +124,8 @@ class Map {
   constructor(params) {
     _.merge(this, params);
     _.defaults(this, {
-      mapWidth: 128,
-      mapHeight: 128,
+      mapWidth: 256,
+      mapHeight: 256,
       tileSize: 32,
       map: [],
       objects: [],

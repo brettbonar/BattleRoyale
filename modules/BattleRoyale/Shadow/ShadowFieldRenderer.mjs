@@ -35,8 +35,8 @@ export default class ShadowFieldRenderer {
   }
 
   renderToTempCanvas(context, object, elapsedTime, clipping, ul) {
-    this.canvas.canvas.width = context.canvas.width;
-    this.canvas.canvas.height = context.canvas.height;
+    this.canvas.canvas.width = context.canvas.width + 8;
+    this.canvas.canvas.height = context.canvas.height + 8;
 
     this.canvas.context.save();
 
@@ -65,21 +65,21 @@ export default class ShadowFieldRenderer {
     if (imageOffset1.x > 0) {
       let width = this.image.width - imageOffset1.x;
       let width2 = this.image2.width - imageOffset2.x;
-      this.canvas.context.drawImage(this.image, imageOffset1.x, imageOffset1.y, width, object.dimensions.height,
-        0, 0, width, object.dimensions.height);
-      this.canvas.context.drawImage(this.image, 0, imageOffset1.y, object.dimensions.width - width, object.dimensions.height,
-        width, 0, object.dimensions.width - width, object.dimensions.height);
+      this.canvas.context.drawImage(this.image, imageOffset1.x, imageOffset1.y, width, this.canvas.canvas.height,
+        0, 0, width, this.canvas.canvas.height);
+      this.canvas.context.drawImage(this.image, 0, imageOffset1.y, this.canvas.canvas.width - width, this.canvas.canvas.height,
+        width, 0, this.canvas.canvas.width - width, this.canvas.canvas.height);
 
-      this.canvas.context.drawImage(this.image2, imageOffset2.x, imageOffset2.y, width2, object.dimensions.height,
-        0, 0, width2, object.dimensions.height - 1);
-      this.canvas.context.drawImage(this.image2, 0, imageOffset2.y, object.dimensions.width - width2, object.dimensions.height,
-        width2, 0, object.dimensions.width - width2, object.dimensions.height);
+      this.canvas.context.drawImage(this.image2, imageOffset2.x, imageOffset2.y, width2, this.canvas.canvas.height,
+        0, 0, width2, this.canvas.canvas.height - 1);
+      this.canvas.context.drawImage(this.image2, 0, imageOffset2.y, this.canvas.canvas.width - width2, this.canvas.canvas.height,
+        width2, 0, this.canvas.canvas.width - width2, this.canvas.canvas.height);
     } else {
-      this.canvas.context.drawImage(this.image, imageOffset1.x, imageOffset1.y, object.dimensions.width, object.dimensions.height,
-        0, 0, object.dimensions.width, object.dimensions.height);
+      this.canvas.context.drawImage(this.image, imageOffset1.x, imageOffset1.y, this.canvas.canvas.width, this.canvas.canvas.height,
+        0, 0, this.canvas.canvas.width, this.canvas.canvas.height);
 
-      this.canvas.context.drawImage(this.image2, imageOffset1.x, imageOffset1.y, object.dimensions.width, object.dimensions.height,
-        0, 0, object.dimensions.width, object.dimensions.height);
+      this.canvas.context.drawImage(this.image2, imageOffset1.x, imageOffset1.y, this.canvas.canvas.width, this.canvas.canvas.height,
+        0, 0, this.canvas.canvas.width, this.canvas.canvas.height);
     }
 
     // TODO: could avoid making gradient if it's not in view
@@ -117,7 +117,8 @@ export default class ShadowFieldRenderer {
     clipping.offset.y -= (ul.y - object.position.y);
 
     // TRICKY: subtract 1 since clipping adds 1 to height by default to avoid artifacts on most other images
-    context.drawImage(this.canvas.canvas, clipping.offset.x, clipping.offset.y, clipping.dimensions.width, clipping.dimensions.height - 1,
-      ul.x + clipping.offset.x, ul.y + clipping.offset.y, clipping.dimensions.width, clipping.dimensions.height - 1);
+    let height = Math.min(clipping.dimensions.height, this.canvas.canvas.height - clipping.offset.y) - 1;
+    context.drawImage(this.canvas.canvas, clipping.offset.x, clipping.offset.y, clipping.dimensions.width, height,
+      ul.x + clipping.offset.x, ul.y + clipping.offset.y, clipping.dimensions.width, height);
   }
 }
