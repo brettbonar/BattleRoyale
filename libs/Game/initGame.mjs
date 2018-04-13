@@ -327,14 +327,14 @@ function initGame(players, maps) {
   //   }
   // }, objects.caveExit));
 
-  // gameObjects.push(new StaticObject({
-  //   position: {
-  //     x: 700,
-  //     y: 700
-  //   },
-  //   objectType: "wheat",
-  //   simulation: true
-  // }));
+  gameObjects.push(new StaticObject({
+    position: {
+      x: 700,
+      y: 700
+    },
+    objectType: "wheat",
+    simulation: true
+  }));
 
   // gameObjects = gameObjects.concat(scenes.corn.getObjects(
   //   {
@@ -347,18 +347,26 @@ function initGame(players, maps) {
   //   }
   // ));
 
-  gameObjects = gameObjects.concat(new ShadowField({
-    position: {
-      x: 0,
-      y: 0,
-      z: 0
-    },
-    dimensions: {
-      width: 500,
-      height: 500,
-      zheight: 32
-    }
-  }));
+  // gameObjects = gameObjects.concat(new ShadowField({
+  //   // TODO: fix issue with 0, 0
+  //   position: {
+  //     x: 1,
+  //     y: 1,
+  //     z: 0
+  //   },
+  //   shadowCenter: {
+  //     x: 1000,
+  //     y: 1000
+  //   },
+  //   shadowRadius: 1000,
+  //   // TODO: inverse circle dimensions
+  //   dimensions: {
+  //     width: maps[0].mapParams.totalMapWidth,
+  //     height: maps[0].mapParams.totalMapHeight,
+  //     zheight: 16
+  //   },
+  //   simulation: true
+  // }));
 
   gameObjects = gameObjects.concat(scenes.house.getObjects(
     {

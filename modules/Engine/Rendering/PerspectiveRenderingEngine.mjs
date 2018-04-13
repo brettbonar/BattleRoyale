@@ -10,38 +10,21 @@ export default class PerspectiveRenderingEngine extends RenderingEngine{
     super(params);
   }
 
-  renderFaded(context, object, elapsedTime) {
-    if (object.fadeDimensions) {
-      context.globalAlpha = 0.3;
-      //object.render(context, elapsedTime);
-      object.render(context, elapsedTime, object.fadeDimensions);
-      let offset = object.fadeDimensions.offset || new Vec3();
-      let dimensions = object.fadeDimensions.dimensions || new Dimensions();
-
-      context.globalAlpha = 1;
-      object.render(context, 0, {
-        offset: offset.plus({ y: dimensions.height }),
-        dimensions: {
-          width: object.dimensions.width,
-          height: object.dimensions.height - dimensions.height
-        }
-      });
-    } else {
-      context.globalAlpha = 0.3;
-      object.render(context, elapsedTime);
-    }
+  renderFaded(context, object, elapsedTime, clipping, center) {
+    context.globalAlpha = 0.3;
+    object.render(context, elapsedTime, clipping, center);
   }
 
   isAnyObjectHidden(losHiddenObjects, fadeObject) {
     return losHiddenObjects.some((obj) => obj.modelBounds.intersects2D(fadeObject.modelBounds));
   }
 
-  renderObject(context, object, elapsedTime, losHiddenObjects, clipping) {
+  renderObject(context, object, elapsedTime, center, losHiddenObjects, clipping) {
     context.save();
     if (object.losFade && this.isAnyObjectHidden(losHiddenObjects, object)) {
-      this.renderFaded(context, object, elapsedTime, clipping);
+      this.renderFaded(context, object, elapsedTime, clipping, center);
     } else {
-      object.render(context, elapsedTime, clipping);
+      object.render(context, elapsedTime, clipping, center);
     }
     context.restore();
   }
@@ -50,7 +33,7 @@ export default class PerspectiveRenderingEngine extends RenderingEngine{
     return clip.object.position.z + clip.object.dimensions.zheight;
   }
 
-  renderClips(context, y, clips, elapsedTime, objsToRender) {
+  renderClips(context, y, clips, elapsedTime, center, objsToRender) {
     // TODO: ignore small things like particles when clipping
     for (const clip of clips) {
       let height = 0;
@@ -63,24 +46,25 @@ export default class PerspectiveRenderingEngine extends RenderingEngine{
 
       if (height > 0) {
         let clipping = {
-          offset: new Vec3({
+          offset: {
             x: 0,
             y: clip.previousClip
-          }),
+          },
           dimensions: new Dimensions({
             width: clip.object.width,
             height: height + 1 // TRICKY: add 1 to prevent one off rendering artifacts
           })
         };
         // TODO: reset elapsed time after first render?
-        this.renderObject(context, clip.object, elapsedTime, objsToRender.losHiddenObjects, clipping);
+        this.renderObject(context, clip.object, elapsedTime, center, objsToRender.losHiddenObjects, clipping);
 
         clip.previousClip += height;
         if (clip.previousClip >= clip.object.height) {
-          _.pull(clips, clip);
+          clip.done = true;
         }
       }
     }
+    _.remove(clips, "done");
   }
 
   // Render highest to lowest y
@@ -92,15 +76,11 @@ export default class PerspectiveRenderingEngine extends RenderingEngine{
       fov.debugRays(context);
     }
 
-    // if (center) {
-    //   context.translate(-(center.x - context.canvas.width / 2), -(center.y - context.canvas.height / 2));
-    // }
-
     let objsToRender = this.getRenderObjects(objects, center, fov);
     let renderObjects = objsToRender.renderObjects;
 
     for (const groundObject of objsToRender.groundObjects) {
-      this.renderObject(context, groundObject, elapsedTime, objsToRender.losHiddenObjects);
+      this.renderObject(context, groundObject, elapsedTime, center, objsToRender.losHiddenObjects);
     }
 
     if (fov) {
@@ -125,49 +105,17 @@ export default class PerspectiveRenderingEngine extends RenderingEngine{
         }
 
         if (clips.some((clip) => clip.object.modelBounds.intersects2D(object.modelBounds))) {
-          this.renderClips(context, y, clips, elapsedTime, objsToRender);
+          this.renderClips(context, y, clips, elapsedTime, center, objsToRender);
         }
-        this.renderObject(context, object, elapsedTime, objsToRender.losHiddenObjects);
+        this.renderObject(context, object, elapsedTime, center, objsToRender.losHiddenObjects);
       }
     }
 
-    this.renderClips(context, Number.MAX_SAFE_INTEGER, clips, elapsedTime, objsToRender);
-    // for (const clip of clips) {
-    //   let clipping = {
-    //     offset: new Vec3({
-    //       x: 0,
-    //       y: clip.previousClip
-    //     }),
-    //     dimensions: new Dimensions({
-    //       width: clip.object.width,
-    //       height: clip.object.height - clip.previousClip
-    //     })
-    //   };
-    //   this.renderObject(context, clip.object, elapsedTime, center, clipping);
-    // }
+    this.renderClips(context, Number.MAX_SAFE_INTEGER, clips, elapsedTime, center, objsToRender);
     
     if (window.debug) {
       this.debugBoxes(context, objects);
     }
-
-    
-    // let pos = {
-    //   x: 600,
-    //   y: 600
-    // };
-    // let radius = 1000;
-    // //context.globalCompositeOperation='difference';
-
-    // context.globalCompositeOperation='saturation';
-    // context.fillStyle = "hsl(0, 100%, 1%)";
-    // // let gradient2 = context.createRadialGradient(pos.x, pos.x, radius,
-    // //   pos.x, pos.y, 0);
-    // // context.globalAlpha = 1;
-    // // gradient2.addColorStop(0.5, "transparent");
-    // // gradient2.addColorStop(0.25, "white");
-    // // context.fillStyle = gradient2;
-    // context.fillRect(pos.x - radius, pos.y - radius,
-    //   radius * 2, radius * 2);
 
     context.restore();
   }

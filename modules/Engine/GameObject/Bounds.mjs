@@ -202,11 +202,12 @@ export default class Bounds {
   }
 
   constructFromRectangle(params) {
+    let position = new Vec3(params.position);
     this.box = {
-      ul: new Vec3(params.position),
-      ur: params.position.plus({ x: params.dimensions.width }),
-      lr: params.position.plus({ x: params.dimensions.width, y: params.dimensions.height }),
-      ll: params.position.plus({ y: params.dimensions.height })
+      ul: position,
+      ur: position.plus({ x: params.dimensions.width }),
+      lr: position.plus({ x: params.dimensions.width, y: params.dimensions.height }),
+      ll: position.plus({ y: params.dimensions.height })
     };
     this.zheight = params.dimensions.zheight;
 

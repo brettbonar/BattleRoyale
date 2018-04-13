@@ -197,6 +197,7 @@ export default class Character extends GameObject {
     this.state.dead = true;
     this.losHidden = false;
     this.dimensions.zheight = 5;
+    this.perspectiveOffset = { y: 1 };
     this.physics.surfaceType = SURFACE_TYPE.NONE;
     this.killedBy = source.ownerId;
     this.speed = 0;

@@ -486,8 +486,8 @@ export default class BattleRoyaleClient extends BattleRoyale {
     this.context.save();
     // Translate to player position
     // TODO: translate to player center?
-    this.context.translate(-(this.gameState.player.center.x - this.context.canvas.width / 2),
-    -(this.gameState.player.center.y - this.context.canvas.height / 2));
+    this.context.translate(-(this.gameState.player.center.x - this.context.canvas.width / 2 + 0.5),
+    -(this.gameState.player.center.y - this.context.canvas.height / 2 + 0.5));
 
     let fov;
     if (!this.gameState.player.state.dead) {

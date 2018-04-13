@@ -70,9 +70,14 @@ export default class ObjectRenderer {
 
   draw(context, object, position, clipping) {
     if (clipping) {
-      let offset = new Vec3(clipping.offset);
-      position = offset.plus(position);
-      let imageOffset = offset.plus(this.imageDimensions);
+      position = {
+        x: clipping.offset.x + position.x,
+        y: clipping.offset.y + position.y
+      };
+      let imageOffset = {
+        x: clipping.offset.x + this.imageDimensions.x,
+        y: clipping.offset.y + this.imageDimensions.y
+      };
       let imageDimensions = clipping.dimensions || this.imageDimensions;
       context.drawImage(this.image, imageOffset.x, imageOffset.y, clipping.dimensions.width, clipping.dimensions.height,
         position.x, position.y - object.position.z, imageDimensions.width, imageDimensions.height);

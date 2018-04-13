@@ -185,6 +185,8 @@ export default class Projectile extends GameObject {
           this.collided = false;
           this.currentTime = this.currentTime - this.damageInterval;
         }
+
+        this.updatePosition();
       }
     } else if (this.effect.path === "tracking") {
       if (!this.source || !this.source.currentAction || this.source.currentAction.actionId !== this.actionId) {

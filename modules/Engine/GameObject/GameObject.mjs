@@ -169,7 +169,7 @@ export default class GameObject extends GameObjectProxy {
       });
     }
     
-    //this.updateBounds();
+    this.updateBounds();
   }
 
   getCenterOfPoints(points) {
@@ -197,9 +197,9 @@ export default class GameObject extends GameObjectProxy {
 
   update(elapsedTime) {}
 
-  render(context, elapsedTime, clipping) {
+  render(context, elapsedTime, clipping, center) {
     if (!this.hidden && this.renderer) {
-      this.renderer.render(context, this, elapsedTime, clipping);
+      this.renderer.render(context, this, elapsedTime, clipping, center);
     }
   }
 
@@ -323,6 +323,27 @@ export default class GameObject extends GameObjectProxy {
   }
 
   updateBounds() {
+    let position = {
+      x: this.position.x,
+      y: this.position.y - this.position.z,
+      z: 0
+    };
+    if (this.modelDimensions) {
+      this.modelBounds = new Bounds({
+        position: {
+          x: this.position.x + this.modelDimensions.offset.x,
+          y: this.position.y + this.modelDimensions.offset.y
+        },
+        dimensions: this.modelDimensions.dimensions,
+        boundsType: this.boundsType
+      });
+    } else {
+      this.modelBounds = new Bounds({
+        position: position,
+        dimensions: this.dimensions,
+        boundsType: this.boundsType
+      });
+    }
     // if (this.lastPosition) {
     //   this.lastCollisionBounds = this.getBoundsFromDimens(this.lastPosition, this.collisionDimensions);
     //   this.collisionBounds = this.getBoundsFromDimens(this.position, this.collisionDimensions);
@@ -393,24 +414,6 @@ export default class GameObject extends GameObjectProxy {
       return this.getBoundsFromDimens(this.position, this.visibleDimensions);
     }
     return this.modelBounds;
-  }
-
-  get modelBounds() {
-    let position = this.position.copy();
-    position.y -= position.z;
-    position.z = 0;
-    if (this.modelDimensions) {
-      return new Bounds({
-        position: position.plus(this.modelDimensions.offset),
-        dimensions: this.modelDimensions.dimensions,
-        boundsType: this.boundsType
-      });
-    }
-    return new Bounds({
-      position: position,
-      dimensions: this.dimensions,
-      boundsType: this.boundsType
-    });
   }
 
   get boundingBox() {
