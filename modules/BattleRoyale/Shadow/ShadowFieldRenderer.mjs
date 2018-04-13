@@ -94,7 +94,7 @@ export default class ShadowFieldRenderer {
     var radGrd = this.canvas.context.createRadialGradient(object.shadowCenter.x - this.ul.x, object.shadowCenter.y - this.ul.y,
       Math.max(0, object.shadowRadius - 250), object.shadowCenter.x - this.ul.x, object.shadowCenter.y - this.ul.y, object.shadowRadius);
     radGrd.addColorStop(  0, "rgba( 0, 0, 0,  1 )" );
-    //radGrd.addColorStop( .8, "rgba( 0, 0, 0, .1 )" );
+    radGrd.addColorStop( .8, "rgba( 0, 0, 0, .3 )" );
     radGrd.addColorStop(  1, "rgba( 0, 0, 0,  0 )" );
     this.canvas.context.globalCompositeOperation = "destination-out";
     this.canvas.context.fillStyle = radGrd;

@@ -233,6 +233,9 @@ export default class BattleRoyale extends Game {
       if (obj.elapsedTime) {
         obj.elapsedTime = 0;
       }
+      if (obj._modified) {
+        this.grid.update(obj);
+      }
       if (obj instanceof Character && !obj.dead && obj.currentHealth <= 0) {
         obj.kill();
         if (this.onKill) {

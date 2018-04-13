@@ -5,6 +5,7 @@ const TYPE = {
   RECTANGLE_UL: "rectangleUl",
   AABB: "aabb",
   CIRCLE: "circle",
+  INVERSE_CIRCLE: "inverse_circle",
   POINT: "point",
   LINE: "line",
   TRIANGLE: "triangle",
@@ -28,6 +29,7 @@ export default class Bounds {
       this.type = TYPE.TRIANGLE;
     } else if (!_.isUndefined(params.dimensions.radius)) {
       this.constructFromCircle(params);
+      this.type = params.boundsType || TYPE.CIRCLE;
     } else if (!_.isUndefined(params.position)) {
       this.position = new Vec3(params.position);
       this.type = TYPE.POINT;
@@ -101,6 +103,33 @@ export default class Bounds {
       (z1 <= z2 && z1 + zheight1 >= z2) || (z2 <= z1 && z2 + zheight2 >= z1);
   }
 
+  // https://forums.tigsource.com/index.php?topic=26092.0
+  // TODO: 3D version?
+  static intersectsAABB_Circle(aabb, circle) {
+    let point = new Vec3(circle.center);
+    if(point.x > aabb.right.x) point.x = aabb.right.x;
+    if(point.x < aabb.left.x) point.x = aabb.left.x;
+    if(point.y > aabb.bottom.y) point.y = aabb.bottom.y;
+    if(point.y < aabb.top.y) point.y = aabb.top.y;
+
+    return point.distanceTo(circle.center) < circle.radius;
+  }
+
+  static intersectsAABB_AABB(first, second) {
+    return Bounds.checkZ(first.box.ul.z, first.zheight, second.box.ul.z, second.zheight) &&
+      first.box.ul.x < second.box.lr.x &&
+      first.box.lr.x > second.box.ul.x &&
+      first.box.ul.y < second.box.lr.y &&
+      first.box.lr.y > second.box.ul.y;
+  }
+
+  static intersectsAABB_AABB2D(first, second) {
+    return first.box.ul.x < second.box.lr.x &&
+      first.box.lr.x > second.box.ul.x &&
+      first.box.ul.y < second.box.lr.y &&
+      first.box.lr.y > second.box.ul.y;
+  }
+
   constructFromTriangle(params) {
     this.points = params.dimensions.triangle;
     this.lines = [];
@@ -134,6 +163,12 @@ export default class Bounds {
       [this.box.ll, this.box.ul]
     ];
     this.points = _.toArray(this.box);
+    this.center = new Vec3({
+      x: this.left.x + this.width / 2,
+      y: this.top.y + this.height / 2,
+      z: this.box.ul.z
+    });
+    this.radius = Math.sqrt(this.height * this.height + this.width * this.width) / 2;
   }
 
   plus(box) {
@@ -185,12 +220,25 @@ export default class Bounds {
   }
 
   constructFromCircle(params) {
+    this.radius = params.dimensions.radius;
     this.zheight = params.dimensions.zheight || 0;
     this.box = {
-      ul: params.position.plus({ x: -params.dimensions.radius, y: -params.dimensions.radius }),
-      ur: params.position.plus({ x: params.dimensions.radius, y: -params.dimensions.radius }),
-      lr: params.position.plus({ x: params.dimensions.radius, y: params.dimensions.radius }),
-      ll: params.position.plus({ x: -params.dimensions.radius, y: params.dimensions.radius })
+      ul: {
+        x: params.position.x - params.dimensions.radius, 
+        y: params.position.y - params.dimensions.radius 
+      },
+      ur: {
+        x: params.position.x + params.dimensions.radius, 
+        y:  params.position.y - params.dimensions.radius 
+      },
+      lr: {
+        x: params.position.x + params.dimensions.radius,
+        y: params.position.y + params.dimensions.radius 
+      },
+      ll: {
+        x: params.position.x - params.dimensions.radius,
+        y: params.position.y +  params.dimensions.radius
+      }
     };
 
     this.lines = [
@@ -199,6 +247,8 @@ export default class Bounds {
       [this.box.lr, this.box.ll],
       [this.box.ll, this.box.ul]
     ];
+
+    this.center = params.position;
   }
 
   constructFromRectangle(params) {
@@ -218,6 +268,12 @@ export default class Bounds {
       [this.box.ll, this.box.ul]
     ];
     this.points = _.toArray(this.box);
+    this.center = new Vec3({
+      x: this.left.x + this.width / 2,
+      y: this.top.y + this.height / 2,
+      z: params.position.z
+    });
+    this.radius = Math.sqrt(params.dimensions.height * params.dimensions.height + params.dimensions.width * params.dimensions.width) / 2;
   }
 
   getIntersections(target) {
@@ -247,6 +303,14 @@ export default class Bounds {
         return Bounds.intersectsAABB_Triangle(this, target);
       } else if (target.type === TYPE.AABB && this.type === TYPE.TRIANGLE) {
         return Bounds.intersectsAABB_Triangle(target, this);
+      } else if (this.type === TYPE.AABB && target.type === TYPE.CIRCLE) {
+        return Bounds.intersectsAABB_Circle(this, target);
+      } else if (target.type === TYPE.AABB && this.type === TYPE.CIRCLE) {
+        return Bounds.intersectsAABB_Circle(target, this);
+      } else if (this.type === TYPE.AABB && target.type === TYPE.INVERSE_CIRCLE) {
+        return !Bounds.intersectsAABB_Circle(this, target);
+      } else if (target.type === TYPE.AABB && this.type === TYPE.INVERSE_CIRCLE) {
+        return !Bounds.intersectsAABB_Circle(target, this);
       } else {
         // TODO: do better check
         return _.some(this.lines, (line) => _.some((target.lines), (targetLine) => Bounds.intersectsLine(line, targetLine, true)));
@@ -260,23 +324,25 @@ export default class Bounds {
     }
 
     return false;
-
   }
 
   intersects(target) {
     // TODO: add circle intersection tests
     if (target instanceof Bounds) {
       if (this.type === TYPE.AABB && target.type === TYPE.AABB) {
-        let box = target.box;
-        return Bounds.checkZ(this.box.ul.z, this.zheight, box.ul.z, target.zheight) &&
-          this.box.ul.x < box.lr.x &&
-          this.box.lr.x > box.ul.x &&
-          this.box.ul.y < box.lr.y &&
-          this.box.lr.y > box.ul.y;
+        return Bounds.intersectsAABB_AABB(this, target);
       } else if (this.type === TYPE.AABB && target.type === TYPE.TRIANGLE) {
         return Bounds.intersectsAABB_Triangle(this, target);
       } else if (target.type === TYPE.AABB && this.type === TYPE.TRIANGLE) {
         return Bounds.intersectsAABB_Triangle(target, this);
+      } else if (this.type === TYPE.AABB && target.type === TYPE.CIRCLE) {
+        return Bounds.intersectsAABB_Circle(this, target);
+      } else if (target.type === TYPE.AABB && this.type === TYPE.CIRCLE) {
+        return Bounds.intersectsAABB_Circle(target, this);
+      } else if (this.type === TYPE.AABB && target.type === TYPE.INVERSE_CIRCLE) {
+        return !Bounds.intersectsAABB_Circle(this, target);
+      } else if (target.type === TYPE.AABB && this.type === TYPE.INVERSE_CIRCLE) {
+        return !Bounds.intersectsAABB_Circle(target, this);
       } else {
         // TODO: do better check
         return _.some(this.lines, (line) => _.some((target.lines), (targetLine) => Bounds.intersectsLine(line, targetLine)));
@@ -292,11 +358,6 @@ export default class Bounds {
     return false;
   }
 
-  get radius() {
-    return this.dimensions.radius ||
-      Math.sqrt(this.dimensions.height * this.dimensions.height + this.dimensions.width * this.dimensions.width) / 2;
-  }
-  
   get ul() {
     return this.box.ul;
   }
@@ -321,14 +382,6 @@ export default class Bounds {
   }
   get right() {
     return this.box.lr;
-  }
-
-  get center() {
-    return new Vec3({
-      x: this.left.x + this.width / 2,
-      y: this.top.y + this.height / 2,
-      z: this.z
-    });
   }
 
   get x() { return this.box.ul.x; }

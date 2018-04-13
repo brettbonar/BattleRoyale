@@ -214,6 +214,10 @@ export default class BattleRoyaleServer extends BattleRoyale {
     if (collision.source.physics.surfaceType === SURFACE_TYPE.PROJECTILE ||
         collision.source.physics.surfaceType === SURFACE_TYPE.GAS) {
       
+      if (!collision.source.effect) {
+        return;
+      }
+
       // Don't let stream weapons interact with themselves
       if (collision.source.actionId === collision.target.actionId && collision.source.effect.path === "stream") {
         return;

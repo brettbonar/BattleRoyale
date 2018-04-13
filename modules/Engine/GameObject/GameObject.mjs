@@ -23,9 +23,9 @@ class GameObjectProxy {
           if (object[key] !== value) {
             object[key] = value;
             object._modified = true;
-            if (key === "position" && this.dimensions) {
-              this.updatePosition();
-            }
+            // if (key === "position" && this.dimensions) {
+            //   this.updatePosition();
+            // }
           }
           return true;
         }
@@ -335,7 +335,7 @@ export default class GameObject extends GameObjectProxy {
           y: this.position.y + this.modelDimensions.offset.y
         },
         dimensions: this.modelDimensions.dimensions,
-        boundsType: this.boundsType
+        boundsType: this.modelDimensions.boundsType
       });
     } else {
       this.modelBounds = new Bounds({
