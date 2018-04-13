@@ -17,6 +17,8 @@ import scenes from "../../modules/BattleRoyale/Objects/Scenes.mjs"
 import Map from "../../modules/Map.mjs"
 import ShadowField from "../../modules/BattleRoyale/Shadow/ShadowField.mjs"
 
+const SQRT_2 = 1.414;
+
 function canPlaceScene(scene, occupiedTiles) {
   if (!occupiedTiles || occupiedTiles.length === 0) {
     return false;
@@ -358,7 +360,7 @@ function initGame(players, maps) {
       x: maps[0].mapParams.totalMapWidth / 2,
       y: maps[0].mapParams.totalMapHeight / 2
     },
-    shadowRadius: maps[0].mapParams.totalMapWidth / 2,
+    shadowRadius: (maps[0].mapParams.totalMapWidth * SQRT_2) / 2,
     // TODO: inverse circle dimensions
     dimensions: {
       width: maps[0].mapParams.totalMapWidth,
