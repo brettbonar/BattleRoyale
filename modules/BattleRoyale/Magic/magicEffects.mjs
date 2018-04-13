@@ -179,6 +179,7 @@ export default {
         }
       }],
       physics: {
+        surfaceType: "gas",
         solidity: 0
       }
     }

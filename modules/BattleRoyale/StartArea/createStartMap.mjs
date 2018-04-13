@@ -1,5 +1,6 @@
 import Map from "../../Map.mjs"
 import SpawnMap from "./SpawnMap.mjs";
+import ShadowField from "../Shadow/ShadowField.mjs";
 
 function createStartMap(maps, players) {
   let size = 100;
@@ -29,6 +30,20 @@ function createStartMap(maps, players) {
     mapDimensions: mapDimensions,
     simulation: true
   }, maps[0]));
+
+  // startMap.objects.push(new ShadowField({
+  //   position: {
+  //     x: 0,
+  //     y: 0,
+  //     z: 0
+  //   },
+  //   level: "start",
+  //   dimensions: {
+  //     width: 500,
+  //     height: 500,
+  //     zheight: 32
+  //   }
+  // }));
 
   return startMap;
 }

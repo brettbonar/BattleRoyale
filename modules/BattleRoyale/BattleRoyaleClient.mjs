@@ -31,6 +31,7 @@ import ImageCache from "../Engine/Rendering/ImageCache.mjs"
 import ParticleEffect from "../Engine/Effects/ParticleEffect.mjs";
 import FieldOfView from "../Engine/FieldOfView.mjs";
 import SpawnMap from "./StartArea/SpawnMap.mjs"
+import ShadowField from "./Shadow/ShadowField.mjs";
 
 const EVENTS = {
   MOVE_UP: "moveUp",
@@ -199,7 +200,9 @@ export default class BattleRoyaleClient extends BattleRoyale {
       return new Item(object);
     } else if (object.type === "SpawnMap") {
       return new SpawnMap(object, this.maps[object.mapLevel]);
-    } else {
+    } else if (object.type === "ShadowField") {
+      return new ShadowField(object);
+    }else {
       console.log("Unsupported object type in createObject: " + object.type);
     }
   }

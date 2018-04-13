@@ -15,6 +15,7 @@ import effects from "../../modules/BattleRoyale/Effects/effects.mjs"
 import Item from "../../modules/BattleRoyale/Objects/Item.mjs"
 import scenes from "../../modules/BattleRoyale/Objects/Scenes.mjs"
 import Map from "../../modules/Map.mjs"
+import ShadowField from "../../modules/BattleRoyale/Shadow/ShadowField.mjs"
 
 function canPlaceScene(scene, occupiedTiles) {
   if (!occupiedTiles || occupiedTiles.length === 0) {
@@ -346,6 +347,18 @@ function initGame(players, maps) {
   //   }
   // ));
 
+  gameObjects = gameObjects.concat(new ShadowField({
+    position: {
+      x: 0,
+      y: 0,
+      z: 0
+    },
+    dimensions: {
+      width: 500,
+      height: 500,
+      zheight: 32
+    }
+  }));
 
   gameObjects = gameObjects.concat(scenes.house.getObjects(
     {
