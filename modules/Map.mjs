@@ -5,8 +5,9 @@ import flavor from "./BattleRoyale/Objects/flavor.mjs"
 import ImageCache from "./Engine/Rendering/ImageCache.mjs"
 import SimplexNoise from "../shared/SimplexNoise.mjs"
 
-const MAX_CANVAS_SIZE = 8192;
-const MINIMAP_CANVAS_SIZE = 2048;
+const MAX_CANVAS_SIZE = 1024;
+const MINIMAP_CANVAS_SIZE = 1024;
+const DEFAULT_MAP_SIZE = 512;
 
 const BIOMES = {
   FOREST: "forest",
@@ -124,8 +125,8 @@ class Map {
   constructor(params) {
     _.merge(this, params);
     _.defaults(this, {
-      mapWidth: 256,
-      mapHeight: 256,
+      mapWidth: DEFAULT_MAP_SIZE,
+      mapHeight: DEFAULT_MAP_SIZE,
       tileSize: 32,
       map: [],
       objects: [],

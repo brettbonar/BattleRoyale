@@ -10,7 +10,7 @@ export default class ShadowFieldRenderer {
   constructor(params) {
     this.centerPosition = params.centerPosition;
     this.fieldRadius = params.fieldRadius;
-    this.image = ImageCache.get("/Assets/shadow_fog.png");
+    this.image = ImageCache.get("/Assets/shadow_fog_s.png");
     this.image2 = ImageCache.get("/Assets/shadow_fog2.png");
     this.renderOffset = new Vec3();
     this.renderOffset2 = new Vec3();
@@ -34,22 +34,27 @@ export default class ShadowFieldRenderer {
     }
   }
 
-  renderToTempCanvas(context, object, elapsedTime, clipping, ul) {
+  renderToTempCanvas(context, object, elapsedTime, clipping, center) {
     if (this.canvas.canvas.width !== context.canvas.width + 8 || this.canvas.canvas.height !== context.canvas.height + 8) {
       this.canvas.canvas.width = context.canvas.width + 8;
       this.canvas.canvas.height = context.canvas.height + 8;
     }
 
+    this.ul = {
+      x: Math.max(object.position.x, center.x - context.canvas.width / 2),
+      y: Math.max(object.position.y, center.y - context.canvas.height / 2)
+    };
+
     this.canvas.context.clearRect(0, 0, this.canvas.canvas.width, this.canvas.canvas.height);
     this.canvas.context.save();
 
     let imageOffset1 = {
-      x: (this.renderOffset.x + ul.x) % this.image.width,
-      y: (this.renderOffset.y + ul.y) % this.image.height,
+      x: (this.renderOffset.x + this.ul.x) % this.image.width,
+      y: (this.renderOffset.y + this.ul.y) % this.image.height,
     }
     let imageOffset2 = {
-      x: (this.renderOffset2.x + ul.x) % this.image.width,
-      y: (this.renderOffset2.y + ul.y) % this.image.height,
+      x: (this.renderOffset2.x + this.ul.x) % this.image.width,
+      y: (this.renderOffset2.y + this.ul.y) % this.image.height,
     }
 
     if (imageOffset1.x > 0) {
@@ -86,15 +91,15 @@ export default class ShadowFieldRenderer {
     }
 
     // TODO: could avoid making gradient if it's not in view
-    var radGrd = this.canvas.context.createRadialGradient(object.shadowCenter.x - ul.x, object.shadowCenter.y - ul.y,
-      Math.max(0, object.shadowRadius - 250), object.shadowCenter.x - ul.x, object.shadowCenter.y - ul.y, object.shadowRadius);
+    var radGrd = this.canvas.context.createRadialGradient(object.shadowCenter.x - this.ul.x, object.shadowCenter.y - this.ul.y,
+      Math.max(0, object.shadowRadius - 250), object.shadowCenter.x - this.ul.x, object.shadowCenter.y - this.ul.y, object.shadowRadius);
     radGrd.addColorStop(  0, "rgba( 0, 0, 0,  1 )" );
     //radGrd.addColorStop( .8, "rgba( 0, 0, 0, .1 )" );
     radGrd.addColorStop(  1, "rgba( 0, 0, 0,  0 )" );
     this.canvas.context.globalCompositeOperation = "destination-out";
     this.canvas.context.fillStyle = radGrd;
-    this.canvas.context.fillRect(object.shadowCenter.x - ul.x - object.shadowRadius,
-      object.shadowCenter.y - ul.y - object.shadowRadius,
+    this.canvas.context.fillRect(object.shadowCenter.x - this.ul.x - object.shadowRadius,
+      object.shadowCenter.y - this.ul.y - object.shadowRadius,
       object.shadowRadius * 2, object.shadowRadius * 2);
 
     //this.canvas.context.globalCompositeOperation = "source-over";
@@ -105,28 +110,24 @@ export default class ShadowFieldRenderer {
   render(context, object, elapsedTime, clipping, center) {
     if (!this.image.complete) return;
 
-    let ul = {
-      x: Math.max(object.position.x, center.x - context.canvas.width / 2),
-      y: Math.max(object.position.y, center.y - context.canvas.height / 2)
-    };
     // let ul = {
     //   x: center.x - context.canvas.width / 2,
     //   y: center.y - context.canvas.height / 2
     // };
     if (clipping) {
       if (clipping.offset.y === 0) {
-        this.renderToTempCanvas(context, object, elapsedTime, clipping, ul);
+        this.renderToTempCanvas(context, object, elapsedTime, clipping, center);
       }
-      clipping.offset.y -= (ul.y - object.position.y);
+      clipping.offset.y = clipping.offset.y - (this.ul.y - object.position.y);
 
       // TRICKY: subtract 1 since clipping adds 1 to height by default to avoid artifacts on most other images
       let height = Math.min(clipping.dimensions.height, this.canvas.canvas.height - clipping.offset.y) - 1;
       context.drawImage(this.canvas.canvas, clipping.offset.x, clipping.offset.y, this.canvas.canvas.width, height,
-        ul.x + clipping.offset.x, ul.y + clipping.offset.y, this.canvas.canvas.width, height);
+        this.ul.x + clipping.offset.x, this.ul.y + clipping.offset.y, this.canvas.canvas.width, height);
     } else {
-      this.renderToTempCanvas(context, object, elapsedTime, clipping, ul);
+      this.renderToTempCanvas(context, object, elapsedTime, clipping, center);
       context.drawImage(this.canvas.canvas, 0, 0, this.canvas.canvas.width, this.canvas.canvas.height,
-        ul.x, ul.y, context.canvas.width, context.canvas.height);
+        this.ul.x, this.ul.y, context.canvas.width, context.canvas.height);
     }
   }
 }

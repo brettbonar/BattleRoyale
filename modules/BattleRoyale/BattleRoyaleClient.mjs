@@ -449,8 +449,8 @@ export default class BattleRoyaleClient extends BattleRoyale {
     });
   }
 
-  getRenderObjects() {
-    return this.grid.getRenderObjects(new Bounds({
+  getVisibleBounds() {
+    return new Bounds({
       position: this.gameState.player.center.minus({
         x: this.context.canvas.width / 2 + 250,
         y: this.context.canvas.height / 2 + 250
@@ -459,8 +459,11 @@ export default class BattleRoyaleClient extends BattleRoyale {
         width: this.context.canvas.width + 500,
         height: this.context.canvas.height + 500
       }
-    }),
-    this.gameState.player.level);
+    });
+  }
+
+  getRenderObjects(bounds) {
+    return this.grid.getRenderObjects(bounds, this.gameState.player.level);
   }
 
   renderInteractions() {
@@ -476,7 +479,15 @@ export default class BattleRoyaleClient extends BattleRoyale {
 
   _render(elapsedTime) {    
     this.context.save();
-    this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+
+    let visibleBounds = this.getVisibleBounds();
+    // TODO: could only clear part that is out of bounds
+    if (visibleBounds.ul.x < 0 || visibleBounds.ul.y < 0 ||
+        visibleBounds.lr.x > this.maps[this.gameState.player.level].mapParams.totalMapWidth ||
+        visibleBounds.lr.y > this.maps[this.gameState.player.level].mapParams.totalMapHeight)
+    {
+      this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);      
+    }
     //this.context.fillRect(0, 0, this.canvas.width, this.canvas.height);
 
     if (this.maps[this.gameState.player.level]) {
@@ -485,15 +496,15 @@ export default class BattleRoyaleClient extends BattleRoyale {
 
     this.context.save();
     // Translate to player position
-    // TODO: translate to player center?
-    this.context.translate(-(this.gameState.player.center.x - this.context.canvas.width / 2 + 0.5),
-    -(this.gameState.player.center.y - this.context.canvas.height / 2 + 0.5));
+    this.context.translate(-(this.gameState.player.center.x - this.context.canvas.width / 2),
+    -(this.gameState.player.center.y - this.context.canvas.height / 2));
 
+    let renderObjects = this.getRenderObjects(visibleBounds);
     let fov;
     if (!this.gameState.player.state.dead) {
-      fov = new FieldOfView(this.gameState.player.fov, this.getRenderObjects());
+      fov = new FieldOfView(this.gameState.player.fov, renderObjects);
     }
-    this.renderingEngine.render(this.context, this.getRenderObjects(), elapsedTime,
+    this.renderingEngine.render(this.context, renderObjects, elapsedTime,
       this.gameState.player.center, fov);
     //this.particleEngine.render(elapsedTime, this.gameState.player.center);
     this.renderInteractions();

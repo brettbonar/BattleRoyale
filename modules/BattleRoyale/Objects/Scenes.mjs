@@ -85,7 +85,7 @@ scenes.house = {
   maxCount: 2,
   size: {
     width: 200,
-    height: 400
+    height: 800
   },
   weight: 1,
   getObjects: function (position, dimensions) {
