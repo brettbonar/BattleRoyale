@@ -44,7 +44,7 @@ export default class Building extends GameObject {
     // TODO: optimize, only need to update position every time
     return this.functionBounds = this.building.interior.bounds.map((bounds) => {
       return {
-        box: new Bounds(Object.assign({
+        bounds: new Bounds(Object.assign({
           position: this.position.plus(bounds.offset)
         }, bounds)),
         cb: (target) => this.insideCb(target)

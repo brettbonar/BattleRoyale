@@ -159,7 +159,7 @@ export default {
         }
       },
       {
-        type: "ray",
+        boundsType: "ray",
         offset: {
           x: 8,
           y: 8
@@ -170,7 +170,7 @@ export default {
         }
       },
       {
-        type: "ray",
+        boundsType: "ray",
         offset: {
           x: 8,
           y: 8
@@ -609,7 +609,7 @@ export default {
         }
       },
       {
-        type: "ray",
+        boundsType: "ray",
         offset: {
           x: 8,
           y: 8
@@ -620,7 +620,7 @@ export default {
         }
       },
       {
-        type: "ray",
+        boundsType: "ray",
         offset: {
           x: 8,
           y: 8

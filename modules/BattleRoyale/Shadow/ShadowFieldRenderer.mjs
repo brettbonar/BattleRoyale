@@ -5,6 +5,8 @@ import Canvas from "../../Engine/Rendering/Canvas.mjs";
 const FRAME_TIME = 64;
 const FRAME_OFFSET = 1;
 const FRAME_OFFSET2 = 0.5;
+const SHADOW_EDGE_START = -128;
+const SHADOW_EDGE_END = 0;
 
 export default class ShadowFieldRenderer {
   constructor(params) {
@@ -16,7 +18,9 @@ export default class ShadowFieldRenderer {
     this.renderOffset2 = new Vec3();
     this.currentTime = 0;
 
-    this.canvas = new Canvas(params.dimensions);
+    let tempCanvas = Canvas.create(params.dimensions);
+    this.canvas = tempCanvas.canvas;
+    this.context = tempCanvas.context;
   }
 
   update(elapsedTime) {
@@ -34,10 +38,29 @@ export default class ShadowFieldRenderer {
     }
   }
 
+  applyGradientHole(context, object) {
+    // TODO: could avoid making gradient if it's not in view
+    if (object.shadowRadius === 0) return;
+    
+    var radGrd = context.createRadialGradient(
+      object.shadowCenter.x - this.ul.x, object.shadowCenter.y - this.ul.y, Math.max(0, object.shadowRadius + SHADOW_EDGE_START),
+      object.shadowCenter.x - this.ul.x, object.shadowCenter.y - this.ul.y, object.shadowRadius + SHADOW_EDGE_END);
+    radGrd.addColorStop(  0, "rgba( 0, 0, 0,  1 )" );
+    radGrd.addColorStop( .5, "rgba( 0, 0, 0, .5 )" );
+    radGrd.addColorStop(  1, "rgba( 0, 0, 0,  0 )" );
+    context.globalCompositeOperation = "destination-out";
+    context.fillStyle = radGrd;
+    context.fillRect(object.shadowCenter.x - this.ul.x - object.shadowRadius * 2 - SHADOW_EDGE_END,
+      object.shadowCenter.y - this.ul.y - object.shadowRadius * 2 - SHADOW_EDGE_END,
+      object.shadowRadius * 4 + SHADOW_EDGE_END * 2, object.shadowRadius * 4 + SHADOW_EDGE_END * 2);
+
+    context.globalCompositeOperation = "source-over";
+  }
+
   renderToTempCanvas(context, object, elapsedTime, clipping, center) {
-    if (this.canvas.canvas.width !== context.canvas.width + 8 || this.canvas.canvas.height !== context.canvas.height + 8) {
-      this.canvas.canvas.width = context.canvas.width + 8;
-      this.canvas.canvas.height = context.canvas.height + 8;
+    if (this.canvas.width !== context.canvas.width + 8 || this.canvas.height !== context.canvas.height + 8) {
+      this.canvas.width = context.canvas.width + 8;
+      this.canvas.height = context.canvas.height + 8;
     }
 
     this.ul = {
@@ -45,8 +68,15 @@ export default class ShadowFieldRenderer {
       y: Math.max(object.position.y, center.y - context.canvas.height / 2)
     };
 
-    this.canvas.context.clearRect(0, 0, this.canvas.canvas.width, this.canvas.canvas.height);
-    this.canvas.context.save();
+    // Draw base fog
+    // this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    // this.context.fillStyle = "rgba(0, 0, 0, 0.8)";
+    // this.context.fillRect(0, 0, this.canvas.width, this.canvas.height);
+    // this.applyGradientHole(this.context, object);
+    // context.drawImage(this.canvas, this.ul.x, this.ul.y, context.canvas.width, context.canvas.height);
+
+    this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    this.context.save();
 
     let imageOffset1 = {
       x: (this.renderOffset.x + this.ul.x) % this.image.width,
@@ -57,53 +87,46 @@ export default class ShadowFieldRenderer {
       y: (this.renderOffset2.y + this.ul.y) % this.image.height,
     }
 
+    // TODO: could optimize this to avoid drawing too much out of bounds
     if (imageOffset1.x > 0) {
-      let width = this.image.width - imageOffset1.x;
-      let width2 = this.image2.width - imageOffset2.x;
-      let height = this.image.height - imageOffset1.y;
-      let height2 = this.image2.height - imageOffset2.y;
-      // Draw width at full height
-      this.canvas.context.drawImage(this.image, imageOffset1.x, imageOffset1.y, width, this.canvas.canvas.height,
-        0, 0, width, this.canvas.canvas.height);
-      this.canvas.context.drawImage(this.image, 0, imageOffset1.y, this.canvas.canvas.width - width, this.canvas.canvas.height,
-        width, 0, this.canvas.canvas.width - width, this.canvas.canvas.height);
+      let drawnWidth = 0;
+      while (drawnWidth < this.canvas.width) {
+        let xoffset = (imageOffset1.x + drawnWidth) % this.image.width;
 
-      if (height < this.canvas.canvas.height) {
-        // Draw at full width
-        let nextHeight = this.canvas.canvas.height - height;
-        this.canvas.context.drawImage(this.image, imageOffset1.x, 0, width, nextHeight,
-          0, height, width, nextHeight);
-        this.canvas.context.drawImage(this.image, 0, 0, this.canvas.canvas.width - width, nextHeight,
-          width, height, this.canvas.canvas.width - width, nextHeight);
+        let width = this.image.width - xoffset;
+        let height = this.image.height - imageOffset1.y;
+        this.context.drawImage(this.image, xoffset, imageOffset1.y, width, height,
+          drawnWidth, 0, width, height);
+
+        let drawnHeight = height;
+        while (drawnHeight < this.canvas.height) {
+          let yoffset = (imageOffset1.y + drawnHeight) % this.image.height;
+          let nextHeight = this.image.height - yoffset;
+          this.context.drawImage(this.image, xoffset, yoffset, width, nextHeight,
+            drawnWidth, drawnHeight, width, nextHeight);
+
+          drawnHeight += nextHeight;
+        }
+
+        drawnWidth += width;
       }
 
-
-      // this.canvas.context.drawImage(this.image2, imageOffset2.x, imageOffset2.y, width2, this.canvas.canvas.height,
-      //   0, 0, width2, this.canvas.canvas.height - 1);
-      // this.canvas.context.drawImage(this.image2, 0, imageOffset2.y, this.canvas.canvas.width - width2, this.canvas.canvas.height,
-      //   width2, 0, this.canvas.canvas.width - width2, this.canvas.canvas.height);
+      this.applyGradientHole(this.context, object);
+      // this.context.drawImage(this.image2, imageOffset2.x, imageOffset2.y, width2, this.canvas.height,
+      //   0, 0, width2, this.canvas.height - 1);
+      // this.context.drawImage(this.image2, 0, imageOffset2.y, this.canvas.width - width2, this.canvas.height,
+      //   width2, 0, this.canvas.width - width2, this.canvas.height);
     } else {
-      this.canvas.context.drawImage(this.image, imageOffset1.x, imageOffset1.y, this.canvas.canvas.width, this.canvas.canvas.height,
-        0, 0, this.canvas.canvas.width, this.canvas.canvas.height);
+      this.context.drawImage(this.image, imageOffset1.x, imageOffset1.y, this.canvas.width, this.canvas.height,
+        0, 0, this.canvas.width, this.canvas.height);
 
-      this.canvas.context.drawImage(this.image2, imageOffset1.x, imageOffset1.y, this.canvas.canvas.width, this.canvas.canvas.height,
-        0, 0, this.canvas.canvas.width, this.canvas.canvas.height);
+      this.context.drawImage(this.image2, imageOffset1.x, imageOffset1.y, this.canvas.width, this.canvas.height,
+        0, 0, this.canvas.width, this.canvas.height);
     }
 
-    // TODO: could avoid making gradient if it's not in view
-    var radGrd = this.canvas.context.createRadialGradient(object.shadowCenter.x - this.ul.x, object.shadowCenter.y - this.ul.y,
-      Math.max(0, object.shadowRadius - 250), object.shadowCenter.x - this.ul.x, object.shadowCenter.y - this.ul.y, object.shadowRadius);
-    radGrd.addColorStop(  0, "rgba( 0, 0, 0,  1 )" );
-    radGrd.addColorStop( .8, "rgba( 0, 0, 0, .3 )" );
-    radGrd.addColorStop(  1, "rgba( 0, 0, 0,  0 )" );
-    this.canvas.context.globalCompositeOperation = "destination-out";
-    this.canvas.context.fillStyle = radGrd;
-    this.canvas.context.fillRect(object.shadowCenter.x - this.ul.x - object.shadowRadius,
-      object.shadowCenter.y - this.ul.y - object.shadowRadius,
-      object.shadowRadius * 2, object.shadowRadius * 2);
 
-    //this.canvas.context.globalCompositeOperation = "source-over";
-    this.canvas.context.restore();
+    //this.context.globalCompositeOperation = "source-over";
+    this.context.restore();
   }
 
   // Since the shadow covers the whole map, get just the part that covers the current field of view
@@ -121,12 +144,12 @@ export default class ShadowFieldRenderer {
       clipping.offset.y = clipping.offset.y - (this.ul.y - object.position.y);
 
       // TRICKY: subtract 1 since clipping adds 1 to height by default to avoid artifacts on most other images
-      let height = Math.min(clipping.dimensions.height, this.canvas.canvas.height - clipping.offset.y) - 1;
-      context.drawImage(this.canvas.canvas, clipping.offset.x, clipping.offset.y, this.canvas.canvas.width, height,
-        this.ul.x + clipping.offset.x, this.ul.y + clipping.offset.y, this.canvas.canvas.width, height);
+      let height = Math.min(clipping.dimensions.height, this.canvas.height - clipping.offset.y) - 1;
+      context.drawImage(this.canvas, clipping.offset.x, clipping.offset.y, this.canvas.width, height,
+        this.ul.x + clipping.offset.x, this.ul.y + clipping.offset.y, this.canvas.width, height);
     } else {
       this.renderToTempCanvas(context, object, elapsedTime, clipping, center);
-      context.drawImage(this.canvas.canvas, 0, 0, this.canvas.canvas.width, this.canvas.canvas.height,
+      context.drawImage(this.canvas, 0, 0, this.canvas.width, this.canvas.height,
         this.ul.x, this.ul.y, context.canvas.width, context.canvas.height);
     }
   }

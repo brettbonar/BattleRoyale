@@ -61,6 +61,7 @@ export default class GameObject extends GameObjectProxy {
         y: 0,
         z: 0
       },
+      team: 0,
       level: 0,
       revision: 0,
       renderer: new Renderer(),
@@ -130,9 +131,10 @@ export default class GameObject extends GameObjectProxy {
   getAllFunctionBounds() {
     return this.functions.map((fn) => {
       return {
-        box: new Bounds({
-          dimensions: fn.dimensions,
-          position: this.position.minus(fn.offset)
+        bounds: new Bounds({
+          dimensions: fn.bounds.dimensions,
+          position: this.position.plus(fn.bounds.offset),
+          boundsType: fn.bounds.boundsType
         }),
         cb: fn.cb
       };
@@ -292,13 +294,14 @@ export default class GameObject extends GameObjectProxy {
     let bounds = [];
     dimens = _.castArray(dimens);
     for (const dimensions of dimens) {
-      if (dimensions.type === Bounds.TYPE.RAY) {
+      if (dimensions.boundsType === Bounds.TYPE.RAY) {
         bounds.push(this.getRayBounds(dimensions));
       } else {
         bounds.push(new Bounds({
           position: position.plus(dimensions.offset),
           dimensions: dimensions.dimensions || this.dimensions,
-          opacity: dimensions.opacity
+          opacity: dimensions.opacity,
+          boundsType: dimensions.boundsType
         }));
       }
     }
@@ -378,13 +381,19 @@ export default class GameObject extends GameObjectProxy {
   }
 
   get collisionExtents() {
-    if (this.collisionDimensions) {
-      let bounds = this.collisionBounds.concat(this.lastCollisionBounds);
-      return bounds.reduce((prev, current) => {
-        return prev.plus(current);
-      }, bounds[0]);
+    let bounds = this.collisionBounds.concat(_.map(this.getAllFunctionBounds(), ("bounds")));
+    if (bounds.length > 0) {
+      if (bounds[0].type === Bounds.TYPE.AABB) {
+        bounds = bounds.concat(this.lastCollisionBounds);
+        return bounds.reduce((prev, current) => {
+          return prev.plus(current);
+        }, bounds[0]);
+      } else {
+        // TODO: get rid of this hack for ShadowField
+        return bounds[0];
+      }
     }
-    return [];
+    return null;
   }
   
   get lastLosBounds() {

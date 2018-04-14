@@ -357,11 +357,15 @@ function initGame(players, maps) {
       z: 0
     },
     shadowCenter: {
-      x: maps[0].mapParams.totalMapWidth / 2,
-      y: maps[0].mapParams.totalMapHeight / 2
+      x: 500,
+      y: 500
     },
-    shadowRadius: (maps[0].mapParams.totalMapWidth * SQRT_2) / 2,
-    // TODO: inverse circle dimensions
+    shadowRadius: 1000,
+    // shadowCenter: {
+    //   x: maps[0].mapParams.totalMapWidth / 2,
+    //   y: maps[0].mapParams.totalMapHeight / 2
+    // },
+    //shadowRadius: (maps[0].mapParams.totalMapWidth * SQRT_2) / 2,
     dimensions: {
       width: maps[0].mapParams.totalMapWidth,
       height: maps[0].mapParams.totalMapHeight,

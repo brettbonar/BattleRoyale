@@ -52,6 +52,7 @@ export default class BattleRoyale extends Game {
     this.physicsEngine = new PhysicsEngine(this.grid);
     this.updates = [];
     this.collisions = [];
+    this.modified = [];
     this.maps = params.maps;
     // TODO: create grid for each level
 
@@ -200,9 +201,6 @@ export default class BattleRoyale extends Game {
         }
       } else {
         let update = obj.update(elapsedTime);
-        if (!obj.position.equals(obj.lastPosition)) {
-          this.grid.update(obj);
-        }
         if (update) {
           this.onCollision(update);
         }
@@ -229,12 +227,17 @@ export default class BattleRoyale extends Game {
       this.handleCollision(collision);
     }
 
+    this.modified = [];
     for (const obj of this.gameState.objects) {
       if (obj.elapsedTime) {
         obj.elapsedTime = 0;
       }
       if (obj._modified) {
+        this.modified.push(obj);
+
+        // TODO: may do this twice for some objects if it is updated in physics engine
         this.grid.update(obj);
+        obj._modified = false;
       }
       if (obj instanceof Character && !obj.dead && obj.currentHealth <= 0) {
         obj.kill();

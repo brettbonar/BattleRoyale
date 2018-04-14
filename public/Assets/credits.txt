@@ -43,6 +43,10 @@ https://opengameart.org/content/items
 https://opengameart.org/content/projectiles
 https://opengameart.org/content/rotating-arrow-projectile
 https://opengameart.org/content/animated-traps-and-obstacles
+https://opengameart.org/content/smoke-aura
+https://opengameart.org/content/smoke-particle-assets
+https://opengameart.org/node/8086
+https://opengameart.org/content/clouds-1
 
 GUI:
 https://opengameart.org/content/gui-elements

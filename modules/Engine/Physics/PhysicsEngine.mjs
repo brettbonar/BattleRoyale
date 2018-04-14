@@ -179,8 +179,10 @@ export default class PhysicsEngine {
       return this.rayBoxTest(lastBounds, currentBounds, targetCurrentBounds);
     } else if (currentBounds.type === Bounds.TYPE.LINE && targetCurrentBounds.type === Bounds.TYPE.AABB) {
       return this.rayBoxTest(targetLastBounds, targetCurrentBounds, currentBounds);
-    } else {
+    } else if (currentBounds.type === Bounds.TYPE.LINE && targetCurrentBounds.type === Bounds.TYPE.LINE) {
       return this.rayRayTest(currentBounds, targetCurrentBounds);
+    } else {
+      console.log("Unsupported intersection test: ", currentBounds.type, targetCurrentBounds.type);
     }
   }
 
@@ -200,20 +202,13 @@ export default class PhysicsEngine {
 
       for (const target of targets) {
         if (target === obj || target.physics.surfaceType === SURFACE_TYPE.NONE) continue;
-        // Only need to test projectiles against characters, not both ways
-        // TODO: do all tests, but exclude ones already found
-        if (obj.physics.surfaceType === SURFACE_TYPE.CHARACTER &&
-            (target.physics.surfaceType === SURFACE_TYPE.PROJECTILE ||
-             target.physics.surfaceType === SURFACE_TYPE.GAS)) {
-          continue;
-        }
         let targetCollisionBounds = target.collisionBounds;
         let targetLastCollisionBounds = target.lastCollisionBounds;
   
         // TODO: do this after all other physics calculations?
-        for (const functionBox of target.getAllFunctionBounds()) {
-          if (objCollisionBounds[objBoundIdx].intersects(functionBox.box)) {
-            functionBox.cb(obj);
+        for (const functionBounds of target.getAllFunctionBounds()) {
+          if (objCollisionBounds[objBoundIdx].intersects(functionBounds.bounds)) {
+            functionBounds.cb(obj);
           }
         }
 

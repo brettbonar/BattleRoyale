@@ -122,6 +122,7 @@ export default class Simulation {
   update() {
     let currentTime = now();
     let elapsedTime = currentTime - this.previousTime;
+    if (!elapsedTime) return;
     this.previousTime = currentTime;
     
     this.game.processUpdates(elapsedTime, currentTime);
@@ -135,10 +136,8 @@ export default class Simulation {
     this.lastObjects = this.game.gameState.objects.slice();
     this.lastCollisions = this.game.collisions.map(this.getCollision);
     
-    this.lastState = this.game.gameState.objects
-      .filter((obj) => obj._modified)
+    this.lastState = this.game.modified
       .map(obj => {
-        obj._modified = false;
         return _.cloneDeep(obj.getUpdateState());
       });
 

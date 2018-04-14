@@ -32,6 +32,7 @@ import ParticleEffect from "../Engine/Effects/ParticleEffect.mjs";
 import FieldOfView from "../Engine/FieldOfView.mjs";
 import SpawnMap from "./StartArea/SpawnMap.mjs"
 import ShadowField from "./Shadow/ShadowField.mjs";
+import Canvas from "../Engine/Rendering/Canvas.mjs";
 
 const EVENTS = {
   MOVE_UP: "moveUp",
@@ -58,9 +59,12 @@ export default class BattleRoyaleClient extends BattleRoyale {
       this.mapCanvas = params.mapCanvas;
       this.mapContext = params.mapCanvas.getContext("2d");
     }
+    let temp = Canvas.create(this.canvas);
+    this.tempCanvas = temp.canvas;
+    this.tempContext = temp.context;
 
     this.renderingEngine = new PerspectiveRenderingEngine({
-      context: this.context
+      context: this.tempContext
     });
 
     _.each(this.maps, (map) => {
@@ -68,7 +72,7 @@ export default class BattleRoyaleClient extends BattleRoyale {
     });
 
     this.particleEngine = new ParticleEngine({
-      context: this.context
+      context: this.tempContext
     }, this.grid);
     this.menus = params.menus;
     this.updates = [];
@@ -473,17 +477,17 @@ export default class BattleRoyaleClient extends BattleRoyale {
 
   renderInteractions() {
     if (this.interaction) {
-      this.context.save();
-      this.context.fillStyle = "green";
-      this.context.fillRect(this.interaction.center.x - 8,
+      this.tempContext.save();
+      this.tempContext.fillStyle = "green";
+      this.tempContext.fillRect(this.interaction.center.x - 8,
         this.interaction.position.y - 20, 
         16, 16);
-      this.context.restore();
+      this.tempContext.restore();
     }
   }
 
   _render(elapsedTime) {    
-    this.context.save();
+    this.tempContext.save();
 
     let visibleBounds = this.getVisibleBounds();
     // TODO: could only clear part that is out of bounds
@@ -491,46 +495,49 @@ export default class BattleRoyaleClient extends BattleRoyale {
         visibleBounds.lr.x > this.maps[this.gameState.player.level].mapParams.totalMapWidth ||
         visibleBounds.lr.y > this.maps[this.gameState.player.level].mapParams.totalMapHeight)
     {
-      this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);      
+      this.tempContext.clearRect(0, 0, this.canvas.width, this.canvas.height);
+      this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
     }
-    //this.context.fillRect(0, 0, this.canvas.width, this.canvas.height);
+    //this.tempContext.fillRect(0, 0, this.canvas.width, this.canvas.height);
 
     if (this.maps[this.gameState.player.level]) {
-      this.maps[this.gameState.player.level].render(this.context, this.gameState.player.center);
+      this.maps[this.gameState.player.level].render(this.tempContext, this.gameState.player.center);
     }
 
-    this.context.save();
+    this.tempContext.save();
     // Translate to player position
-    this.context.translate(-(this.gameState.player.center.x - this.context.canvas.width / 2),
-    -(this.gameState.player.center.y - this.context.canvas.height / 2));
+    this.tempContext.translate(-(this.gameState.player.center.x - this.tempContext.canvas.width / 2),
+    -(this.gameState.player.center.y - this.tempContext.canvas.height / 2));
 
     let renderObjects = this.getRenderObjects(visibleBounds);
     let fov;
     if (!this.gameState.player.state.dead) {
       fov = new FieldOfView(this.gameState.player.fov, renderObjects);
     }
-    this.renderingEngine.render(this.context, renderObjects, elapsedTime,
+    this.renderingEngine.render(this.tempContext, renderObjects, elapsedTime,
       this.gameState.player.center, fov);
     //this.particleEngine.render(elapsedTime, this.gameState.player.center);
     this.renderInteractions();
-    this.context.restore();
+    this.tempContext.restore();
 
     // TODO: put somewhere else
     // Render cursor
-    this.context.beginPath();
-    this.context.arc(this.gameState.cursor.position.x, this.gameState.cursor.position.y, 5, 0, 2 * Math.PI);
-    this.context.closePath();
+    this.tempContext.beginPath();
+    this.tempContext.arc(this.gameState.cursor.position.x, this.gameState.cursor.position.y, 5, 0, 2 * Math.PI);
+    this.tempContext.closePath();
 
-    this.context.strokeStyle = "red";
-    this.context.stroke();
+    this.tempContext.strokeStyle = "red";
+    this.tempContext.stroke();
 
-    this.context.restore();
+    this.tempContext.restore();
 
     // if (this.ui.complete) {
-    //   this.context.drawImage(this.ui, this.context.canvas.width / 2 - 512,
-    //     this.context.canvas.height - 104, 1024, 104);
+    //   this.tempContext.drawImage(this.ui, this.tempContext.canvas.width / 2 - 512,
+    //     this.tempContext.canvas.height - 104, 1024, 104);
     // }
-    this.interface.render(this.context, this.gameState.player, this.maps);
+    this.interface.render(this.tempContext, this.gameState.player, this.maps);
+
+    this.context.drawImage(this.tempCanvas, 0, 0, this.tempCanvas.width, this.tempCanvas.height);
   }
 
   sendEvent(params) {
