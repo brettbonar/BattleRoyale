@@ -3,7 +3,7 @@ import ShadowFieldRenderer from "./ShadowFieldRenderer.mjs"
 import { SURFACE_TYPE } from "../../Engine/Physics/PhysicsConstants.mjs"
 import Bounds from "../../Engine/GameObject/Bounds.mjs";
 import Vec3 from "../../Engine/GameObject/Vec3.mjs";
-import Character from "../Objects/Character.mjs"
+import Character from "../Characters/Character.mjs"
 import Teams from "../Teams.mjs";
 import RenderObject from "../Objects/RenderObject.mjs";
 
@@ -51,7 +51,7 @@ export default class ShadowField extends GameObject {
   }
 
   onCollision(object) {
-    if (object instanceof Character) {
+    if (object instanceof Character && !object.state.dead) {
       this.targets.add(object);
     }
   }
@@ -67,7 +67,7 @@ export default class ShadowField extends GameObject {
         if (target.state.currentMana) {
           target.state.currentMana = Math.max(0, target.state.currentMana - damageRate);
         } else {
-          target.state.currentHealth = Math.max(0, target.state.currentHealth - damageRate * 2);
+          target.damage(this, damageRate * 2);
         }
       }
     }

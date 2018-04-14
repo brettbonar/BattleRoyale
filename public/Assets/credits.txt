@@ -47,6 +47,7 @@ https://opengameart.org/content/smoke-aura
 https://opengameart.org/content/smoke-particle-assets
 https://opengameart.org/node/8086
 https://opengameart.org/content/clouds-1
+https://opengameart.org/content/lpc-terrain-extension
 
 GUI:
 https://opengameart.org/content/gui-elements

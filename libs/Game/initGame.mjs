@@ -4,7 +4,7 @@ import Bounds from "../../modules/Engine/GameObject/Bounds.mjs"
 import Vec3 from "../../modules/Engine/GameObject/Vec3.mjs"
 import { MOVEMENT_TYPE } from "../../modules/Engine/Physics/PhysicsConstants.mjs"
 
-import Character from "../../modules/BattleRoyale/Objects/Character.mjs"
+import Character from "../../modules/BattleRoyale/Characters/Character.mjs"
 import Projectile from "../../modules/BattleRoyale/Objects/Projectile.mjs"
 import objects from "../../modules/BattleRoyale/Objects/objects.mjs"
 import equipment from "../../modules/BattleRoyale/Objects/equipment.mjs"

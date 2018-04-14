@@ -77,7 +77,8 @@ export default class Simulation {
   }
 
   getPlayerIdFromObjectId(objectId) {
-    return this.players.find((player) => player.character.objectId === objectId).playerId;
+    let character = this.players.find((player) => player.character.objectId === objectId);
+    return character && character.playerId;
   }
 
   getEvent(event) {
@@ -85,7 +86,8 @@ export default class Simulation {
       return {
         eventType: event.eventType,
         killed: event.killed,
-        killedBy: this.getPlayerIdFromObjectId(event.killedBy)
+        killedByPlayer: this.getPlayerIdFromObjectId(event.killedBy),
+        killedBy: event.killedBy
       };
     }
     return event;
@@ -122,7 +124,6 @@ export default class Simulation {
   update() {
     let currentTime = now();
     let elapsedTime = currentTime - this.previousTime;
-    if (!elapsedTime) return;
     this.previousTime = currentTime;
     
     this.game.processUpdates(elapsedTime, currentTime);

@@ -57,7 +57,9 @@ export default class BattleRoyale extends Game {
     // TODO: create grid for each level
 
     this.gameState = {
-      objects: []
+      objects: [],
+      killed: [],
+      characters: []
     };
 
     this.initObjects(params.objects);
@@ -81,6 +83,9 @@ export default class BattleRoyale extends Game {
 
   addObject(object) {
     this.gameState.objects.push(object);
+    if (object instanceof Character) {
+      this.gameState.characters.push(object);
+    }
     // TODO: move objects between quad trees when level changes
     //this.quadTrees[object.level].push(object);
     this.grid.add(object);
@@ -91,6 +96,9 @@ export default class BattleRoyale extends Game {
     //this.quadTrees[object.level].remove(object);
     this.grid.remove(object);
     _.pull(this.gameState.objects, object);
+    if (object instanceof Character) {
+      _.pull(this.gameState.characters, object);
+    }
   }
 
   createAttack(character, params, attack, timeDiff, mods, action) {
@@ -239,10 +247,13 @@ export default class BattleRoyale extends Game {
         this.grid.update(obj);
         obj._modified = false;
       }
-      if (obj instanceof Character && !obj.dead && obj.currentHealth <= 0) {
-        obj.kill();
+    }
+
+    for (const character of this.gameState.characters) {
+      if (character.state.dead && !this.gameState.killed.includes(character)) {
+        this.gameState.killed.push(character);
         if (this.onKill) {
-          this.onKill(obj);
+          this.onKill(character);
         }
       }
     }

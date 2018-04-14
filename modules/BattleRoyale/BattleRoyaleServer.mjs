@@ -226,7 +226,7 @@ export default class BattleRoyaleServer extends BattleRoyale {
       if (_.get(collision.target, "physics.surfaceType") === SURFACE_TYPE.CHARACTER) {
         // TODO: something else
         if (!collision.source.damagedTargets.includes(collision.target) && collision.source.damageReady) {
-          collision.target.damage(collision.source);
+          collision.target.damage(collision.source, collision.source.effect.damage);
           collision.source.damagedTargets.push(collision.target);
         }
         // if (!character.dead && character.currentHealth <= 0) {
