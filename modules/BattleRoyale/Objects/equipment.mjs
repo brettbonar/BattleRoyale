@@ -212,6 +212,7 @@ export default {
   bow: {
     imageSource: "/Assets/character/weapons/right hand/either/bow.png",
     imageSize: 64,
+    cosmetics: ["arrow", "quiver"],
     itemType: "bow",
     type: "weapon",
     attackType: "bow",
@@ -225,13 +226,14 @@ export default {
   shadowBow: {
     imageSource: "/Assets/character/weapons/right hand/either/shadow_bow.png",
     imageSize: 64,
+    cosmetics: ["shadowArrow", "shadowQuiver"],
     itemType: "shadowBow",
     type: "weapon",
     attackType: "bow",
     hands: 1,
     gender: "either",
     attacks: {
-      1: "arrow"
+      1: "shadowArrow"
     },
     world: items.shadowBow
   },
@@ -353,6 +355,18 @@ export default {
     imageSize: 64,
     type: "hands",
     gender: "male"
+  },
+  quiver: {
+    imageSource: "/Assets/character/behind_body/equipment/quiver.png",
+    imageSize: 64,
+    type: "back",
+    gender: "either"
+  },
+  arrow: {
+    imageSource: "/Assets/character/weapons/left hand/either/arrow.png",
+    imageSize: 64,
+    type: "offhand",
+    gender: "either"
   },
 
   // Body parts

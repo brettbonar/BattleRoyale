@@ -121,9 +121,10 @@ export default class BattleRoyale extends Game {
   doAttack(character, params, elapsedTime, animateOnly) {
     if (character.state.dead) return;
 
-    let attack = attacks[character.state.loadout.weapon.attacks[params.attackType]];
+    let weapon = equipment[character.state.loadout.weapon];
+    let attack = attacks[weapon.attacks[params.attackType]];
     if (!attack) {
-      attack = magicEffects[character.state.loadout.weapon.attacks[params.attackType]];
+      attack = magicEffects[weapon.attacks[params.attackType]];
     }
 
     let cb;

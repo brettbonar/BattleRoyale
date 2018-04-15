@@ -401,14 +401,14 @@ export default {
   },
   fov: {
     range: 1300,
-    angle: 90
+    angle: 120
   },
   stats: {
     maxHealth: 30,
     speed: 128,
     canInteract: false,
     loadout: {
-      weapon: equipment.shadow_wolf
+      weapon: "shadow_wolf"
     }
   },
   dimensions: {

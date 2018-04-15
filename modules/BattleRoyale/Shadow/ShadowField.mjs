@@ -35,18 +35,19 @@ const SHADOW_SPAWNS = [
       body: "shadow_acolyte"
     },
     state: {
+      maxMana: 0,
+      maxHealth: 30,
       loadout: {
-        weapon: equipment.shadowBow,
-        torso: equipment.shadowLeatherChestMale,
-        legs: equipment.shadowPantsMale,
-        head: equipment.shadowHoodMale,
-        feet: equipment.blackShoesMale,
-        belt: equipment.shadowBeltMale,
-        shoulders: equipment.shadowLeatherShouldersMale,
-        hands: equipment.shadowBracersMale,
-        back: equipment.shadowQuiver,
-        offhand: equipment.shadowArrow
-      }
+        weapon: "shadowBow",
+        torso: "shadowLeatherChestMale",
+        legs: "shadowPantsMale",
+        head: "shadowHoodMale",
+        feet: "blackShoesMale",
+        belt: "shadowBeltMale",
+        shoulders: "shadowLeatherShouldersMale",
+        hands: "shadowBracersMale"
+      },
+      items: ["shadowBow"]
     },
     weight: 10
   }

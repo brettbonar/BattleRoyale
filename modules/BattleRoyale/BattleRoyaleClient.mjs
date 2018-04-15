@@ -292,6 +292,14 @@ export default class BattleRoyaleClient extends BattleRoyale {
       if (!collision.source.effect) {
         return;
       }
+      
+      if (collision.source.effect.noFriendlyFire) {
+        // Don't damage self or other teammates if no FF is on
+        if ((collision.source.team === Teams.SOLO && collision.source.source === collision.target) ||
+             collision.source.team !== Teams.SOLO && collision.source.team === collision.target.team) {
+          return;
+        }
+      }
 
       // Don't let stream weapons interact with themselves
       if (collision.target && collision.source.actionId === collision.target.actionId && collision.source.effect.path === "stream") {

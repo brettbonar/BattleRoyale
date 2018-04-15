@@ -254,7 +254,7 @@ magicEffects.bat_bite = {
   action: {
     name: "bat_bite",
     actionDuration: 0,
-    actionRate: 1,
+    actionRate: 2,
     actionType: "exclusive",
     automatic: false,
     manaCost: 0
@@ -264,6 +264,7 @@ magicEffects.bat_bite = {
     y: 64
   },
   effect: {
+    triggerDamagedEffect: true,
     distance: 48,
     renderingDelay: 0,
     damageDelay: 150,
@@ -312,7 +313,7 @@ magicEffects.wolf_bite = {
   action: {
     name: "wolf_bite",
     actionDuration: 0,
-    actionRate: 1,
+    actionRate: 2,
     actionType: "exclusive",
     automatic: false,
     manaCost: 0
@@ -322,6 +323,7 @@ magicEffects.wolf_bite = {
     y: 64
   },
   effect: {
+    triggerDamagedEffect: true,
     distance: 64,
     renderingDelay: 0,
     damageDelay: 150,

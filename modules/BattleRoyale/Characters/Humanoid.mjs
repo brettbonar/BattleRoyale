@@ -476,10 +476,9 @@ export default {
   },
   stats: {
     canInteract: true,
+    canPickUp: true,
     maxHealth: 100,
     maxMana: 100,
-    currentHealth: 100,
-    currentMana: 100,
     speed: 96
   },
   dimensions: {

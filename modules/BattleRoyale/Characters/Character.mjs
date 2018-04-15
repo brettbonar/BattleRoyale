@@ -20,15 +20,16 @@ export default class Character extends GameObject {
   constructor(params) {
     super(params);
 
-    this.state = _.cloneDeep(params.state) || {};
     this.type = "Character";
     this.characterInfo = params.characterInfo;
+    this.state = {};
     this.initFromCharacterType(params.characterInfo.type);
+    _.merge(this.state, params.state);
 
     this.state.currentHealth = this.state.maxHealth;
     this.state.currentMana = this.state.maxMana;
-    this.state.hasHealth = _.has(this.state, "maxHealth");
-    this.state.hasMana = _.has(this.state, "maxMana");
+    this.state.hasHealth = !!this.state.maxHealth;
+    this.state.hasMana = !!this.state.maxMana;
 
     this.losHidden = true;
     this.cooldowns = [];
@@ -37,7 +38,7 @@ export default class Character extends GameObject {
     this.physics.surfaceType = "character";
 
     if (!params.simulation) {
-      this.renderer = new CharacterRenderer(this.characterInfo, this.state.loadout);
+      this.renderer = new CharacterRenderer(this.characterInfo);
     }
 
     if (this.state.dead) {
@@ -80,6 +81,7 @@ export default class Character extends GameObject {
       target: this.position,
       inventory: [],
       loadout: {},
+      cosmetics: {},
       characterDirection: "down",
       attacking: false,
       attackTime: 0
@@ -122,26 +124,26 @@ export default class Character extends GameObject {
 
   previousWeapon() {
     let inventory = this.state.inventory.slice().reverse();
-    let current = inventory.indexOf(this.state.loadout.weapon.itemType);
+    let current = inventory.indexOf(this.state.loadout.weapon);
     let next = _.find(inventory, this.isWeapon, current + 1);
     if (!next) {
       next = _.find(inventory, this.isWeapon);
     }
     if (next) {
       this.stopAllActions();
-      this.state.loadout.weapon = equipment[next];
+      this.state.loadout.weapon = next;
     }
   }
 
   nextWeapon() {
-    let current = this.state.inventory.indexOf(this.state.loadout.weapon.itemType);
+    let current = this.state.inventory.indexOf(this.state.loadout.weapon);
     let next = _.find(this.state.inventory, this.isWeapon, current + 1);
     if (!next) {
       next = _.find(this.state.inventory, this.isWeapon);
     }
     if (next) {
       this.stopAllActions();
-      this.state.loadout.weapon = equipment[next];
+      this.state.loadout.weapon = next;
     }
   }
 

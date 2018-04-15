@@ -250,7 +250,7 @@ export default class BattleRoyaleServer extends BattleRoyale {
     }
 
     if (collision.source.onCollision) {
-      this.onCollision(collision.source.onCollision(collision));
+      this.handleObjectUpdate(collision.source.onCollision(collision));
     }
   }
 }

@@ -191,7 +191,7 @@ export default {
     maxHealth: 10,
     speed: 192,
     loadout: {
-      weapon: equipment.shadow_bat
+      weapon: "shadow_bat"
     }
   },
   dimensions: {

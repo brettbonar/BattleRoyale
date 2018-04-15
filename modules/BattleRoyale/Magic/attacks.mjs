@@ -251,8 +251,8 @@ let attacks = {
     type: "projectile",
     name: "arrow",
     dimensions: {
-      width: 32,
-      height: 32
+      width: 33,
+      height: 7
     },
     action: {
       name: "arrow",
@@ -269,29 +269,80 @@ let attacks = {
       manaCost: 0
     },
     rendering: {
-      imageSource: "/Assets/projectiles/Arrow2.png",
+      imageSource: "/Assets/projectiles/arrow.png",
       dimensions: {
-        width: 32,
-        height: 32
-      },
-      frames: 4,
-      framesPerSec: 4,
-      repeat: true,
-      modelDimensions: {
-        offset: {
-          x: 5,
-          y: 12
-        },
-        dimensions: {
-          width: 23,
-          height: 9
-        }
+        width: 33,
+        height: 7
       },
       hitEffect: {
-        imageSource: "/Assets/projectiles/Arrow2.png",
+        imageSource: "/Assets/projectiles/arrow.png",
         imageDimensions: {
-          width: 24,
-          height: 32,
+          width: 28,
+          height: 7,
+          x: 0,
+          y: 0
+        },
+        // offset: {
+        //   x: 5,
+        //   y: 12
+        // },
+        //duration: 5000
+      },
+      shadow: "/Assets/shadows/shadow24x4.png"
+    },
+    effect: {
+      path: "arc",
+      damage: 5,
+      triggerDamagedEffect: true,
+      // TODO: more shapes
+      collisionDimensions: [{
+        offset: {
+          x: 8,
+          y: 8
+        },
+        dimensions: {
+          width: 16,
+          height: 16,
+          zheight: 16
+        }
+      }],
+      range: 1000,
+      punchThrough: false,
+      speed: 350
+    }
+  },
+  shadowArrow: {
+    type: "projectile",
+    name: "shadowArrow",
+    dimensions: {
+      width: 33,
+      height: 7
+    },
+    action: {
+      name: "shadowArrow",
+      actionDuration: 0,
+      actionRate: 2,
+      actionType: "exclusive",
+      automatic: false,
+      charge: {
+        speed: {
+          maxTime: 1000,
+          maxMult: 2.0
+        }
+      },
+      manaCost: 0
+    },
+    rendering: {
+      imageSource: "/Assets/projectiles/shadow_arrow.png",
+      dimensions: {
+        width: 33,
+        height: 7
+      },
+      hitEffect: {
+        imageSource: "/Assets/projectiles/shadow_arrow.png",
+        imageDimensions: {
+          width: 28,
+          height: 7,
           x: 0,
           y: 0
         },

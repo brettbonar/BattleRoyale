@@ -4,6 +4,7 @@ import Vec3 from "../../Engine/GameObject/Vec3.mjs"
 import ImageCache from "../../Engine/Rendering/ImageCache.mjs";
 import characters from "./characters.mjs"
 import teams from "../Teams.mjs"
+import equipment from "../Objects/equipment.mjs"
 
 export const STATE = {
   IDLE: "idle",
@@ -44,12 +45,14 @@ const CHARACTER_TYPE = {
 }
 
 export default class CharacterRenderer {
-  constructor(characterInfo, loadout) {
+  constructor(characterInfo) {
     this.characterInfo = characterInfo;
 
     let typeInfo = characters[characterInfo.type];
     this.rendering = typeInfo.rendering;
     
+    this.loadout = {};
+    this.cosmetics = {};
     this.animationQueue = [];
     this.frame = 0;
     this.currentTime = 0;
@@ -59,9 +62,8 @@ export default class CharacterRenderer {
       this.shadowImage = ImageCache.get(this.rendering.shadowImage);
     }
 
-    this.loadout = loadout;
-    if (this.hasLoadout()) {
-      this.initBody(characterInfo, loadout);
+    if (this.characterInfo.type === "humanoid") {
+      this.initBody(characterInfo);
     } else {
       this.body = ImageCache.get(this.rendering.body);
     }
@@ -71,18 +73,21 @@ export default class CharacterRenderer {
     return this.characterInfo.type === "humanoid" && this.loadout;
   }
 
-  initBody(characterInfo, loadout) {
+  initBody(characterInfo) {
     this.body = ImageCache.get("/Assets/character/body/" + characterInfo.gender + "/" + characterInfo.body + ".png");
-    _.each(loadout, (piece) => {
-      piece.image = ImageCache.get(piece.imageSource);
-    });
   }
 
   updateLoadout(character) {
     // TODO: don't clone every time. Just update pieces that have changed.
-    this.loadout = _.cloneDeep(character.state.loadout);
+    this.loadout = character.state.loadout;
+    this.cosmetics = {};
     _.each(this.loadout, (piece) => {
-      piece.image = ImageCache.get(piece.imageSource);
+      let item = equipment[piece];
+      if (item.cosmetics) {
+        for (const cosmetic of item.cosmetics) {
+          this.cosmetics[equipment[cosmetic].type] = cosmetic;
+        }
+      }
     });
   }
 
@@ -113,19 +118,17 @@ export default class CharacterRenderer {
     }
   }
 
-  drawBody() {
-
-  }
-
   drawLoadout(context, object, offset, animationSettings, position) {
     for (const piece of LOADOUT_ORDER) {
-      let item = this.loadout[piece];
-      if (!item && piece === "body") {
+      let itemType = this.loadout[piece] || this.cosmetics[piece];
+      if (!itemType && piece === "body") {
         this.drawBody(context, object);
-      } else if (item) {
-        if (item.image.complete) {
+      } else if (itemType) {
+        let item = equipment[itemType];
+        let image = ImageCache.get(item.imageSource);
+        if (image && image.complete) {
           let offset = getOffset(this.currentAnimationSettings, this.frame, item.imageSize);
-          context.drawImage(item.image, offset.x, offset.y, item.imageSize, item.imageSize,
+          context.drawImage(image, offset.x, offset.y, item.imageSize, item.imageSize,
             object.position.x, object.position.y - object.position.z, item.imageSize, item.imageSize);
         }
       }
@@ -231,31 +234,30 @@ export default class CharacterRenderer {
     return this.currentAction && this.currentAction.actionDuration;
   }
 
-  clearAnimationQueue() {
-    if (this.currentAnimationDone) {
-      this.frame = 0;
-    }
-    this.animationQueue.length = 0;
+  get state() {
+    return this.animationQueue.length > 0 && this.animationQueue[0].state;
   }
 
-  clearFinishedAnimations() {
-    if (this.currentAnimationDone) {
-      this.frame = 0;
-    }
-    _.remove(this.animationQueue, "done");
-  }
-
-  queueAnimation(animation) {
+  queueAnimation(animation, state) {
     if (this.currentAnimation !== animation) {
       let animationSettings = this.rendering.ANIMATION_SETTINGS[animation];
       if (animationSettings.forceAnimation) {
-        this.clearAnimationQueue();
+        if (this.currentAnimationDone && state !== this.state) {
+          this.frame = 0;
+        }
+        // Clear the whole queue when forcing an animation
+        this.animationQueue.length = 0;
       } else {
-        this.clearFinishedAnimations();
+        if (this.currentAnimationDone && state !== this.state) {
+          this.frame = 0;
+        }
+        _.remove(this.animationQueue, "done");
       }
       this.animationQueue.push({
         animation: animation,
-        done: !animationSettings.forceAnimation
+        done: !animationSettings.forceAnimation,
+        // TODO: make start part of animation settings
+        state: state
       });
     }
   }
@@ -263,7 +265,7 @@ export default class CharacterRenderer {
   setAnimation(elapsedTime, object) {
     this.currentAnimationTime += elapsedTime;
     let currentAction = object.currentAction || object.latestAction;
-    let prevState = this.state;
+    this.prevState = this.state;
 
     // We may start and finish an action within a frame, make sure we still animate it
     if (currentAction && !currentAction.new) {
@@ -282,28 +284,25 @@ export default class CharacterRenderer {
         this.currentAction = { type: this.currentAnimationSettings.nextAnimation };
       } else if (!this.currentAnimation || this.currentAnimationDone) {
         if (object.state.dead) {
-          this.state = STATE.DEAD;
-          this.queueAnimation(this.rendering.DEATH_ANIMATIONS[object.state.characterDirection]);
+          this.queueAnimation(this.rendering.DEATH_ANIMATIONS[object.state.characterDirection], STATE.DEAD);
         } else if (object.direction.x || object.direction.y || object.moving) {
-          this.state = STATE.MOVING;
-          this.queueAnimation(this.rendering.MOVE_ANIMATIONS[object.state.characterDirection]);
+          this.queueAnimation(this.rendering.MOVE_ANIMATIONS[object.state.characterDirection], STATE.MOVING);
         } else {
-          this.state = STATE.IDLE;
-          this.queueAnimation(this.rendering.IDLE_ANIMATIONS[object.state.characterDirection]);
+          this.queueAnimation(this.rendering.IDLE_ANIMATIONS[object.state.characterDirection], STATE.IDLE);
         }
       }
     } else {
       if (this.currentAction && this.currentAction.type === "attack") {
-        this.state = STATE.ATTACKING;
         if (this.rendering.WEAPON_ANIMATIONS) {
-          this.queueAnimation(this.rendering.WEAPON_ANIMATIONS[object.state.loadout.weapon.attackType][object.state.characterDirection]);
+          let weapon = equipment[object.state.loadout.weapon];
+          this.queueAnimation(this.rendering.WEAPON_ANIMATIONS[weapon.attackType][object.state.characterDirection], STATE.ATTACKING);
         } else if (this.rendering.ATTACK_ANIMATIONS) {
-          this.queueAnimation(this.rendering.ATTACK_ANIMATIONS[object.state.characterDirection]);
+          this.queueAnimation(this.rendering.ATTACK_ANIMATIONS[object.state.characterDirection], STATE.ATTACKING);
         }
       }
     }
 
-    if (this.state !== prevState) {
+    if (this.state !== this.prevState) {
       this.frame = 0;
       this.currentTime = 0;
     }
