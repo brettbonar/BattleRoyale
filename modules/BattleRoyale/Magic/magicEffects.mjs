@@ -1,5 +1,5 @@
 
-export default {
+let magicEffects = {
   fireLion: {
     type: "magic",
     name: "fireLion",
@@ -228,4 +228,122 @@ export default {
       // additional status effects
     }
   }
-}
+};
+
+magicEffects.bat_bite = {
+  type: "magic",
+  name: "bat_bite",
+  rendering: {
+    image: {
+      imageSource: "/Assets/magic/bite.png",
+      offset: {
+        x: 0,
+        y: 0
+      }
+    },
+    imageSize: 512,
+    renderSize: 128,
+    frames: 16,
+    framesPerSec: 32
+  },
+  dimensions: {
+    width: 128,
+    height: 128,
+    zheight: 64
+  },
+  action: {
+    name: "bat_bite",
+    actionDuration: 0,
+    actionRate: 1,
+    actionType: "exclusive",
+    automatic: false,
+    manaCost: 0
+  },
+  positionOffset: {
+    x: 64,
+    y: 64
+  },
+  effect: {
+    distance: 48,
+    renderingDelay: 0,
+    damageDelay: 150,
+    duration: 1000,
+    noFriendlyFire: true,
+    damage: 5,
+    collisionDimensions: [{
+      offset: {
+        x: 0,
+        y: 0
+      },
+      dimensions: {
+        width: 128,
+        height: 128,
+        zheight: 8
+      }
+    }],
+    physics: {
+      surfaceType: "gas",
+      solidity: 0
+    }
+  }
+};
+
+magicEffects.wolf_bite = {
+  type: "magic",
+  name: "wolf_bite",
+  rendering: {
+    image: {
+      imageSource: "/Assets/magic/bite.png",
+      offset: {
+        x: 0,
+        y: 0
+      }
+    },
+    imageSize: 512,
+    renderSize: 128,
+    frames: 16,
+    framesPerSec: 32
+  },
+  dimensions: {
+    width: 128,
+    height: 128,
+    zheight: 64
+  },
+  action: {
+    name: "wolf_bite",
+    actionDuration: 0,
+    actionRate: 1,
+    actionType: "exclusive",
+    automatic: false,
+    manaCost: 0
+  },
+  positionOffset: {
+    x: 64,
+    y: 64
+  },
+  effect: {
+    distance: 64,
+    renderingDelay: 0,
+    damageDelay: 150,
+    duration: 1000,
+    noFriendlyFire: true,
+    damage: 15,
+    collisionDimensions: [{
+      offset: {
+        x: 0,
+        y: 0
+      },
+      dimensions: {
+        width: 128,
+        height: 128,
+        zheight: 8
+      }
+    }],
+    physics: {
+      surfaceType: "gas",
+      solidity: 0
+    }
+  }
+};
+
+export default magicEffects;

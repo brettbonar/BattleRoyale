@@ -14,7 +14,7 @@ import { getDistance } from "../util.mjs"
 import GameSettings from "../Engine/GameSettings.mjs"
 
 import ObjectRenderer from "./Renderers/ObjectRenderer.mjs"
-import Character from "./Objects/Character.mjs"
+import Character from "./Characters/Character.mjs"
 import Projectile from "./Objects/Projectile.mjs"
 import objects from "./Objects/objects.mjs"
 import equipment from "./Objects/equipment.mjs"
@@ -26,6 +26,7 @@ import effects from "./Effects/effects.mjs"
 import attacks from "./Magic/attacks.mjs"
 import RenderObject from "./Objects/RenderObject.mjs"
 import lootTable from "./Objects/lootTable.mjs";
+import Teams from "./Teams.mjs";
 
 export default class BattleRoyaleServer extends BattleRoyale {
   constructor(params) {
@@ -35,12 +36,10 @@ export default class BattleRoyaleServer extends BattleRoyale {
       changeTarget: (data, elapsedTime) => this.changeTargetEvent(data, elapsedTime),
       attack: (data, elapsedTime) => this.attackEvent(data, elapsedTime),
       use: (data, elapsedTime) => this.useEvent(data, elapsedTime),
-      changeAltitude: (data, elapsedTime) => this.changeAltitudeEvent(data, elapsedTime),
       nextWeapon: (data, elapsedTime) => this.nextWeaponEvent(data, elapsedTime),
       previousWeapon: (data, elapsedTime) => this.previousWeaponEvent(data, elapsedTime)
     };
     this.initTreasure();
-    this.broadcastEvents = [];
   }
 
   spawnTreasure(source, tileType) {
@@ -157,12 +156,15 @@ export default class BattleRoyaleServer extends BattleRoyale {
       objectId: data.source.objectId
     });
     if (object && !object.state.dead) {
+      object.revision = data.source.revision;
       if (data.position) {
         // TODO: could remove this so players cant cheat
         object.position = new Vec3(data.position);
       }
+      if (_.isNumber(data.direction.z) && data.direction.z !== 0 && !object.state.canFly) {
+        return;
+      }
       object.setDirection(data.direction);
-      object.revision = data.source.revision;
       //object.elapsedTime = elapsedTime || 0;
     }
   }
@@ -206,7 +208,7 @@ export default class BattleRoyaleServer extends BattleRoyale {
         eventType: "kill",
         killed: character.playerId,
         killedBy: character.killedBy
-      })
+      });
     }
   }
 
@@ -223,17 +225,30 @@ export default class BattleRoyaleServer extends BattleRoyale {
         return;
       }
 
+      if (collision.source.effect.noFriendlyFire) {
+        // Don't damage self or other teammates if no FF is on
+        if ((collision.source.team === Teams.SOLO && collision.source.source === collision.target) ||
+             collision.source.team !== Teams.SOLO && collision.source.team === collision.target.team) {
+          return;
+        }
+      }
+
+      if (collision.source.team !== Teams.SOLO &&
+          collision.source.effect.noFriendlyFire && collision.source.team === collision.target.team) {
+        return;
+      }
+
       if (_.get(collision.target, "physics.surfaceType") === SURFACE_TYPE.CHARACTER) {
         // TODO: something else
         if (!collision.source.damagedTargets.includes(collision.target) && collision.source.damageReady) {
           collision.target.damage(collision.source, collision.source.effect.damage);
           collision.source.damagedTargets.push(collision.target);
         }
-        // if (!character.dead && character.currentHealth <= 0) {
-        //   character.kill();
-        // }
-        if (!collision.source.effect.punchThrough && collision.source.effect.path !== "beam") {
-          this.removeObject(collision.source);
+
+        if (collision.source.physics.surfaceType !== SURFACE_TYPE.GAS) {
+          if (!collision.source.effect.punchThrough && collision.source.effect.path !== "beam") {
+            this.removeObject(collision.source);
+          }
         }
       } else {
         if (collision.source.physics.surfaceType === SURFACE_TYPE.PROJECTILE &&

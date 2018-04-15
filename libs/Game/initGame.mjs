@@ -16,6 +16,7 @@ import Item from "../../modules/BattleRoyale/Objects/Item.mjs"
 import scenes from "../../modules/BattleRoyale/Objects/Scenes.mjs"
 import Map from "../../modules/Map.mjs"
 import ShadowField from "../../modules/BattleRoyale/Shadow/ShadowField.mjs"
+import teams from "../../modules/BattleRoyale/Teams.mjs";
 
 const SQRT_2 = 1.414;
 
@@ -185,21 +186,32 @@ function initGame(players, maps) {
   for (const player of players) {
     let char = new Character({
       //level: "start",
-      body: "tanned",
-      gender: "male",
+      team: teams.SOLO,
+      characterInfo: {
+        type: "humanoid",
+        body: "tanned",
+        gender: "male"
+      },
       isPlayer: true,
       playerId: player.playerId,
       simulation: true,
-      damagedEffect: effects.blood,
-      loadout: {
-        weapon: equipment.staffMale,
-        torso: equipment.leatherChestMale,
-        legs: equipment.tealPantsMale,
-        head: equipment.clothHoodMale,
-        feet: equipment.brownShoesMale,
-        hands: equipment.leatherBracersMale
+      state: {
+        loadout: {
+          weapon: equipment.staffMale,
+          torso: equipment.leatherChestMale,
+          legs: equipment.tealPantsMale,
+          head: equipment.clothHoodMale,
+          feet: equipment.brownShoesMale,
+          hands: equipment.leatherBracersMale
+        },
+        inventory: [
+          "bow",
+          "lightStaffMale",
+          "fireStaffMale",
+          "waterStaffMale",
+          "staffMale"
+        ]
       },
-      fireReady: true,
       position: {
         x: pos,
         y: pos,
@@ -216,11 +228,6 @@ function initGame(players, maps) {
         z: 0
       }
     });
-    char.state.inventory.push("bow");
-    char.state.inventory.push("lightStaffMale");
-    char.state.inventory.push("fireStaffMale");
-    char.state.inventory.push("waterStaffMale");
-    char.state.inventory.push("staffMale");
     gameObjects.push(char);
     player.character = char;
     pos += 100;
@@ -374,12 +381,12 @@ function initGame(players, maps) {
     simulation: true
   }));
 
-  gameObjects = gameObjects.concat(scenes.house.getObjects(
-    {
-      x: 300,
-      y: 300
-    }
-  ));
+  // gameObjects = gameObjects.concat(scenes.house.getObjects(
+  //   {
+  //     x: 300,
+  //     y: 300
+  //   }
+  // ));
 
   addScenes(maps);
   //gameObjects = gameObjects.concat(addScenes(maps));

@@ -1,6 +1,5 @@
 import GameObject from "../../Engine/GameObject/GameObject.mjs"
 import magicEffects from "./magicEffects.mjs"
-import MagicRenderer from "./MagicRenderer.mjs"
 import Vec3 from "../../Engine/GameObject/Vec3.mjs"
 import Dimensions from "../../Engine/GameObject/Dimensions.mjs"
 import { SURFACE_TYPE } from "../../Engine/Physics/PhysicsConstants.mjs"
@@ -20,6 +19,7 @@ export default class Magic extends GameObject {
     this.physics.surfaceType = SURFACE_TYPE.GAS;
     this.damagedTargets = [];
     this.damageReady = true;
+    this.source = params.source;
 
     if (!params.simulation) {
       let image = this.magic.rendering.image;
@@ -75,13 +75,24 @@ export default class Magic extends GameObject {
   
   static create(params) {
     let magic = magicEffects[params.attackType];
-    let position = new Vec3(params.position).minus(magic.positionOffset);
+    let direction = params.source.state.target.minus(params.source.attackCenter).normalize();
+    let position;
+    
+    if (_.isUndefined(magic.effect.distance)) {
+      position = new Vec3(params.position).minus(magic.positionOffset);
+    } else {
+      direction.z = 0;
+      position = params.source.attackCenter
+        .plus(direction.times(magic.effect.distance))
+        .minus(magic.positionOffset);
+    }
 
     return new Magic({
       position: position,
+      source: params.source,
       simulation: params.simulation,
       attackType: params.attackType,
-      direction: params.direction,
+      direction: direction,
       simulation: params.simulation
       // playerId: params.source.playerId,
       // ownerId: params.source.objectId,

@@ -1,5 +1,5 @@
 
-export default {
+let attacks = {
   magicBall: {
     rendering: {
       imageSource: "/Assets/magic/magic-ball.png",
@@ -719,4 +719,6 @@ export default {
       //zspeed: 5000
     }
   },
-}
+};
+
+export default attacks;

@@ -16,7 +16,7 @@ import { getDistance } from "../util.mjs"
 import GameSettings from "../Engine/GameSettings.mjs"
 
 import ObjectRenderer from "./Renderers/ObjectRenderer.mjs"
-import Character from "./Objects/Character.mjs"
+import Character from "./Characters/Character.mjs"
 import Projectile from "./Objects/Projectile.mjs"
 import objects from "./Objects/objects.mjs"
 import equipment from "./Objects/equipment.mjs"
@@ -44,8 +44,8 @@ const EVENTS = {
   PREVIOUS_WEAPON: "previousWeapon",
   NEXT_WEAPON: "nextWeapon",
   USE: "use",
-  RAISE_ALTITUDE: "raiseAltitude",
-  LOWER_ALTITUDE: "lowerAltitude",
+  FLY_UP: "raiseAltitude",
+  FLY_DOWN: "lowerAltitude",
   SHOW_MAP: "showMap"
 }
 
@@ -99,8 +99,8 @@ export default class BattleRoyaleClient extends BattleRoyale {
     this.keyBindings[KEY_CODE.Q] = EVENTS.PREVIOUS_WEAPON;
     this.keyBindings[KEY_CODE.R] = EVENTS.NEXT_WEAPON;
     this.keyBindings[KEY_CODE.M] = EVENTS.SHOW_MAP;
-    this.keyBindings[KEY_CODE.UP] = EVENTS.RAISE_ALTITUDE;
-    this.keyBindings[KEY_CODE.DOWN] = EVENTS.LOWER_ALTITUDE;
+    this.keyBindings[KEY_CODE.SPACE] = EVENTS.FLY_UP;
+    this.keyBindings[KEY_CODE.SHIFT] = EVENTS.FLY_DOWN;
     this.keyBindings["leftClick"] = EVENTS.PRIMARY_FIRE;
     this.keyBindings["rightClick"] = EVENTS.SECONDARY_FIRE;
     this.activeEvents = [];
@@ -116,8 +116,8 @@ export default class BattleRoyaleClient extends BattleRoyale {
     this.addEventHandler(EVENTS.PRIMARY_FIRE, (event) => this.attack(event, 1));
     this.addEventHandler(EVENTS.SECONDARY_FIRE, (event) => this.attack(event, 2));
     this.addEventHandler(EVENTS.USE, (event) => this.use(event));
-    this.addEventHandler(EVENTS.RAISE_ALTITUDE, (event) => this.changeAltitude(event, 10));
-    this.addEventHandler(EVENTS.LOWER_ALTITUDE, (event) => this.changeAltitude(event, -10));
+    this.addEventHandler(EVENTS.FLY_UP, (event) => this.flyUp(event));
+    this.addEventHandler(EVENTS.FLY_DOWN, (event) => this.flyDown(event));
     this.addEventHandler(EVENTS.PREVIOUS_WEAPON, (event) => this.previousWeapon(event));
     this.addEventHandler(EVENTS.NEXT_WEAPON, (event) => this.nextWeapon(event));
     this.addEventHandler(EVENTS.SHOW_MAP, (event) => this.showMap(event));
@@ -420,6 +420,51 @@ export default class BattleRoyaleClient extends BattleRoyale {
     });
   }
 
+  flyDown(event) {
+    if (!this.gameState.player.state.canFly) return;
+
+    let direction = this.gameState.player.direction;
+    if (event.release) {
+      direction.z = 0;
+    } else {
+      direction.z = -1.0;
+    }
+    
+    this.gameState.player.setDirection(direction);
+    this.sendEvent({
+      type: "changeDirection",
+      source: {
+        playerId: this.player.playerId,
+        objectId: this.gameState.player.objectId
+      },
+      direction: direction,
+      position: this.gameState.player.position
+    });
+  }
+
+  flyUp(event) {
+    if (!this.gameState.player.state.canFly) return;
+
+    let direction = this.gameState.player.direction;
+
+    if (event.release) {
+      direction.z = 0;
+    } else {
+      direction.z = 1.0;
+    }
+
+    this.gameState.player.setDirection(direction);
+    this.sendEvent({
+      type: "changeDirection",
+      source: {
+        playerId: this.player.playerId,
+        objectId: this.gameState.player.objectId
+      },
+      direction: direction,
+      position: this.gameState.player.position
+    });
+  }
+
   move(event) {
     let direction = new Vec3({
       x: 0,
@@ -476,7 +521,7 @@ export default class BattleRoyaleClient extends BattleRoyale {
   }
 
   renderInteractions() {
-    if (this.interaction) {
+    if (this.interaction && this.gameState.player.state.canInteract) {
       this.tempContext.save();
       this.tempContext.fillStyle = "green";
       this.tempContext.fillRect(this.interaction.center.x - 8,
@@ -512,7 +557,7 @@ export default class BattleRoyaleClient extends BattleRoyale {
     let renderObjects = this.getRenderObjects(visibleBounds);
     let fov;
     if (!this.gameState.player.state.dead) {
-      fov = new FieldOfView(this.gameState.player.fov, renderObjects);
+      fov = new FieldOfView(this.gameState.player.fovDimensions, renderObjects);
     }
     this.renderingEngine.render(this.tempContext, renderObjects, elapsedTime,
       this.gameState.player.center, fov);

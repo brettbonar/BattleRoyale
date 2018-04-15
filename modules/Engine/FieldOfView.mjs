@@ -395,7 +395,7 @@ export default class FieldOfView {
     }
 
     // Come full circle
-    if (fov.angle >= FULL_FOV) {
+    if (rays.rays.length > 0 && fov.angle >= FULL_FOV) {
       bounds.push(new Bounds({
         dimensions: {
           triangle: [

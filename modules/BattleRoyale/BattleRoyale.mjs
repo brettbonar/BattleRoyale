@@ -12,7 +12,7 @@ import { getDistance } from "../util.mjs"
 import GameSettings from "../Engine/GameSettings.mjs"
 
 import ObjectRenderer from "./Renderers/ObjectRenderer.mjs"
-import Character from "./Objects/Character.mjs"
+import Character from "./Characters/Character.mjs"
 import Projectile from "./Objects/Projectile.mjs"
 import objects from "./Objects/objects.mjs"
 import equipment from "./Objects/equipment.mjs"
@@ -28,18 +28,6 @@ import ParticleEffect from "../Engine/Effects/ParticleEffect.mjs"
 import Grid from "../Engine/Grid.mjs"
 import LevelGrids from "../Engine/LevelGrids.mjs";
 import magicEffects from "./Magic/magicEffects.mjs";
-
-const EVENTS = {
-  MOVE_UP: "moveUp",
-  MOVE_DOWN: "moveDown",
-  MOVE_LEFT: "moveLeft",
-  MOVE_RIGHT: "moveRight",
-  PRIMARY_FIRE: "primaryFire",
-  SECONDARY_FIRE: "secondaryFire",
-  USE: "use",
-  RAISE_ALTITUDE: "raiseAltitude",
-  LOWER_ALTITUDE: "lowerAltitude"
-}
 
 let sequenceNumber = 1;
 
@@ -61,6 +49,7 @@ export default class BattleRoyale extends Game {
       killed: [],
       characters: []
     };
+    this.broadcastEvents = [];
 
     this.initObjects(params.objects);
     // TODO: create static objects for map boundaries. Also for ground?
@@ -120,9 +109,9 @@ export default class BattleRoyale extends Game {
     } else if (attack.type === "magic") {
       this.addObject(Magic.create({
         type: "Magic",
+        source: character,
         attackType: attack.name,
         position: character.state.target,
-        direction: character.state.target.minus(character.attackCenter),
         simulation: this.simulation
       }));
     }
@@ -164,6 +153,10 @@ export default class BattleRoyale extends Game {
   }
 
   getInteraction(target) {
+    if (!target.state.canInteract) {
+      return null;
+    }
+
     let interactions = _.filter(this.gameState.objects, (obj) => {
       return obj.isInteractable && obj.interactionsBoundingBox.some((box) => 
         target.collisionBounds.some((targetBounds) => box.intersects(targetBounds)));
@@ -174,13 +167,27 @@ export default class BattleRoyale extends Game {
     });
   }
 
-  onCollision(result) {
-    if (result.create && this.simulation) {
-      result.create.simulation = this.simulation;
-      if (result.create.type === "Magic") {
-        this.addObject(Magic.create(result.create));
+  handleObjectUpdate(result) {
+    if (this.simulation) {
+      let updates = _.castArray(result);
+      for (const update of updates) {
+        if (update.create) {
+          update.create.simulation = this.simulation;
+          // TODO: test if create is instance of GameObject?
+          // Or just require that create is instance
+          if (update.create.type === "Magic") {
+            this.addObject(Magic.create(update.create));
+          } else {
+            this.addObject(update.create);
+          }
+        }
+        if (update.remove) {
+          this.removeObject(update.remove);
+        }
+        if (update.event) {
+          this.broadcastEvents.push(update.event);
+        }
       }
-      this.removeObject(result.remove);
     }
   }
 
@@ -210,7 +217,7 @@ export default class BattleRoyale extends Game {
       } else {
         let update = obj.update(elapsedTime);
         if (update) {
-          this.onCollision(update);
+          this.handleObjectUpdate(update);
         }
         // Test if a beam intersects any other beams
         // TODO: fix this so it doesn't ignore people in path of beam

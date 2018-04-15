@@ -89,13 +89,16 @@ export default class Simulation {
         killedByPlayer: this.getPlayerIdFromObjectId(event.killedBy),
         killedBy: event.killedBy
       };
+    } else if (event.eventType === "playerAvatarChange") {
+      let player = this.players.find((player) => player.playerId === event.playerId);
+      player.character = this.game.gameState.objects.find((obj) => obj.objectId === event.objectId);
+      return event;
     }
     return event;
   }
 
   sendUpdates() {
     let broadcastEvents = this.game.broadcastEvents.map((event) => this.getEvent(event));
-
 
     for (const player of this.players) {
       if (this.lastState.length > 0) {

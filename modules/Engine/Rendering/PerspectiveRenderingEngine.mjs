@@ -73,7 +73,7 @@ export default class PerspectiveRenderingEngine extends RenderingEngine{
     context.save();
 
     if (window.debug) {
-      fov.debugRays(context);
+      //fov.debugRays(context);
     }
 
     let objsToRender = this.getRenderObjects(objects, center, fov);

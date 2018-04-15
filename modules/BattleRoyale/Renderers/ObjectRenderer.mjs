@@ -63,9 +63,10 @@ export default class ObjectRenderer {
       position.add(this.imageDimensions.offset);
     }
 
+    let renderSize = this.renderSize || this.imageSize;
     context.drawImage(this.image, frameOffset.x, frameOffset.y,
       this.imageSize, this.imageSize,
-      position.x, position.y, this.imageSize, this.imageSize);
+      position.x, position.y, renderSize, renderSize);
   }
 
   draw(context, object, position, clipping) {

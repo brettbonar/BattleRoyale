@@ -352,7 +352,8 @@ export default class Projectile extends GameObject {
       direction: direction,
       playerId: params.source.playerId,
       ownerId: params.source.objectId,
-      elapsedTime: params.elapsedTime
+      elapsedTime: params.elapsedTime,
+      team: params.source.team
     });
 
     return projectile;

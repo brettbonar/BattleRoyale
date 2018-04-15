@@ -2,10 +2,12 @@ import GameObject from "../../Engine/GameObject/GameObject.mjs"
 import Vec3 from "../../Engine/GameObject/Vec3.mjs"
 import Bounds from "../../Engine/GameObject/Bounds.mjs"
 import Dimensions from "../../Engine/GameObject/Dimensions.mjs"
-import CharacterRenderer, { STATE } from "../Renderers/CharacterRenderer.mjs"
+import CharacterRenderer, { STATE } from "./CharacterRenderer.mjs"
 import { SURFACE_TYPE } from "../../Engine/Physics/PhysicsConstants.mjs"
 import GameSettings from "../../Engine/GameSettings.mjs"
-import equipment from "./equipment.mjs"
+import equipment from "../Objects/equipment.mjs"
+import characters from "./characters.mjs"
+import effects from "../Effects/effects.mjs"
 
 class Action {
   constructor(params) {
@@ -17,113 +19,85 @@ let actionId = 0;
 export default class Character extends GameObject {
   constructor(params) {
     super(params);
-    _.defaults(this, {
-      type: "Character",
-      state: {
-        target: this.position,
-        inventory: [],
-        loadout: params.loadout,
-        characterDirection: "down",
-        attacking: false,
-        attackTime: 0,
-        maxHealth: 100,
-        maxMana: 100,
-        currentHealth: 100,
-        currentMana: 100,
-        hasHealth: true,
-        hasMana: true
-      },
-      attackDuration: 1000
-    });
-    this.speed = params.speed || 96;
-    this.baseSpeed = this.speed;
+
+    this.state = _.cloneDeep(params.state) || {};
+    this.type = "Character";
+    this.characterInfo = params.characterInfo;
+    this.initFromCharacterType(params.characterInfo.type);
+
+    this.state.currentHealth = this.state.maxHealth;
+    this.state.currentMana = this.state.maxMana;
+    this.state.hasHealth = _.has(this.state, "maxHealth");
+    this.state.hasMana = _.has(this.state, "maxMana");
+
     this.losHidden = true;
-
-    // Dimensions of the actual model within the image
-    _.defaults(this, {
-      modelDimensions: {
-        offset: new Vec3({
-          x: 16,
-          y: 16
-        }),
-        dimensions: new Dimensions({
-          width: 32,
-          height: 44,
-          zheight: 44
-        })
-      }
-    });
-
-    // actionDuration
-    // actionRate
-    // actionCooldown
-    // currentDuration
-    // currentCooldown
-    // active
     this.cooldowns = [];
     this.actionStack = [];
+    
+    this.physics.surfaceType = "character";
 
-    if (params.collisionDimensions) {
-      this.collisionDimensions = this.parseDimensions(params.collisionDimensions);
-    } else {
-      this.collisionDimensions = [
-        {
-          offset: {
-            x: 16,
-            y: 44, // 64 - 20,
-            z: 0
-          },
-          dimensions: new Dimensions({
-            width: 32,
-            height: 20,
-            zheight: 44
-          })
-        }
-      ];
+    if (!params.simulation) {
+      this.renderer = new CharacterRenderer(this.characterInfo, this.state.loadout);
     }
 
-    // Dimensions indicating what part of the character is visible. Used for FOV checks.
-    this.visibleDimensions = params.visibleDimensions || this.collisionDimensions;
+    if (this.state.dead) {
+      this.kill();
+    }
+  }
 
-    if (!params.attackOrigin) {
+  updateDimensions() {
+    let dimensions = characters[this.characterInfo.type].dimensions[this.state.characterDirection];
+
+    this.modelDimensions = dimensions.modelDimensions;
+    this.collisionDimensions = dimensions.collisionDimensions;
+    this.visibleDimensions = dimensions.visibleDimensions || dimensions.collisionDimensions;
+    this.dimensions = dimensions.dimensions;
+
+    if (dimensions.attackOrigin) {
+      this.attackOrigin = dimensions.attackOrigin;
+    } else if (this.collisionDimensions.length > 0) {
       this.attackOrigin = {
         offset: new Vec3(this.collisionDimensions[0].offset).plus({
-          z: 20
+          z: this.collisionDimensions[0].dimensions.zheight / 2
         }),
         dimensions: new Dimensions({
           width: this.collisionDimensions[0].dimensions.width,
           height: this.collisionDimensions[0].dimensions.height
         })
       };
+    } else {
+      this.attackOrigin = this.center;
     }
 
-    this.dimensions = params.dimensions || new Dimensions({
-      width: 64,
-      height: 64,
-      zheight: 64
-    });
-    
-    this.physics.surfaceType = "character";
-
-    if (!params.simulation) {
-      this.renderer = new CharacterRenderer({
-        gender: params.gender,
-        body: params.body,
-        loadout: params.state.loadout,
-        isOtherPlayer: this.isOtherPlayer
-      });
-    }
+    this.updateBounds();
   }
 
-  get fov() {
+  initFromCharacterType(type) {
+    let typeInfo = _.cloneDeep(characters[type]);
+
+    _.merge(this.state, typeInfo.stats);
+    _.defaults(this.state, {
+      target: this.position,
+      inventory: [],
+      loadout: {},
+      characterDirection: "down",
+      attacking: false,
+      attackTime: 0
+    });
+
+    this.fov = typeInfo.fov;
+    this.speed = typeInfo.stats.speed;
+    this.baseSpeed = typeInfo.stats.speed;
+    this.damagedEffect = effects[typeInfo.rendering.damagedEffect];
+    this.updateDimensions();
+  }
+
+  get fovDimensions() {
     return {
-      center: this.position.plus({
-        x: this.dimensions.width / 2,
-        y: this.dimensions.height - 10
-      }),
+      center: this.attackCenter,
       target: this.state.target,
-      range: 1100,
-      angle: 90
+      range: this.fov.range,
+      angle: this.fov.angle
     };
   }
 
@@ -198,11 +172,13 @@ export default class Character extends GameObject {
     this.losHidden = false;
     this.dimensions.zheight = 5;
     this.perspectiveOffset = { y: 1 };
-    this.physics.surfaceType = SURFACE_TYPE.NONE;
-    this.killedBy = source.ownerId;
+    this.physics.surfaceType = SURFACE_TYPE.GAS;
+    //this.collisionDimensions = [];
+    this.killedBy = source && source.ownerId;
     this.speed = 0;
     this.direction.x = 0;
     this.direction.y = 0;
+    this.stopAllActions();
     this.updatePosition();
   }
 
@@ -239,10 +215,12 @@ export default class Character extends GameObject {
 
   canDoAction(action) {
     let manaCost = action.manaCost || 0;
+    let hasEnoughMana = !manaCost || this.state.currentMana >= manaCost;
     let healthCost = action.healthCost || 0;
+    let hasEnoughHealth = !healthCost || this.state.currentHealth >= healthCost;
     // TODO: add elapsedTime to cooldown here?
     let cooldown = _.find(this.cooldowns, { actionName: action.name });
-    return this.canQueueAction(action) && this.state.currentMana >= manaCost && this.state.currentHealth >= healthCost && !cooldown;
+    return this.canQueueAction(action) && hasEnoughHealth && hasEnoughMana && !cooldown;
   }
 
   addItem(itemType) {
@@ -312,7 +290,8 @@ export default class Character extends GameObject {
     if (action.action) {
       let manaCost = action.action.manaCost || 0;
       let healthCost = action.action.healthCost || 0;
-      if (this.state.currentMana >= manaCost && this.state.currentHealth >= healthCost) {
+      if ((!manaCost || this.state.currentMana >= manaCost) &&
+           (!healthCost || this.state.currentHealth >= healthCost)) {
         this.state.currentHealth -= action.action.healthCost || 0;
         this.state.currentMana -= action.action.manaCost || 0;
         if (action.cb) action.cb(actionTimeDiff, modifiers, action);
@@ -344,6 +323,8 @@ export default class Character extends GameObject {
   }
 
   setTarget(target) {
+    if (this.state.dead) return;
+
     this.state.target = new Vec3(target);
     let center = this.attackCenter;
     let direction = new Vec3(target).minus(center).normalize();
@@ -360,6 +341,7 @@ export default class Character extends GameObject {
     }
 
     this.targetRotation = Math.atan2(direction.y, direction.x ) * 180 / Math.PI;
+    this.updateDimensions();
   }
 
   updateAction(action, elapsedTime) {
@@ -437,6 +419,10 @@ export default class Character extends GameObject {
       return cooldown.currentTime >= cooldown.cooldownTime;
     });
 
+    if (this.position.z > this.state.maxAltitude) {
+      this.position.z = this.state.maxAltitude;
+    }
+
     // if (this.targetPosition) {
     //   if (Math.abs(this.position.x - this.targetPosition.x) <= 15 && 
     //       Math.abs(this.position.y - this.targetPosition.y) <= 15) {
@@ -449,8 +435,12 @@ export default class Character extends GameObject {
   }
 
   updateState(state, interpolateTime) {
+    if (!this.state.dead && _.get(state, "state.dead")) {
+      this.kill();
+    }
+
     _.merge(this, _.omit(state, "position", "direction", "state"));
-    _.merge(this.state, _.omit(state.state, "target"));
+    _.merge(this.state, _.omit(state.state, "target", "characterDirection"));
     //_.merge(this, state);
     if (state.latestAction && (!this.currentAction || state.latestAction.actionId !== this.currentAction.actionId)) {
       // Pause previous action
@@ -525,13 +515,13 @@ export default class Character extends GameObject {
     //   ]));
     // }
     return Object.assign(super.getUpdateState(), _.pick(this, [
+      "team",
       "state",
       "body",
       "gender",
       "isPlayer",
       "killedBy",
-      // TODO: make this part of character type, or just part of weapon
-      "damagedEffect"
+      "characterInfo"
     ]), {
       //currentAction: this.currentAction,
       latestAction: latestAction

@@ -34,6 +34,37 @@ let items = {
       }
     ]
   },
+  shadowBow: {
+    type: "item",
+    itemType: "shadowBow",
+    equipmentType: "shadowBow",
+    name: "Shadow Bow",
+    biome: "any",
+    imageSource: "/Assets/items/shadowBow.png",
+    imageDimensions: {
+      x: 0,
+      y: 0,
+      width: 64,
+      height: 64
+    },
+    physics: {
+      surfaceType: "none",
+    },
+    dimensions: {
+      width: 64,
+      height: 64,
+      zheight: 16
+    },
+    isInteractable: true,
+    interactionDimensions: [
+      {
+        dimensions: {
+          width: 64,
+          height: 64
+        }
+      }
+    ]
+  },
   fireOrb: {
     type: "item",
     itemType: "fireStaff",
@@ -191,6 +222,19 @@ export default {
     },
     world: items.bow
   },
+  shadowBow: {
+    imageSource: "/Assets/character/weapons/right hand/either/shadow_bow.png",
+    imageSize: 64,
+    itemType: "shadowBow",
+    type: "weapon",
+    attackType: "bow",
+    hands: 1,
+    gender: "either",
+    attacks: {
+      1: "arrow"
+    },
+    world: items.shadowBow
+  },
   staffMale: {
     imageSource: "/Assets/character/weapons/right hand/male/staff_male.png",
     imageSize: 64,
@@ -258,6 +302,16 @@ export default {
       2: "lightningclaw"
     }
   },
+  shadow_bat: {
+    attacks: {
+      1: "bat_bite"
+    }
+  },
+  shadow_wolf: {
+    attacks: {
+      1: "wolf_bite"
+    }
+  },
   // spear: {
   //   imageSource: "/Assets/character/weapons/both hand/spear.png",
   //   imageSize: 64,
@@ -299,5 +353,69 @@ export default {
     imageSize: 64,
     type: "hands",
     gender: "male"
-  }  
+  },
+
+  // Body parts
+  // redEyes: {
+  //   imageSource: "/Assets/character/body/male/eyes/red.png",
+  //   imageSize: 64,
+  //   type: "eyes",
+  //   gender: "male"
+  // },
+
+  // Shadow equipment
+  shadowLeatherChestMale: {
+    imageSource: "/Assets/character/torso/leather/shadow_chest_male.png",
+    imageSize: 64,
+    type: "torso",
+    gender: "male"
+  },
+  shadowLeatherShouldersMale: {
+    imageSource: "/Assets/character/torso/leather/shadow_shoulders_male.png",
+    imageSize: 64,
+    type: "shoulders",
+    gender: "male"
+  },
+  shadowBeltMale: {
+    imageSource: "/Assets/character/belt/leather/male/shadow_leather_male.png",
+    imageSize: 64,
+    type: "belt",
+    gender: "male"
+  },
+  shadowPantsMale: {
+    imageSource: "/Assets/character/legs/pants/male/shadow_pants_male.png",
+    imageSize: 64,
+    type: "legs",
+    gender: "male"
+  },
+  shadowHoodMale: {
+    imageSource: "/Assets/character/head/hoods/male/shadow_hood_male.png",
+    imageSize: 64,
+    type: "head",
+    gender: "male"
+  },
+  blackShoesMale: {
+    imageSource: "/Assets/character/feet/shoes/male/black_shoes_male.png",
+    imageSize: 64,
+    type: "feet",
+    gender: "male"
+  },
+  shadowBracersMale: {
+    imageSource: "/Assets/character/hands/bracers/male/shadow_bracers_male.png",
+    imageSize: 64,
+    type: "hands",
+    gender: "male"
+  },
+  shadowQuiver: {
+    imageSource: "/Assets/character/behind_body/equipment/shadow_quiver.png",
+    imageSize: 64,
+    type: "back",
+    gender: "either"
+  },
+  shadowArrow: {
+    imageSource: "/Assets/character/weapons/left hand/either/shadow_arrow.png",
+    imageSize: 64,
+    type: "offhand",
+    gender: "either"
+  }
 }
