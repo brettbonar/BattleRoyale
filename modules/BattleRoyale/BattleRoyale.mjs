@@ -111,22 +111,30 @@ export default class BattleRoyale extends Game {
         type: "Magic",
         source: character,
         attackType: attack.name,
+        direction: character.state.target.minus(character.attackCenter).normalize(),        
         position: character.state.target,
         simulation: this.simulation
       }));
     }
   }
 
-  doAttack(character, params, elapsedTime) {
+  doAttack(character, params, elapsedTime, animateOnly) {
+    if (character.state.dead) return;
+
     let attack = attacks[character.state.loadout.weapon.attacks[params.attackType]];
     if (!attack) {
       attack = magicEffects[character.state.loadout.weapon.attacks[params.attackType]];
     }
+
+    let cb;
+    if (!animateOnly) {
+      cb = (timeDiff, mods, action) => {
+        this.createAttack(character, params, attack, timeDiff, mods, action);
+      };
+    }
+
     if (attack) {
-      character.doAction("attack", params.release, attack.action, elapsedTime,
-        (timeDiff, mods, action) => {
-          this.createAttack(character, params, attack, timeDiff, mods, action);
-        });
+      character.doAction("attack", params.release, attack.action, elapsedTime, cb);
     }
   }
 

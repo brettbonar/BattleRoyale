@@ -189,19 +189,6 @@ export default class BattleRoyaleServer extends BattleRoyale {
     this.updates.length = 0;
   }
 
-  attack(event, attackType) {
-    let source = {
-      playerId: this.player.playerId,
-      objectId: this.gameState.player.objectId
-    };
-
-    this.doAttack(this.gameState.player, {
-      source: source,
-      attackType: attackType,
-      release: event.release
-    });
-  }
-
   onKill(character) {
     if (character.isPlayer) {
       this.broadcastEvents.push({

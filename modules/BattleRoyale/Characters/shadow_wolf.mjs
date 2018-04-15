@@ -73,7 +73,8 @@ const ANIMATION_SETTINGS = {
       x: 16
     },
     frames: 4,
-    framesPerSec: 10
+    framesPerSec: 10,
+    forceAnimation: true
   },
   [ANIMATIONS.DEATH_RIGHT]: {
     dimensions: {
@@ -88,7 +89,8 @@ const ANIMATION_SETTINGS = {
       y: 16
     },
     frames: 4,
-    framesPerSec: 10
+    framesPerSec: 10,
+    forceAnimation: true
   },
   [ANIMATIONS.DEATH_UP]: {
     dimensions: {
@@ -104,7 +106,8 @@ const ANIMATION_SETTINGS = {
       x: 16
     },
     frames: 4,
-    framesPerSec: 10
+    framesPerSec: 10,
+    forceAnimation: true
   },
   [ANIMATIONS.DEATH_LEFT]: {
     dimensions: {
@@ -119,7 +122,8 @@ const ANIMATION_SETTINGS = {
       y: 16
     },
     frames: 4,
-    framesPerSec: 10
+    framesPerSec: 10,
+    forceAnimation: true
   },
   [ANIMATIONS.MOVE_DOWN]: {
     dimensions: {
@@ -260,7 +264,8 @@ const ANIMATION_SETTINGS = {
       x: 16
     },
     frames: 5,
-    framesPerSec: 10
+    framesPerSec: 10,
+    forceAnimation: true
   },
   [ANIMATIONS.ATTACK_RIGHT]: {
     dimensions: {
@@ -275,7 +280,8 @@ const ANIMATION_SETTINGS = {
       y: 16
     },
     frames: 5,
-    framesPerSec: 10
+    framesPerSec: 10,
+    forceAnimation: true
   },
   [ANIMATIONS.ATTACK_UP]: {
     dimensions: {
@@ -291,7 +297,8 @@ const ANIMATION_SETTINGS = {
       y: 260
     },
     frames: 5,
-    framesPerSec: 10
+    framesPerSec: 10,
+    forceAnimation: true
   },
   [ANIMATIONS.ATTACK_LEFT]: {
     dimensions: {
@@ -306,7 +313,8 @@ const ANIMATION_SETTINGS = {
       y: 16
     },
     frames: 5,
-    framesPerSec: 10
+    framesPerSec: 10,
+    forceAnimation: true
   }
 };
 

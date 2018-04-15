@@ -442,22 +442,22 @@ export default class Character extends GameObject {
     _.merge(this, _.omit(state, "position", "direction", "state"));
     _.merge(this.state, _.omit(state.state, "target", "characterDirection"));
     //_.merge(this, state);
-    if (state.latestAction && (!this.currentAction || state.latestAction.actionId !== this.currentAction.actionId)) {
-      // Pause previous action
-      // if (this.currentAction) {
-      //   this.currentAction.currentTime = 0;
-      // }
-
-      this.actionStack.unshift(state.latestAction);
-      this.startAction(state.latestAction);
-    } else if (!state.latestAction && !this.isThisPlayer) { // TODO: set a timeout for the current action in case the player really shouldn't be able to do it
-      this.actionStack.length = 0;
-    }
     // TODO: interpolate target location
     // if (state.position) {
     //   this.moveToPosition = new Vec3(state.position);
     // }
     if (!this.isThisPlayer) {
+      if (state.latestAction && (!this.currentAction || state.latestAction.actionId !== this.currentAction.actionId)) {
+        // Pause previous action
+        // if (this.currentAction) {
+        //   this.currentAction.currentTime = 0;
+        // }
+  
+        this.actionStack.unshift(state.latestAction);
+        this.startAction(state.latestAction);
+      } else if (!state.latestAction && !this.isThisPlayer) { // TODO: set a timeout for the current action in case the player really shouldn't be able to do it
+        this.actionStack.length = 0;
+      }
       // if (this.moveToPosition) {
       //   this.position = this.moveToPosition;
       // }

@@ -50,12 +50,10 @@ export default class CharacterRenderer {
     let typeInfo = characters[characterInfo.type];
     this.rendering = typeInfo.rendering;
     
-    this.animation = this.rendering.ANIMATIONS.MOVE_DOWN;
-    this.prevAnimation = this.rendering.ANIMATIONS.MOVE_DOWN;
+    this.animationQueue = [];
     this.frame = 0;
     this.currentTime = 0;
     this.currentAnimationTime = 0;
-    this.framesPerSec = 0;
  
     if (this.rendering.shadowImage) {
       this.shadowImage = ImageCache.get(this.rendering.shadowImage);
@@ -126,7 +124,7 @@ export default class CharacterRenderer {
         this.drawBody(context, object);
       } else if (item) {
         if (item.image.complete) {
-          let offset = getOffset(this.rendering.ANIMATION_SETTINGS[this.animation], this.frame, item.imageSize);
+          let offset = getOffset(this.currentAnimationSettings, this.frame, item.imageSize);
           context.drawImage(item.image, offset.x, offset.y, item.imageSize, item.imageSize,
             object.position.x, object.position.y - object.position.z, item.imageSize, item.imageSize);
         }
@@ -167,7 +165,7 @@ export default class CharacterRenderer {
   }
 
   drawBody(context, object) {
-    let animationSettings = this.rendering.ANIMATION_SETTINGS[this.animation];
+    let animationSettings = this.currentAnimationSettings;
     let offset = getOffset(animationSettings, this.frame);
     let position = object.position.plus(animationSettings.renderOffset);
 
@@ -209,9 +207,64 @@ export default class CharacterRenderer {
     //   object.terrainDimensions.width, object.terrainDimensions.height);
   }
 
+  get currentAnimationFramesPerSec() {
+    if (this.currentAnimationDuration) {
+      return this.currentAnimationSettings.frames / (this.currentAnimationDuration / 1000);
+    } else {
+      return this.currentAnimationSettings.framesPerSec;
+    }
+  }
+
+  get currentAnimationSettings() {
+    return this.rendering.ANIMATION_SETTINGS[this.currentAnimation];
+  }
+
+  get currentAnimationDone() {
+    return this.animationQueue.length > 0 && this.animationQueue[0].done;
+  }
+
+  get currentAnimation() {
+    return this.animationQueue.length > 0 && this.animationQueue[0].animation;
+  }
+
+  get currentAnimationDuration() {
+    return this.currentAction && this.currentAction.actionDuration;
+  }
+
+  clearAnimationQueue() {
+    if (this.currentAnimationDone) {
+      this.frame = 0;
+    }
+    this.animationQueue.length = 0;
+  }
+
+  clearFinishedAnimations() {
+    if (this.currentAnimationDone) {
+      this.frame = 0;
+    }
+    _.remove(this.animationQueue, "done");
+  }
+
+  queueAnimation(animation) {
+    if (this.currentAnimation !== animation) {
+      let animationSettings = this.rendering.ANIMATION_SETTINGS[animation];
+      if (animationSettings.forceAnimation) {
+        this.clearAnimationQueue();
+      } else {
+        this.clearFinishedAnimations();
+      }
+      this.animationQueue.push({
+        animation: animation,
+        done: !animationSettings.forceAnimation
+      });
+    }
+  }
+
   setAnimation(elapsedTime, object) {
     this.currentAnimationTime += elapsedTime;
     let currentAction = object.currentAction || object.latestAction;
+    let prevState = this.state;
+
     // We may start and finish an action within a frame, make sure we still animate it
     if (currentAction && !currentAction.new) {
       this.currentAction = currentAction;
@@ -222,62 +275,59 @@ export default class CharacterRenderer {
       // }
     }
 
-    this.prevAnimation = this.animation;
-    this.prevState = this.state;
-
-    if (object.state.dead) {
-      this.state = STATE.DEAD;
-      this.animation = this.rendering.DEATH_ANIMATIONS[object.state.characterDirection];
-    } else if (this.currentAction && this.currentAction.type === "attack") {
-      this.state = STATE.ATTACKING;
-      if (this.rendering.WEAPON_ANIMATIONS) {
-        this.animation = this.rendering.WEAPON_ANIMATIONS[object.state.loadout.weapon.attackType][object.state.characterDirection];
-        this.animationDuration = Math.max(this.currentAction.actionDuration, 250);
-      } else if (this.rendering.ATTACK_ANIMATIONS) {
-        this.animation = this.rendering.ATTACK_ANIMATIONS[object.state.characterDirection];
+    // TODO: add flag to animations marking whether or not they must be completed before moving on
+    if (!currentAction) {
+      if (this.currentAnimationDone && this.currentAnimationSettings.nextAnimation) {
+        this.queueAnimation(this.currentAnimationSettings.nextAnimation);
+        this.currentAction = { type: this.currentAnimationSettings.nextAnimation };
+      } else if (!this.currentAnimation || this.currentAnimationDone) {
+        if (object.state.dead) {
+          this.state = STATE.DEAD;
+          this.queueAnimation(this.rendering.DEATH_ANIMATIONS[object.state.characterDirection]);
+        } else if (object.direction.x || object.direction.y || object.moving) {
+          this.state = STATE.MOVING;
+          this.queueAnimation(this.rendering.MOVE_ANIMATIONS[object.state.characterDirection]);
+        } else {
+          this.state = STATE.IDLE;
+          this.queueAnimation(this.rendering.IDLE_ANIMATIONS[object.state.characterDirection]);
+        }
       }
-    } else if (object.direction.x || object.direction.y || object.moving) {
-      this.state = STATE.MOVING;
-      this.animation = this.rendering.MOVE_ANIMATIONS[object.state.characterDirection];
     } else {
-      this.state = STATE.IDLE;
-      this.animation = this.rendering.IDLE_ANIMATIONS[object.state.characterDirection];
-    }
-
-    if (this.state !== this.prevState) {
-      this.frame = this.state === STATE.MOVING ? 1 : 0;
-      this.currentTime = 0;
-      if (this.animationDuration) {
-        this.framesPerSec = this.rendering.ANIMATION_SETTINGS[this.animation].frames / (this.animationDuration / 1000);
-      } else {
-        this.framesPerSec = this.rendering.ANIMATION_SETTINGS[this.animation].framesPerSec;
+      if (this.currentAction && this.currentAction.type === "attack") {
+        this.state = STATE.ATTACKING;
+        if (this.rendering.WEAPON_ANIMATIONS) {
+          this.queueAnimation(this.rendering.WEAPON_ANIMATIONS[object.state.loadout.weapon.attackType][object.state.characterDirection]);
+        } else if (this.rendering.ATTACK_ANIMATIONS) {
+          this.queueAnimation(this.rendering.ATTACK_ANIMATIONS[object.state.characterDirection]);
+        }
       }
     }
 
-    if (this.currentAction && this.currentAnimationTime >= this.animationDuration) {
+    if (this.state !== prevState) {
+      this.frame = 0;
+      this.currentTime = 0;
+    }
+
+    if (this.currentAction && this.currentAnimationTime >= this.currentAnimationDuration) {
       this.currentAction = null;
-      this.animationDuration = 0;
     }
   }
 
   update(elapsedTime, object) {
     this.updateLoadout(object);
     this.setAnimation(elapsedTime, object);
-    let animationSettings = this.rendering.ANIMATION_SETTINGS[this.animation];
+    let animationSettings = this.currentAnimationSettings;
     this.currentTime += elapsedTime;
     if (animationSettings.frames > 1) {
-      while (this.currentTime >= 1000 / this.framesPerSec) {
-        this.currentTime -= 1000 / this.framesPerSec;
+      while (this.currentTime >= 1000 / this.currentAnimationFramesPerSec) {
+        this.currentTime -= 1000 / this.currentAnimationFramesPerSec;
         this.frame++;
         if (this.frame >= animationSettings.frames) {
+          this.animationQueue[0].done = true;
           if (animationSettings.repeat) {
             this.frame = animationSettings.cycleStart || 0;
           } else {
             this.frame = animationSettings.frames - 1;
-            if (this.currentAction) {
-              this.currentAction = null;
-              this.animationDuration = 0;
-            }
           }
         }
       }

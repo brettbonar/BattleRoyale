@@ -19,6 +19,10 @@ const ANIMATIONS = {
   ATTACK_BOW_LEFT: "attackBowLeft",
   ATTACK_BOW_DOWN: "attackBowDown",
   ATTACK_BOW_RIGHT: "attackBowRight",
+  COOLDOWN_BOW_UP: "COOLDOWNBowUp",
+  COOLDOWN_BOW_LEFT: "COOLDOWNBowLeft",
+  COOLDOWN_BOW_DOWN: "COOLDOWNBowDown",
+  COOLDOWN_BOW_RIGHT: "COOLDOWNBowRight",
   DEATH: "death"
 };
 
@@ -76,7 +80,8 @@ const ANIMATION_SETTINGS = {
     },
     frames: 6,
     framesPerSec: 6,
-    repeat: false
+    repeat: false,
+    forceAnimation: true
   },
   [ANIMATIONS.IDLE_UP]: {
     dimensions: {
@@ -128,11 +133,11 @@ const ANIMATION_SETTINGS = {
       height: 64
     },
     offset: {
-      x: 0,
+      x: 64,
       y: 8 * 64
     },
-    frames: 9,
-    cycleStart: 2,
+    frames: 8,
+    cycleStart: 0,
     framesPerSec: 7,
     repeat: true
   },
@@ -142,11 +147,11 @@ const ANIMATION_SETTINGS = {
       height: 64
     },
     offset: {
-      x: 0,
+      x: 64,
       y: 9 * 64
     },
-    frames: 9,
-    cycleStart: 2,
+    frames: 8,
+    cycleStart: 0,
     framesPerSec: 7,
     repeat: true
   },
@@ -156,11 +161,11 @@ const ANIMATION_SETTINGS = {
       height: 64
     },
     offset: {
-      x: 0,
+      x: 64,
       y: 10 * 64
     },
-    frames: 9,
-    cycleStart: 2,
+    frames: 8,
+    cycleStart: 0,
     framesPerSec: 7,
     repeat: true
   },
@@ -170,11 +175,11 @@ const ANIMATION_SETTINGS = {
       height: 64
     },
     offset: {
-      x: 0,
+      x: 64,
       y: 11 * 64
     },
-    frames: 9,
-    cycleStart: 2,
+    frames: 8,
+    cycleStart: 0,
     framesPerSec: 7,
     repeat: true
   },
@@ -190,7 +195,8 @@ const ANIMATION_SETTINGS = {
     frames: 8,
     cycleStart: 0,
     framesPerSec: 16,
-    repeat: false
+    repeat: false,
+    forceAnimation: true
   },
   [ANIMATIONS.ATTACK_THRUST_LEFT]: {
     dimensions: {
@@ -204,7 +210,8 @@ const ANIMATION_SETTINGS = {
     frames: 8,
     cycleStart: 0,
     framesPerSec: 16,
-    repeat: false
+    repeat: false,
+    forceAnimation: true
   },
   [ANIMATIONS.ATTACK_THRUST_DOWN]: {
     dimensions: {
@@ -218,7 +225,8 @@ const ANIMATION_SETTINGS = {
     frames: 8,
     cycleStart: 0,
     framesPerSec: 16,
-    repeat: false
+    repeat: false,
+    forceAnimation: true
   },
   [ANIMATIONS.ATTACK_THRUST_RIGHT]: {
     dimensions: {
@@ -232,7 +240,8 @@ const ANIMATION_SETTINGS = {
     frames: 8,
     cycleStart: 0,
     framesPerSec: 16,
-    repeat: false
+    repeat: false,
+    forceAnimation: true
   },
   [ANIMATIONS.ATTACK_SLASH_UP]: {
     dimensions: {
@@ -246,7 +255,8 @@ const ANIMATION_SETTINGS = {
     frames: 6,
     cycleStart: 0,
     framesPerSec: 16,
-    repeat: false
+    repeat: false,
+    forceAnimation: true
   },
   [ANIMATIONS.ATTACK_SLASH_LEFT]: {
     dimensions: {
@@ -260,7 +270,8 @@ const ANIMATION_SETTINGS = {
     frames: 6,
     cycleStart: 0,
     framesPerSec: 16,
-    repeat: false
+    repeat: false,
+    forceAnimation: true
   },
   [ANIMATIONS.ATTACK_SLASH_DOWN]: {
     dimensions: {
@@ -274,7 +285,8 @@ const ANIMATION_SETTINGS = {
     frames: 6,
     cycleStart: 0,
     framesPerSec: 16,
-    repeat: false
+    repeat: false,
+    forceAnimation: true
   },
   [ANIMATIONS.ATTACK_SLASH_RIGHT]: {
     dimensions: {
@@ -288,7 +300,8 @@ const ANIMATION_SETTINGS = {
     frames: 6,
     cycleStart: 0,
     framesPerSec: 16,
-    repeat: false
+    repeat: false,
+    forceAnimation: true
   },
 
   [ANIMATIONS.ATTACK_BOW_UP]: {
@@ -300,10 +313,10 @@ const ANIMATION_SETTINGS = {
       x: 0,
       y: 16 * 64
     },
-    frames: 13,
-    cycleStart: 0,
-    framesPerSec: 16,
-    repeat: false
+    frames: 9,
+    framesPerSec: 27,
+    nextAnimation: ANIMATIONS.COOLDOWN_BOW_UP,
+    forceAnimation: true
   },
   [ANIMATIONS.ATTACK_BOW_LEFT]: {
     dimensions: {
@@ -314,10 +327,10 @@ const ANIMATION_SETTINGS = {
       x: 0,
       y: 17 * 64
     },
-    frames: 13,
-    cycleStart: 0,
-    framesPerSec: 16,
-    repeat: false
+    frames: 9,
+    framesPerSec: 27,
+    nextAnimation: ANIMATIONS.COOLDOWN_BOW_LEFT,
+    forceAnimation: true
   },
   [ANIMATIONS.ATTACK_BOW_DOWN]: {
     dimensions: {
@@ -328,10 +341,10 @@ const ANIMATION_SETTINGS = {
       x: 0,
       y: 18 * 64
     },
-    frames: 13,
-    cycleStart: 0,
-    framesPerSec: 16,
-    repeat: false
+    frames: 9,
+    framesPerSec: 27,
+    nextAnimation: ANIMATIONS.COOLDOWN_BOW_DOWN,
+    forceAnimation: true
   },
   [ANIMATIONS.ATTACK_BOW_RIGHT]: {
     dimensions: {
@@ -342,10 +355,63 @@ const ANIMATION_SETTINGS = {
       x: 0,
       y: 19 * 64
     },
-    frames: 13,
-    cycleStart: 0,
-    framesPerSec: 16,
-    repeat: false
+    frames: 9,
+    framesPerSec: 27,
+    nextAnimation: ANIMATIONS.COOLDOWN_BOW_RIGHT,
+    forceAnimation: true
+  },
+  
+  [ANIMATIONS.COOLDOWN_BOW_UP]: {
+    dimensions: {
+      width: 64,
+      height: 64
+    },
+    offset: {
+      x: 578,
+      y: 16 * 64
+    },
+    frames: 4,
+    framesPerSec: 4,
+    forceAnimation: true
+  },
+  [ANIMATIONS.COOLDOWN_BOW_LEFT]: {
+    dimensions: {
+      width: 64,
+      height: 64
+    },
+    offset: {
+      x: 578,
+      y: 17 * 64
+    },
+    frames: 4,
+    framesPerSec: 4,
+    forceAnimation: true
+  },
+  [ANIMATIONS.COOLDOWN_BOW_DOWN]: {
+    dimensions: {
+      width: 64,
+      height: 64
+    },
+    offset: {
+      x: 578,
+      y: 18 * 64
+    },
+    frames: 4,
+    framesPerSec: 4,
+    forceAnimation: true
+  },
+  [ANIMATIONS.COOLDOWN_BOW_RIGHT]: {
+    dimensions: {
+      width: 64,
+      height: 64
+    },
+    offset: {
+      x: 578,
+      y: 19 * 64
+    },
+    frames: 4,
+    framesPerSec: 4,
+    forceAnimation: true
   }
 };
 

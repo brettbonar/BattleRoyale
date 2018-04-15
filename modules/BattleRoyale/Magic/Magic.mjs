@@ -75,15 +75,13 @@ export default class Magic extends GameObject {
   
   static create(params) {
     let magic = magicEffects[params.attackType];
-    let direction = params.source.state.target.minus(params.source.attackCenter).normalize();
     let position;
-    
     if (_.isUndefined(magic.effect.distance)) {
       position = new Vec3(params.position).minus(magic.positionOffset);
     } else {
-      direction.z = 0;
+      params.direction.z = 0;
       position = params.source.attackCenter
-        .plus(direction.times(magic.effect.distance))
+        .plus(params.direction.times(magic.effect.distance))
         .minus(magic.positionOffset);
     }
 
@@ -92,7 +90,7 @@ export default class Magic extends GameObject {
       source: params.source,
       simulation: params.simulation,
       attackType: params.attackType,
-      direction: direction,
+      direction: params.direction,
       simulation: params.simulation
       // playerId: params.source.playerId,
       // ownerId: params.source.objectId,

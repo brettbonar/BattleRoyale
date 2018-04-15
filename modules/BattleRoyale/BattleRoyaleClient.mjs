@@ -406,11 +406,11 @@ export default class BattleRoyaleClient extends BattleRoyale {
     };
 
     // TODO: start animation immediately
-    // this.doAttack(this.gameState.player, {
-    //   source: source,
-    //   attackType: attackType,
-    //   release: event.release
-    // });
+    this.doAttack(this.gameState.player, {
+      source: source,
+      attackType: attackType,
+      release: event.release
+    }, 0, true);
 
     this.sendEvent({
       type: "attack",

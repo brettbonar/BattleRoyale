@@ -42,7 +42,8 @@ const ANIMATION_SETTINGS = {
       x: 0,
       y: 0
     },
-    frames: 1
+    frames: 1,
+    forceAnimation: true
   },
   [ANIMATIONS.DEATH_RIGHT]: {
     dimensions: {
@@ -53,7 +54,8 @@ const ANIMATION_SETTINGS = {
       x: 0,
       y: 32
     },
-    frames: 1
+    frames: 1,
+    forceAnimation: true
   },
   [ANIMATIONS.DEATH_UP]: {
     dimensions: {
@@ -64,7 +66,8 @@ const ANIMATION_SETTINGS = {
       x: 0,
       y: 64
     },
-    frames: 1
+    frames: 1,
+    forceAnimation: true
   },
   [ANIMATIONS.DEATH_LEFT]: {
     dimensions: {
@@ -75,7 +78,8 @@ const ANIMATION_SETTINGS = {
       x: 0,
       y: 96
     },
-    frames: 1
+    frames: 1,
+    forceAnimation: true
   },
   [ANIMATIONS.MOVE_DOWN]: {
     dimensions: {
