@@ -36,23 +36,28 @@ export default class ShadowFieldRenderer {
     }
   }
 
-  applyGradientHole(context, object) {
+  addHole(context, object) {
     // TODO: could avoid making gradient if it's not in view
     if (object.shadowRadius === 0 && object.bufferRadius === 0) return;
-    
-    var radGrd = context.createRadialGradient(
-      object.shadowCenter.x - this.ul.x, object.shadowCenter.y - this.ul.y, Math.max(0, object.shadowRadius),
-      object.shadowCenter.x - this.ul.x, object.shadowCenter.y - this.ul.y, object.shadowRadius + object.bufferRadius);
-    radGrd.addColorStop(  0, "rgba( 0, 0, 0,  1 )" );
-    //radGrd.addColorStop( .5, "rgba( 0, 0, 0, .5 )" );
-    radGrd.addColorStop(  1, "rgba( 0, 0, 0,  0 )" );
-    context.globalCompositeOperation = "destination-out";
-    context.fillStyle = radGrd;
-    context.fillRect(object.shadowCenter.x - this.ul.x - object.shadowRadius * 2 - object.bufferRadius,
-      object.shadowCenter.y - this.ul.y - object.shadowRadius * 2 - object.bufferRadius,
-      object.shadowRadius * 4 + object.bufferRadius * 2, object.shadowRadius * 4 + object.bufferRadius * 2);
 
-    context.globalCompositeOperation = "source-over";
+    context.beginPath();
+    context.arc(object.shadowCenter.x - this.ul.x, object.shadowCenter.y - this.ul.y, Math.max(0, object.shadowRadius), 0, 2 * Math.PI);
+    context.clip();
+    context.clearRect(0, 0, context.canvas.width, context.canvas.height);
+
+    // Gradient too slow sadly...
+    // var radGrd = context.createRadialGradient(
+    //   object.shadowCenter.x - this.ul.x, object.shadowCenter.y - this.ul.y, Math.max(0, object.shadowRadius),
+    //   object.shadowCenter.x - this.ul.x, object.shadowCenter.y - this.ul.y, object.shadowRadius + object.bufferRadius);
+    // radGrd.addColorStop(  0, "rgba( 0, 0, 0,  1 )" );
+    // //radGrd.addColorStop( .5, "rgba( 0, 0, 0, .5 )" );
+    // radGrd.addColorStop(  1, "rgba( 0, 0, 0,  0 )" );
+    // context.globalCompositeOperation = "destination-out";
+    // context.fillStyle = radGrd;
+    // context.fillRect(object.shadowCenter.x - this.ul.x - object.shadowRadius * 2 - object.bufferRadius,
+    //   object.shadowCenter.y - this.ul.y - object.shadowRadius * 2 - object.bufferRadius,
+    //   object.shadowRadius * 4 + object.bufferRadius * 2, object.shadowRadius * 4 + object.bufferRadius * 2);
+    // context.globalCompositeOperation = "source-over";
   }
 
   renderToTempCanvas(context, object, elapsedTime, clipping, center) {
@@ -70,7 +75,7 @@ export default class ShadowFieldRenderer {
     // this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
     // this.context.fillStyle = "rgba(0, 0, 0, 0.8)";
     // this.context.fillRect(0, 0, this.canvas.width, this.canvas.height);
-    // this.applyGradientHole(this.context, object);
+    // this.addHole(this.context, object);
     // context.drawImage(this.canvas, this.ul.x, this.ul.y, context.canvas.width, context.canvas.height);
 
     this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
@@ -108,9 +113,8 @@ export default class ShadowFieldRenderer {
       drawnWidth += width;
     }
 
-    this.applyGradientHole(this.context, object);
+    this.addHole(this.context, object);
 
-    //this.context.globalCompositeOperation = "source-over";
     this.context.restore();
   }
 

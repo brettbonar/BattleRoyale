@@ -10,9 +10,10 @@ import characters from "../Characters/characters.mjs"
 import equipment from "../Objects/equipment.mjs"
 import effects from "../Effects/effects.mjs";
 
-const DAMAGE_RATE = 100;
+const DAMAGE_RATE = 15;
 const HEAL_RATE = 1;
 const BUFFER_RADIUS = 512;
+const COLLAPSE_RATE = 15;
 
 const SHADOW_SPAWNS = [
   // {
@@ -59,7 +60,7 @@ export default class ShadowField extends GameObject {
   constructor(params) {
     super(params);
     this.type = "ShadowField";
-    this.renderClipped = true;
+    //this.renderClipped = true;
     this.physics.surfaceType = SURFACE_TYPE.NONE;
     this.shadowCenter = new Vec3(params.shadowCenter);
     this.shadowRadius = params.shadowRadius;
@@ -95,7 +96,7 @@ export default class ShadowField extends GameObject {
     this.physics.surfaceType = SURFACE_TYPE.GAS;
 
     _.defaults(this, {
-      collapseRate: 0
+      collapseRate: COLLAPSE_RATE
     });
 
     if (!params.simulation) {

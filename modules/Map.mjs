@@ -7,7 +7,7 @@ import SimplexNoise from "../shared/SimplexNoise.mjs"
 
 const MAX_CANVAS_SIZE = 1024;
 const MINIMAP_CANVAS_SIZE = 1024;
-const DEFAULT_MAP_SIZE = 128;
+const DEFAULT_MAP_SIZE = 256;
 
 const BIOMES = {
   FOREST: "forest",
