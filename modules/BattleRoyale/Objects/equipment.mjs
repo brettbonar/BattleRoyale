@@ -238,11 +238,20 @@ export default {
     world: items.shadowBow
   },
   staffMale: {
-    imageSource: "/Assets/character/weapons/right hand/male/staff_male.png",
-    imageSize: 64,
+    rendering: {
+      imageSource: "/Assets/character/weapons/right hand/male/staff_male.png",
+      renderOffset: {
+        x: -32,
+        y: -32
+      },
+      dimensions: {
+        width: 128,
+        height: 128
+      }
+    },
     itemType: "staffMale",
     type: "weapon",
-    attackType: "thrust",
+    attackType: "staff",
     hands: 1,
     gender: "male",
     attacks: {
@@ -251,11 +260,20 @@ export default {
     }
   },
   fireStaffMale: {
-    imageSource: "/Assets/character/weapons/right hand/male/fireStaff_male.png",
-    imageSize: 64,
+    rendering: {
+      imageSource: "/Assets/character/weapons/right hand/male/fireStaff.png",
+      renderOffset: {
+        x: -32,
+        y: -32
+      },
+      dimensions: {
+        width: 128,
+        height: 128
+      }
+    },
     itemType: "fireStaffMale",
     type: "weapon",
-    attackType: "thrust",
+    attackType: "staff",
     hands: 1,
     gender: "male",
     attacks: {
@@ -265,11 +283,20 @@ export default {
     world: items.fireOrb
   },
   lightStaffMale: {
-    imageSource: "/Assets/character/weapons/right hand/male/lightStaff.png",
-    imageSize: 64,
+    rendering: {
+      imageSource: "/Assets/character/weapons/right hand/male/lightStaff.png",
+      renderOffset: {
+        x: -32,
+        y: -32
+      },
+      dimensions: {
+        width: 128,
+        height: 128
+      }
+    },
     itemType: "lightStaffMale",
     type: "weapon",
-    attackType: "thrust",
+    attackType: "staff",
     hands: 1,
     gender: "male",
     attacks: {
@@ -279,11 +306,20 @@ export default {
     world: items.lightOrb
   },
   waterStaffMale: {
-    imageSource: "/Assets/character/weapons/right hand/male/waterStaff_male.png",
-    imageSize: 64,
+    rendering: {
+      imageSource: "/Assets/character/weapons/right hand/male/waterStaff.png",
+      renderOffset: {
+        x: -32,
+        y: -32
+      },
+      dimensions: {
+        width: 128,
+        height: 128
+      }
+    },
     itemType: "waterStaffMale",
     type: "weapon",
-    attackType: "thrust",
+    attackType: "staff",
     hands: 1,
     gender: "male",
     attacks: {

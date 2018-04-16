@@ -33,6 +33,7 @@ import FieldOfView from "../Engine/FieldOfView.mjs";
 import SpawnMap from "./StartArea/SpawnMap.mjs"
 import ShadowField from "./Shadow/ShadowField.mjs";
 import Canvas from "../Engine/Rendering/Canvas.mjs";
+import Teams from "./Teams.mjs"
 
 const EVENTS = {
   MOVE_UP: "moveUp",
@@ -74,6 +75,7 @@ export default class BattleRoyaleClient extends BattleRoyale {
     this.particleEngine = new ParticleEngine({
       context: this.tempContext
     }, this.grid);
+
     this.menus = params.menus;
     this.updates = [];
     this.pendingUpdates = [];
@@ -194,6 +196,7 @@ export default class BattleRoyaleClient extends BattleRoyale {
     } else if (object.type === "Building") {
       return new Building(object);
     } else if (object.type === "Magic") {
+      object.source = _.find(this.gameState.objects, { objectId: object.ownerId });
       return new Magic(object);
     } else if (object.type === "StaticObject") {
       return new StaticObject(object);
@@ -306,14 +309,16 @@ export default class BattleRoyaleClient extends BattleRoyale {
         return;
       }
 
-      if (collision.target && collision.target.damagedEffect && collision.source.effect.triggerDamagedEffect) {
+      if (collision.target && collision.target.damagedEffect &&
+          collision.source.effect.triggerDamagedEffect && !collision.source.collided) {
+        collision.source.collided = true;
         this.particleEngine.addEffect(new AnimationEffect({
           position: {
             x: collision.target.center.x,
             y: collision.target.center.y
           },
           level: collision.target.level
-        }, collision.target.damagedEffect));
+        }, effects[collision.target.damagedEffect]));
       }
       
       if (collision.source.rendering.hitEffect && !collision.source.collided) {
@@ -526,6 +531,15 @@ export default class BattleRoyaleClient extends BattleRoyale {
 
   getRenderObjects(bounds) {
     return this.grid.getRenderObjects(bounds, this.gameState.player.level);
+  }
+
+  handleUpdate(update) {
+    if (update.effect) {
+      this.particleEngine.addEffect(new AnimationEffect({
+        position: update.effect.position,
+        level: update.effect.level
+      }, effects[update.effect.effect]));
+    }
   }
 
   renderInteractions() {

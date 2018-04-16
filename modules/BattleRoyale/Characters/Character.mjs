@@ -90,7 +90,7 @@ export default class Character extends GameObject {
     this.fov = typeInfo.fov;
     this.speed = typeInfo.stats.speed;
     this.baseSpeed = typeInfo.stats.speed;
-    this.damagedEffect = effects[typeInfo.rendering.damagedEffect];
+    this.damagedEffect = typeInfo.rendering.damagedEffect;
     this.updateDimensions();
   }
 

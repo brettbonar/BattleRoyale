@@ -11,6 +11,10 @@ const ANIMATIONS = {
   ATTACK_THRUST_LEFT: "attackThrustLeft",
   ATTACK_THRUST_DOWN: "attackThrustDown",
   ATTACK_THRUST_RIGHT: "attackThrustRight",
+  ATTACK_STAFF_UP: "attackSTAFFUp",
+  ATTACK_STAFF_LEFT: "attackSTAFFLeft",
+  ATTACK_STAFF_DOWN: "attackSTAFFDown",
+  ATTACK_STAFF_RIGHT: "attackSTAFFRight",
   ATTACK_SLASH_UP: "attackSLASHUp",
   ATTACK_SLASH_LEFT: "attackSLASHLeft",
   ATTACK_SLASH_DOWN: "attackSLASHDown",
@@ -32,6 +36,12 @@ const WEAPON_ANIMATIONS = {
     left: ANIMATIONS.ATTACK_THRUST_LEFT,
     down: ANIMATIONS.ATTACK_THRUST_DOWN,
     right: ANIMATIONS.ATTACK_THRUST_RIGHT
+  },
+  staff: {
+    up: ANIMATIONS.ATTACK_STAFF_UP,
+    left: ANIMATIONS.ATTACK_STAFF_LEFT,
+    down: ANIMATIONS.ATTACK_STAFF_DOWN,
+    right: ANIMATIONS.ATTACK_STAFF_RIGHT
   },
   slash: {
     up: ANIMATIONS.ATTACK_SLASH_UP,
@@ -182,6 +192,57 @@ const ANIMATION_SETTINGS = {
     cycleStart: 0,
     framesPerSec: 7,
     repeat: true
+  },[ANIMATIONS.ATTACK_STAFF_UP]: {
+    dimensions: {
+      width: 64,
+      height: 64
+    },
+    offset: {
+      x: 0,
+      y: 4 * 64
+    },
+    frames: 6,
+    framesPerSec: 16,
+    forceAnimation: true
+  },
+  [ANIMATIONS.ATTACK_STAFF_LEFT]: {
+    dimensions: {
+      width: 64,
+      height: 64
+    },
+    offset: {
+      x: 0,
+      y: 5 * 64
+    },
+    frames: 6,
+    framesPerSec: 16,
+    forceAnimation: true
+  },
+  [ANIMATIONS.ATTACK_STAFF_DOWN]: {
+    dimensions: {
+      width: 64,
+      height: 64
+    },
+    offset: {
+      x: 0,
+      y: 6 * 64
+    },
+    frames: 6,
+    framesPerSec: 16,
+    forceAnimation: true
+  },
+  [ANIMATIONS.ATTACK_STAFF_RIGHT]: {
+    dimensions: {
+      width: 64,
+      height: 64
+    },
+    offset: {
+      x: 0,
+      y: 7 * 64
+    },
+    frames: 6,
+    framesPerSec: 16,
+    forceAnimation: true
   },
   [ANIMATIONS.ATTACK_THRUST_UP]: {
     dimensions: {
@@ -463,6 +524,10 @@ export default {
   rendering: {
     damagedEffect: "blood",
     shadowImage: "/Assets/shadows/shadow24.png",
+    bodyDimensions: {
+      width: 64,
+      height: 64
+    },
     ANIMATIONS: ANIMATIONS,
     WEAPON_ANIMATIONS: WEAPON_ANIMATIONS,
     MOVE_ANIMATIONS: MOVE_ANIMATIONS,

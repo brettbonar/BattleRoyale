@@ -137,6 +137,25 @@ export default class BattleRoyaleServer extends BattleRoyale {
     }
   }
 
+  handleUpdate(update) {
+    if (update.create) {
+      update.create.simulation = this.simulation;
+      // TODO: test if create is instance of GameObject?
+      // Or just require that create is instance
+      if (update.create.type === "Magic") {
+        this.addObject(Magic.create(update.create));
+      } else {
+        this.addObject(update.create);
+      }
+    }
+    if (update.remove) {
+      this.removeObject(update.remove);
+    }
+    if (update.event) {
+      this.broadcastEvents.push(update.event);
+    }
+  }
+  
   changeTargetEvent(data, elapsedTime) {
     let object = _.find(this.gameState.objects, {
       playerId: data.source.playerId,

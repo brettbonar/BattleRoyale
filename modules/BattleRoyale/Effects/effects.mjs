@@ -2,6 +2,19 @@ import ImageCache from "../../Engine/Rendering/ImageCache.mjs"
 import Vec3 from "../../Engine/GameObject/Vec3.mjs"
 
 export default {
+  smoke: {
+    imageSource: "/Assets/Shadow/Smoke/dark_smoke_animation.png",
+    imageSize: 128,
+    frames: 91,
+    framesPerSec: 20,
+    repeat: true,
+    duration: 5000,
+    fade: {
+      fadeIn: 1000,
+      fadeOutStart: 4000,
+      fadeOutEnd: 5000
+    }
+  },
   blood: {
     imageSource: "/Assets/effects/blood-64.png",
     // offset: {

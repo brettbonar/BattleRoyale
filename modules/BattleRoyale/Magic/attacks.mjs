@@ -251,7 +251,7 @@ let attacks = {
     type: "projectile",
     name: "arrow",
     dimensions: {
-      width: 33,
+      width: 30,
       height: 7
     },
     action: {
@@ -271,13 +271,13 @@ let attacks = {
     rendering: {
       imageSource: "/Assets/projectiles/arrow.png",
       dimensions: {
-        width: 33,
+        width: 30,
         height: 7
       },
       hitEffect: {
         imageSource: "/Assets/projectiles/arrow.png",
         imageDimensions: {
-          width: 28,
+          width: 25,
           height: 7,
           x: 0,
           y: 0
@@ -294,16 +294,15 @@ let attacks = {
       path: "arc",
       damage: 5,
       triggerDamagedEffect: true,
-      // TODO: more shapes
       collisionDimensions: [{
         offset: {
-          x: 8,
-          y: 8
+          x: 11,
+          y: 0
         },
         dimensions: {
-          width: 16,
-          height: 16,
-          zheight: 16
+          width: 8,
+          height: 8,
+          zheight: 8
         }
       }],
       range: 1000,
@@ -315,7 +314,7 @@ let attacks = {
     type: "projectile",
     name: "shadowArrow",
     dimensions: {
-      width: 33,
+      width: 30,
       height: 7
     },
     action: {
@@ -335,13 +334,13 @@ let attacks = {
     rendering: {
       imageSource: "/Assets/projectiles/shadow_arrow.png",
       dimensions: {
-        width: 33,
+        width: 30,
         height: 7
       },
       hitEffect: {
         imageSource: "/Assets/projectiles/shadow_arrow.png",
         imageDimensions: {
-          width: 28,
+          width: 25,
           height: 7,
           x: 0,
           y: 0
@@ -358,16 +357,15 @@ let attacks = {
       path: "arc",
       damage: 5,
       triggerDamagedEffect: true,
-      // TODO: more shapes
       collisionDimensions: [{
         offset: {
-          x: 8,
-          y: 8
+          x: 11,
+          y: 0
         },
         dimensions: {
-          width: 16,
-          height: 16,
-          zheight: 16
+          width: 8,
+          height: 8,
+          zheight: 8
         }
       }],
       range: 1000,

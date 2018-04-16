@@ -23,35 +23,35 @@ export default class Grid {
 
   addInverseCircleToGrid(grid, allGrid, object, extents) {
     let grids = [];
-    if (extents.radius > 0) {
-      let xstart = Math.max(0, Math.floor(extents.ul.x / this.size));
-      let xend = Math.max(0, Math.floor(extents.lr.x / this.size));
-      let ystart = Math.max(0, Math.floor(extents.ul.y / this.size));
-      let yend = Math.max(0, Math.floor(extents.lr.y / this.size));
+    allGrid.push(object);
 
-      let center = new Vec3({
-        x: extents.center.x / this.size,
-        y: extents.center.y / this.size
-      });
-      let distance = Math.max(0, extents.radius / this.size - 1);
+    // if (extents.radius > 0) {
+    //   let xstart = Math.max(0, Math.floor(extents.ul.x / this.size));
+    //   let xend = Math.max(0, Math.floor(extents.lr.x / this.size));
+    //   let ystart = Math.max(0, Math.floor(extents.ul.y / this.size));
+    //   let yend = Math.max(0, Math.floor(extents.lr.y / this.size));
 
-      for (let x = xstart; x <= xend; x++) {
-        for (let y = ystart; y <= yend; y++) {
-          if (center.distanceTo({ x: x, y: y }) > distance) {
-            this.setGrid(grid, object, x, y);
-            grids.push({
-              x: x,
-              y: y
-            });
-          }
-        }
-      }
+    //   let center = new Vec3({
+    //     x: extents.center.x / this.size,
+    //     y: extents.center.y / this.size
+    //   });
+    //   let distance = Math.max(0, extents.radius / this.size - 1);
 
-      return grids;
-    } else {
-      allGrid.push(object);
-      return [];
-    }
+    //   for (let x = xstart; x <= xend; x++) {
+    //     for (let y = ystart; y <= yend; y++) {
+    //       if (center.distanceTo({ x: x, y: y }) > distance) {
+    //         this.setGrid(grid, object, x, y);
+    //         grids.push({
+    //           x: x,
+    //           y: y
+    //         });
+    //       }
+    //     }
+    //   }
+    // } else {
+    //   allGrid.push(object);
+    // }
+    return grids;
   }
 
   addBoxToGrid(grid, allGrid, object, extents) {

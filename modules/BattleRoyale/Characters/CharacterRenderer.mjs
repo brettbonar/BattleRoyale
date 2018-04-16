@@ -32,10 +32,10 @@ const LOADOUT_ORDER = [
   "offhand"
 ];
 
-function getOffset(animationSettings, frame) {
+function getOffset(offset, frame, dimensions) {
   return {
-    x: animationSettings.offset.x + frame * animationSettings.dimensions.width,
-    y: animationSettings.offset.y
+    x: offset.x + frame * dimensions.width,
+    y: offset.y
   };
 }
 
@@ -118,18 +118,41 @@ export default class CharacterRenderer {
     }
   }
 
-  drawLoadout(context, object, offset, animationSettings, position) {
+  drawLoadout(context, object) {
     for (const piece of LOADOUT_ORDER) {
       let itemType = this.loadout[piece] || this.cosmetics[piece];
       if (!itemType && piece === "body") {
         this.drawBody(context, object);
       } else if (itemType) {
         let item = equipment[itemType];
-        let image = ImageCache.get(item.imageSource);
+        let imageSource, renderOffset, dimensions, animationOffset;
+        if (item.rendering) {
+          imageSource = item.rendering.imageSource;
+          renderOffset = item.rendering.renderOffset;
+          dimensions = item.rendering.dimensions;
+          let diff = {
+            x: dimensions.width / this.currentAnimationSettings.dimensions.width,
+            y: dimensions.height / this.currentAnimationSettings.dimensions.height
+          };
+          animationOffset = {
+            x: this.currentAnimationSettings.offset.x * diff.x,
+            y: this.currentAnimationSettings.offset.y * diff.y
+          };
+        } else {
+          animationOffset = this.currentAnimationSettings.offset;
+          imageSource = item.imageSource;
+          dimensions = {
+            width: item.imageSize,
+            height: item.imageSize
+          };
+        }
+        let image = ImageCache.get(imageSource);
+
         if (image && image.complete) {
-          let offset = getOffset(this.currentAnimationSettings, this.frame, item.imageSize);
-          context.drawImage(image, offset.x, offset.y, item.imageSize, item.imageSize,
-            object.position.x, object.position.y - object.position.z, item.imageSize, item.imageSize);
+          let offset = getOffset(animationOffset, this.frame, dimensions);
+          let position = object.position.plus(renderOffset);
+          context.drawImage(image, offset.x, offset.y, dimensions.width, dimensions.height,
+            position.x, position.y - position.z, dimensions.width, dimensions.height);
         }
       }
     }
@@ -169,11 +192,12 @@ export default class CharacterRenderer {
 
   drawBody(context, object) {
     let animationSettings = this.currentAnimationSettings;
-    let offset = getOffset(animationSettings, this.frame);
+    let dimensions = this.rendering.bodyDimensions || animationSettings.dimensions;
+    let offset = getOffset(animationSettings.offset, this.frame, dimensions);
     let position = object.position.plus(animationSettings.renderOffset);
 
-    context.drawImage(this.body, offset.x, offset.y, animationSettings.dimensions.width, animationSettings.dimensions.height,
-      position.x, position.y - position.z, animationSettings.dimensions.width, animationSettings.dimensions.height);
+    context.drawImage(this.body, offset.x, offset.y, dimensions.width, dimensions.height,
+      position.x, position.y - position.z, dimensions.width, dimensions.height);
   }
 
   render(context, object, elapsedTime, center) {

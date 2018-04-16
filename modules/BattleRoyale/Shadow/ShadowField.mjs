@@ -8,9 +8,11 @@ import Teams from "../Teams.mjs";
 import RenderObject from "../Objects/RenderObject.mjs";
 import characters from "../Characters/characters.mjs"
 import equipment from "../Objects/equipment.mjs"
+import effects from "../Effects/effects.mjs";
 
 const DAMAGE_RATE = 100;
 const HEAL_RATE = 1;
+const BUFFER_RADIUS = 512;
 
 const SHADOW_SPAWNS = [
   // {
@@ -18,7 +20,7 @@ const SHADOW_SPAWNS = [
   //   characterInfo: {
   //     type: "shadow_bat"
   //   },
-  //   weight: 5
+  //   weight: 4
   // },
   // {
   //   name: "Shadow Wolf",
@@ -63,6 +65,8 @@ export default class ShadowField extends GameObject {
     this.shadowRadius = params.shadowRadius;
     this.currentTime = 0;
     this.targets = new Set();
+    this.bufferRadius = BUFFER_RADIUS;
+    this.spawnedCharacters = [];
 
     this.shadowSpawns = [];
     for (const spawn of SHADOW_SPAWNS) {
@@ -91,7 +95,7 @@ export default class ShadowField extends GameObject {
     this.physics.surfaceType = SURFACE_TYPE.GAS;
 
     _.defaults(this, {
-      collapseRate: 15
+      collapseRate: 0
     });
 
     if (!params.simulation) {
@@ -139,17 +143,26 @@ export default class ShadowField extends GameObject {
         target.state.currentHealth = Math.min(target.state.maxHealth, target.state.currentHealth + healRate);
         target.state.currentMana = Math.min(target.state.maxMana, target.state.currentMana + healRate)
       } else if (target.team !== Teams.SHADOW) {
-        if (target.state.dead && target.isPlayer) {
+        if (target.state.dead && target.isPlayer && !this.spawnedCharacters.includes(target)) {
           let spawn = this.getRandomSpawn(target);
           updates.push({
-            remove: target,
-            create: spawn,
+            effect: {
+              position: target.center,
+              level: target.level,
+              effect: "smoke"
+            }
+          });
+          updates.push({
+            delay: 5000,
             event: {
               eventType: "playerAvatarChange",
               playerId: target.playerId,
               objectId: spawn.objectId
-            }
+            },
+            //remove: target,
+            create: spawn
           });
+          this.spawnedCharacters.push(target);
         } else if (!target.state.dead) {
           if (target.state.currentMana) {
             target.state.currentMana = Math.max(0, target.state.currentMana - damageRate);
@@ -169,6 +182,9 @@ export default class ShadowField extends GameObject {
     if (elapsedTime) {
       this.currentTime += elapsedTime;
       this.shadowRadius = Math.max(0, this.shadowRadius - (this.collapseRate * (elapsedTime / 1000)));
+      if (this.shadowRadius === 0) {
+        this.bufferRadius = Math.max(0, this.bufferRadius - (this.collapseRate * (elapsedTime / 1000)));
+      }
       this.modelDimensions.dimensions.radius = this.shadowRadius;
       this.functions[0].bounds.dimensions.radius = this.shadowRadius;
       this.updatePosition();

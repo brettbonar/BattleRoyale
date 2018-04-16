@@ -20,6 +20,7 @@ export default class Magic extends GameObject {
     this.damagedTargets = [];
     this.damageReady = true;
     this.source = params.source;
+    this.ownerId = params.source && params.source.objectId;
 
     if (!params.simulation) {
       let image = this.magic.rendering.image;
@@ -69,7 +70,8 @@ export default class Magic extends GameObject {
 
   getUpdateState() {
     return Object.assign(super.getUpdateState(), {
-      attackType: this.magic.name
+      attackType: this.magic.name,
+      ownerId: this.ownerId
     });
   }
   

@@ -39,6 +39,7 @@ export default class BattleRoyale extends Game {
     this.grid = new LevelGrids(400);
     this.physicsEngine = new PhysicsEngine(this.grid);
     this.updates = [];
+    this.delayedUpdates = [];
     this.collisions = [];
     this.modified = [];
     this.maps = params.maps;
@@ -177,25 +178,15 @@ export default class BattleRoyale extends Game {
   }
 
   handleObjectUpdate(result) {
-    if (this.simulation) {
-      let updates = _.castArray(result);
-      for (const update of updates) {
-        if (update.create) {
-          update.create.simulation = this.simulation;
-          // TODO: test if create is instance of GameObject?
-          // Or just require that create is instance
-          if (update.create.type === "Magic") {
-            this.addObject(Magic.create(update.create));
-          } else {
-            this.addObject(update.create);
-          }
-        }
-        if (update.remove) {
-          this.removeObject(update.remove);
-        }
-        if (update.event) {
-          this.broadcastEvents.push(update.event);
-        }
+    let updates = _.castArray(result);
+    for (const update of updates) {
+      if (update.delay) {
+        this.delayedUpdates.push({
+          elapsedTime: 0,
+          update: update
+        });
+      } else {
+        this.handleUpdate(update);
       }
     }
   }
@@ -271,6 +262,15 @@ export default class BattleRoyale extends Game {
         if (this.onKill) {
           this.onKill(character);
         }
+      }
+    }
+
+    for (let i = this.delayedUpdates.length - 1; i >= 0; i--) {
+      let update = this.delayedUpdates[i];
+      update.elapsedTime += elapsedTime;
+      if (update.elapsedTime >= update.update.delay) {
+        this.handleUpdate(update.update);
+        this.delayedUpdates.splice(i, 1);
       }
     }
   }

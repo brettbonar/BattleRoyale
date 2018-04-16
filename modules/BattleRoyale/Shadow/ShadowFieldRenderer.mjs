@@ -5,13 +5,11 @@ import Canvas from "../../Engine/Rendering/Canvas.mjs";
 const FRAME_TIME = 64;
 const FRAME_OFFSET = 1;
 const FRAME_OFFSET2 = 0.5;
-const SHADOW_EDGE_START = -128;
-const SHADOW_EDGE_END = 0;
+const SHADOW_EDGE_START = 0;
 
 export default class ShadowFieldRenderer {
   constructor(params) {
     this.centerPosition = params.centerPosition;
-    this.fieldRadius = params.fieldRadius;
     this.image = ImageCache.get("/Assets/shadow_fog_s.png");
     this.image2 = ImageCache.get("/Assets/shadow_fog2.png");
     this.renderOffset = new Vec3();
@@ -40,19 +38,19 @@ export default class ShadowFieldRenderer {
 
   applyGradientHole(context, object) {
     // TODO: could avoid making gradient if it's not in view
-    if (object.shadowRadius === 0) return;
+    if (object.shadowRadius === 0 && object.bufferRadius === 0) return;
     
     var radGrd = context.createRadialGradient(
-      object.shadowCenter.x - this.ul.x, object.shadowCenter.y - this.ul.y, Math.max(0, object.shadowRadius + SHADOW_EDGE_START),
-      object.shadowCenter.x - this.ul.x, object.shadowCenter.y - this.ul.y, object.shadowRadius + SHADOW_EDGE_END);
+      object.shadowCenter.x - this.ul.x, object.shadowCenter.y - this.ul.y, Math.max(0, object.shadowRadius),
+      object.shadowCenter.x - this.ul.x, object.shadowCenter.y - this.ul.y, object.shadowRadius + object.bufferRadius);
     radGrd.addColorStop(  0, "rgba( 0, 0, 0,  1 )" );
-    radGrd.addColorStop( .5, "rgba( 0, 0, 0, .5 )" );
+    //radGrd.addColorStop( .5, "rgba( 0, 0, 0, .5 )" );
     radGrd.addColorStop(  1, "rgba( 0, 0, 0,  0 )" );
     context.globalCompositeOperation = "destination-out";
     context.fillStyle = radGrd;
-    context.fillRect(object.shadowCenter.x - this.ul.x - object.shadowRadius * 2 - SHADOW_EDGE_END,
-      object.shadowCenter.y - this.ul.y - object.shadowRadius * 2 - SHADOW_EDGE_END,
-      object.shadowRadius * 4 + SHADOW_EDGE_END * 2, object.shadowRadius * 4 + SHADOW_EDGE_END * 2);
+    context.fillRect(object.shadowCenter.x - this.ul.x - object.shadowRadius * 2 - object.bufferRadius,
+      object.shadowCenter.y - this.ul.y - object.shadowRadius * 2 - object.bufferRadius,
+      object.shadowRadius * 4 + object.bufferRadius * 2, object.shadowRadius * 4 + object.bufferRadius * 2);
 
     context.globalCompositeOperation = "source-over";
   }
@@ -88,42 +86,29 @@ export default class ShadowFieldRenderer {
     }
 
     // TODO: could optimize this to avoid drawing too much out of bounds
-    if (imageOffset1.x > 0) {
-      let drawnWidth = 0;
-      while (drawnWidth < this.canvas.width) {
-        let xoffset = (imageOffset1.x + drawnWidth) % this.image.width;
+    let drawnWidth = 0;
+    while (drawnWidth < this.canvas.width) {
+      let xoffset = (imageOffset1.x + drawnWidth) % this.image.width;
 
-        let width = this.image.width - xoffset;
-        let height = this.image.height - imageOffset1.y;
-        this.context.drawImage(this.image, xoffset, imageOffset1.y, width, height,
-          drawnWidth, 0, width, height);
+      let width = this.image.width - xoffset;
+      let height = this.image.height - imageOffset1.y;
+      this.context.drawImage(this.image, xoffset, imageOffset1.y, width, height,
+        drawnWidth, 0, width, height);
 
-        let drawnHeight = height;
-        while (drawnHeight < this.canvas.height) {
-          let yoffset = (imageOffset1.y + drawnHeight) % this.image.height;
-          let nextHeight = this.image.height - yoffset;
-          this.context.drawImage(this.image, xoffset, yoffset, width, nextHeight,
-            drawnWidth, drawnHeight, width, nextHeight);
+      let drawnHeight = height;
+      while (drawnHeight < this.canvas.height) {
+        let yoffset = (imageOffset1.y + drawnHeight) % this.image.height;
+        let nextHeight = this.image.height - yoffset;
+        this.context.drawImage(this.image, xoffset, yoffset, width, nextHeight,
+          drawnWidth, drawnHeight, width, nextHeight);
 
-          drawnHeight += nextHeight;
-        }
-
-        drawnWidth += width;
+        drawnHeight += nextHeight;
       }
 
-      this.applyGradientHole(this.context, object);
-      // this.context.drawImage(this.image2, imageOffset2.x, imageOffset2.y, width2, this.canvas.height,
-      //   0, 0, width2, this.canvas.height - 1);
-      // this.context.drawImage(this.image2, 0, imageOffset2.y, this.canvas.width - width2, this.canvas.height,
-      //   width2, 0, this.canvas.width - width2, this.canvas.height);
-    } else {
-      this.context.drawImage(this.image, imageOffset1.x, imageOffset1.y, this.canvas.width, this.canvas.height,
-        0, 0, this.canvas.width, this.canvas.height);
-
-      this.context.drawImage(this.image2, imageOffset1.x, imageOffset1.y, this.canvas.width, this.canvas.height,
-        0, 0, this.canvas.width, this.canvas.height);
+      drawnWidth += width;
     }
 
+    this.applyGradientHole(this.context, object);
 
     //this.context.globalCompositeOperation = "source-over";
     this.context.restore();

@@ -66,7 +66,7 @@ const ANIMATION_SETTINGS = {
     },
     offset: {
       x: 0,
-      y: 0
+      y: 66
     },
     renderOffset: {
       y: -8,
@@ -78,8 +78,8 @@ const ANIMATION_SETTINGS = {
   },
   [ANIMATIONS.DEATH_RIGHT]: {
     dimensions: {
-      width: 33,
-      height: 65
+      width: 66,
+      height: 33
     },
     offset: {
       x: 356,
@@ -111,7 +111,7 @@ const ANIMATION_SETTINGS = {
   },
   [ANIMATIONS.DEATH_LEFT]: {
     dimensions: {
-      width: 65,
+      width: 66,
       height: 33
     },
     offset: {

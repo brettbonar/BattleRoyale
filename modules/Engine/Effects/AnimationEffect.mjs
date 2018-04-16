@@ -8,6 +8,7 @@ export default class AnimationEffect extends Effect {
     _.merge(this, params);
     Object.assign(this, effect);
 
+    this.renderSize = this.renderSize || this.imageSize;
     this.image = ImageCache.get(effect.imageSource);
     this.frame = 0;
     this.currentTime = 0;
@@ -16,6 +17,14 @@ export default class AnimationEffect extends Effect {
       width: effect.imageSize,
       height: effect.imageSize
     };
+  }
+
+  applyFade(context) {
+    if (this.fade.fadeIn && this.totalTime > 0 && this.totalTime < this.fade.fadeIn) {
+      context.globalAlpha = this.totalTime / this.fade.fadeIn;
+    } else if (this.fade.fadeOutStart && this.totalTime > 0 && this.totalTime >= this.fade.fadeOutStart) {
+      context.globalAlpha = Math.max(0, 1.0 - (this.totalTime - this.fade.fadeOutStart) / (this.fade.fadeOutEnd - this.fade.fadeOutStart));
+    }
   }
 
   render(context, elapsedTime) {
@@ -34,13 +43,18 @@ export default class AnimationEffect extends Effect {
       context.translate(-(pos.x + this.imageSize / 2), -(pos.y + this.imageSize / 2));        
     }
 
+    if (this.fade) {
+      this.applyFade(context);
+    }
+
     context.drawImage(this.image, offset.x, offset.y,
       this.imageSize, this.imageSize,
-      this.position.x - this.imageSize / 2, this.position.y - this.imageSize / 2, this.imageSize, this.imageSize);
+      this.position.x - this.renderSize / 2, this.position.y - this.renderSize / 2, this.renderSize, this.renderSize);
   }
 
   update(elapsedTime) {
     this.currentTime += elapsedTime;
+    this.totalTime += elapsedTime;
     while (this.currentTime > 1000 / this.framesPerSec) {
       this.currentTime -= 1000 / this.framesPerSec;
       this.frame++;
