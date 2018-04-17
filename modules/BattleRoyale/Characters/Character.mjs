@@ -106,13 +106,14 @@ export default class Character extends GameObject {
   // TODO: should probably put somewhere else, but could be adjusted for each character
   // Also don't hard code the numbers
   get viewBounds() {
+    // Get roughly 2x actual view bounds
     return new Bounds({
       position: this.center.minus({
-        x: 2048,
+        x: 1600,
         y: 1200
       }),
       dimensions: {
-        width: 4096,
+        width: 3200,
         height: 2400
       }
     });

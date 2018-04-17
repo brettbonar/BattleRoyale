@@ -115,6 +115,15 @@ export default class Bounds {
     return point.distanceTo(circle.center) < circle.radius;
   }
 
+  static intersectsAABB_InverseCircle(aabb, circle) {
+    let point = new Vec3({
+      x: circle.center.x + Math.max(Math.abs(circle.center.x - aabb.left.x), Math.abs(circle.center.x - aabb.right.x)),
+      y: circle.center.y + Math.max(Math.abs(circle.center.y - aabb.top.y), Math.abs(circle.center.y - aabb.bottom.y))
+    });
+
+    return point.distanceTo(circle.center) > circle.radius;
+  }
+
   static intersectsAABB_AABB(first, second) {
     return Bounds.checkZ(first.box.ul.z, first.zheight, second.box.ul.z, second.zheight) &&
       first.box.ul.x < second.box.lr.x &&
@@ -308,9 +317,9 @@ export default class Bounds {
       } else if (target.type === TYPE.AABB && this.type === TYPE.CIRCLE) {
         return Bounds.intersectsAABB_Circle(target, this);
       } else if (this.type === TYPE.AABB && target.type === TYPE.INVERSE_CIRCLE) {
-        return !Bounds.intersectsAABB_Circle(this, target);
+        return Bounds.intersectsAABB_InverseCircle(this, target);
       } else if (target.type === TYPE.AABB && this.type === TYPE.INVERSE_CIRCLE) {
-        return !Bounds.intersectsAABB_Circle(target, this);
+        return Bounds.intersectsAABB_InverseCircle(target, this);
       } else {
         // TODO: do better check
         return _.some(this.lines, (line) => _.some((target.lines), (targetLine) => Bounds.intersectsLine(line, targetLine, true)));
@@ -340,9 +349,9 @@ export default class Bounds {
       } else if (target.type === TYPE.AABB && this.type === TYPE.CIRCLE) {
         return Bounds.intersectsAABB_Circle(target, this);
       } else if (this.type === TYPE.AABB && target.type === TYPE.INVERSE_CIRCLE) {
-        return !Bounds.intersectsAABB_Circle(this, target);
+        return Bounds.intersectsAABB_InverseCircle(this, target);
       } else if (target.type === TYPE.AABB && this.type === TYPE.INVERSE_CIRCLE) {
-        return !Bounds.intersectsAABB_Circle(target, this);
+        return Bounds.intersectsAABB_InverseCircle(target, this);
       } else {
         // TODO: do better check
         return _.some(this.lines, (line) => _.some((target.lines), (targetLine) => Bounds.intersectsLine(line, targetLine)));

@@ -11,9 +11,23 @@ export default class Canvas {
 
   static create(dimensions) {
     let canvas = document.createElement("canvas");
-    canvas.style.display = "none";
     canvas.width = dimensions.width;
     canvas.height = dimensions.height;
+
+    return {
+      canvas: canvas,
+      context: canvas.getContext("2d")
+    };
+  }
+  
+  static createOverlay(dimensions) {
+    let canvas = document.createElement("canvas");
+    canvas.width = dimensions.width;
+    canvas.height = dimensions.height;
+    canvas.classList.add("game-canvas");
+    canvas.classList.add("overlay-canvas");
+    
+    document.getElementById("canvas-group").appendChild(canvas);
 
     return {
       canvas: canvas,

@@ -21,6 +21,7 @@ export default class Grid {
     grid[x][y].push(object);
   }
 
+  // TODO: fix performance issues with this method
   addInverseCircleToGrid(grid, allGrid, object, extents) {
     let grids = [];
     allGrid.push(object);

@@ -60,7 +60,7 @@ export default class ShadowField extends GameObject {
   constructor(params) {
     super(params);
     this.type = "ShadowField";
-    //this.renderClipped = true;
+    this.renderClipped = true;
     this.physics.surfaceType = SURFACE_TYPE.NONE;
     this.shadowCenter = new Vec3(params.shadowCenter);
     this.shadowRadius = params.shadowRadius;
@@ -192,6 +192,24 @@ export default class ShadowField extends GameObject {
       this.renderer.update(elapsedTime);
 
       return this.handleTargets(elapsedTime);
+    }
+  }
+
+  render(context, elapsedTime, clipping, center) {
+    // TRICKY: there are performance issues with adding this to every grid, so check here
+    // if it is in view
+    let bounds = new Bounds({
+      position: center.minus({
+        x: context.canvas.width / 2 + 1,
+        y: context.canvas.height / 2 + 1
+      }),
+      dimensions: {
+        width: context.canvas.width + 2,
+        height: context.canvas.height + 2
+      }
+    });
+    if (this.modelBounds.intersects(bounds)) {
+      super.render(context, elapsedTime, clipping, center);
     }
   }
 

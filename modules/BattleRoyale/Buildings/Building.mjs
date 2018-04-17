@@ -11,6 +11,7 @@ export default class Building extends GameObject {
     }, params));
     this.type = "Building";
     this.building = buildings[params.buildingType];
+    this.dimensions = this.building.dimensions;
     //this.losDimensions = this.building.bounds;
     this.collisionDimensions = this.building.collisionDimensions;
     this.outside = true;

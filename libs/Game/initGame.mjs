@@ -213,6 +213,11 @@ function initGame(players, maps) {
           "staffMale"
         ]
       },
+      // position: {
+      //   x: maps[0].mapParams.totalMapWidth - 200,
+      //   y: maps[0].mapParams.totalMapHeight - 200,
+      //   z: 0
+      // },
       position: {
         x: pos,
         y: pos,
@@ -377,7 +382,7 @@ function initGame(players, maps) {
     dimensions: {
       width: maps[0].mapParams.totalMapWidth,
       height: maps[0].mapParams.totalMapHeight,
-      zheight: 448
+      zheight: 16
     },
     simulation: true
   }));

@@ -36,7 +36,7 @@ export default class BattleRoyale extends Game {
     super(params);
     
     // TODO: create a separate render grid?
-    this.grid = new LevelGrids(400);
+    this.grid = new LevelGrids(100);
     this.physicsEngine = new PhysicsEngine(this.grid);
     this.updates = [];
     this.delayedUpdates = [];

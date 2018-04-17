@@ -4,10 +4,12 @@ import { getDistance } from "./util.mjs"
 import flavor from "./BattleRoyale/Objects/flavor.mjs"
 import ImageCache from "./Engine/Rendering/ImageCache.mjs"
 import SimplexNoise from "../shared/SimplexNoise.mjs"
+import Canvas from "./Engine/Rendering/Canvas.mjs";
+import Bounds from "./Engine/GameObject/Bounds.mjs"
 
 const MAX_CANVAS_SIZE = 1024;
-const MINIMAP_CANVAS_SIZE = 1024;
-const DEFAULT_MAP_SIZE = 256;
+const MINIMAP_CANVAS_SIZE = 2048;
+const DEFAULT_MAP_SIZE = 512;
 
 const BIOMES = {
   FOREST: "forest",
@@ -349,12 +351,12 @@ class Map {
       }
     }
 
-    this.minimapCanvas = $("<canvas>", {
-      class: "game-canvas map-save-canvas"
-    }).appendTo(document.getElementById("canvas-group"))[0];
-    this.minimapCanvas.width = MINIMAP_CANVAS_SIZE;
-    this.minimapCanvas.height = MINIMAP_CANVAS_SIZE;
-    this.minimapContext = this.minimapCanvas.getContext("2d");
+    let temp = Canvas.create({
+      width: MINIMAP_CANVAS_SIZE,
+      height: MINIMAP_CANVAS_SIZE
+    });
+    this.minimapCanvas = temp.canvas;
+    this.minimapContext = temp.context;
 
     this.renderMinimapFull(this.minimapContext, location);
   }
@@ -542,20 +544,18 @@ class Map {
       this.mapCanvases[x] = new Array(numRows);
       this.minimapCanvases[x] = new Array(numRows);
       for (let y = 0; y < numRows; y++) {
-        let canvas = $("<canvas>", {
-          class: "game-canvas map-save-canvas"
-        }).appendTo(document.getElementById("canvas-group"))[0];
-        canvas.width = this.mapParams.mapCanvasWidth;
-        canvas.height = this.mapParams.mapCanvasHeight;
+        let canvas = Canvas.create({
+          width: this.mapParams.mapCanvasWidth,
+          height: this.mapParams.mapCanvasHeight
+        });
 
-        let minimapCanvas = $("<canvas>", {
-          class: "game-canvas map-save-canvas"
-        }).appendTo(document.getElementById("canvas-group"))[0];
-        minimapCanvas.width = this.mapParams.mapCanvasWidth;
-        minimapCanvas.height = this.mapParams.mapCanvasHeight;
+        let minimapCanvas = Canvas.create({
+          width: this.mapParams.mapCanvasWidth,
+          height: this.mapParams.mapCanvasHeight
+        });
 
-        let context = canvas.getContext("2d");
-        let minimapContext = minimapCanvas.getContext("2d");
+        let context = canvas.context;
+        let minimapContext = minimapCanvas.context;
         let offset = {
           x: -x * mapWidth,
           y: -y * mapHeight
@@ -570,15 +570,35 @@ class Map {
         }
 
         this.mapCanvases[x][y] = {
-          canvas: canvas,
+          canvas: canvas.canvas,
           context: context,
-          offset: offset
+          offset: offset,
+          bounds: new Bounds({
+            position: {
+              x: x * mapWidth,
+              y: y * mapHeight
+            },
+            dimensions: {
+              width: mapWidth,
+              height: mapHeight
+            }
+          })
         };
 
         this.minimapCanvases[x][y] = {
-          canvas: minimapCanvas,
+          canvas: minimapCanvas.canvas,
           context: minimapContext,
-          offset: offset
+          offset: offset,
+          bounds: new Bounds({
+            position: {
+              x: x * mapWidth,
+              y: y * mapHeight
+            },
+            dimensions: {
+              width: mapWidth,
+              height: mapHeight
+            }
+          })
         };
       }
     }
@@ -596,13 +616,11 @@ class Map {
     }
   }
 
-  renderImpl(canvases, context, position, location, dimensions) {
-    if (!dimensions) {
-      dimensions = {
-        width: context.canvas.width,
-        height: context.canvas.height
-      };
-    }
+  renderImpl(canvases, context, position) {
+    let dimensions = {
+      width: context.canvas.width,
+      height: context.canvas.height
+    };
 
     let ul = {
       x: position.x - dimensions.width / 2,
@@ -618,26 +636,18 @@ class Map {
     let ystart = _.clamp(Math.floor(ul.y / this.mapParams.mapHeight), 0, canvases[0].length - 1);
     let yend = _.clamp(Math.floor(lr.y / this.mapParams.mapHeight), 0, canvases[0].length - 1);
 
-    if (!location) {
-      location = {
-        position: {
-          x: 0,
-          y: 0,
-        },
-        dimensions: {
-          width: context.canvas.width,
-          height: context.canvas.height
-        }
-      };
-    }
-
     for (let x = xstart; x <= xend; x++) {
       for (let y = ystart; y <= yend; y++) {
         let map = canvases[x][y];
-        context.drawImage(map.canvas,
-          position.x - dimensions.width / 2 + map.offset.x, position.y - dimensions.height / 2 + map.offset.y,
-          dimensions.width, dimensions.height,
-          location.position.x, location.position.y, location.dimensions.width, location.dimensions.height);
+        let offset = {
+          x: ul.x - map.bounds.ul.x,
+          y: ul.y - map.bounds.ul.y
+        };
+        // TRICKY: add 1 to avoid rendering artifacts in FF
+        let width = 1 + map.bounds.width - offset.x;
+        let height = 1 + map.bounds.height - offset.y;
+        context.drawImage(map.canvas, Math.max(0, offset.x), Math.max(0, offset.y), width, height,
+          Math.max(0, -offset.x), Math.max(0, -offset.y), width, height);
       }
     }
   }
@@ -659,7 +669,6 @@ class Map {
   renderMinimap(context, location, position, dimensions) {
     if (this.minimapCanvas) {
       if (position && dimensions) {
-        //this.renderImpl(this.minimapCanvases, context, position, location, dimensions);
         let xscale = this.minimapCanvas.width / this.mapParams.totalMapWidth;
         let yscale = this.minimapCanvas.height / this.mapParams.totalMapHeight;
         context.drawImage(this.minimapCanvas, 

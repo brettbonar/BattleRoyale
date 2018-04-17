@@ -64,6 +64,11 @@ export default class BattleRoyaleClient extends BattleRoyale {
     this.tempCanvas = temp.canvas;
     this.tempContext = temp.context;
 
+    // this.tempContext.mozImageSmoothingEnabled = false;
+    // this.tempContext.webkitImageSmoothingEnabled = false;
+    // this.context.mozImageSmoothingEnabled = false;
+    // this.context.webkitImageSmoothingEnabled = false;
+
     this.renderingEngine = new PerspectiveRenderingEngine({
       context: this.tempContext
     });
@@ -519,12 +524,12 @@ export default class BattleRoyaleClient extends BattleRoyale {
   getVisibleBounds() {
     return new Bounds({
       position: this.gameState.player.center.minus({
-        x: this.context.canvas.width / 2 + 250,
-        y: this.context.canvas.height / 2 + 250
+        x: this.context.canvas.width / 2 + 1,
+        y: this.context.canvas.height / 2 + 1
       }),
       dimensions: {
-        width: this.context.canvas.width + 500,
-        height: this.context.canvas.height + 500
+        width: this.context.canvas.width + 2,
+        height: this.context.canvas.height + 2
       }
     });
   }
@@ -557,15 +562,9 @@ export default class BattleRoyaleClient extends BattleRoyale {
     this.tempContext.save();
 
     let visibleBounds = this.getVisibleBounds();
-    // TODO: could only clear part that is out of bounds
-    if (visibleBounds.ul.x < 0 || visibleBounds.ul.y < 0 ||
-        visibleBounds.lr.x > this.maps[this.gameState.player.level].mapParams.totalMapWidth ||
-        visibleBounds.lr.y > this.maps[this.gameState.player.level].mapParams.totalMapHeight)
-    {
-      this.tempContext.clearRect(0, 0, this.canvas.width, this.canvas.height);
-      this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
-    }
-    //this.tempContext.fillRect(0, 0, this.canvas.width, this.canvas.height);
+    
+    this.tempContext.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
     if (this.maps[this.gameState.player.level]) {
       this.maps[this.gameState.player.level].render(this.tempContext, this.gameState.player.center);
@@ -573,8 +572,12 @@ export default class BattleRoyaleClient extends BattleRoyale {
 
     this.tempContext.save();
     // Translate to player position
-    this.tempContext.translate(-(this.gameState.player.center.x - this.tempContext.canvas.width / 2),
-    -(this.gameState.player.center.y - this.tempContext.canvas.height / 2));
+    this.tempContext.translate(
+      -(this.gameState.player.center.x - this.tempContext.canvas.width / 2),
+      -(this.gameState.player.center.y - this.tempContext.canvas.height / 2));
+    // this.tempContext.translate(
+    //   -(this.gameState.player.center.x - this.tempContext.canvas.width / 2) + 0.5,
+    //   -(this.gameState.player.center.y - this.tempContext.canvas.height / 2) + 0.5);
 
     let renderObjects = this.getRenderObjects(visibleBounds);
     let fov;

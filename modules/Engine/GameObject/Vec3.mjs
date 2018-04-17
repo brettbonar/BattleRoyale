@@ -25,6 +25,20 @@ export default class Vec3 {
     return point;
   }
 
+  round() {
+    this.x = Math.round(this.x);
+    this.y = Math.round(this.y);
+    this.z = Math.round(this.z);
+    return this;
+  }
+
+  floor() {
+    this.x = Math.floor(this.x);
+    this.y = Math.floor(this.y);
+    this.z = Math.floor(this.z);
+    return this;
+  }
+
   normalize() {
     return Object.assign(this, Vec3.normalize(this));
   }

@@ -52,7 +52,7 @@ export default class BeamRenderer {
     });
 
     let frameOffset;
-    let distance = Math.ceil(object.lastPosition.distanceTo(object.position));
+    let distance = Math.max(1, Math.ceil(object.lastPosition.distanceTo(object.position)));
     for (let i = 0; i < distance; i += dimensions.width) {
       if (this.animating) {
         frameOffset = getAnimationOffset(this.imageBody, this.rendering.body.dimensions, (this.frame + i) % this.rendering.body.frames);
@@ -108,7 +108,7 @@ export default class BeamRenderer {
     this.drawBody(context, object, elapsedTime, clipping);
     this.renderAt(context, this.imageStart, this.rendering.start, object.lastPosition, object);
 
-    let distance = Math.ceil(object.lastPosition.distanceTo(object.position));
+    let distance = Math.max(1, Math.ceil(object.lastPosition.distanceTo(object.position)));
     this.renderAt(context, this.imageEnd, this.rendering.end,
       object.lastPosition.plus({ x: distance }), object);
   }
