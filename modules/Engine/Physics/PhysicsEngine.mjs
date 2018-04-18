@@ -258,12 +258,23 @@ export default class PhysicsEngine {
       let target = intersection.target;
       let collision = intersection.collision;
 
-      if (obj.physics.solidity > 0 && target.physics.solidity > 0) {
+      if (obj.physics.solidity > 0 && target.physics.solidity > 0 &&
+          obj.physics.surfaceType !== SURFACE_TYPE.GAS && target.physics.surfaceType !== SURFACE_TYPE.GAS) {
         // TODO: find a good way to allow you to slide along walls without also screwing up beams
-        for (const axis of AXES) {
-          let diff = (obj.position[axis] - obj.lastPosition[axis]) * collision.time;
-          if (diff !== 0) {
-            obj.position[axis] = obj.lastPosition[axis] + diff - Math.sign(obj.position[axis] - obj.lastPosition[axis]);
+        if (collision.time === 0) {
+          obj.position = obj.lastPosition.copy();
+          target.position = target.lastPosition.copy();
+        } else {
+          for (const axis of AXES) {
+            let diff = (obj.position[axis] - obj.lastPosition[axis]) * collision.time;
+            if (diff !== 0) {
+              obj.position[axis] = obj.lastPosition[axis] + diff - Math.sign(obj.position[axis] - obj.lastPosition[axis]);
+            }
+
+            let targetDiff = (target.position[axis] - target.lastPosition[axis]) * collision.time;
+            if (targetDiff !== 0) {
+              target.position[axis] = target.lastPosition[axis] + targetDiff - Math.sign(target.position[axis] - target.lastPosition[axis]);
+            }
           }
         }
 
@@ -277,25 +288,25 @@ export default class PhysicsEngine {
         obj.updatePosition();
       }
       
-      let collisionPosition = obj.position.plus({
-        x: intersection.sourceBounds.width / 2,
-        y: intersection.sourceBounds.height / 2
-      });
       collisions.push({
         source: obj,
         sourceBounds: intersection.sourceBounds,
         target: target,
         targetBounds: intersection.targetBounds,
-        // TODO: use position of collision from sweep test
-        position: collisionPosition
+        position: obj.position.plus({
+          x: intersection.sourceBounds.width / 2,
+          y: intersection.sourceBounds.height / 2
+        })
       });
       collisions.push({
         source: target,
         sourceBounds: intersection.targetBounds,
         target: obj,
         targetBounds: intersection.sourceBounds,
-        // TODO: use position of collision from sweep test
-        position: collisionPosition
+        position: target.position.plus({
+          x: intersection.targetBounds.width / 2,
+          y: intersection.targetBounds.height / 2
+        })
       });
 
       // this.quadTrees[obj.level].remove(obj);

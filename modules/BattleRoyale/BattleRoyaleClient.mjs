@@ -314,43 +314,45 @@ export default class BattleRoyaleClient extends BattleRoyale {
         return;
       }
 
-      if (collision.target && collision.target.damagedEffect &&
-          collision.source.effect.triggerDamagedEffect && !collision.source.collided) {
+      if (!collision.source.collided) {
         collision.source.collided = true;
-        this.particleEngine.addEffect(new AnimationEffect({
-          position: {
-            x: collision.target.center.x,
-            y: collision.target.center.y
-          },
-          level: collision.target.level
-        }, effects[collision.target.damagedEffect]));
-      }
-      
-      if (collision.source.rendering.hitEffect && !collision.source.collided) {
-        collision.source.collided = true;
-        if (collision.source.effect.path !== "beam") {
-          collision.source.done = true;
-        }
 
-        if (collision.source.rendering.hitEffect.particleEffect) {
-          this.particleEngine.addEffect(new ParticleEffect({
-            position: collision.position.plus({
-              x: collision.sourceBounds.width / 2,
-              y: collision.sourceBounds.height / 2
-            }),
-            level: collision.source.level,
-            direction: collision.source.direction,
-            speed: collision.source.speed,
-            rotation: collision.source.rotation,
-            effect: effects[collision.source.rendering.hitEffect.particleEffect]
-          }));
-        } else {
-          this.addObject(new RenderObject({
-            position: collision.position,
-            //dimensions: collision.source.dimensions,
-            rotation: collision.source.rotation,
-            level: collision.source.level
-          }, collision.source.rendering.hitEffect));
+        if (collision.target && collision.target.damagedEffect &&
+            collision.source.effect.triggerDamagedEffect) {
+          this.particleEngine.addEffect(new AnimationEffect({
+            position: {
+              x: collision.target.center.x,
+              y: collision.target.center.y
+            },
+            level: collision.target.level
+          }, effects[collision.target.damagedEffect]));
+        }
+        
+        if (collision.source.rendering.hitEffect) {
+          if (collision.source.effect.path !== "beam") {
+            collision.source.done = true;
+          }
+
+          if (collision.source.rendering.hitEffect.particleEffect) {
+            this.particleEngine.addEffect(new ParticleEffect({
+              position: collision.position.plus({
+                x: collision.sourceBounds.width / 2,
+                y: collision.sourceBounds.height / 2
+              }),
+              level: collision.source.level,
+              direction: collision.source.direction,
+              speed: collision.source.speed,
+              rotation: collision.source.rotation,
+              effect: effects[collision.source.rendering.hitEffect.particleEffect]
+            }));
+          } else {
+            this.addObject(new RenderObject({
+              position: collision.position,
+              //dimensions: collision.source.dimensions,
+              rotation: collision.source.rotation,
+              level: collision.source.level
+            }, collision.source.rendering.hitEffect));
+          }
         }
       }
 
