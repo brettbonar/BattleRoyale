@@ -219,16 +219,10 @@ export default class BattleRoyale extends Game {
         if (update) {
           this.handleObjectUpdate(update);
         }
-        // Test if a beam intersects any other beams
-        // TODO: fix this so it doesn't ignore people in path of beam
-        // TODO: make beams consist of start box, end box, and lines for center and sides
-        // if (obj instanceof Projectile && obj.effect.path === "beam") {
-        //   for (const target of this.gameState.objects) {
-        //     if (target instanceof Projectile && target.effect.path === "beam") {
-        //       obj.beamIntersects(target);
-        //     }
-        //   }
-        // }
+        if (obj._modified) {
+          // TODO: may do this twice for some objects if it is updated in physics engine
+          this.grid.update(obj);
+        }
       }
     }
 
@@ -249,9 +243,6 @@ export default class BattleRoyale extends Game {
       }
       if (obj._modified) {
         this.modified.push(obj);
-
-        // TODO: may do this twice for some objects if it is updated in physics engine
-        this.grid.update(obj);
         obj._modified = false;
       }
     }

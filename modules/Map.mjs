@@ -9,7 +9,7 @@ import Bounds from "./Engine/GameObject/Bounds.mjs"
 
 const MAX_CANVAS_SIZE = 1024;
 const MINIMAP_CANVAS_SIZE = 2048;
-const DEFAULT_MAP_SIZE = 512;
+const DEFAULT_MAP_SIZE = 128;
 
 const BIOMES = {
   FOREST: "forest",

@@ -137,12 +137,12 @@ export default class PerspectiveRenderingEngine extends RenderingEngine{
     // context.closePath();
     // context.fill();
 
-    // let perspectivePosition = object.perspectivePosition;
-    // if (perspectivePosition) {
-    //   context.strokeStyle = "purple";
-    //   context.strokeRect(perspectivePosition.x, perspectivePosition.y,
-    //     object.width, object.height);
-    // }
+    let perspectivePosition = object.perspectivePosition;
+    if (perspectivePosition) {
+      context.strokeStyle = "purple";
+      context.strokeRect(perspectivePosition.x, perspectivePosition.y,
+        object.width, object.height);
+    }
 
     let box = object.modelBounds;
     if (box) {

@@ -189,7 +189,7 @@ let attacks = {
     dimensions: {
       width: 32,
       height: 32,
-      zheight: 32
+      zheight: 16
     },
     action: {
       name: "lightMote",
@@ -218,7 +218,8 @@ let attacks = {
         },
         dimensions: {
           width: 16,
-          height: 16
+          height: 16,
+          zheight: 16
         }
       },
       shadowColor: "white",
