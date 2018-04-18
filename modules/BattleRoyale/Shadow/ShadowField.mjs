@@ -195,11 +195,11 @@ export default class ShadowField extends GameObject {
     }
   }
 
-  render(context, elapsedTime, clipping, center) {
+  render(context, elapsedTime, clipping, player) {
     // TRICKY: there are performance issues with adding this to every grid, so check here
     // if it is in view
     let bounds = new Bounds({
-      position: center.minus({
+      position: player.center.minus({
         x: context.canvas.width / 2 + 1,
         y: context.canvas.height / 2 + 1
       }),
@@ -209,7 +209,7 @@ export default class ShadowField extends GameObject {
       }
     });
     if (this.modelBounds.intersects(bounds)) {
-      super.render(context, elapsedTime, clipping, center);
+      super.render(context, elapsedTime, clipping, player);
     }
   }
 

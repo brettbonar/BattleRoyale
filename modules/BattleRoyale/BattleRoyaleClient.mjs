@@ -587,7 +587,7 @@ export default class BattleRoyaleClient extends BattleRoyale {
       fov = new FieldOfView(this.gameState.player.fovDimensions, renderObjects);
     }
     this.renderingEngine.render(this.tempContext, renderObjects, elapsedTime,
-      this.gameState.player.center, fov);
+      this.gameState.player, fov);
     //this.particleEngine.render(elapsedTime, this.gameState.player.center);
     this.renderInteractions();
     this.tempContext.restore();

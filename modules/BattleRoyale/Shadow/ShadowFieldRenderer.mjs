@@ -170,9 +170,9 @@ export default class ShadowFieldRenderer {
   }
 
   // Since the shadow covers the whole map, get just the part that covers the current field of view
-  render(context, object, elapsedTime, clipping, center) {
+  render(context, object, elapsedTime, clipping, player) {
     if (!this.image.complete) return;
-
+    let center = player.center;
     // if (clipping.offset.y === 0) {
     //   this.renderToOverlay(context, object, elapsedTime, clipping, center);
     // }

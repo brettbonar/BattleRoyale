@@ -21,4 +21,8 @@ function smoothStop(exp) {
   }
 }
 
-export { getRangeMap, smoothStart, smoothStop }
+function lerp(t, a, b) {
+  return (1 - t) * a + t * b;
+} 
+
+export { getRangeMap, smoothStart, smoothStop, lerp }

@@ -347,7 +347,8 @@ export default {
   },
   shadow_wolf: {
     attacks: {
-      1: "wolf_bite"
+      1: "wolf_bite",
+      2: "prowl"
     }
   },
   // spear: {

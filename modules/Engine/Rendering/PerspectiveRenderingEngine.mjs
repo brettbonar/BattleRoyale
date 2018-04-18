@@ -10,21 +10,21 @@ export default class PerspectiveRenderingEngine extends RenderingEngine{
     super(params);
   }
 
-  renderFaded(context, object, elapsedTime, clipping, center) {
+  renderFaded(context, object, elapsedTime, clipping, player) {
     context.globalAlpha = 0.3;
-    object.render(context, elapsedTime, clipping, center);
+    object.render(context, elapsedTime, clipping, player);
   }
 
   isAnyObjectHidden(losHiddenObjects, fadeObject) {
     return losHiddenObjects.some((obj) => obj.modelBounds.intersects2D(fadeObject.modelBounds));
   }
 
-  renderObject(context, object, elapsedTime, center, losHiddenObjects, clipping) {
+  renderObject(context, object, elapsedTime, player, losHiddenObjects, clipping) {
     context.save();
     if (object.losFade && this.isAnyObjectHidden(losHiddenObjects, object)) {
-      this.renderFaded(context, object, elapsedTime, clipping, center);
+      this.renderFaded(context, object, elapsedTime, clipping, player);
     } else {
-      object.render(context, elapsedTime, clipping, center);
+      object.render(context, elapsedTime, clipping, player);
     }
     context.restore();
   }
@@ -33,7 +33,7 @@ export default class PerspectiveRenderingEngine extends RenderingEngine{
     return clip.object.position.z + clip.object.dimensions.zheight;
   }
 
-  renderClips(context, y, clips, elapsedTime, center, objsToRender) {
+  renderClips(context, y, clips, elapsedTime, player, objsToRender) {
     // TODO: ignore small things like particles when clipping
     for (const clip of clips) {
       let height = 0;
@@ -56,7 +56,7 @@ export default class PerspectiveRenderingEngine extends RenderingEngine{
           })
         };
         // TODO: reset elapsed time after first render?
-        this.renderObject(context, clip.object, elapsedTime, center, objsToRender.losHiddenObjects, clipping);
+        this.renderObject(context, clip.object, elapsedTime, player, objsToRender.losHiddenObjects, clipping);
 
         clip.previousClip += height;
         if (clip.previousClip >= clip.object.height) {
@@ -68,7 +68,7 @@ export default class PerspectiveRenderingEngine extends RenderingEngine{
   }
 
   // Render highest to lowest y
-  render(context, objects, elapsedTime, center, fov) {
+  render(context, objects, elapsedTime, player, fov) {
     //window.debug = true;
     context.save();
 
@@ -76,15 +76,16 @@ export default class PerspectiveRenderingEngine extends RenderingEngine{
       //fov.debugRays(context);
     }
 
-    let objsToRender = this.getRenderObjects(objects, center, fov);
+    let objsToRender = this.getRenderObjects(objects, player, fov);
     let renderObjects = objsToRender.renderObjects;
 
+    // TODO: remember why these were separated out
     for (const groundObject of objsToRender.groundObjects) {
-      this.renderObject(context, groundObject, elapsedTime, center, objsToRender.losHiddenObjects);
+      this.renderObject(context, groundObject, elapsedTime, player, objsToRender.losHiddenObjects);
     }
 
     if (fov) {
-      fov.render(context, center);
+      fov.render(context, player);
     }
 
     let clips = [];
@@ -105,13 +106,13 @@ export default class PerspectiveRenderingEngine extends RenderingEngine{
         }
 
         if (clips.some((clip) => clip.object.modelBounds.intersects2D(object.modelBounds))) {
-          this.renderClips(context, y, clips, elapsedTime, center, objsToRender);
+          this.renderClips(context, y, clips, elapsedTime, player, objsToRender);
         }
-        this.renderObject(context, object, elapsedTime, center, objsToRender.losHiddenObjects);
+        this.renderObject(context, object, elapsedTime, player, objsToRender.losHiddenObjects);
       }
     }
 
-    this.renderClips(context, Number.MAX_SAFE_INTEGER, clips, elapsedTime, center, objsToRender);
+    this.renderClips(context, Number.MAX_SAFE_INTEGER, clips, elapsedTime, player, objsToRender);
     
     if (window.debug) {
       this.debugBoxes(context, objects);
@@ -210,7 +211,7 @@ export default class PerspectiveRenderingEngine extends RenderingEngine{
     }
   }
 
-  getRenderObjects(objects, center, fov) {
+  getRenderObjects(objects, player, fov) {
     let renderObjects = [];
     let groundObjects = [];
     let losHiddenObjects = [];
@@ -219,7 +220,7 @@ export default class PerspectiveRenderingEngine extends RenderingEngine{
     for (const object of objects) {
       for (const renderObj of object.renderObjects) {
         // TODO: create new grid for rendering
-        if (!renderObj.hidden && (!fov || fov.isInView(renderObj, losHiddenObjects))) {
+        if (!renderObj.hidden && (!fov || fov.isInView(renderObj, losHiddenObjects, player))) {
           let pos = Math.round(renderObj.perspectivePosition.y);
 
           if (pos > 0) {
@@ -239,7 +240,7 @@ export default class PerspectiveRenderingEngine extends RenderingEngine{
       // }
     }
     
-    //renderObjects = renderObjects.concat(this.getCharactersInFov(characters, center));
+    //renderObjects = renderObjects.concat(this.getCharactersInFov(characters, player));
 
     //return _.sortBy(renderObjects, this.sortByY, this.sortByZ);
     //return _.sortBy(renderObjects, this.sortByPerspective);

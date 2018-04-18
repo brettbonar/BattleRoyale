@@ -200,10 +200,10 @@ export default class CharacterRenderer {
       position.x, position.y - position.z, dimensions.width, dimensions.height);
   }
 
-  render(context, object, elapsedTime, center) {
+  render(context, object, elapsedTime, clipping, player) {
     if (!this.body.complete) return;
 
-    if (!object.state.dead) {
+    if (!object.state.dead && object.sameTeamAs(player)) {
       this.drawDirectionMarker(context, object);
     }
 
@@ -213,13 +213,21 @@ export default class CharacterRenderer {
         object.position.y + object.height - this.shadowImage.height / 2 - 5);
     }
 
+    if (object.state.opacity && object.state.opacity < 1) {
+      context.globalAlpha = object.state.opacity;
+    }
+
     if (this.hasLoadout()) {
       this.drawLoadout(context, object);
     } else {
       this.drawBody(context, object);
     }
 
-    if (this.state !== STATE.DEAD && !object.isOtherPlayer) {
+    if (object.state.opacity && object.state.opacity < 1) {
+      context.globalAlpha = 1.0;
+    }
+
+    if (this.state !== STATE.DEAD && object.sameTeamAs(player)) {
       CharacterRenderer.drawStatusBars(context, object, this.rendering.statusBarOffset);
     }
 
@@ -301,6 +309,8 @@ export default class CharacterRenderer {
       // }
     }
 
+    let isMoving = object.direction.x || object.direction.y || object.moving;
+
     // TODO: add flag to animations marking whether or not they must be completed before moving on
     if (!currentAction) {
       if (this.currentAnimationDone && this.currentAnimationSettings.nextAnimation) {
@@ -309,7 +319,7 @@ export default class CharacterRenderer {
       } else if (!this.currentAnimation || this.currentAnimationDone) {
         if (object.state.dead) {
           this.queueAnimation(this.rendering.DEATH_ANIMATIONS[object.state.characterDirection], STATE.DEAD);
-        } else if (object.direction.x || object.direction.y || object.moving) {
+        } else if (isMoving) {
           this.queueAnimation(this.rendering.MOVE_ANIMATIONS[object.state.characterDirection], STATE.MOVING);
         } else {
           this.queueAnimation(this.rendering.IDLE_ANIMATIONS[object.state.characterDirection], STATE.IDLE);
@@ -317,11 +327,17 @@ export default class CharacterRenderer {
       }
     } else {
       if (this.currentAction && this.currentAction.type === "attack") {
-        if (this.rendering.WEAPON_ANIMATIONS) {
-          let weapon = equipment[object.state.loadout.weapon];
-          this.queueAnimation(this.rendering.WEAPON_ANIMATIONS[weapon.attackType][object.state.characterDirection], STATE.ATTACKING);
-        } else if (this.rendering.ATTACK_ANIMATIONS) {
-          this.queueAnimation(this.rendering.ATTACK_ANIMATIONS[object.state.characterDirection], STATE.ATTACKING);
+        if (this.currentAction.animationType) {
+          let moving = isMoving ? "moving" : "idle";
+          this.queueAnimation(this.rendering.ANIMATION_SETS[this.currentAction.animationType][moving][object.state.characterDirection],
+            STATE.ATTACKING);
+        } else {
+          if (this.rendering.WEAPON_ANIMATIONS) {
+            let weapon = equipment[object.state.loadout.weapon];
+            this.queueAnimation(this.rendering.WEAPON_ANIMATIONS[weapon.attackType][object.state.characterDirection], STATE.ATTACKING);
+          } else if (this.rendering.ATTACK_ANIMATIONS) {
+            this.queueAnimation(this.rendering.ATTACK_ANIMATIONS[object.state.characterDirection], STATE.ATTACKING);
+          }
         }
       }
     }

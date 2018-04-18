@@ -11,6 +11,8 @@ import { SURFACE_TYPE, MOVEMENT_TYPE } from "../Engine/Physics/PhysicsConstants.
 import { getDistance } from "../util.mjs"
 import GameSettings from "../Engine/GameSettings.mjs"
 
+import actions from "./Scripts/actions.mjs"
+import createScript from "./Scripts/Script.mjs"
 import ObjectRenderer from "./Renderers/ObjectRenderer.mjs"
 import Character from "./Characters/Character.mjs"
 import Projectile from "./Objects/Projectile.mjs"
@@ -48,7 +50,8 @@ export default class BattleRoyale extends Game {
     this.gameState = {
       objects: [],
       killed: [],
-      characters: []
+      characters: [],
+      scripts: []
     };
     this.broadcastEvents = [];
 
@@ -91,8 +94,12 @@ export default class BattleRoyale extends Game {
     }
   }
 
-  createAttack(character, params, attack, timeDiff, mods, action) {
-    if (attack.type === "projectile") {
+  addScript(script) {
+    this.gameState.scripts.push(script);
+  }
+
+  createAttack(character, params, attack, timeDiff, mods, action, animateOnly) {
+    if (attack.type === "projectile" && !animateOnly) {
       // let direction = character.state.target.minus(character.attackCenter).normalize();
       // direction.z = 0;
       this.addObject(Projectile.create({
@@ -107,7 +114,7 @@ export default class BattleRoyale extends Game {
         ownerId: params.source.objectId,
         //elapsedTime: timeDiff
       }));
-    } else if (attack.type === "magic") {
+    } else if (attack.type === "magic" && !animateOnly) {
       this.addObject(Magic.create({
         type: "Magic",
         source: character,
@@ -115,6 +122,11 @@ export default class BattleRoyale extends Game {
         direction: character.state.target.minus(character.attackCenter).normalize(),        
         position: character.state.target,
         simulation: this.simulation
+      }));
+    } else if (attack.type === "script") {
+      this.addScript(createScript(attack.effect.runScript, {
+        source: character,
+        //elapsedTime: timeDiff
       }));
     }
   }
@@ -127,13 +139,13 @@ export default class BattleRoyale extends Game {
     if (!attack) {
       attack = magicEffects[weapon.attacks[params.attackType]];
     }
-
-    let cb;
-    if (!animateOnly) {
-      cb = (timeDiff, mods, action) => {
-        this.createAttack(character, params, attack, timeDiff, mods, action);
-      };
+    if (!attack) {
+      attack = actions[weapon.attacks[params.attackType]];
     }
+
+    let cb = (timeDiff, mods, action) => {
+      this.createAttack(character, params, attack, timeDiff, mods, action, animateOnly);
+    };
 
     if (attack) {
       character.doAction("attack", params.release, attack.action, elapsedTime, cb);
@@ -203,6 +215,14 @@ export default class BattleRoyale extends Game {
 
     // TODO: move above physics?
     let updates = [];
+    for (const script of this.gameState.scripts) {
+      let update = script.update(elapsedTime);
+      if (update) {
+        this.handleObjectUpdate(update);
+      }
+    }
+    _.remove(this.gameState.scripts, "done");
+
     for (const obj of this.gameState.objects) {
       //obj.elapsedTime = 0;
       // TODO: fix this hack

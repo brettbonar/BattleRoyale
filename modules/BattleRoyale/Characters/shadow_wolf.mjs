@@ -392,6 +392,28 @@ export default {
     statusBarOffset: {
       y: -8
     },
+    ANIMATION_SETS: {
+      move: {
+        moving: MOVE_ANIMATIONS,
+        idle: IDLE_ANIMATIONS
+      },
+      attack: {
+        moving: ATTACK_ANIMATIONS,
+        idle: ATTACK_ANIMATIONS
+      },
+      stealth: {
+        moving: MOVE_ANIMATIONS,
+        idle: IDLE_ANIMATIONS
+      },
+      idle: {
+        moving: IDLE_ANIMATIONS,
+        idle: IDLE_ANIMATIONS
+      },
+      death: {
+        moving: DEATH_ANIMATIONS,
+        idle: DEATH_ANIMATIONS
+      }
+    },
     ANIMATIONS: ANIMATIONS,
     MOVE_ANIMATIONS: MOVE_ANIMATIONS,
     ATTACK_ANIMATIONS: ATTACK_ANIMATIONS,

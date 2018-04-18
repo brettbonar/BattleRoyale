@@ -149,19 +149,25 @@ export default class GameObject extends GameObjectProxy {
     // TODO: ***try subtracting zheight from Y position by default***
 
     // Anything with a z position and zheight of 0 should be rendered as ground
-    if (this.position.z <= 0 && !zheight) {
-      this.perspectivePosition = new Vec3({
-        y: 0
-      });
-    } else {
-      let position = new Vec3(this.position);
-      if (this.perspectiveOffset) {
-        position.add(this.perspectiveOffset);
-      } else if (zheight > 0 && !this.renderClipped) {
-        position.add({ y: this.height });
-      }
-      this.perspectivePosition = position.add({ y: this.position.z });
+    // if (this.position.z <= 0 && !zheight) {
+    //   this.perspectivePosition = new Vec3({
+    //     y: 0
+    //   });
+    // } else {
+    //   let position = new Vec3(this.position);
+    //   if (this.perspectiveOffset) {
+    //     position.add(this.perspectiveOffset);
+    //   } else if (zheight > 0 && !this.renderClipped) {
+    //     position.add({ y: this.height });
+    //   }
+    //   this.perspectivePosition = position.add({ y: this.position.z });
+    // }
+    if (this.perspectiveOffset) {
+
     }
+    this.perspectivePosition = {
+      y: this.position.y + this.position.z + zheight
+    };
 
     if (this.static) {
       this.staticBox = new Bounds({

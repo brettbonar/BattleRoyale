@@ -46,6 +46,10 @@ export default class Character extends GameObject {
     }
   }
 
+  sameTeamAs(target) {
+    return this === target || this.team && this.team === target.team;
+  }
+
   updateDimensions() {
     let dimensions = characters[this.characterInfo.type].dimensions[this.state.characterDirection];
 
@@ -272,6 +276,7 @@ export default class Character extends GameObject {
           actionRate: action.actionRate,
           automatic: action.automatic,
           charge: action.charge,
+          animationType: action.animationType,
           action: action,
           new: true,
           stopCb: stopCb,
@@ -506,6 +511,7 @@ export default class Character extends GameObject {
         "finishedTime",
         "actionDuration",
         "actionRate",
+        "animationType",
         "new",
         "actionId",
         "actionType"
