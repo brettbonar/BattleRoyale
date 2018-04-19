@@ -176,11 +176,8 @@ export default class BattleRoyaleServer extends BattleRoyale {
     });
     if (object && !object.state.dead) {
       object.revision = data.source.revision;
-      if (data.position && object.position.distanceTo(data.position) <= object.speed * (elapsedTime / 1000)) {
+      if (data.position) {// && object.position.distanceTo(data.position) <= object.speed * (elapsedTime / 1000)) {
         object.position = new Vec3(data.position);
-      }
-      if (_.isNumber(data.direction.z) && data.direction.z !== 0 && !object.state.canFly) {
-        return;
       }
       object.setDirection(data.direction);
       //object.elapsedTime = elapsedTime || 0;

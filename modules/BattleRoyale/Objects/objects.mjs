@@ -343,7 +343,8 @@ let objects = {
         },
         dimensions: {
           width: 190,
-          height: 178
+          height: 178,
+          zheight: 178
         },
         offset: {
           z: 156,
@@ -359,9 +360,6 @@ let objects = {
           y: 1128,
           width: 104,
           height: 83
-        },
-        perspectiveOffset: {
-          y: 60
         },
         dimensions: {
           width: 104,
@@ -537,9 +535,6 @@ let objects = {
     physics: {
       surfaceType: "terrain"
     },
-    perspectiveOffset: {
-      y: 60
-    },
     dimensions: {
       width: 102,
       height: 84,
@@ -603,9 +598,6 @@ let objects = {
           width: 120,
           height: 128
         },
-        perspectiveOffset: {
-          y: 105
-        },
         dimensions: {
           width: 120,
           height: 128,
@@ -624,9 +616,6 @@ let objects = {
           y: 1158,
           width: 120,
           height: 60
-        },
-        perspectiveOffset: {
-          y: 0
         },
         dimensions: {
           width: 120,
@@ -1226,10 +1215,6 @@ let objects = {
       width: 64,
       height: 86
     },
-    perspectiveOffset: {
-      x: 0,
-      y: -86
-    },
     physics: {
       surfaceType: "terrain",
     },
@@ -1261,10 +1246,6 @@ let objects = {
       y: 320,
       width: 64,
       height: 86
-    },
-    perspectiveOffset: {
-      x: 0,
-      y: -86
     },
     physics: {
       surfaceType: "terrain",
@@ -1307,9 +1288,6 @@ objects.bed1 = {
   },
   physics: {
     surfaceType: "terrain",
-  },
-  perspectiveOffset: {
-    y: 14
   },
   collisionDimensions: [
     {

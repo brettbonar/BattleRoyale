@@ -20,11 +20,7 @@ export default class Building extends GameObject {
 
     if (!params.simulation) {
       this.exterior = new RenderObject(Object.assign({}, params, this.building), this.building.exterior);
-      this.interior = new RenderObject(Object.assign({
-        perspectiveOffset: {
-          y: 0
-        }
-      }, params, this.building), this.building.interior);
+      this.interior = new RenderObject(Object.assign({}, params, this.building), this.building.interior);
     }
     
     this.exteriorDoors = [];

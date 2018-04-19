@@ -8,7 +8,15 @@ const ANIMATIONS = {
   DEATH_UP: "death_up",
   DEATH_LEFT: "death_left",
   DEATH_DOWN: "death_down",
-  DEATH_RIGHT: "death_right"
+  DEATH_RIGHT: "death_right",
+  ATTACK_UP: "attack_up",
+  ATTACK_LEFT: "attack_left",
+  ATTACK_DOWN: "attack_right",
+  ATTACK_RIGHT: "attack_down",
+  COOLDOWN_ATTACK_UP: "cooldown_attack_up",
+  COOLDOWN_ATTACK_LEFT: "cooldown_attack_left",
+  COOLDOWN_ATTACK_DOWN: "cooldown_attack_right",
+  COOLDOWN_ATTACK_RIGHT: "cooldown_attack_down",
 };
 
 const MOVE_ANIMATIONS = {
@@ -26,10 +34,10 @@ const DEATH_ANIMATIONS = {
 };
 
 const ATTACK_ANIMATIONS = {
-  up: ANIMATIONS.MOVE_UP,
-  left: ANIMATIONS.MOVE_LEFT,
-  down: ANIMATIONS.MOVE_DOWN,
-  right: ANIMATIONS.MOVE_RIGHT
+  up: ANIMATIONS.ATTACK_UP,
+  left: ANIMATIONS.ATTACK_LEFT,
+  down: ANIMATIONS.ATTACK_DOWN,
+  right: ANIMATIONS.ATTACK_RIGHT
 };
 
 const ANIMATION_SETTINGS = {
@@ -128,6 +136,72 @@ const ANIMATION_SETTINGS = {
     offset: {
       x: 32,
       y: 96
+    },
+    frames: 3,
+    framesPerSec: 12,
+    repeat: true
+  },
+  [ANIMATIONS.COOLDOWN_ATTACK_DOWN]: {
+    dimensions: {
+      width: 32,
+      height: 32
+    },
+    offset: {
+      x: 192,
+      y: 128
+    },
+    frames: 2,
+    framesPerSec: 24,
+    forceAnimation: true
+  },
+  [ANIMATIONS.ATTACK_DOWN]: {
+    dimensions: {
+      width: 32,
+      height: 32
+    },
+    offset: {
+      x: 0,
+      y: 128
+    },
+    frames: 6,
+    framesPerSec: 16,
+    forceAnimation: true,
+    nextAnimation: ANIMATIONS.COOLDOWN_ATTACK_DOWN,
+  },
+  [ANIMATIONS.ATTACK_RIGHT]: {
+    dimensions: {
+      width: 32,
+      height: 32
+    },
+    offset: {
+      x: 0,
+      y: 160
+    },
+    frames: 3,
+    framesPerSec: 12,
+    repeat: true
+  },
+  [ANIMATIONS.ATTACK_UP]: {
+    dimensions: {
+      width: 32,
+      height: 32
+    },
+    offset: {
+      x: 0,
+      y: 192
+    },
+    frames: 3,
+    framesPerSec: 12,
+    repeat: true
+  },
+  [ANIMATIONS.ATTACK_LEFT]: {
+    dimensions: {
+      width: 32,
+      height: 32
+    },
+    offset: {
+      x: 0,
+      y: 224
     },
     frames: 3,
     framesPerSec: 12,

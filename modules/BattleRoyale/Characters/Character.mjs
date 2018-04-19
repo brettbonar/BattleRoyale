@@ -155,6 +155,7 @@ export default class Character extends GameObject {
   setDirection(direction) {
     Object.assign(this.direction, direction);
     this.direction = this.direction.normalize();
+    this.direction.z = Math.sign(this.direction.z);
   }
 
   get attackCenter() {
@@ -179,7 +180,6 @@ export default class Character extends GameObject {
     this.losHidden = false;
     this.dimensions.zheight = 0;
     this.position.z = 0;
-    this.perspectiveOffset = { y: 1 };
     this.physics.surfaceType = SURFACE_TYPE.GAS;
     //this.collisionDimensions = [];
     this.killedBy = source && source.ownerId;
@@ -448,7 +448,7 @@ export default class Character extends GameObject {
       this.kill();
     }
 
-    _.merge(this, _.omit(state, "position", "direction", "state"));
+    _.merge(this, _.omit(state, "position", "direction", "state", "latestAction"));
     _.merge(this.state, _.omit(state.state, "target", "characterDirection"));
     //_.merge(this, state);
     // TODO: interpolate target location

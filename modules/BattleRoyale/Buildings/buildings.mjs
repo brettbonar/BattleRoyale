@@ -20,10 +20,6 @@ export default {
           renderOffset: {
             x: 80,
             y: 144
-          },
-          perspectiveOffset: {
-            x: 194 / 2,
-            y: 194
           }
         },
         closed: {
@@ -203,19 +199,7 @@ export default {
         width: 194,
         height: 225,
         zheight: 128
-      },
-      // fadeEndOffset: {
-      //   y: 142
-      // },
-      // fadeDimensions: {
-      //   dimensions: {
-      //     width: 194,
-      //     height: 135
-      //   }
-      // },
-      // perspectiveDimensions: {
-      //   zheight: 128
-      // }
+      }
     }
   }
 }

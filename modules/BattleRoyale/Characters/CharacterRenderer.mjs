@@ -296,11 +296,12 @@ export default class CharacterRenderer {
 
   setAnimation(elapsedTime, object) {
     this.currentAnimationTime += elapsedTime;
-    let currentAction = object.currentAction || object.latestAction;
+    let currentAction = object.currentAction;// || object.latestAction;
     this.prevState = this.state;
 
     // We may start and finish an action within a frame, make sure we still animate it
-    if (currentAction && !currentAction.new) {
+    if (currentAction && !currentAction.new && (!this.currentAction || (this.currentAction.name !== currentAction.name))) {
+
       this.currentAction = currentAction;
       this.currentAnimationTime = 0;
       // if (currentAction.name !== (this.currentAction && this.currentAction.name)) {

@@ -90,8 +90,8 @@ export default class BeamRenderer {
         clipping.dimensions.height + this.rendering.start.dimensions.height);
 
       if (window.debug) {
-        context.strokeStyle = "red";
-        context.stroke();
+        // context.strokeStyle = "red";
+        // context.stroke();
       }
       context.clip();
     }

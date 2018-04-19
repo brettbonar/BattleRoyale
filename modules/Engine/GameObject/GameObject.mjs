@@ -142,8 +142,7 @@ export default class GameObject extends GameObjectProxy {
   }
 
   updatePosition() {
-    let zheight = this.perspectiveDimensions ? 
-      this.perspectiveDimensions.zheight : this.dimensions.zheight;
+    let zheight = this.dimensions.zheight || 0;
 
     // TODO: add or subtract zheight for perspective?
     // TODO: ***try subtracting zheight from Y position by default***
@@ -161,13 +160,15 @@ export default class GameObject extends GameObjectProxy {
     //     position.add({ y: this.height });
     //   }
     //   this.perspectivePosition = position.add({ y: this.position.z });
-    // }
-    if (this.perspectiveOffset) {
-
-    }
+  // }
     this.perspectivePosition = {
+      x: this.position.x,
       y: this.position.y + this.position.z + zheight
     };
+    if (this.perspectiveOffset) {
+      this.perspectivePosition.x += this.perspectiveOffset.x;
+      this.perspectivePosition.y += this.perspectiveOffset.y;
+    }
 
     if (this.static) {
       this.staticBox = new Bounds({
