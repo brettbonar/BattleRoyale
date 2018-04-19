@@ -188,36 +188,36 @@ function initGame(players, maps) {
       //level: "start",
       team: teams.SOLO,
       characterInfo: {
-        type: "shadow_bat",
+        type: "humanoid",
         body: "tanned",
         gender: "male"
       },
       isPlayer: true,
       playerId: player.playerId,
       simulation: true,
-      // state: {
-      //   loadout: {
-      //     weapon: "staffMale",
-      //     torso: "leatherChestMale",
-      //     legs: "tealPantsMale",
-      //     head: "clothHoodMale",
-      //     feet: "brownShoesMale",
-      //     hands: "leatherBracersMale"
-      //   },
-      //   inventory: [
-      //     "bow",
-      //     "shadowBow",
-      //     "lightStaffMale",
-      //     "fireStaffMale",
-      //     "waterStaffMale",
-      //     "staffMale"
-      //   ]
-      // },
-      // position: {
-      //   x: maps[0].mapParams.totalMapWidth - 200,
-      //   y: maps[0].mapParams.totalMapHeight - 200,
-      //   z: 0
-      // },
+      state: {
+        loadout: {
+          weapon: "staffMale",
+          torso: "leatherChestMale",
+          legs: "tealPantsMale",
+          head: "clothHoodMale",
+          feet: "brownShoesMale",
+          hands: "leatherBracersMale"
+        },
+        inventory: [
+          "bow",
+          "shadowBow",
+          "lightStaffMale",
+          "fireStaffMale",
+          "waterStaffMale",
+          "staffMale"
+        ]
+      },
+      position: {
+        x: maps[0].mapParams.totalMapWidth - 200,
+        y: maps[0].mapParams.totalMapHeight - 200,
+        z: 0
+      },
       position: {
         x: pos,
         y: pos,
@@ -387,12 +387,12 @@ function initGame(players, maps) {
   //   simulation: true
   // }));
 
-  // gameObjects = gameObjects.concat(scenes.house.getObjects(
-  //   {
-  //     x: 300,
-  //     y: 300
-  //   }
-  // ));
+  gameObjects = gameObjects.concat(scenes.house.getObjects(
+    {
+      x: 300,
+      y: 300
+    }
+  ));
 
   addScenes(maps);
   //gameObjects = gameObjects.concat(addScenes(maps));

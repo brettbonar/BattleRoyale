@@ -263,7 +263,6 @@ export default class BattleRoyale extends Game {
       }
       if (obj._modified) {
         this.modified.push(obj);
-        obj._modified = false;
       }
     }
 

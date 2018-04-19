@@ -300,7 +300,8 @@ export default class CharacterRenderer {
     this.prevState = this.state;
 
     // We may start and finish an action within a frame, make sure we still animate it
-    if (currentAction && !currentAction.new && (!this.currentAction || (this.currentAction.name !== currentAction.name))) {
+    //  !currentAction.new &&
+    if (currentAction && (!this.currentAction || (this.currentAction.name !== currentAction.name))) {
 
       this.currentAction = currentAction;
       this.currentAnimationTime = 0;

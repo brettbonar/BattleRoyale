@@ -253,7 +253,7 @@ magicEffects.bat_bite = {
   },
   action: {
     name: "bat_bite",
-    actionDuration: 250,
+    actionDuration: 0,
     actionRate: 2,
     actionType: "blocking",
     automatic: false,

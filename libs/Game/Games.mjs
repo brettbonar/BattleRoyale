@@ -96,6 +96,7 @@ class Game {
   addPlayer(player) {
     player.client = sockets[player.playerId];
     player.socket = sockets[player.playerId].socket;
+    player.lastUpdates = [];
     this.players.push(player);
     player.socket.join(this.gameId);
     player.socket.on("update", (data) => {

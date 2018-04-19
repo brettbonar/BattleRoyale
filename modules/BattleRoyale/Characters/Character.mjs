@@ -198,11 +198,12 @@ export default class Character extends GameObject {
   }
 
   stopAllActions() {
-    let topAction = this.actionStack.shift();
-    while (topAction) {
-      this.stopAction(topAction);
-      topAction = this.actionStack.shift();
-    }
+    this.actionStack.length = 0;
+    // let topAction = this.actionStack.shift();
+    // while (topAction) {
+    //   this.stopAction(topAction);
+    //   topAction = this.actionStack.shift();
+    // }
   }
 
   stopAction(action, elapsedTime) {
@@ -356,7 +357,9 @@ export default class Character extends GameObject {
   updateAction(action, elapsedTime) {
     if (action && !action.channeling) {
       if (action.new) {
-        if (!this.canDoAction(action)) return;
+        if (!this.canDoAction(action)) {
+          return;
+        }
         elapsedTime = 0;
         action.new = false;
       }
@@ -524,17 +527,29 @@ export default class Character extends GameObject {
     //     "type", "name", "currentTime", "actionDuration", "actionRate"
     //   ]));
     // }
-    return Object.assign(super.getUpdateState(), _.pick(this, [
-      "team",
-      "state",
-      "body",
-      "gender",
-      "isPlayer",
-      "killedBy",
-      "characterInfo"
-    ]), {
-      //currentAction: this.currentAction,
-      latestAction: latestAction
-    });
+    return Object.assign(
+      super.getUpdateState(),
+      _.pick(this, [
+        "team",
+        "state",
+        "body",
+        "gender",
+        "isPlayer",
+        "killedBy",
+        "characterInfo"
+      ]),
+      // _.pick(_.pick(this, [
+      //   "team",
+      //   "state",
+      //   "body",
+      //   "gender",
+      //   "isPlayer",
+      //   "killedBy",
+      //   "characterInfo"
+      // ]), this._modifiedKeys),
+      {
+        latestAction: latestAction
+      }
+    );
   }
 }

@@ -17,12 +17,16 @@ let objectId = GameSettings.isServer ? 1 : -1;
 
 class GameObjectProxy {
   constructor(params) {
+    this._modified = true;
+    //this._modifiedKeys = [];
+
     if (!params.static) {
       return new Proxy(this, {
         set: (object, key, value) => {
           if (object[key] !== value) {
             object[key] = value;
             object._modified = true;
+            //object._modifiedKeys.push(key);
             // if (key === "position" && this.dimensions) {
             //   this.updatePosition();
             // }
@@ -105,8 +109,6 @@ export default class GameObject extends GameObjectProxy {
     } else {
       objectId--;
     }
-
-    this._modified = true;
   }
 
   get x() { return this.position.x }
@@ -144,27 +146,18 @@ export default class GameObject extends GameObjectProxy {
   updatePosition() {
     let zheight = this.dimensions.zheight || 0;
 
-    // TODO: add or subtract zheight for perspective?
-    // TODO: ***try subtracting zheight from Y position by default***
-
     // Anything with a z position and zheight of 0 should be rendered as ground
-    // if (this.position.z <= 0 && !zheight) {
-    //   this.perspectivePosition = new Vec3({
-    //     y: 0
-    //   });
-    // } else {
-    //   let position = new Vec3(this.position);
-    //   if (this.perspectiveOffset) {
-    //     position.add(this.perspectiveOffset);
-    //   } else if (zheight > 0 && !this.renderClipped) {
-    //     position.add({ y: this.height });
-    //   }
-    //   this.perspectivePosition = position.add({ y: this.position.z });
-  // }
-    this.perspectivePosition = {
-      x: this.position.x,
-      y: this.position.y + this.position.z + zheight
-    };
+    // This is so FOV bounds work properly
+    if (this.position.z <= 0 && !zheight) {
+      this.perspectivePosition = new Vec3({
+        y: 0
+      });
+    } else {
+      this.perspectivePosition = {
+        x: this.position.x,
+        y: this.position.y + this.position.z + zheight
+      };
+    }
     if (this.perspectiveOffset) {
       this.perspectivePosition.x += this.perspectiveOffset.x;
       this.perspectivePosition.y += this.perspectiveOffset.y;
@@ -341,8 +334,8 @@ export default class GameObject extends GameObjectProxy {
     if (this.modelDimensions) {
       this.modelBounds = new Bounds({
         position: {
-          x: this.position.x + this.modelDimensions.offset.x,
-          y: this.position.y + this.modelDimensions.offset.y
+          x: position.x + this.modelDimensions.offset.x,
+          y: position.y + this.modelDimensions.offset.y
         },
         dimensions: this.modelDimensions.dimensions,
         boundsType: this.modelDimensions.boundsType
@@ -518,10 +511,28 @@ export default class GameObject extends GameObjectProxy {
       "zspeed",
       "level"
     ]);
+    // return _.pick(_.pick(this, [
+    //   "type",
+    //   "dimensions",
+    //   //"hidden",
+    //   "direction",
+    //   "position",
+    //   "acceleration",
+    //   "revision",
+    //   "objectId",
+    //   "ownerId",
+    //   "playerId",
+    //   "elapsedTime",
+    //   "physics",
+    //   "speed",
+    //   "zspeed",
+    //   "level"
+    // ]), this._modifiedKeys);
   }
 
   updateState(object) {
     _.merge(this, object);
+    this.updatePosition();
   }
 
   static get BOUNDS_TYPE() { return BOUNDS_TYPE; }

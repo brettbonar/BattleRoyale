@@ -364,7 +364,7 @@ let objects = {
         dimensions: {
           width: 104,
           height: 83,
-          zheight: 64
+          zheight: 54
         },
         offset: {
           x: 41,
@@ -601,7 +601,7 @@ let objects = {
         dimensions: {
           width: 120,
           height: 128,
-          zheight: 128
+          zheight: 112
         },
         offset: {
           x: 30,
@@ -1398,7 +1398,6 @@ objects.chairUp = {
 };
 
 objects.chest1 = {
-  imageSource: "/Assets/chests.png",
   interactionType: "treasure",
   images: {
     closed: {
@@ -1512,6 +1511,107 @@ objects.chest2 = {
       }
     }
   ]
+};
+
+objects.door1 = {
+  interactionType: "door",
+  images: {
+    closed: {
+      imageSource: "/Assets/build_atlas.png",
+      imageDimensions: {
+        x: 103,
+        y: 295,
+        width: 34,
+        height: 50
+      }
+    },
+    opened: {
+      imageSource: "/Assets/build_atlas.png",
+      imageDimensions: {
+        x: 144,
+        y: 311,
+        width: 10,
+        height: 34,
+        offset: {
+          x: -12,
+          y: 8
+        }
+      }      
+    }    
+  },
+  stateDimensions: {
+    closed: {
+      dimensions: {
+        width: 34,
+        height: 50,
+        zheight: 50
+      },
+      collisionDimensions: [
+        {
+          offset: {
+            x: -8,
+            y: 42
+          },
+          dimensions: {
+            width: 48,
+            height: 8,
+            zheight: 48
+          },
+          opacity: 1.0
+        }
+      ],
+      interactionDimensions: [
+        {
+          offset: {
+            x: -16,
+            y: 34
+          },
+          dimensions: {
+            width: 66,
+            height: 24
+          }
+        }
+      ]
+    },
+    opened: {
+      dimensions: {
+        width: 10,
+        height: 34,
+        zheight: 34
+      },
+      collisionDimensions: [
+        {
+          offset: {
+            x: -12,
+            y: 17
+          },
+          dimensions: {
+            width: 8,
+            height: 32,
+            zheight: 48
+          },
+          opacity: 1.0
+        }
+      ],
+      interactionDimensions: [
+        {
+          offset: {
+            x: -20,
+            y: 0
+          },
+          dimensions: {
+            width: 24,
+            height: 56,
+            zheight: 48
+          }
+        }
+      ]
+    }
+  },
+  physics: {
+    surfaceType: "terrain",
+  },
+  isInteractable: true,
 };
 
 export default objects;

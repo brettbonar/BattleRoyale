@@ -141,6 +141,62 @@ const ANIMATION_SETTINGS = {
     framesPerSec: 12,
     repeat: true
   },
+  [ANIMATIONS.ATTACK_DOWN]: {
+    dimensions: {
+      width: 32,
+      height: 32
+    },
+    offset: {
+      x: 0,
+      y: 128
+    },
+    frames: 6,
+    framesPerSec: 18,
+    forceAnimation: true,
+    nextAnimation: ANIMATIONS.COOLDOWN_ATTACK_DOWN,
+  },
+  [ANIMATIONS.ATTACK_RIGHT]: {
+    dimensions: {
+      width: 32,
+      height: 32
+    },
+    offset: {
+      x: 0,
+      y: 160
+    },
+    frames: 6,
+    framesPerSec: 18,
+    forceAnimation: true,
+    nextAnimation: ANIMATIONS.COOLDOWN_ATTACK_RIGHT,
+  },
+  [ANIMATIONS.ATTACK_UP]: {
+    dimensions: {
+      width: 32,
+      height: 32
+    },
+    offset: {
+      x: 0,
+      y: 192
+    },
+    frames: 6,
+    framesPerSec: 18,
+    forceAnimation: true,
+    nextAnimation: ANIMATIONS.COOLDOWN_ATTACK_UP,
+  },
+  [ANIMATIONS.ATTACK_LEFT]: {
+    dimensions: {
+      width: 32,
+      height: 32
+    },
+    offset: {
+      x: 0,
+      y: 224
+    },
+    frames: 6,
+    framesPerSec: 18,
+    forceAnimation: true,
+    nextAnimation: ANIMATIONS.COOLDOWN_ATTACK_LEFT,
+  },
   [ANIMATIONS.COOLDOWN_ATTACK_DOWN]: {
     dimensions: {
       width: 32,
@@ -154,58 +210,44 @@ const ANIMATION_SETTINGS = {
     framesPerSec: 24,
     forceAnimation: true
   },
-  [ANIMATIONS.ATTACK_DOWN]: {
+  [ANIMATIONS.COOLDOWN_ATTACK_RIGHT]: {
     dimensions: {
       width: 32,
       height: 32
     },
     offset: {
-      x: 0,
-      y: 128
-    },
-    frames: 6,
-    framesPerSec: 16,
-    forceAnimation: true,
-    nextAnimation: ANIMATIONS.COOLDOWN_ATTACK_DOWN,
-  },
-  [ANIMATIONS.ATTACK_RIGHT]: {
-    dimensions: {
-      width: 32,
-      height: 32
-    },
-    offset: {
-      x: 0,
+      x: 192,
       y: 160
     },
-    frames: 3,
-    framesPerSec: 12,
-    repeat: true
+    frames: 2,
+    framesPerSec: 24,
+    forceAnimation: true
   },
-  [ANIMATIONS.ATTACK_UP]: {
+  [ANIMATIONS.COOLDOWN_ATTACK_UP]: {
     dimensions: {
       width: 32,
       height: 32
     },
     offset: {
-      x: 0,
+      x: 192,
       y: 192
     },
-    frames: 3,
-    framesPerSec: 12,
-    repeat: true
+    frames: 2,
+    framesPerSec: 24,
+    forceAnimation: true
   },
-  [ANIMATIONS.ATTACK_LEFT]: {
+  [ANIMATIONS.COOLDOWN_ATTACK_LEFT]: {
     dimensions: {
       width: 32,
       height: 32
     },
     offset: {
-      x: 0,
+      x: 192,
       y: 224
     },
-    frames: 3,
-    framesPerSec: 12,
-    repeat: true
+    frames: 2,
+    framesPerSec: 24,
+    forceAnimation: true
   }
 };
 

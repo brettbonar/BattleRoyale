@@ -97,14 +97,30 @@ export default class Simulation {
     return event;
   }
 
+  // Don't send updates for properties that haven't actually changed
+  refineUpdates(lastUpdates, updates) {
+    let refinedUpdates = updates;
+
+    for (let i = 0; i < updates.length; i++) {
+      let existing = lastUpdates.find((update) => update.objectId === updates[i].objectId);
+      updates[i] = _.omitBy(updates[i], (key) => {
+        return lastUpdates[key] && _.isEqual(lastUpdates[key] === updates[i][key]);
+      });
+    }
+
+    return refinedUpdates;
+  }
+
   sendUpdates() {
     let broadcastEvents = this.game.broadcastEvents.map((event) => this.getEvent(event));
 
     for (const player of this.players) {
       if (this.lastState.length > 0) {
+        let updates = this.refineUpdates(player.lastUpdates, this.getPlayerViewObjects(player));
+        player.lastUpdates = updates;
         player.socket.emit("update", {
           elapsedTime: this.lastElapsedTime,
-          objects: this.getPlayerViewObjects(player)
+          objects: updates
         });
       }
       if (this.lastCollisions.length > 0) {
@@ -142,7 +158,9 @@ export default class Simulation {
     
     this.lastState = this.game.modified
       .map(obj => {
-        return _.cloneDeep(obj.getUpdateState());
+        let result = _.cloneDeep(obj.getUpdateState());
+        //obj._modifiedKeys.length = 0;
+        return result;
       });
 
     this.interval = setTimeout(() => {

@@ -1,5 +1,6 @@
 import objects from "./objects.mjs"
 import StaticObject from "./StaticObject.mjs"
+import Door from "./Door.mjs"
 import Building from "../Buildings/Building.mjs"
 
 const scenes = {};
@@ -130,8 +131,16 @@ scenes.house = {
       new StaticObject({
         objectType: "chest2",
         position: {
-          x: position.x + 142,
+          x: position.x + 140,
           y: position.y + 140
+        },
+        simulation: true        
+      }),
+      new Door({
+        objectType: "door1",
+        position: {
+          x: position.x + 80,
+          y: position.y + 176
         },
         simulation: true        
       })

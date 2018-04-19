@@ -65,7 +65,6 @@ export default class BattleRoyaleServer extends BattleRoyale {
     }));
     source.state = "opened";
     source.isInteractable = false;
-    source._modified = true;
   }
 
   initTreasure() {

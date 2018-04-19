@@ -179,7 +179,7 @@ let attacks = {
           rayDistance: -11
         }
       }],
-      range: 500,
+      range: 350,
       punchThrough: false
     }
   },
@@ -593,7 +593,7 @@ let attacks = {
           rayDistance: -11
         }
       }],
-      range: 500,
+      range: 350,
       punchThrough: false
     }
   },

@@ -16,7 +16,10 @@ export default class PerspectiveRenderingEngine extends RenderingEngine{
   }
 
   isAnyObjectHidden(losHiddenObjects, fadeObject) {
-    return losHiddenObjects.some((obj) => obj.modelBounds.intersects2D(fadeObject.modelBounds));
+    return losHiddenObjects.some((obj) => {
+      return obj.perspectivePosition.y < fadeObject.perspectivePosition.y && 
+        obj.modelBounds.intersects2D(fadeObject.modelBounds);
+    });
   }
 
   renderObject(context, object, elapsedTime, player, losHiddenObjects, clipping) {
@@ -138,12 +141,12 @@ export default class PerspectiveRenderingEngine extends RenderingEngine{
     // context.closePath();
     // context.fill();
 
-    let perspectivePosition = object.perspectivePosition;
-    if (perspectivePosition) {
-      context.strokeStyle = "purple";
-      context.strokeRect(perspectivePosition.x, perspectivePosition.y,
-        object.width, object.height);
-    }
+    // let perspectivePosition = object.perspectivePosition;
+    // if (perspectivePosition) {
+    //   context.strokeStyle = "purple";
+    //   context.strokeRect(perspectivePosition.x, perspectivePosition.y,
+    //     object.width, object.height);
+    // }
 
     // let box = object.modelBounds;
     // if (box) {
@@ -151,23 +154,23 @@ export default class PerspectiveRenderingEngine extends RenderingEngine{
     //   context.strokeRect(box.ul.x, box.ul.y, box.width, box.height);
     // }
       
-    // if (object.lastCollisionBounds) {
-    //   for (const bounds of object.lastCollisionBounds) {
-    //     if (!bounds.box) continue; // TODO: render ray bounds
-    //     context.strokeStyle = "lawnGreen";
-    //     context.strokeRect(bounds.ul.x, bounds.ul.y - bounds.ul.z,
-    //       bounds.width, bounds.height);
-    //   }
-    // }
+    if (object.lastCollisionBounds) {
+      for (const bounds of object.lastCollisionBounds) {
+        if (!bounds.box) continue; // TODO: render ray bounds
+        context.strokeStyle = "orange";
+        context.strokeRect(bounds.ul.x, bounds.ul.y - bounds.ul.z,
+          bounds.width, bounds.height);
+      }
+    }
 
-    // if (object.collisionBounds) {
-    //   for (const bounds of object.collisionBounds) {
-    //     if (!bounds.box) continue; // TODO: render ray bounds
-    //     context.strokeStyle = "crimson";
-    //     context.strokeRect(bounds.ul.x, bounds.ul.y - bounds.ul.z,
-    //       bounds.width, bounds.height);
-    //   }
-    // }
+    if (object.collisionBounds) {
+      for (const bounds of object.collisionBounds) {
+        if (!bounds.box) continue; // TODO: render ray bounds
+        context.strokeStyle = "crimson";
+        context.strokeRect(bounds.ul.x, bounds.ul.y - bounds.ul.z,
+          bounds.width, bounds.height);
+      }
+    }
     // for (let i = 0; i < object.collisionBounds.length; i++) {
     //   context.strokeStyle = "blue";
     //   let bounds = object.lastCollisionBounds[i].plus(object.collisionBounds[i]);

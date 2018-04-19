@@ -7,61 +7,6 @@ export default {
       height: 226,
       zheight: 128
     },
-    doors: [
-      {
-        exterior: {
-          imageSource: "../../Assets/Buildings/house1.png",
-          imageDimensions: {
-            x: 0,
-            y: 194,
-            width: 34,
-            height: 50
-          },
-          renderOffset: {
-            x: 80,
-            y: 144
-          }
-        },
-        closed: {
-          losDimensions: [
-            {
-              offset: {
-                x: 96,
-                y: 192
-              },
-              dimensions: {
-                width: 34,
-                height: 16
-              }
-            }
-          ],
-          terrainDimensions: [
-            {
-              offset: {
-                x: 96,
-                y: 192
-              },
-              dimensions: {
-                width: 34,
-                height: 16
-              }
-            }
-          ],
-          hitboxDimensions: [
-            {
-              offset: {
-                x: 96,
-                y: 192
-              },
-              dimensions: {
-                width: 34,
-                height: 16
-              }
-            }
-          ]
-        }
-      }
-    ],
     collisionDimensions: [
       { // Left side
         offset: {
@@ -171,7 +116,7 @@ export default {
           dimensions: {
             width: 174,
             height: 160,
-            zheight: 128
+            zheight: 120
           }
         }
         // {
@@ -193,12 +138,13 @@ export default {
         x: 0,
         y: 0,
         width: 194,
-        height: 290
+        height: 226
       },
       dimensions: {
         width: 194,
-        height: 225,
-        zheight: 128
+        height: 226,
+        zheight: 226
+        //zheight: 182
       }
     }
   }

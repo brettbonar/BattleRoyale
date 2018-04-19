@@ -34,6 +34,7 @@ import SpawnMap from "./StartArea/SpawnMap.mjs"
 import ShadowField from "./Shadow/ShadowField.mjs";
 import Canvas from "../Engine/Rendering/Canvas.mjs";
 import Teams from "./Teams.mjs"
+import Door from "./Objects/Door.mjs";
 
 const EVENTS = {
   MOVE_UP: "moveUp",
@@ -205,6 +206,8 @@ export default class BattleRoyaleClient extends BattleRoyale {
       return new Magic(object);
     } else if (object.type === "StaticObject") {
       return new StaticObject(object);
+    } else if (object.type === "Door") {
+      return new Door(object);
     } else if (object.type === "Projectile") {
       object.source = _.find(this.gameState.objects, { objectId: object.ownerId });
       return new Projectile(object);

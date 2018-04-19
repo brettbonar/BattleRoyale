@@ -238,12 +238,20 @@ export default class Projectile extends GameObject {
   }
 
   getUpdateState() {
-    return Object.assign(super.getUpdateState(), {
-      attackType: this.attack.name,
-      ownerId: this.ownerId,
-      actionId: this.actionId,
-      damageReady: this.damageReady
-    });
+    return Object.assign(
+      super.getUpdateState(), 
+      {
+        attackType: this.attack.name,
+        ownerId: this.ownerId,
+        actionId: this.actionId,
+        damageReady: this.damageReady
+      }
+      // _.pick({
+      //   ownerId: this.ownerId,
+      //   actionId: this.actionId,
+      //   damageReady: this.damageReady
+      // }, this._modifiedKeys));
+    );
   }
   
   // https://gamedev.stackexchange.com/questions/61301/how-to-implement-throw-curve-with-virtual-height-in-a-2d-side-view-game
