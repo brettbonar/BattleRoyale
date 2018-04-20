@@ -79,6 +79,25 @@ scenes.forestTree = {
   }
 }
 
+// scenes.treasure = {
+//   biomes: ["plain", "forest", "desert"],
+//   type: "treasure",
+//   size: {
+//     width: 100,
+//     height: 100
+//   },
+//   weight: 1,
+//   getObjects: function (position, dimensions) {
+//     return [
+//       new StaticObject({
+//         objectType: "chest2",
+//         position,
+//         simulation: true        
+//       }),
+//     ];
+//   }
+// };
+
 scenes.house = {
   biomes: ["plain"],
   type: "building",

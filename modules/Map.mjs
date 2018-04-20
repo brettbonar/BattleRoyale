@@ -9,7 +9,7 @@ import Bounds from "./Engine/GameObject/Bounds.mjs"
 
 const MAX_CANVAS_SIZE = 1024;
 const MINIMAP_CANVAS_SIZE = 2048;
-const DEFAULT_MAP_SIZE = 128;
+const DEFAULT_MAP_SIZE = 256;
 
 const BIOMES = {
   FOREST: "forest",
@@ -36,22 +36,22 @@ const BIOME_PARAMS = {
     sceneDensity: 0.025,
     noise: {
       min: -1,
-      max: -0.5
+      max: -0.75
     }
   },
   [BIOMES.FOREST]: {
     flavorDensity: 0.1,
     sceneDensity: 0.025,
     noise: {
-      min: -0.5,
-      max: 0.25
+      min: -.75,
+      max: -0.25
     }
   },
   [BIOMES.PLAIN]: {
     flavorDensity: 0.1,
     sceneDensity: 0.005,
     noise: {
-      min: 0.25,
+      min: -0.25,
       max: 1.0
     }
   },

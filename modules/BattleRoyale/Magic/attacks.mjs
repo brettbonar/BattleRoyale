@@ -293,7 +293,7 @@ let attacks = {
     },
     effect: {
       path: "arc",
-      damage: 5,
+      damage: 15,
       triggerDamagedEffect: true,
       collisionDimensions: [{
         offset: {

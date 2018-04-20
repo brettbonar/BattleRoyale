@@ -2,6 +2,7 @@ import GameObject from "../GameObject/GameObject.mjs"
 import { AXES, MOVEMENT_TYPE, SURFACE_TYPE } from "./PhysicsConstants.mjs";
 import Vec3 from "../GameObject/Vec3.mjs";
 import Bounds from "../GameObject/Bounds.mjs";
+import ShadowField from "../../BattleRoyale/Shadow/ShadowField.mjs";
 
 export default class PhysicsEngine {
   constructor(grid) {
@@ -202,6 +203,9 @@ export default class PhysicsEngine {
 
       for (const target of targets) {
         if (target === obj || target.physics.surfaceType === SURFACE_TYPE.NONE) continue;
+        if (target instanceof ShadowField && !(obj instanceof Character) || obj instanceof ShadowField && !(target instanceof Character)) {
+          continue;
+        }
         let targetCollisionBounds = target.collisionBounds;
         let targetLastCollisionBounds = target.lastCollisionBounds;
   

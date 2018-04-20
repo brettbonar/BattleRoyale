@@ -16,20 +16,20 @@ const BUFFER_RADIUS = 512;
 const COLLAPSE_RATE = 15;
 
 const SHADOW_SPAWNS = [
-  // {
-  //   name: "Shadow Bat",
-  //   characterInfo: {
-  //     type: "shadow_bat"
-  //   },
-  //   weight: 4
-  // },
-  // {
-  //   name: "Shadow Wolf",
-  //   characterInfo: {
-  //     type: "shadow_wolf"
-  //   },
-  //   weight: 10
-  // },
+  {
+    name: "Shadow Bat",
+    characterInfo: {
+      type: "shadow_bat"
+    },
+    weight: 4
+  },
+  {
+    name: "Shadow Wolf",
+    characterInfo: {
+      type: "shadow_wolf"
+    },
+    weight: 10
+  },
   {
     name: "Shadow Ranger",
     characterInfo: {
@@ -182,9 +182,9 @@ export default class ShadowField extends GameObject {
   update(elapsedTime) {
     if (elapsedTime) {
       this.currentTime += elapsedTime;
-      this.shadowRadius = Math.max(0, this.shadowRadius - (this.collapseRate * (elapsedTime / 1000)));
+      this.shadowRadius = Math.max(500, this.shadowRadius - (this.collapseRate * (elapsedTime / 1000)));
       if (this.shadowRadius === 0) {
-        this.bufferRadius = Math.max(0, this.bufferRadius - (this.collapseRate * (elapsedTime / 1000)));
+        this.bufferRadius = Math.max(500, this.bufferRadius - (this.collapseRate * (elapsedTime / 1000)));
       }
       this.modelDimensions.dimensions.radius = this.shadowRadius;
       this.functions[0].bounds.dimensions.radius = this.shadowRadius;

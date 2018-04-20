@@ -19,7 +19,7 @@ export default class Simulation {
   constructor(params) {
     _.merge(this, params);
     let maps = {};
-    maps[0] = new Map();
+    maps[0] = new Map(params.map);
     maps[0].generateSimplex();
 
     maps["start"] = createStartMap(maps, params.players);

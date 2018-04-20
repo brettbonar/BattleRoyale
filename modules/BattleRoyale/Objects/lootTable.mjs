@@ -18,5 +18,9 @@ export default {
       itemType: "lightStaffMale",
       weight: 1
     },
+    {
+      itemType: "waterStaffMale",
+      weight: 1
+    }
   ],
 };
