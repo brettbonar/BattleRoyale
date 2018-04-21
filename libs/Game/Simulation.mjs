@@ -37,13 +37,14 @@ function addTreasure(game) {
   console.log(game.maps[0].mapParams.totalMapWidth);
   console.log("Count", count);
 
-
   freeGrids = _.shuffle(freeGrids);
   for (let i = 0; i < count && i < freeGrids.length; i++) {
     console.log(freeGrids[i].position);
     game.addObject(new StaticObject({
       objectType: "chest2",
       position: freeGrids[i].position,
+      level: 0,
+      state: "closed",
       simulation: true        
     }));
   }
