@@ -39,7 +39,11 @@ export default class BattleRoyaleServer extends BattleRoyale {
       nextWeapon: (data, elapsedTime) => this.nextWeaponEvent(data, elapsedTime),
       previousWeapon: (data, elapsedTime) => this.previousWeaponEvent(data, elapsedTime)
     };
+  }
+
+  start() {
     this.initTreasure();
+    super.start();
   }
 
   spawnTreasure(source, tileType) {

@@ -43,8 +43,6 @@ function addTreasure(game) {
     game.addObject(new StaticObject({
       objectType: "chest2",
       position: freeGrids[i].position,
-      level: 0,
-      state: "closed",
       simulation: true        
     }));
   }
