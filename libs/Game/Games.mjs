@@ -48,11 +48,11 @@ function initSockets(socketIo) {
     socket.on("disconnect", () => {
       console.log("Disconnected");
       // TODO: remove player from game
-      let client = sockets[socket.id];
-      if (client) {
-        clearInterval(client.ping);
-        delete sockets[socket.id];
-      }
+      // let client = sockets[socket.id];
+      // if (client) {
+      //   clearInterval(client.ping);
+      //   delete sockets[socket.id];
+      // }
     });
   });
 }
