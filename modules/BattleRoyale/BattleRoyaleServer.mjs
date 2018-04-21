@@ -41,11 +41,6 @@ export default class BattleRoyaleServer extends BattleRoyale {
     };
   }
 
-  start() {
-    this.initTreasure();
-    super.start();
-  }
-
   spawnTreasure(source, tileType) {
     let treasure = _.sample(lootTable[tileType]);
     let item = equipment[treasure.itemType].world;
