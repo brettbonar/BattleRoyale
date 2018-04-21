@@ -69,11 +69,18 @@ class Game {
     this.gameId = gameId++;
     this.players = [];
     this.sockets = [];
+    this.gameParams = {
+      mapSize: params.mapSize || 128,
+      biomes: params.biomes || {
+        plain: 50,
+        forest: 25,
+        desert: 25
+      }
+    };
 
-    _.defaults(this, {
-      maxPlayers: 96,
-      mapSize: 128,
-      
+    _.defaultsDeep(this, {
+      name: "New Game",
+      maxPlayers: 100,
       status: STATUS.LOBBY
     });
 
@@ -152,6 +159,7 @@ class Game {
     this.simulation = new Simulation({
       gameId: this.gameId,
       players: this.players,
+      gameParams: this.gameParams,
       io: io
     });
     
@@ -188,6 +196,9 @@ function getLobby(gameId) {
 }
 
 function create(params) {
+  if (params && params.biomes) {
+    _.each(params.biomes, (val, key) => params.biomes[key] = parseInt(val, 10));
+  }
   let game = new Game(params);
   games.push(game);
   return q.resolve(game.gameId);

@@ -65,6 +65,7 @@ export default class BattleRoyaleServer extends BattleRoyale {
     }));
     source.state = "opened";
     source.isInteractable = false;
+    source._modified = true;
   }
 
   initTreasure() {
@@ -175,7 +176,7 @@ export default class BattleRoyaleServer extends BattleRoyale {
     });
     if (object && !object.state.dead) {
       object.revision = data.source.revision;
-      if (data.position) {// && object.position.distanceTo(data.position) <= object.speed * (elapsedTime / 1000)) {
+      if (data.position && object.position.distanceTo(data.position) <= object.speed / 2) {
         object.position = new Vec3(data.position);
       }
       object.setDirection(data.direction);
@@ -210,6 +211,28 @@ export default class BattleRoyaleServer extends BattleRoyale {
         killed: character.playerId,
         killedBy: character.killedBy
       });
+
+      if (character.state.inventory) {
+        let center = character.center;
+        let maxRange = 16;
+        for (const item of character.state.inventory) {
+          let worldItem = equipment[item].world;
+          if (worldItem) {
+            let buffer = {
+              width: worldItem.imageDimensions.width / 2,
+              height: worldItem.imageDimensions.height / 2
+            };
+            this.addObject(new Item({
+              itemType: item,
+              position: {
+                x: center.x + _.random(-maxRange - buffer.width, maxRange - buffer.width),
+                y: center.y + _.random(-maxRange - buffer.height, maxRange - buffer.height)
+              },
+              simulation: true
+            }));
+          }
+        }
+      }
     }
   }
 

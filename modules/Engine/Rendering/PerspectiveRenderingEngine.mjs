@@ -44,7 +44,7 @@ export default class PerspectiveRenderingEngine extends RenderingEngine{
         height = clip.object.height - clip.previousClip;
       } else {
         height = Math.round(Math.min(clip.object.height - clip.previousClip,
-          (y - clip.top - clip.previousClip) - clip.object.zheight));
+          (y - clip.top - clip.previousClip)));
       }
 
       if (height > 0) {
@@ -100,7 +100,7 @@ export default class PerspectiveRenderingEngine extends RenderingEngine{
         if (object.renderClipped) {
           clips.push({
             object: object,
-            bottom: y + object.height,
+            bottom: y + object.dimensions.height - object.dimensions.zheight,
             top: y,
             previousClip: 0
           });
@@ -141,12 +141,12 @@ export default class PerspectiveRenderingEngine extends RenderingEngine{
     // context.closePath();
     // context.fill();
 
-    // let perspectivePosition = object.perspectivePosition;
-    // if (perspectivePosition) {
-    //   context.strokeStyle = "purple";
-    //   context.strokeRect(perspectivePosition.x, perspectivePosition.y,
-    //     object.width, object.height);
-    // }
+    let perspectivePosition = object.perspectivePosition;
+    if (perspectivePosition) {
+      context.strokeStyle = "purple";
+      context.strokeRect(perspectivePosition.x, perspectivePosition.y,
+        object.width, object.height);
+    }
 
     // let box = object.modelBounds;
     // if (box) {
@@ -154,23 +154,24 @@ export default class PerspectiveRenderingEngine extends RenderingEngine{
     //   context.strokeRect(box.ul.x, box.ul.y, box.width, box.height);
     // }
       
-    if (object.lastCollisionBounds) {
-      for (const bounds of object.lastCollisionBounds) {
-        if (!bounds.box) continue; // TODO: render ray bounds
-        context.strokeStyle = "orange";
-        context.strokeRect(bounds.ul.x, bounds.ul.y - bounds.ul.z,
-          bounds.width, bounds.height);
-      }
-    }
+    // if (object.lastCollisionBounds) {
+    //   for (const bounds of object.lastCollisionBounds) {
+    //     if (!bounds.box) continue; // TODO: render ray bounds
+    //     context.strokeStyle = "orange";
+    //     context.strokeRect(bounds.ul.x, bounds.ul.y - bounds.ul.z,
+    //       bounds.width, bounds.height);
+    //   }
+    // }
 
-    if (object.collisionBounds) {
-      for (const bounds of object.collisionBounds) {
-        if (!bounds.box) continue; // TODO: render ray bounds
-        context.strokeStyle = "crimson";
-        context.strokeRect(bounds.ul.x, bounds.ul.y - bounds.ul.z,
-          bounds.width, bounds.height);
-      }
-    }
+    // if (object.collisionBounds) {
+    //   for (const bounds of object.collisionBounds) {
+    //     if (!bounds.box) continue; // TODO: render ray bounds
+    //     context.strokeStyle = "crimson";
+    //     context.strokeRect(bounds.ul.x, bounds.ul.y - bounds.ul.z,
+    //       bounds.width, bounds.height);
+    //   }
+    // }
+
     // for (let i = 0; i < object.collisionBounds.length; i++) {
     //   context.strokeStyle = "blue";
     //   let bounds = object.lastCollisionBounds[i].plus(object.collisionBounds[i]);

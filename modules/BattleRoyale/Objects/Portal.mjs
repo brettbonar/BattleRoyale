@@ -4,7 +4,7 @@ import objects from "./objects.mjs"
 import { SURFACE_TYPE } from "../../Engine/Physics/PhysicsConstants.mjs"
 import RenderObject from "./RenderObject.mjs"
 
-export default class StaticObject extends GameObject {
+export default class Portal extends GameObject {
   constructor(params) {
     let object = objects[params.objectType];
     super(Object.assign({
@@ -12,7 +12,7 @@ export default class StaticObject extends GameObject {
       renderClipped: object.renderClipped
     }, params));
     _.merge(this, object);
-    this.type = "StaticObject";
+    this.type = "Portal";
 
     if (!params.simulation) {
       if (object.imageSource) {

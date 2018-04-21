@@ -45,6 +45,10 @@ let objects = {
     group: "wheat",
     imageSource: "/Assets/terrain_atlas.png",
     renderClipped: true,
+    perspectiveOffset: {
+      x: 0,
+      y: 0
+    },
     imageDimensions: {
       x: 0,
       y: 906,
@@ -1399,6 +1403,8 @@ objects.chairUp = {
 
 objects.chest1 = {
   interactionType: "treasure",
+  losHidden: true,
+  mapHidden: true,
   images: {
     closed: {
       imageSource: "/Assets/chests.png",
@@ -1422,7 +1428,7 @@ objects.chest1 = {
   dimensions: {
     width: 34,
     height: 34,
-    zheight: 9
+    zheight: 17
   },
   physics: {
     surfaceType: "terrain",
@@ -1436,7 +1442,7 @@ objects.chest1 = {
       dimensions: {
         width: 32,
         height: 16,
-        zheight: 9
+        zheight: 16
       }
     }
   ],
@@ -1457,6 +1463,8 @@ objects.chest1 = {
 
 objects.chest2 = {
   interactionType: "treasure",
+  losHidden: true,
+  mapHidden: true,
   images: {
     closed: {
       imageSource: "/Assets/chests.png",
@@ -1480,7 +1488,7 @@ objects.chest2 = {
   dimensions: {
     width: 34,
     height: 34,
-    zheight: 9
+    zheight: 17
   },
   physics: {
     surfaceType: "terrain",
@@ -1494,7 +1502,7 @@ objects.chest2 = {
       dimensions: {
         width: 32,
         height: 16,
-        zheight: 9
+        zheight: 16
       }
     }
   ],

@@ -51,12 +51,13 @@ export default class Character extends GameObject {
   }
 
   updateDimensions() {
-    let dimensions = characters[this.characterInfo.type].dimensions[this.state.characterDirection];
+    let dimensions = _.cloneDeep(characters[this.characterInfo.type].dimensions[this.state.characterDirection]);
 
     this.modelDimensions = dimensions.modelDimensions;
     this.collisionDimensions = dimensions.collisionDimensions;
     this.visibleDimensions = dimensions.visibleDimensions || dimensions.collisionDimensions;
     this.dimensions = dimensions.dimensions;
+    this.perspectiveOffset = dimensions.perspectiveOffset;
 
     if (dimensions.attackOrigin) {
       this.attackOrigin = dimensions.attackOrigin;
@@ -177,6 +178,7 @@ export default class Character extends GameObject {
 
   kill(source) {
     this.state.dead = true;
+    this.state.canInteract = false;
     this.losHidden = false;
     this.dimensions.zheight = 0;
     this.position.z = 0;
@@ -356,12 +358,14 @@ export default class Character extends GameObject {
 
   updateAction(action, elapsedTime) {
     if (action && !action.channeling) {
+      // TRICKY: make each action last for at least one frame even if it has 0 duration
+      // Find a better way of dealing with this
       if (action.new) {
-        if (!this.canDoAction(action)) {
-          return;
+        if (this.canDoAction(action)) {
+          elapsedTime = 0;
+          action.new = false;
         }
-        elapsedTime = 0;
-        action.new = false;
+        return;
       }
       let cooldownTimeDiff = 0;
       let cooldown = _.find(this.cooldowns, { actionName: action.name });
@@ -387,6 +391,7 @@ export default class Character extends GameObject {
   }
 
   update(elapsedTime) {
+    this.latestAction = null;
     // if (this.moveToPosition) {
     //   this.moving = true;
     //   this.currentInterpolateTime += elapsedTime;
@@ -487,19 +492,30 @@ export default class Character extends GameObject {
       }
 
       if (state.position && !this.position.equals(state.position)) {
-        let dist = this.position.distanceTo(state.position);
-        if (interpolateTime > 0 && dist >= 1) {
-          this.startPosition = new Vec3(this.position);
-          this.moveToPosition = new Vec3(state.position);
-          this.setDirection(this.moveToPosition.minus(this.startPosition));
-          //this.speed = dist * (1000 / interpolateTime);
-          //this.targetDirection = state.direction;
+        if (state.level !== this.level || this.position.distanceTo(state.position) > this.speed / 2) {
+          this.position = new Vec3(state.position);
+          this.lastPosition = this.position.copy();
         } else {
-          // this.position = new Vec3(state.position);
-          // this.lastPosition = new Vec3(this.position);
-          this.speed = state.speed || this.baseSpeed;
-          this.direction = new Vec3(state.direction) || new Vec3();
+          let dist = this.position.distanceTo(state.position);
+          if (interpolateTime > 0 && dist >= 1) {
+            this.startPosition = new Vec3(this.position);
+            this.moveToPosition = new Vec3(state.position);
+            this.setDirection(this.moveToPosition.minus(this.startPosition));
+            //this.speed = dist * (1000 / interpolateTime);
+            //this.targetDirection = state.direction;
+          } else {
+            // this.position = new Vec3(state.position);
+            // this.lastPosition = new Vec3(this.position);
+            this.speed = state.speed || this.baseSpeed;
+            this.direction = new Vec3(state.direction) || new Vec3();
+          }
         }
+      }
+    } else {
+      // Updates just for this player
+      if (state.position && (state.level !== this.level || this.position.distanceTo(state.position) > this.speed / 2)) {
+        this.position = new Vec3(state.position);
+        this.lastPosition = this.position.copy();
       }
     }
   }
@@ -520,7 +536,6 @@ export default class Character extends GameObject {
         "actionType"
       ]);
     }
-    this.latestAction = null;
     // let actionStack = [];
     // if (this.actionStack.length > 0) {
     //   actionStack.push(_.pick(this.actionStack[0], [

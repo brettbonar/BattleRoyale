@@ -28,7 +28,12 @@ export default class BattleRoyaleUI extends GameUI {
       enableFilter: true,
       enableColResize: true,
       rowSelection: "single",
-      onRowSelected: (event) => this.gamesListRowSelected(event)
+      onRowSelected: (event) => this.gamesListRowSelected(event),
+      onRowDoubleClicked: (event) => {
+        if (event.node.selected && event.data.numberOfPlayers < event.data.maxPlayers && event.data.status === "lobby") {
+          this.joinGame();
+        }
+      }
     };
     
     this.lobbyListGridOptions = {
@@ -59,6 +64,27 @@ export default class BattleRoyaleUI extends GameUI {
       .done((game) => {
         this.controller.joinGame(game);
         this.transition("LOBBY");
+      });
+  }
+  
+  createGame() {
+    let game = {
+      name: this.menus.CREATE_GAME.find("#name").val(),
+      mapSize: this.menus.CREATE_GAME.find("#mapSize").val(),
+      maxPlayers: this.menus.CREATE_GAME.find("#maxPlayers").val(),
+      biomes: {
+        plain: this.menus.CREATE_GAME.find("#plain").val(),
+        forest: this.menus.CREATE_GAME.find("#forest").val(),
+        desert: this.menus.CREATE_GAME.find("#desert").val()
+      }
+    };
+    API.createGame(game)
+      .done((gameId) => {
+        API.joinGame(gameId, this.controller.player)
+          .done((game) => {
+            this.controller.joinGame(game);
+            this.transition("LOBBY");
+          });
       });
   }
 

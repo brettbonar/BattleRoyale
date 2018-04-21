@@ -303,6 +303,7 @@ export default {
   stats: {
     canFly: true,
     canInteract: false,
+    shareLos: true,
     maxAltitude: 512,
     maxHealth: 10,
     speed: 192,

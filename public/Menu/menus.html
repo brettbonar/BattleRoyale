@@ -21,32 +21,52 @@
 </gui-menu>
 
 <gui-menu class="menu" id="JOIN_GAME" gui-on-show="menus.listGames()">
-  <h1 class="title">Battle Royale</h1>
+  <h1 class="subtitle">Join Game</h1>
   <div class="sub-menu">
     <div id="games-list" class="ag-theme-balham-dark list-table"></div>
     <hr />
-    <button class="control" gui-click="menus.transition('MAIN')">Back</button>
-    <button id="join-game" class="control float-right" disabled gui-click="menus.joinGame()">Join</button>
-    <button class="control float-right" gui-click="menus.listGames()">Refresh</button>
+    <button class="control float-right" gui-click="menus.transition('MAIN')">Back</button>
+    <button id="join-game" class="control" disabled gui-click="menus.joinGame()">Join</button>
+    <button class="control" gui-click="menus.listGames()">Refresh</button>
   </div>
 </gui-menu>
 
-<gui-menu class="menu" id="CREATE_GAME">
-  <h1 class="title">Battle Royale</h1>
-  <div class="sub-menu">
+<gui-menu class="menu" id="CREATE_GAME" gui-on-show="menus.listGames()">
+  <h1 class="subtitle">Create Game</h1>
+  <div class="sub-menu form">
+    <label for="name">Name</label>
+    <input id="name" value="New Game" />
+    <label for="mapSize">Map Size</label>
+    <input id="mapSize" value="256" />
+    <label for="maxPlayers">Max Number of Players</label>
+    <input id="maxPlayers" value="100" />
+    <h2>Biomes</h2>
+    <label for="plain">Plain</label>
+    <div class="slidecontainer">
+      <input id="plain" type="range" min="0" max="100" value="50" class="slider">
+    </div>
+    <label for="forest">Forest</label>
+    <div class="slidecontainer">
+      <input id="forest" type="range" min="0" max="100" value="50" class="slider">
+    </div>
+    <label for="desert">Desert</label>
+    <div class="slidecontainer">
+      <input id="desert" type="range" min="0" max="100" value="25" class="slider">
+    </div>
     <hr />
-    <button class="control" gui-click="menus.transition('MAIN')">Back</button>
+    <button type="submit" class="control" gui-click="menus.createGame()">Create</button>
+    <button class="control float-right" gui-click="menus.transition('MAIN')">Back</button>
   </div>
 </gui-menu>
 
 <gui-menu class="menu" id="LOBBY" gui-on-show="menus.showLobby()">
-    <h1 class="title">Battle Royale</h1>
+    <h1 class="subtitle">Lobby</h1>
     <div class="sub-menu">
         <div id="lobby-list" class="ag-theme-balham-dark list-table"></div>
       <hr />
       <button class="control" gui-click="ready()">Ready</button>
-      <button class="control" gui-click="leaveGame()">Leave</button>
-      <button class="control float-right" gui-click="menus.showLobby()">Refresh</button>
+      <button class="control" gui-click="menus.showLobby()">Refresh</button>
+      <button class="control float-right" gui-click="leaveGame()">Leave</button>
     </div>
   </gui-menu>
 
@@ -61,8 +81,8 @@
       </tr>
     </table>
     <hr />
-    <button class="control" gui-click="menus.transition('MAIN')">Back</button>
-    <button class="control float-right" gui-click="clearScores()">Clear Scores</button>
+    <button class="control float-right" gui-click="menus.transition('MAIN')">Back</button>
+    <!-- <button class="control float-right" gui-click="clearScores()">Clear Scores</button> -->
   </div>
 </gui-menu>
 
@@ -70,9 +90,8 @@
   <h1 class="title">Battle Royale</h1>
   <div class="sub-menu credits">
     <div>Created by Brett Bonar for CS5460 taught by Dean Mathias</div>
-    <div>Voronoi Diagram implementation: https://github.com/gorhill/Javascript-Voronoi</div>
     <hr />
-    <button class="control" gui-click="menus.transition('MAIN')">Back</button>
+    <button class="control float-right" gui-click="menus.transition('MAIN')">Back</button>
   </div>
 </gui-menu>
 

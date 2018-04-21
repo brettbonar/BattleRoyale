@@ -18,7 +18,7 @@ let objectId = GameSettings.isServer ? 1 : -1;
 class GameObjectProxy {
   constructor(params) {
     this._modified = true;
-    //this._modifiedKeys = [];
+    this._modifiedKeys = [];
 
     if (!params.static) {
       return new Proxy(this, {
@@ -26,7 +26,7 @@ class GameObjectProxy {
           if (object[key] !== value) {
             object[key] = value;
             object._modified = true;
-            //object._modifiedKeys.push(key);
+            object._modifiedKeys.push(key);
             // if (key === "position" && this.dimensions) {
             //   this.updatePosition();
             // }
@@ -291,6 +291,8 @@ export default class GameObject extends GameObjectProxy {
   }
 
   getBoundsFromDimens(position, dimens) {
+    if (!dimens) return [];
+
     let bounds = [];
     dimens = _.castArray(dimens);
     for (const dimensions of dimens) {
@@ -354,8 +356,8 @@ export default class GameObject extends GameObjectProxy {
     //       _.castArray(this.collisionDimensions).filter((dimens) => dimens.opacity > 0));
     //   this.losBounds = this.getBoundsFromDimens(this.position,
     //       _.castArray(this.collisionDimensions).filter((dimens) => dimens.opacity > 0));
-    //   this.getLastInteractionsBoundingBox = this.getAllBounds(this.lastPosition, this.interactionDimensions);
-    //   this.interactionsBoundingBox = this.getAllBounds(this.position, this.interactionDimensions);
+    //   this.getLastInteractionsBounds = this.getAllBounds(this.lastPosition, this.interactionDimensions);
+    //   this.interactionsBounds = this.getAllBounds(this.position, this.interactionDimensions);
     //   this.boundingBox = this.staticBox || 
     //       new Bounds({
     //         position: this.position,
@@ -381,7 +383,9 @@ export default class GameObject extends GameObjectProxy {
   }
 
   get collisionExtents() {
-    let bounds = this.collisionBounds.concat(_.map(this.getAllFunctionBounds(), ("bounds")));
+    let bounds = this.collisionBounds
+      .concat(this.interactionsBounds)
+      .concat(_.map(this.getAllFunctionBounds(), ("bounds")));
     if (bounds.length > 0) {
       if (bounds[0].type === Bounds.TYPE.AABB) {
         bounds = bounds.concat(this.lastCollisionBounds);
@@ -406,12 +410,12 @@ export default class GameObject extends GameObjectProxy {
       _.castArray(this.collisionDimensions).filter((dimens) => dimens.opacity > 0));
   }
 
-  get getLastInteractionsBoundingBox() {
-    return this.getAllBounds(this.lastPosition, this.interactionDimensions);
+  get getLastInteractionsBounds() {
+    return this.getBoundsFromDimens(this.lastPosition, this.interactionDimensions);
   }
 
-  get interactionsBoundingBox() {
-    return this.getAllBounds(this.position, this.interactionDimensions);
+  get interactionsBounds() {
+    return this.getBoundsFromDimens(this.position, this.interactionDimensions);
   }
 
   get bounds() {
@@ -422,7 +426,7 @@ export default class GameObject extends GameObjectProxy {
     if (this.visibleDimensions) {
       return this.getBoundsFromDimens(this.position, this.visibleDimensions);
     }
-    return this.modelBounds;
+    return [this.modelBounds];
   }
 
   get boundingBox() {

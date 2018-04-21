@@ -185,11 +185,11 @@ export default class ShadowFieldRenderer {
 
       // TRICKY: subtract 1 since clipping adds 1 to height by default to avoid artifacts on most other images
       let height = Math.min(clipping.dimensions.height, this.canvas.height - clipping.offset.y) - 1;
-      if (window.debug) {
-        context.lineWidth = 1;
-        context.strokeStyle = "red";
-        context.strokeRect(this.ul.x + clipping.offset.x, this.ul.y + clipping.offset.y, this.canvas.width, height);
-      }
+      // if (window.debug) {
+      //   context.lineWidth = 1;
+      //   context.strokeStyle = "red";
+      //   context.strokeRect(this.ul.x + clipping.offset.x, this.ul.y + clipping.offset.y, this.canvas.width, height);
+      // }
 
       context.drawImage(this.canvas, clipping.offset.x, clipping.offset.y, this.canvas.width, height,
         this.ul.x + clipping.offset.x, this.ul.y + clipping.offset.y, this.canvas.width, height);

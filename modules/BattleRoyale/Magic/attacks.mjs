@@ -143,6 +143,7 @@ let attacks = {
       }
     },
     effect: {
+      persistAfterHit: true,
       path: "beam",
       damage: 2,
       damageRate: 8,
@@ -263,7 +264,7 @@ let attacks = {
       automatic: false,
       charge: {
         speed: {
-          maxTime: 1000,
+          maxTime: 500,
           maxMult: 2.0
         }
       },
@@ -276,13 +277,14 @@ let attacks = {
         height: 7
       },
       hitEffect: {
-        imageSource: "/Assets/projectiles/arrow.png",
+        imageSource: "/Assets/projectiles/arrow_hit.png",
         imageDimensions: {
-          width: 25,
+          width: 30,
           height: 7,
           x: 0,
           y: 0
         },
+        location: "self"
         // offset: {
         //   x: 5,
         //   y: 12
@@ -293,7 +295,7 @@ let attacks = {
     },
     effect: {
       path: "arc",
-      damage: 15,
+      damage: 5,
       triggerDamagedEffect: true,
       collisionDimensions: [{
         offset: {
@@ -326,7 +328,7 @@ let attacks = {
       automatic: false,
       charge: {
         speed: {
-          maxTime: 1000,
+          maxTime: 500,
           maxMult: 2.0
         }
       },
@@ -339,13 +341,14 @@ let attacks = {
         height: 7
       },
       hitEffect: {
-        imageSource: "/Assets/projectiles/shadow_arrow.png",
+        imageSource: "/Assets/projectiles/shadow_arrow_hit.png",
         imageDimensions: {
-          width: 25,
+          width: 30,
           height: 7,
           x: 0,
           y: 0
         },
+        location: "self"
         // offset: {
         //   x: 5,
         //   y: 12
@@ -461,6 +464,9 @@ let attacks = {
       frames: 4,
       framesPerSec: 8,
       repeat: true,
+      hitEffect: {
+        particleEffect: "lightSmall"
+      }
       // dimensions: {
       //   width: 64,
       //   height: 32
@@ -549,15 +555,13 @@ let attacks = {
         framesPerSec: 54,
         repeat: true,
       },
-      // TODO: may need a maximum rate at which hit effects are added
-      // Right now a new hit effect is created each frame
-      // TODO: maybe attach a single effect to each projectile and move it with projectile?
       hitEffect: {
         particleEffect: "splash"
       }
     },
     effect: {
       path: "beam",
+      persistAfterHit: true,
       damage: 2,
       damageRate: 8,
       // TODO: more shapes
@@ -632,6 +636,9 @@ let attacks = {
           width: 16,
           height: 16
         }
+      },
+      hitEffect: {
+        particleEffect: "lightSmall"
       },
       shadowColor: "rgba(230, 140, 100, 1)",
       shadow: "/Assets/shadows/shadow16orange.png"

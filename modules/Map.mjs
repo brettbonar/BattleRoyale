@@ -33,37 +33,28 @@ const BIOME_PARAMS = {
   },
   [BIOMES.DESERT]: {
     flavorDensity: 0.1,
-    sceneDensity: 0.025,
-    noise: {
-      min: -1,
-      max: -0.75
-    }
+    sceneDensity: 0.025
   },
   [BIOMES.FOREST]: {
     flavorDensity: 0.1,
-    sceneDensity: 0.025,
-    noise: {
-      min: -.75,
-      max: -0.25
-    }
+    sceneDensity: 0.025
   },
   [BIOMES.PLAIN]: {
     flavorDensity: 0.1,
-    sceneDensity: 0.005,
-    noise: {
-      min: -0.25,
-      max: 1.0
-    }
+    sceneDensity: 0.005
   },
   [BIOMES.STONE]: {
     flavorDensity: 0.1
-    //sceneDensity: 0.005,
-    // noise: {
-    //   min: -0.5,
-    //   max: 0.25
-    // }
+    //sceneDensity: 0.005
   }
 };
+
+const BIOME_GROWTH_ORDER = [
+  BIOMES.DESERT,
+  BIOMES.PLAIN,
+  BIOMES.FOREST,
+  //BIOMES.SNOW
+];
 
 const GROWTH_TYPE = {
   JAGGED: "jagged",
@@ -126,32 +117,23 @@ const TERRAIN_OFFSETS = {
 class Map {
   constructor(params) {
     _.merge(this, params);
-    _.defaults(this, {
-      mapWidth: DEFAULT_MAP_SIZE,
-      mapHeight: DEFAULT_MAP_SIZE,
+    _.defaultsDeep(this, {
+      mapSize: DEFAULT_MAP_SIZE,
       tileSize: 32,
       map: [],
       objects: [],
-      seeds: {
-        "forest": 4,
-        "desert": 3,
-        "death": 2,
-        "plain": 6,
-        "water": 2,
-        "fire": 2
-      },
-      weights: {
-        "forest": 25,
-        "desert": 15,
-        "death": 1,
-        "plain": 40,
-        "water": 1,
-        "fire": 1
+      biomes: {
+        [BIOMES.PLAIN]: 50,
+        [BIOMES.FOREST]: 25,
+        [BIOMES.DESERT]: 25,
+        // "death": 1,
+        // "water": 1,
+        // "fire": 1
       }
     });
 
-    let totalMapWidth = this.mapWidth * this.tileSize;
-    let totalMapHeight = this.mapHeight * this.tileSize;
+    let totalMapWidth = this.mapSize * this.tileSize;
+    let totalMapHeight = this.mapSize * this.tileSize;
     let numColumns = Math.ceil(totalMapWidth / MAX_CANVAS_SIZE);
     let numRows = Math.ceil(totalMapHeight / MAX_CANVAS_SIZE);
     // TRICKY: extend dimensions a little to avoid rendering artifacts
@@ -180,6 +162,23 @@ class Map {
     if (params && _.isArray(params.map)) {
       this.buildMap(params.map);
     } else {
+      this.biomeWeights = {};
+      let last = -1;
+      let weightSum = _.sum(_.toArray(this.biomes));
+      for (const biome of BIOME_GROWTH_ORDER) {
+        if (this.biomes[biome]) {
+          let pct = this.biomes[biome] / weightSum;
+          let max = last + pct * 2
+          this.biomeWeights[biome] = {
+            min: last,
+            max: max
+          };
+          last = max;
+        }
+      }
+  
+      // Avoid rounding/one off errors
+      //_.last(this.biomeWeights).max = 1;
       this.initializeMap();
     }    
   }
@@ -236,9 +235,9 @@ class Map {
   }
 
   initializeMap() {
-    for (const x in _.range(this.mapWidth)) {
+    for (const x in _.range(this.mapSize)) {
       let tiles = [];
-      for (const y in _.range(this.mapHeight)) {
+      for (const y in _.range(this.mapSize)) {
         tiles.push(new Tile({
           position: {
             x: x,
@@ -340,13 +339,14 @@ class Map {
   }
 
   renderFullMapToMinimap(renderingEngine) {
+    let objects = this.objects.filter((obj) => !obj.mapHidden);
     for (let x = 0; x < this.mapParams.numColumns; x++) {
       for (let y = 0; y < this.mapParams.numRows; y++) {
         let minimap = this.minimapCanvases[x][y];
         minimap.context.drawImage(this.mapCanvases[x][y].canvas, 0, 0, minimap.canvas.width, minimap.canvas.height);
         minimap.context.save();
         minimap.context.translate(minimap.offset.x, minimap.offset.y);
-        renderingEngine.render(minimap.context, this.objects, 0, { x: 0, y: 0 });
+        renderingEngine.render(minimap.context, objects, 0, { x: 0, y: 0 });
         minimap.context.restore();
       }
     }
@@ -519,8 +519,7 @@ class Map {
 
   toJSON() {
     return {
-      mapWidth: this.mapWidth,
-      mapHeight: this.mapHeight,
+      mapSize: this.mapSize,
       tileSize: this.tileSize,
       map: this.serializeMap(this.map),
       objects: this.objects.map((obj) => obj.getUpdateState())
@@ -561,8 +560,8 @@ class Map {
           y: -y * mapHeight
         };
 
-        let maxX = Math.min(this.mapWidth - 1, x * mapTileWidth + mapTileWidth);
-        let maxY = Math.min(this.mapHeight - 1, y * mapTileHeight + mapTileHeight);
+        let maxX = Math.min(this.mapSize - 1, x * mapTileWidth + mapTileWidth);
+        let maxY = Math.min(this.mapSize - 1, y * mapTileHeight + mapTileHeight);
         for (let tileX = x * (mapTileWidth - 1); tileX < maxX; tileX++) {
           for (let tileY = y * (mapTileHeight - 1); tileY < maxY; tileY++) {
             this.drawTile(context, this.map[tileX][tileY], offset);
@@ -688,8 +687,8 @@ class Map {
   }
 
   getTileType(noise) {
-    return _.findKey(BIOME_PARAMS, (params, type) => {
-      return params.noise && noise < params.noise.max && noise >= params.noise.min;
+    return _.findKey(this.biomeWeights, (params, type) => {
+      return noise < params.max && noise >= params.min;
     });
   }
 

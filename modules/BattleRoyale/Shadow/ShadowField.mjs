@@ -10,26 +10,27 @@ import characters from "../Characters/characters.mjs"
 import equipment from "../Objects/equipment.mjs"
 import effects from "../Effects/effects.mjs";
 
+const MIN_RADIUS = 500;
 const DAMAGE_RATE = 15;
 const HEAL_RATE = 1;
 const BUFFER_RADIUS = 512;
 const COLLAPSE_RATE = 15;
 
 const SHADOW_SPAWNS = [
-  {
-    name: "Shadow Bat",
-    characterInfo: {
-      type: "shadow_bat"
-    },
-    weight: 4
-  },
-  {
-    name: "Shadow Wolf",
-    characterInfo: {
-      type: "shadow_wolf"
-    },
-    weight: 10
-  },
+  // {
+  //   name: "Shadow Bat",
+  //   characterInfo: {
+  //     type: "shadow_bat"
+  //   },
+  //   weight: 4
+  // },
+  // {
+  //   name: "Shadow Wolf",
+  //   characterInfo: {
+  //     type: "shadow_wolf"
+  //   },
+  //   weight: 10
+  // },
   {
     name: "Shadow Ranger",
     characterInfo: {
@@ -40,6 +41,7 @@ const SHADOW_SPAWNS = [
     state: {
       maxMana: 0,
       maxHealth: 30,
+      canPickUp: false,
       loadout: {
         weapon: "shadowBow",
         torso: "shadowLeatherChestMale",
@@ -61,13 +63,14 @@ export default class ShadowField extends GameObject {
     super(params);
     this.type = "ShadowField";
     this.renderClipped = true;
-    this.physics.surfaceType = SURFACE_TYPE.NONE;
+    this.physics.surfaceType = SURFACE_TYPE.GAS;
     this.shadowCenter = new Vec3(params.shadowCenter);
     this.shadowRadius = params.shadowRadius;
     this.currentTime = 0;
     this.targets = new Set();
     this.bufferRadius = BUFFER_RADIUS;
     this.spawnedCharacters = [];
+    this.interactsWith = ["Character"];
 
     this.shadowSpawns = [];
     for (const spawn of SHADOW_SPAWNS) {
@@ -93,7 +96,6 @@ export default class ShadowField extends GameObject {
       },
       cb: (obj) => this.onCollision(obj)
     }];
-    this.physics.surfaceType = SURFACE_TYPE.GAS;
 
     _.defaults(this, {
       collapseRate: COLLAPSE_RATE
@@ -182,9 +184,9 @@ export default class ShadowField extends GameObject {
   update(elapsedTime) {
     if (elapsedTime) {
       this.currentTime += elapsedTime;
-      this.shadowRadius = Math.max(500, this.shadowRadius - (this.collapseRate * (elapsedTime / 1000)));
-      if (this.shadowRadius === 0) {
-        this.bufferRadius = Math.max(500, this.bufferRadius - (this.collapseRate * (elapsedTime / 1000)));
+      this.shadowRadius = Math.max(MIN_RADIUS, this.shadowRadius - (this.collapseRate * (elapsedTime / 1000)));
+      if (this.shadowRadius === MIN_RADIUS) {
+        this.bufferRadius = Math.max(0, this.bufferRadius - (this.collapseRate * (elapsedTime / 1000)));
       }
       this.modelDimensions.dimensions.radius = this.shadowRadius;
       this.functions[0].bounds.dimensions.radius = this.shadowRadius;

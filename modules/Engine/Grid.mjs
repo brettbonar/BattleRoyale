@@ -84,6 +84,36 @@ export default class Grid {
     return this.addBoxToGrid(grid, allGrid, object, extents);
   }
 
+  getFreeGrids(bounds) {
+    let grids = [];
+
+    let xstart = Math.max(0, Math.floor(bounds.ul.x / this.size));
+    let xend = Math.max(0, Math.floor(bounds.lr.x / this.size));
+    let ystart = Math.max(0, Math.floor(bounds.ul.y / this.size));
+    let yend = Math.max(0, Math.floor(bounds.lr.y / this.size));
+
+    for (let x = xstart; x <= xend; x++) {
+      for (let y = ystart; y <= yend; y++) {
+        if (!this.collisionGrid[x] ||
+            !this.collisionGrid[x][y] ||
+             this.collisionGrid[x][y].length === 0) {
+          grids.push({
+            position: {
+              x: x * this.size,
+              y: y * this.size
+            },
+            dimensions: {
+              width: this.size,
+              height: this.size
+            }
+          });
+        }
+      }
+    }
+
+    return grids;
+  }
+
   add(object) {
     let collisionExtents = object.collisionExtents;
     if (collisionExtents) {

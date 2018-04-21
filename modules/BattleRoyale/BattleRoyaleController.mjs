@@ -8,8 +8,30 @@ import GameSettings from "../Engine/GameSettings.mjs"
 import ImageCache from "../Engine/Rendering/ImageCache.mjs"
 import BattleRoyaleClient from "./BattleRoyaleClient.mjs"
 import objects from "./Objects/objects.mjs"
+import equipment from "./Objects/equipment.mjs"
 import buildings from "./Buildings/buildings.mjs"
+import attacks from "./Magic/attacks.mjs";
+import magicEffects from "./Magic/magicEffects.mjs";
 //import { initialize } from "../Engine/Rendering/Scratch.mjs"
+
+function loadAssets(group) {
+  let imagePromises = [];
+  _.each(group, (obj) => {
+    if (obj.imageSource) {
+      imagePromises.push(ImageCache.put(obj.imageSource));
+    } else if (obj.images) {
+      _.each(obj.images, (image) => imagePromises.push(ImageCache.put(image.imageSource)));
+    } else if (obj.rendering) {
+      if (obj.rendering.imageSource) {
+        imagePromises.push(ImageCache.put(obj.imageSource));
+      } else if (obj.images) {
+        _.each(obj.rendering.images, (image) => imagePromises.push(ImageCache.put(image.imageSource)));
+      }
+    }
+  });
+
+  return imagePromises;
+}
 
 export default class BattleRoyaleController extends GameController {
   constructor(element, params) {
@@ -25,15 +47,13 @@ export default class BattleRoyaleController extends GameController {
 
     // TODO: put asset initialization in a function somewhere else
     let imagePromises = [];
+    imagePromises.push(ImageCache.put("/Assets/terrain.png"));
     imagePromises.push(ImageCache.put("/Assets/terrain_atlas.png"));
-
-    _.each(objects, (obj) => {
-      if (obj.imageSource) {
-        imagePromises.push(ImageCache.put(obj.imageSource));
-      } else if (obj.images) {
-        _.each(obj.images, (image) => imagePromises.push(ImageCache.put(image.imageSource)));
-      }
-    });
+    imagePromises = imagePromises
+      .concat(loadAssets(objects))
+      .concat(loadAssets(equipment))
+      .concat(loadAssets(attacks))
+      .concat(loadAssets(magicEffects));
 
     _.each(buildings, (obj) => {
       imagePromises.push(ImageCache.put(obj.exterior.imageSource));
@@ -53,12 +73,8 @@ export default class BattleRoyaleController extends GameController {
     this.menus.transition("MAIN");
   }
 
-  createGame() {
-
-  }
-
   leaveGame() {
-    API.leaveGame(this.game.gameId, this.player);
+    API.leaveGame(this.gameInfo.gameId, this.player);
     this.menus.transition("MAIN");
   }
 
@@ -80,40 +96,40 @@ export default class BattleRoyaleController extends GameController {
       console.log("Initializing");
 
       $.when(API.getMaps(game.gameId), API.getObjects(game.gameId))
-      .done((mapsData, objectsData) => {
-        let maps = {};
-        let quadTrees = {};
-        _.each(mapsData[0], (map, level) => {
-          maps[level] = new Map(Object.assign({
-            gameCanvas: document.getElementById("canvas-main")
-          }, map));
-          quadTrees[level] = new Quadtree({
-            width: map.mapWidth * map.tileSize,
-            height: map.mapHeight * map.tileSize,
-            maxElements: 5
+        .done((mapsData, objectsData) => {
+          let maps = {};
+          let quadTrees = {};
+          _.each(mapsData[0], (map, level) => {
+            maps[level] = new Map(Object.assign({
+              gameCanvas: document.getElementById("canvas-main")
+            }, map));
+            quadTrees[level] = new Quadtree({
+              width: map.mapWidth * map.tileSize,
+              height: map.mapHeight * map.tileSize,
+              maxElements: 5
+            });
+          });
+          let mapCanvas = document.getElementById("canvas-map");
+          this.game = new BattleRoyaleClient({
+            canvas: document.getElementById("canvas-main"),
+            mapCanvas: mapCanvas,
+            maps: maps,
+            player: this.player,
+            gameSettings: {
+              viewDistance: 32 * 12
+            },
+            socket: this.socket,
+            quadTrees: quadTrees
+          });
+          this.game.updateObjects({ objects: objectsData[0], elapsedTime: 0 });
+          this.game.processUpdates(0);
+          this.initialized.then(() => this.socket.emit("initialized", "initialized"));
+
+          this.socket.on("start", (data) => {
+            console.log("Starting");
+            this.start();
           });
         });
-        let mapCanvas = document.getElementById("canvas-map");
-        this.game = new BattleRoyaleClient({
-          canvas: document.getElementById("canvas-main"),
-          mapCanvas: mapCanvas,
-          maps: maps,
-          player: this.player,
-          gameSettings: {
-            viewDistance: 32 * 12
-          },
-          socket: this.socket,
-          quadTrees: quadTrees
-        });
-        this.game.updateObjects({ objects: objectsData[0], elapsedTime: 0 });
-        this.game.processUpdates(0);
-        this.initialized.then(() => this.socket.emit("initialized", "initialized"));
-
-        this.socket.on("start", (data) => {
-          console.log("Starting");
-          this.start();
-        });
-      });
     });
   }
 

@@ -312,11 +312,6 @@ export default class BattleRoyaleClient extends BattleRoyale {
         }
       }
 
-      // Don't let stream weapons interact with themselves
-      if (collision.target && collision.source.actionId === collision.target.actionId && collision.source.effect.path === "stream") {
-        return;
-      }
-
       if (!collision.source.collided) {
         collision.source.collided = true;
 
@@ -332,16 +327,13 @@ export default class BattleRoyaleClient extends BattleRoyale {
         }
         
         if (collision.source.rendering.hitEffect) {
-          if (collision.source.effect.path !== "beam") {
+          if (!collision.source.effect.persistAfterHit) {
             collision.source.done = true;
           }
 
           if (collision.source.rendering.hitEffect.particleEffect) {
             this.particleEngine.addEffect(new ParticleEffect({
-              position: collision.position.plus({
-                x: collision.sourceBounds.width / 2,
-                y: collision.sourceBounds.height / 2
-              }),
+              position: collision.position,
               level: collision.source.level,
               direction: collision.source.direction,
               speed: collision.source.speed,
@@ -349,8 +341,14 @@ export default class BattleRoyaleClient extends BattleRoyale {
               effect: effects[collision.source.rendering.hitEffect.particleEffect]
             }));
           } else {
+            let position = collision.position;
+            // If location is "self" then put hit effect on same position as projectile.
+            // Otherwise place it at the collision position
+            if (collision.source.rendering.hitEffect.location === "self") {
+              position = collision.source.position;
+            }
             this.addObject(new RenderObject({
-              position: collision.position,
+              position: position,
               //dimensions: collision.source.dimensions,
               rotation: collision.source.rotation,
               level: collision.source.level
@@ -593,6 +591,7 @@ export default class BattleRoyaleClient extends BattleRoyale {
       this.gameState.player, fov);
     //this.particleEngine.render(elapsedTime, this.gameState.player.center);
     this.renderInteractions();
+    
     this.tempContext.restore();
 
     // TODO: put somewhere else
@@ -624,8 +623,10 @@ export default class BattleRoyaleClient extends BattleRoyale {
   }
 
   showInteractions() {
-    // TODO: put this in GameObject? Some other Interface?
-    this.interaction = this.getInteraction(this.gameState.player);
+    if (this.gameState.player.state.canInteract && !this.gameState.player.state.dead) {
+      // TODO: put this in GameObject? Some other Interface?
+      this.interaction = this.getInteraction(this.gameState.player);
+    }
   }
 
   _update(elapsedTime) {

@@ -82,9 +82,12 @@ export default class Magic extends GameObject {
       position = new Vec3(params.position).minus(magic.positionOffset);
     } else {
       params.direction.z = 0;
-      position = params.source.attackCenter
-        .plus(params.direction.times(magic.effect.distance))
-        .minus(magic.positionOffset);
+      position = params.source.attackCenter.copy();
+      if (magic.effect.targetGround) {
+        position.z = 0;
+      }
+      position.add(params.direction.times(magic.effect.distance))
+      position.subtract(magic.positionOffset);
     }
 
     return new Magic({

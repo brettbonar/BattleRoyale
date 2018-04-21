@@ -22,6 +22,13 @@ export default class LevelGrids {
     this.add(object);
   }
 
+  getFreeGrids(bounds, level) {
+    if (this.levelGrids[level]) {
+      return this.levelGrids[level].getFreeGrids(bounds);
+    }
+    return [];
+  }
+
   getAdjacentCollision(object) {
     if (this.levelGrids[object.level]) {
       return this.levelGrids[object.level].getAdjacentCollision(object);

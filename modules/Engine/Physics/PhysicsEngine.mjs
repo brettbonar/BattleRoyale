@@ -193,22 +193,21 @@ export default class PhysicsEngine {
         .some((targetBounds) => targetBounds.intersects(bounds)));
   }
 
-  getIntersections(obj, targets) {
+  getIntersections(obj, targets, allCollisions) {
     let intersections = [];
     let objCollisionBounds = obj.collisionBounds;
     let objLastCollisionBounds = obj.lastCollisionBounds;
 
-    for (let objBoundIdx = 0; objBoundIdx < objCollisionBounds.length; objBoundIdx++) {
-      //let targets = this.quadTrees[obj.level].colliding(objLastCollisionBounds[objBoundIdx].plus(objCollisionBounds[objBoundIdx]));
+    for (const target of targets) {
+      if (target === obj || target.physics.surfaceType === SURFACE_TYPE.NONE) continue;
+      if (obj.interactsWith && obj.interactsWith.length > 0 && !obj.interactsWith.includes(target.type)) continue;
+      if (obj.actionId && obj.actionId === target.actionId) continue;
+      if (this.alreadyCollided(obj, target, allCollisions)) continue;
 
-      for (const target of targets) {
-        if (target === obj || target.physics.surfaceType === SURFACE_TYPE.NONE) continue;
-        if (target instanceof ShadowField && !(obj instanceof Character) || obj instanceof ShadowField && !(target instanceof Character)) {
-          continue;
-        }
-        let targetCollisionBounds = target.collisionBounds;
-        let targetLastCollisionBounds = target.lastCollisionBounds;
-  
+      let targetCollisionBounds = target.collisionBounds;
+      let targetLastCollisionBounds = target.lastCollisionBounds;
+
+      for (let objBoundIdx = 0; objBoundIdx < objCollisionBounds.length; objBoundIdx++) {
         // TODO: do this after all other physics calculations?
         for (const functionBounds of target.getAllFunctionBounds()) {
           if (objCollisionBounds[objBoundIdx].intersects(functionBounds.bounds)) {
@@ -218,13 +217,13 @@ export default class PhysicsEngine {
 
         for (let targetBoundIdx = 0; targetBoundIdx < targetCollisionBounds.length; targetBoundIdx++) {
           let collision = this.getCollision(objLastCollisionBounds[objBoundIdx], objCollisionBounds[objBoundIdx],
-              targetLastCollisionBounds[targetBoundIdx], targetCollisionBounds[targetBoundIdx])
+            targetLastCollisionBounds[targetBoundIdx], targetCollisionBounds[targetBoundIdx])
           if (collision) {
             intersections.push({
               source: obj,
-              sourceBounds: objCollisionBounds[objBoundIdx],
+              sourceBoundsIdx: objBoundIdx,
               target: target,
-              targetBounds: targetCollisionBounds[targetBoundIdx],
+              targetBoundsIdx: targetBoundIdx,
               collision: collision
             });
           }
@@ -237,7 +236,8 @@ export default class PhysicsEngine {
 
   alreadyCollided(obj, target, collisions) {
     return _.find(collisions, (collision) => {
-      return collision.source === target && collision.target === obj;
+      return collision.source === target && collision.target === obj ||
+        collision.target === target && collision.source === obj;
     });
   }
 
@@ -254,11 +254,11 @@ export default class PhysicsEngine {
 
   detectCollisions(obj, objects, allCollisions) {
     let collisions = [];
-    let intersections = this.getIntersections(obj, objects);
+    let intersections = this.getIntersections(obj, objects, allCollisions);
     // TODO: order by collision time?
     let intersection = _.minBy(intersections, (intersection) => intersection.collision.time);
     //for (const intersection of intersections) {
-    if (intersection && !this.alreadyCollided(obj, intersection.target, allCollisions)) {
+    if (intersection) {
       let target = intersection.target;
       let collision = intersection.collision;
 
@@ -292,25 +292,23 @@ export default class PhysicsEngine {
         obj.updatePosition();
       }
       
+      let sourceBounds = obj.collisionBounds[intersection.sourceBoundsIdx];
+      let targetBounds = target.collisionBounds[intersection.targetBoundsIdx];
+
       collisions.push({
         source: obj,
-        sourceBounds: intersection.sourceBounds,
+        sourceBounds: sourceBounds,
         target: target,
-        targetBounds: intersection.targetBounds,
-        position: obj.position.plus({
-          x: intersection.sourceBounds.width / 2,
-          y: intersection.sourceBounds.height / 2
-        })
+        targetBounds: targetBounds,
+        position: sourceBounds.center
       });
+
       collisions.push({
         source: target,
-        sourceBounds: intersection.targetBounds,
+        sourceBounds: targetBounds,
         target: obj,
-        targetBounds: intersection.sourceBounds,
-        position: target.position.plus({
-          x: intersection.targetBounds.width / 2,
-          y: intersection.targetBounds.height / 2
-        })
+        targetBounds: sourceBounds,
+        position: targetBounds.center
       });
 
       // this.quadTrees[obj.level].remove(obj);

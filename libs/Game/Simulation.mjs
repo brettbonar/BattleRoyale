@@ -9,6 +9,7 @@ import GameSettings from "../../modules/Engine/GameSettings.mjs"
 import Quadtree from "quadtree-lib"
 import BattleRoyaleServer from "../../modules/BattleRoyale/BattleRoyaleServer.mjs"
 import createStartMap from "../../modules/BattleRoyale/StartArea/createStartMap.mjs"
+import createScript from "../../modules/BattleRoyale/Scripts/Script.mjs";
 
 const TICK_RATE = 20;
 const SIMULATION_TIME = 1000 / TICK_RATE;
@@ -19,11 +20,13 @@ export default class Simulation {
   constructor(params) {
     _.merge(this, params);
     let maps = {};
-    maps[0] = new Map(params.map);
+    maps[0] = new Map(params.gameParams);
     maps[0].generateSimplex();
 
-    maps["start"] = createStartMap(maps, params.players);
+    let startArea = createStartMap(maps, params.players);
+    maps["start"] = startArea.map;
 
+    let objects = initGame(this.players, maps);
     this.game = new BattleRoyaleServer({
       isServer: true,
       simulation: true,
@@ -32,8 +35,18 @@ export default class Simulation {
         height: 2048
       },
       maps: maps,
-      objects: initGame(this.players, maps)
+      objects: objects
     });
+
+    // TODO: fix this awful hack
+    this.game.addScript(createScript("EntryPortals", {
+      grid: this.game.grid,
+      map: maps[0],
+      duration: 5000,
+      characters: this.players.map((player) => player.character),
+      spawnMap: startArea.spawnMap
+    }));
+
     this.lastState = [];
     this.lastObjects = [];
     this.lastCollisions = [];

@@ -13,6 +13,7 @@ export default class Projectile extends GameObject {
     super(params);
     this.type = "Projectile";
     this.physics.surfaceType = "projectile";
+
     this.boundsType = "circle";
     this.damagedTargets = [];
     this.source = params.source;

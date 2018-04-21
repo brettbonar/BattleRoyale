@@ -1,7 +1,6 @@
 import GameObject from "../../Engine/GameObject/GameObject.mjs"
 import ObjectRenderer from "../Renderers/ObjectRenderer.mjs"
 import objects from "./objects.mjs"
-import items from "./items.mjs"
 import { SURFACE_TYPE } from "../../Engine/Physics/PhysicsConstants.mjs"
 import RenderObject from "./RenderObject.mjs"
 

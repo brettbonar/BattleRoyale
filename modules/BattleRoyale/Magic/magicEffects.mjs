@@ -8,6 +8,10 @@ let magicEffects = {
       height: 128,
       zheight: 128
     },
+    perspectiveOffset: {
+      x: 0,
+      y: -32
+    },
     rendering: {
       images: {
         up: {
@@ -26,9 +30,13 @@ let magicEffects = {
       imageSize: 128,
       frames: 16,
       framesPerSec: 16,
-      repeat: false
+      repeat: false,
+      hitEffect: {
+        particleEffect: "lightSmall"
+      }
     },
     effect: {
+      persistAfterHit: true,
       renderingDelay: 0,
       damageDelay: 0,
       duration: 1000,
@@ -37,8 +45,8 @@ let magicEffects = {
       damage: 15,
       collisionDimensions: [{
         offset: {
-          x: 32,
-          y: 32
+          x: 16,
+          y: 16
         },
         dimensions: {
           width: 96,
@@ -136,10 +144,13 @@ let magicEffects = {
     rendering: {
       image: {
         imageSource: "/Assets/magic/torrentacle.png",
-        offset: {
-          x: 10,
-          y: 38
-        }
+        // offset: {
+        //   x: 10,
+        //   y: 38
+        // }
+      },
+      hitEffect: {
+        particleEffect: "splash"
       },
       imageSize: 128,
       frames: 16,
@@ -148,7 +159,11 @@ let magicEffects = {
     dimensions: {
       width: 128,
       height: 128,
-      zheight: 128
+      zheight: 96
+    },
+    perspectiveOffset: {
+      x: 0,
+      y: -32
     },
     action: {
       name: "torrentacle",
@@ -163,14 +178,16 @@ let magicEffects = {
       y: 64
     },
     effect: {
+      targetGround: true,
+      persistAfterHit: true,
       renderingDelay: 0,
       damageDelay: 1000,
       duration: 1000,
       damage: 20,
       collisionDimensions: [{
         offset: {
-          x: 32,
-          y: 32
+          x: 16,
+          y: 16
         },
         dimensions: {
           width: 96,

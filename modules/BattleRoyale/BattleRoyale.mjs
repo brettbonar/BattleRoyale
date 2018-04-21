@@ -132,9 +132,9 @@ export default class BattleRoyale extends Game {
   }
 
   doAttack(character, params, elapsedTime, animateOnly) {
-    if (character.state.dead) return;
-
     let weapon = equipment[character.state.loadout.weapon];
+    if (character.state.dead || !weapon) return;
+
     let attack = attacks[weapon.attacks[params.attackType]];
     if (!attack) {
       attack = magicEffects[weapon.attacks[params.attackType]];
@@ -142,13 +142,12 @@ export default class BattleRoyale extends Game {
     if (!attack) {
       attack = actions[weapon.attacks[params.attackType]];
     }
-
-    let cb = (timeDiff, mods, action) => {
-      this.createAttack(character, params, attack, timeDiff, mods, action, animateOnly);
-    };
-
+    
     if (attack) {
-      character.doAction("attack", params.release, attack.action, elapsedTime, cb);
+      character.doAction("attack", params.release, attack.action, elapsedTime, 
+        (timeDiff, mods, action) => {
+        this.createAttack(character, params, attack, timeDiff, mods, action, animateOnly);
+      });
     }
   }
 
@@ -179,13 +178,14 @@ export default class BattleRoyale extends Game {
       return null;
     }
 
-    let interactions = _.filter(this.gameState.objects, (obj) => {
-      return obj.isInteractable && obj.interactionsBoundingBox.some((box) => 
-        target.collisionBounds.some((targetBounds) => box.intersects(targetBounds)));
+    let interactions = _.filter(this.grid.getAdjacentCollision(target), (obj) => {
+      return obj.isInteractable && (!(obj instanceof Item) || target.state.canPickUp) &&
+        obj.interactionsBounds.some((box) => 
+          target.collisionBounds.some((targetBounds) => box.intersects(targetBounds)));
     });
     return _.minBy(interactions, (interaction) => {
       // TODO: may want to consider interaction dimensions offset
-      return getDistance(target.center, interaction.position);
+      return getDistance(target.center, interaction.center);
     });
   }
 
@@ -227,6 +227,7 @@ export default class BattleRoyale extends Game {
       //obj.elapsedTime = 0;
       // TODO: fix this hack
       // TODO: remove objects outside of game bounds
+      obj._modifiedKeys.length = 0;
       if (obj.done) {
         this.removeObject(obj);
 
@@ -236,12 +237,12 @@ export default class BattleRoyale extends Game {
         }
       } else {
         let update = obj.update(elapsedTime);
-        if (update) {
-          this.handleObjectUpdate(update);
-        }
         if (obj._modified) {
           // TODO: may do this twice for some objects if it is updated in physics engine
           this.grid.update(obj);
+        }
+        if (update) {
+          this.handleObjectUpdate(update);
         }
       }
     }
