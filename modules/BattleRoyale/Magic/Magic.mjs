@@ -100,7 +100,7 @@ export default class Magic extends GameObject {
 
     return new Magic({
       position: position,
-      level: params.source.level,
+      level: params.source && params.source.level,
       source: params.source,
       simulation: params.simulation,
       attackType: params.attackType,
