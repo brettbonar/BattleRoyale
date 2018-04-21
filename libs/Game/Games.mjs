@@ -46,7 +46,7 @@ function initSockets(socketIo) {
     // socket.send(socket.id);
 
     socket.on("disconnect", () => {
-      console.log("Disconnected");
+      console.log("Disconnected", socket.id);
       // TODO: remove player from game
       // let client = sockets[socket.id];
       // if (client) {
