@@ -186,7 +186,7 @@ export default class ShadowField extends GameObject {
       this.currentTime += elapsedTime;
       this.shadowRadius = Math.max(MIN_RADIUS, this.shadowRadius - (this.collapseRate * (elapsedTime / 1000)));
       if (this.shadowRadius === MIN_RADIUS) {
-        this.bufferRadius = Math.max(0, this.bufferRadius - (this.collapseRate * (elapsedTime / 1000)));
+        this.bufferRadius = Math.max(100, this.bufferRadius - (this.collapseRate * (elapsedTime / 1000)));
       }
       this.modelDimensions.dimensions.radius = this.shadowRadius;
       this.functions[0].bounds.dimensions.radius = this.shadowRadius;
