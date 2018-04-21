@@ -1,5 +1,5 @@
-import humanoid from "./humanoid.mjs"
-import shadow_bat from "./shadow_bat.mjs"
+import humanoid from "./humanoid.mjs";
+import shadow_bat from "./shadow_bat.mjs";
 import shadow_wolf from "./shadow_wolf.mjs";
 
 let characters = {};
