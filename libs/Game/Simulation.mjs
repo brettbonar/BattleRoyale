@@ -72,6 +72,7 @@ export default class Simulation {
       characters: this.players.map((player) => player.character),
       spawnMap: startArea.spawnMap
     }));
+    addTreasure(this.game);
 
     this.lastState = [];
     this.lastObjects = [];
