@@ -13,7 +13,7 @@ let server = http.Server(app);
 let io = socketIo(server);
 initSockets(io);
 
-server.listen(3000);
+server.listen(80);
 
 app.use(session({
   name: 'server-session-cookie-id',
