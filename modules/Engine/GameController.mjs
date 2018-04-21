@@ -17,9 +17,9 @@ class GameController {
       this.player.playerId = id;
       this.player.playerName = id;
     });
-    this.socket.on("pingpong", () => {
-      this.socket.emit("pingpong");
-    });
+    // this.socket.on("pingpong", () => {
+    //   this.socket.emit("pingpong");
+    // });
 
     this.menus.controller = this;
     if (params.template) {

@@ -15,12 +15,13 @@ const PING_INTERVAL = 5000;
 function setPing(client) {
   return setInterval(() => {
     client.pingTime = now();
-    client.socket.emit("pingpong");
+    //client.socket.emit("pingpong");
   }, PING_INTERVAL);
 }
 
 function initSockets(socketIo) {
   io = socketIo;
+  io.sockets.setMaxListeners(0);
   io.on("connection", (socket) => {
     let client = {
       socket: socket,
@@ -31,13 +32,13 @@ function initSockets(socketIo) {
     }
     sockets[socket.id] = client;
     client.ping = setPing(client);
-    socket.on("pingpong", () => {
-      let newPing = (client.lastPing + 1) % 5;
-      client.pings[newPing] = (now() - client.pingTime) / 2;
-      client.lastPing = newPing;
-      client.latency = _.mean(client.pings);
-      //console.log("Latency for " + socket.id + ": " + client.latency);
-    });
+    // socket.on("pingpong", () => {
+    //   let newPing = (client.lastPing + 1) % 5;
+    //   client.pings[newPing] = (now() - client.pingTime) / 2;
+    //   client.lastPing = newPing;
+    //   client.latency = _.mean(client.pings);
+    //   //console.log("Latency for " + socket.id + ": " + client.latency);
+    // });
 
     console.log("Connected");
     //console.log(socket);
@@ -48,11 +49,11 @@ function initSockets(socketIo) {
     socket.on("disconnect", () => {
       console.log("Disconnected", socket.id);
       // TODO: remove player from game
-      // let client = sockets[socket.id];
-      // if (client) {
-      //   clearInterval(client.ping);
-      //   delete sockets[socket.id];
-      // }
+      let client = sockets[socket.id];
+      if (client) {
+        clearInterval(client.ping);
+        delete sockets[socket.id];
+      }
     });
   });
 }
