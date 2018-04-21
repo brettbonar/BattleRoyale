@@ -117,6 +117,7 @@ class Game {
       console.log("Got ready");
       player.ready = true;
 
+      console.log("Ready players", _.sumBy(this.players, "ready"));
       if (_.sumBy(this.players, "ready") >= this.players.length && !this.initialized) {
         console.log("Initializing");
         this.initialize();
@@ -125,6 +126,7 @@ class Game {
 
       player.socket.on("initialized", () => {
         player.initialized = true;
+        console.log("Initialized players", _.sumBy(this.players, "initialized"));
         if (_.sumBy(this.players, "initialized") >= this.players.length && !this.started) {
           console.log("Starting");
           this.start();
