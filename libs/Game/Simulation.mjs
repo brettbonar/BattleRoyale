@@ -5,6 +5,7 @@ import Map from "../../modules/Map.mjs"
 import Projectile from "../../modules/BattleRoyale/Objects/Projectile.mjs"
 import now from "performance-now"
 import StaticObject from "../../modules/BattleRoyale/Objects/StaticObject.mjs"
+import Bounds from "../../modules/Engine/GameObject/Bounds.mjs"
 import GameSettings from "../../modules/Engine/GameSettings.mjs"
 import Quadtree from "quadtree-lib"
 import BattleRoyaleServer from "../../modules/BattleRoyale/BattleRoyaleServer.mjs"
@@ -15,6 +16,31 @@ const TICK_RATE = 20;
 const SIMULATION_TIME = 1000 / TICK_RATE;
 
 GameSettings.isServer = true;
+
+function addTreasure(game) {
+  let freeGrids = game.grid.getFreeGrids(new Bounds({
+    position: {
+      x: 0,
+      y: 0
+    },
+    dimensions: {
+      width: game.maps[0].mapParams.totalMapWidth,
+      height: game.maps[0].mapParams.totalMapHeight
+    }
+  }, 0));
+
+  let count = Math.floor(game.maps[0].mapParams.totalMapWidth / 1000);
+  count *= count;
+
+  freeGrids = _.shuffle(freeGrids);
+  for (let i = 0; i < count && i < freeGrids.length; i++) {
+    game.addObject(new StaticObject({
+      objectType: "chest2",
+      position: freeGrids[i].position,
+      simulation: true        
+    }));
+  }
+}
 
 export default class Simulation {
   constructor(params) {
