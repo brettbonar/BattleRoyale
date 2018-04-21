@@ -29,8 +29,14 @@ function addTreasure(game) {
     }
   }, 0));
 
+  console.log("Free grids", freeGrids.length);
+
   let count = Math.floor(game.maps[0].mapParams.totalMapWidth / 1000);
   count *= count;
+
+  console.log(game.maps[0].mapParams.totalMapWidth);
+  console.log("Count", count);
+
 
   freeGrids = _.shuffle(freeGrids);
   for (let i = 0; i < count && i < freeGrids.length; i++) {
