@@ -8,17 +8,29 @@ import GameSettings from "../../Engine/GameSettings.mjs"
 import equipment from "../Objects/equipment.mjs"
 import characters from "./characters.mjs"
 import effects from "../Effects/effects.mjs"
+import magicEffects from "../Magic/magicEffects.mjs";
+import attacks from "../Magic/attacks.mjs"
+import actions from "../Scripts/actions.mjs"
 
-class Action {
-  constructor(params) {
+
+function getAction(name) {
+  let action = attacks[name];
+  if (!action) {
+    action = magicEffects[name];
   }
-}
+  if (!action) {
+    action = actions[name];
+  }
 
-let actionId = 0;
+  return action.action;
+}
 
 export default class Character extends GameObject {
   constructor(params) {
     super(params);
+
+    this.actionIdIncrement = GameSettings.isServer ? 1 : -1;
+    this.actionId = GameSettings.isServer ? 1 : -1;
 
     this.type = "Character";
     this.characterInfo = params.characterInfo;
@@ -210,12 +222,12 @@ export default class Character extends GameObject {
 
   stopAction(action, elapsedTime) {
     // Release charged attack
-    if (action.charge && this.canDoAction(action)) {
+    if (action.action.charge && this.canDoAction(action)) {
       this.updateAction(action, elapsedTime);
-      if (!action.actionDuration || action.currentTime >= action.actionDuration) {
+      if (!action.action.actionDuration || action.currentTime >= action.action.actionDuration) {
         let modifiers = {};
-        _.each(action.charge, (mod, type) => {
-          modifiers[type] = Math.min(mod.maxMult, 1 + (mod.maxMult - 1) * ((action.currentTime - action.actionDuration) / mod.maxTime));
+        _.each(action.action.charge, (mod, type) => {
+          modifiers[type] = Math.min(mod.maxMult, 1 + (mod.maxMult - 1) * ((action.currentTime - action.action.actionDuration) / mod.maxTime));
         });
         this.completeAction(action, modifiers);
       }
@@ -242,7 +254,7 @@ export default class Character extends GameObject {
 
   canQueueAction(action) {
     let top = this.currentAction;
-    if (top !== action && top && (top.actionType === "exclusive" && action.actionType === "exclusive" || top.actionType === "blocking")) {
+    if (top !== action && top && (top.action.actionType === "exclusive" && action.action.actionType === "exclusive" || top.action.actionType === "blocking")) {
       return false;
     }
     return true;
@@ -264,7 +276,7 @@ export default class Character extends GameObject {
     if (stopAction) {
       let actionToStop = _.find(this.actionStack, { name: action.name });
       // TODO: change "blocking" to "charging"?
-      if (actionToStop && actionToStop.actionType !== "blocking") {
+      if (actionToStop && actionToStop.action.actionType !== "blocking") {
         this.stopAction(actionToStop, elapsedTime);
       }
     } else {
@@ -272,14 +284,8 @@ export default class Character extends GameObject {
         let newAction = {
           type: type,
           name: action.name,
-          actionId: actionId++,
+          actionId: this.actionId += this.actionIdIncrement,
           currentTime: elapsedTime || 0,
-          actionDuration: action.actionDuration || 0,
-          actionType: action.actionType,
-          actionRate: action.actionRate,
-          automatic: action.automatic,
-          charge: action.charge,
-          animationType: action.animationType,
           action: action,
           new: true,
           stopCb: stopCb,
@@ -298,7 +304,8 @@ export default class Character extends GameObject {
   }
 
   completeAction(action, modifiers) {
-    let actionTimeDiff = action.finishedTime - action.actionDuration;
+    action.finishedTime = action.finishedTime || 0;
+    let actionTimeDiff = action.finishedTime - (action.action.actionDuration || 0);
     if (action.action) {
       let manaCost = action.action.manaCost || 0;
       let healthCost = action.action.healthCost || 0;
@@ -311,22 +318,22 @@ export default class Character extends GameObject {
     }
 
     let cooldown;
-    if (action.actionRate) {
+    if (action.action.actionRate) {
       cooldown = {
         actionName: action.name,
-        currentTime: actionTimeDiff - (1000 / action.actionRate),
-        cooldownTime: 1000 / action.actionRate
+        currentTime: actionTimeDiff - (1000 / action.action.actionRate),
+        cooldownTime: 1000 / action.action.actionRate
       };
       this.cooldowns.push(cooldown);
     }
 
-    if (action.automatic) {
+    if (action.action.automatic) {
       //action.currentTime = -actionTimeDiff;
       action.currentTime = 0;
       action.finishedTime = 0;
       this.updateAction(action, 0);
       //this.nextAction(-actionTimeDiff);
-    } else if (action.actionType === "channeling") {
+    } else if (action.action.actionType === "channeling") {
       action.channeling = true;
     } else {
       this.actionStack.shift();
@@ -376,9 +383,11 @@ export default class Character extends GameObject {
       if (cooldownTimeDiff >= 0) {
         _.pull(this.cooldowns, cooldown);
         action.currentTime += (elapsedTime + cooldownTimeDiff);
-        if (!action.actionDuration || action.currentTime >= action.actionDuration) {
-          if (!action.finishedTime) action.finishedTime = action.currentTime;
-          if (!action.charge) {
+        if (!action.action.actionDuration || action.currentTime >= action.action.actionDuration) {
+          if (!action.finishedTime) {
+            action.finishedTime = action.currentTime || 0;
+          }
+          if (!action.action.charge) {
             this.completeAction(action);
           }
         }
@@ -470,6 +479,7 @@ export default class Character extends GameObject {
         //   this.currentAction.currentTime = 0;
         // }
   
+        state.latestAction.action = getAction(state.latestAction.name);
         this.actionStack.unshift(state.latestAction);
         this.startAction(state.latestAction);
       } else if (!state.latestAction && !this.isThisPlayer) { // TODO: set a timeout for the current action in case the player really shouldn't be able to do it
@@ -517,6 +527,16 @@ export default class Character extends GameObject {
         this.position = new Vec3(state.position);
         this.lastPosition = this.position.copy();
       }
+
+      if (state.latestAction) {
+        if (!this.currentAction || state.latestAction.name !== this.currentAction.name) {
+          state.latestAction.action = getAction(state.latestAction.name);
+          this.actionStack.unshift(state.latestAction);
+          this.startAction(state.latestAction);
+        } else if (state.latestAction.name === this.currentAction.name) {
+          this.currentAction.actionId = state.latestAction.actionId;
+        }
+      }
     }
   }
 
@@ -528,12 +548,8 @@ export default class Character extends GameObject {
         "name",
         "currentTime",
         "finishedTime",
-        "actionDuration",
-        "actionRate",
-        "animationType",
         "new",
-        "actionId",
-        "actionType"
+        "actionId"
       ]);
     }
     // let actionStack = [];

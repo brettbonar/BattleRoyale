@@ -17,6 +17,8 @@ export default class StaticObject extends GameObject {
     if (!params.simulation) {
       if (object.imageSource) {
         this.renderer = new ObjectRenderer(object);
+      } else if (object.rendering) {
+        this.renderer = new ObjectRenderer(object.rendering);
       } else if (_.isArray(object.images)) {
         this.renderObjects = _.map(object.images, (part) => {
           return new RenderObject(params, part);
@@ -35,5 +37,9 @@ export default class StaticObject extends GameObject {
       "state",
       "isInteractable"
     ]));
+  }
+
+  update(elapsedTime) {
+    this.renderer.update(elapsedTime);
   }
 }

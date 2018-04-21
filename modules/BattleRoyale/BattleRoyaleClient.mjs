@@ -35,6 +35,7 @@ import ShadowField from "./Shadow/ShadowField.mjs";
 import Canvas from "../Engine/Rendering/Canvas.mjs";
 import Teams from "./Teams.mjs"
 import Door from "./Objects/Door.mjs";
+import Portal from "./Objects/Portal.mjs";
 
 const EVENTS = {
   MOVE_UP: "moveUp",
@@ -213,6 +214,8 @@ export default class BattleRoyaleClient extends BattleRoyale {
       return new Projectile(object);
     } else if (object.type === "Item") {
       return new Item(object);
+    } else if (object.type === "Portal") {
+      return new Portal(object);
     } else if (object.type === "SpawnMap") {
       return new SpawnMap(object, this.maps[object.mapLevel]);
     } else if (object.type === "ShadowField") {
@@ -256,11 +259,11 @@ export default class BattleRoyaleClient extends BattleRoyale {
           playerId: object.playerId
         });
         if (existing) {
-          //if (existing.revision <= object.revision) {
+          if (existing.revision <= object.revision) {
             existing.updateState(object, update.elapsedTime);
           //}
             //existing.updateState(object, object.elapsedTime - (now - update.time));
-          //}
+          }
           this.clearAndApplyUpdates(object);
         } else {
           // Don't recreate an object that has been removed

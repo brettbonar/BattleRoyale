@@ -27,12 +27,15 @@ let magicEffects = {
           imageSource: "/Assets/magic/firelion_right.png"
         }
       },
-      imageSize: 128,
+      dimensions: {
+        width: 128,
+        height: 128
+      },
       frames: 16,
       framesPerSec: 16,
       repeat: false,
       hitEffect: {
-        particleEffect: "lightSmall"
+        particleEffect: "sparkSmall"
       }
     },
     effect: {
@@ -152,9 +155,12 @@ let magicEffects = {
       hitEffect: {
         particleEffect: "splash"
       },
-      imageSize: 128,
+      dimensions: {
+        width: 128,
+        height: 128
+      },
       frames: 16,
-      framesPerSec: 16
+      framesPerSec: 8
     },
     dimensions: {
       width: 128,
@@ -182,7 +188,7 @@ let magicEffects = {
       persistAfterHit: true,
       renderingDelay: 0,
       damageDelay: 1000,
-      duration: 1000,
+      duration: 2000,
       damage: 20,
       collisionDimensions: [{
         offset: {

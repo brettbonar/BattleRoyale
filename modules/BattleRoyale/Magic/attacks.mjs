@@ -147,6 +147,9 @@ let attacks = {
       path: "beam",
       damage: 2,
       damageRate: 8,
+      physics: {
+        force: 0
+      },
       // TODO: more shapes
       collisionDimensions: [{
         offset: {
@@ -465,7 +468,7 @@ let attacks = {
       framesPerSec: 8,
       repeat: true,
       hitEffect: {
-        particleEffect: "lightSmall"
+        particleEffect: "sparkSmall"
       }
       // dimensions: {
       //   width: 64,
@@ -483,7 +486,7 @@ let attacks = {
     },
     effect: {
       path: "stream",
-      damage: 5,
+      damage: 2,
       // TODO: more shapes
       collisionDimensions: [{
         offset: {

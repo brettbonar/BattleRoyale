@@ -18,7 +18,12 @@ export default class Magic extends GameObject {
     this.position = new Vec3(params.position);
     this.physics.surfaceType = SURFACE_TYPE.GAS;
     this.damagedTargets = [];
+
     this.damageReady = true;
+    if (this.magic.effect.damageDelay) {
+      this.damageReady = false;
+    }
+    
     this.source = params.source;
     this.ownerId = params.source && params.source.objectId;
 
@@ -52,6 +57,9 @@ export default class Magic extends GameObject {
 
   update(elapsedTime) {
     this.currentTime += elapsedTime;
+    if (this.magic.effect.damageDelay && this.currentTime >= this.magic.effect.damageDelay) {
+      this.damageReady = true;
+    }
     if (this.currentTime >= this.magic.effect.duration) {
       this.done = true;
     }
@@ -92,6 +100,7 @@ export default class Magic extends GameObject {
 
     return new Magic({
       position: position,
+      level: params.source.level,
       source: params.source,
       simulation: params.simulation,
       attackType: params.attackType,

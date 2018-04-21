@@ -10,9 +10,11 @@ export default class ObjectRenderer {
     if (images) {
       this.images = images;
     } else {
-      this.image = ImageCache.get(params.imageSource);
+      this.image = ImageCache.get(params.imageSource || params.imageSource);
     }
     this.totalTime = 0;
+    this.currentTime = 0;
+    this.opacity = 1.0;
 
     // TODO: come up with a more robust check for animations
     if (params.frames) {
@@ -25,48 +27,29 @@ export default class ObjectRenderer {
     }
   }
 
-  update(elapsedTime) {
-    this.currentTime += elapsedTime;
-    this.totalTime += elapsedTime;
-
-    if (this.animating) {
-      while (this.currentTime > 1000 / this.framesPerSec) {
-        this.currentTime -= 1000 / this.framesPerSec;
-        this.frame++;
-        if (this.frame >= this.frames) {
-          if (this.repeat) {
-            this.frame = this.cycleStart || 0;
-          } else {
-            this.frame = this.frames - 1;
-            this.done = true;
-          }
-        }
-      }
-    }
-
-    if (this.totalTime >= this.duration) {
-      this.done = true;
-    }
-  }
-
   renderAnimation(context, object, elapsedTime) {    
     if (!this.image || !this.image.complete || this.done) return;
 
-    let frameOffset = getAnimationOffset(this.image, this.imageSize || this.dimensions, this.frame)
+    let frameOffset = getAnimationOffset(this.image, this.dimensions, this.frame)
     // if (this.rotation) {
     //   context.translate(pos.x + this.imageSize / 2, pos.y + this.imageSize / 2);
     //   context.rotate((this.rotation * Math.PI) / 180);
     //   context.translate(-(pos.x + this.imageSize / 2), -(pos.y + this.imageSize / 2));        
     // }
     let position = object.position.minus({ y: object.position.z });
-    if (this.imageDimensions) {
-      position.add(this.imageDimensions.offset);
+    position.add(this.offset);
+
+    if (this.opacity !== 1.0) {
+      context.globalAlpha = this.opacity;
     }
 
-    let renderSize = this.renderSize || this.imageSize;
     context.drawImage(this.image, frameOffset.x, frameOffset.y,
-      this.imageSize, this.imageSize,
-      position.x, position.y, renderSize, renderSize);
+      this.dimensions.width, this.dimensions.height,
+      position.x, position.y, this.dimensions.width, this.dimensions.height);
+
+    if (this.opacity !== 1.0) {
+      context.globalAlpha = 1.0;
+    }
   }
 
   draw(context, object, position, clipping) {
@@ -110,6 +93,10 @@ export default class ObjectRenderer {
       }
     }
 
+    if (this.opacity !== 1.0) {
+      context.globalAlpha = this.opacity;
+    }
+
     if (object.rotation) {
       context.save();
 
@@ -125,6 +112,34 @@ export default class ObjectRenderer {
       context.restore();
     } else {
       this.draw(context, object, position, clipping);
+    }
+
+    if (this.opacity !== 1.0) {
+      context.globalAlpha = 1.0;
+    }
+  }
+
+  update(elapsedTime) {
+    this.currentTime += elapsedTime;
+    this.totalTime += elapsedTime;
+
+    if (this.animating) {
+      while (this.currentTime > 1000 / this.framesPerSec) {
+        this.currentTime -= 1000 / this.framesPerSec;
+        this.frame++;
+        if (this.frame >= this.frames) {
+          if (this.repeat) {
+            this.frame = this.cycleStart || 0;
+          } else {
+            this.frame = this.frames - 1;
+            this.done = true;
+          }
+        }
+      }
+    }
+
+    if (this.totalTime >= this.duration) {
+      this.done = true;
     }
   }
 }

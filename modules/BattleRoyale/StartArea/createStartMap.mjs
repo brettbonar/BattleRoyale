@@ -28,7 +28,7 @@ function createStartMap(maps, players) {
     },
     level: "start",
     mapLevel: "0",
-    mapDimensions: mapDimensions,
+    dimensions: mapDimensions,
     simulation: true
   }, maps[0]);
 

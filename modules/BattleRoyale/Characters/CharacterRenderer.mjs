@@ -296,7 +296,7 @@ export default class CharacterRenderer {
 
   setAnimation(elapsedTime, object) {
     this.currentAnimationTime += elapsedTime;
-    let currentAction = object.currentAction;// || object.latestAction;
+    let currentAction = object.currentAction || object.latestAction;
     this.prevState = this.state;
 
     // We may start and finish an action within a frame, make sure we still animate it
@@ -328,9 +328,9 @@ export default class CharacterRenderer {
       }
     } else {
       if (this.currentAction && this.currentAction.type === "attack") {
-        if (this.currentAction.animationType) {
+        if (this.currentAction.action.animationType) {
           let moving = isMoving ? "moving" : "idle";
-          this.queueAnimation(this.rendering.ANIMATION_SETS[this.currentAction.animationType][moving][object.state.characterDirection],
+          this.queueAnimation(this.rendering.ANIMATION_SETS[this.currentAction.action.animationType][moving][object.state.characterDirection],
             STATE.ATTACKING);
         } else {
           if (this.rendering.WEAPON_ANIMATIONS) {
@@ -348,7 +348,7 @@ export default class CharacterRenderer {
       this.currentTime = 0;
     }
 
-    if (this.currentAction && this.currentAnimationTime >= this.currentAnimationDuration) {
+    if (this.currentAction && this.currentAnimationTime >= this.currentAnimationDuration && (!object.currentAction || (this.currentAction.name !== object.currentAction.name))) {
       this.currentAction = null;
     }
   }

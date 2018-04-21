@@ -3,7 +3,7 @@ import Map from "../../Map.mjs"
 export default {
   [Map.BIOMES.FOREST]: [
     {
-      itemType: "bow",
+      itemType: "waterStaffMale",
       weight: 1
     },
   ],
@@ -16,10 +16,6 @@ export default {
   [Map.BIOMES.PLAIN]: [
     {
       itemType: "lightStaffMale",
-      weight: 1
-    },
-    {
-      itemType: "waterStaffMale",
       weight: 1
     }
   ],

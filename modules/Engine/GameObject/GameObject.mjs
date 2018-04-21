@@ -5,14 +5,6 @@ import Renderer from "../Rendering/Renderers/Renderer.mjs"
 import { SURFACE_TYPE, MOVEMENT_TYPE } from "../../Engine/Physics/PhysicsConstants.mjs"
 import GameSettings from "../GameSettings.mjs";
 
-// boundsType: RECTANGLE, CIRCLE, POINT, LINE
-// dimensions: radius, width, height
-// position: x, y
-// rotation: degrees
-// spin: degrees / time
-// direction: Vector
-// speed: distance / time
-// acceleration: +/- speed / time
 let objectId = GameSettings.isServer ? 1 : -1;
 
 class GameObjectProxy {
@@ -80,7 +72,8 @@ export default class GameObject extends GameObjectProxy {
         movementType: MOVEMENT_TYPE.NORMAL,
         elasticity: 0,
         reflectivity: 0,
-        solidity: 1.0
+        solidity: 1.0,
+        force: 1.0
       },
       position: {
         z: 0

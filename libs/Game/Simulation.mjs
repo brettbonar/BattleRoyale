@@ -42,7 +42,7 @@ export default class Simulation {
     this.game.addScript(createScript("EntryPortals", {
       grid: this.game.grid,
       map: maps[0],
-      duration: 5000,
+      duration: 150000,
       characters: this.players.map((player) => player.character),
       spawnMap: startArea.spawnMap
     }));

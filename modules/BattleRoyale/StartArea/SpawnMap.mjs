@@ -10,20 +10,14 @@ export default class SpawnMap extends GameObject {
     this.portalDuration = params.portalDuration;
     this.portalCreationDuration = params.portalCreationDuration;
 
-
     if (!params.simulation) {
-      this.renderer = new SpawnMapRenderer(map, params.mapDimensions);
+      this.renderer = new SpawnMapRenderer(map, params.dimensions);
     }
   }
 
   getUpdateState() {
     return Object.assign(super.getUpdateState(), {
-      mapLevel: this.mapLevel,
-      mapDimensions: this.mapDimensions
+      mapLevel: this.mapLevel
     });
-  }
-
-  update(elapsedTime) {
-    
   }
 }

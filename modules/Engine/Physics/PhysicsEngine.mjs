@@ -44,9 +44,9 @@ export default class PhysicsEngine {
 
   // https://www.gamasutra.com/view/feature/3383/simple_intersection_tests_for_games.php?page=3
   sweepTest(A1, A2, B1, B2) {
-    if (A2.intersects(B2)) {
-      return this.getCollisionTime(A1, A2, B1, B2);
-    }
+    // if (A2.intersects(B2)) {
+    //   return this.getCollisionTime(A1, A2, B1, B2);
+    // }
 
     // Just check if both Z's are within range
     let AminZ = Math.min(A1.box.ul.z, A2.box.ul.z);
@@ -256,11 +256,16 @@ export default class PhysicsEngine {
     let collisions = [];
     let intersections = this.getIntersections(obj, objects, allCollisions);
     // TODO: order by collision time?
-    let intersection = _.minBy(intersections, (intersection) => intersection.collision.time);
+    intersections = _.sortBy(intersections, (intersection) => intersection.collision.time);
     //for (const intersection of intersections) {
-    if (intersection) {
+    let collided = false;
+
+    let prevObjPosition = obj.position.copy();
+    for (let i = 0; i < intersections.length && !collided; i++) {
+      let intersection = intersections[i];
       let target = intersection.target;
       let collision = intersection.collision;
+      let prevTargetPosition = target.position.copy();
 
       if (obj.physics.solidity > 0 && target.physics.solidity > 0 &&
           obj.physics.surfaceType !== SURFACE_TYPE.GAS && target.physics.surfaceType !== SURFACE_TYPE.GAS) {
@@ -270,14 +275,18 @@ export default class PhysicsEngine {
           target.position = target.lastPosition.copy();
         } else {
           for (const axis of AXES) {
-            let diff = (obj.position[axis] - obj.lastPosition[axis]) * collision.time;
-            if (diff !== 0) {
-              obj.position[axis] = obj.lastPosition[axis] + diff - Math.sign(obj.position[axis] - obj.lastPosition[axis]);
+            if (target.physics.force > 0) {
+              let diff = (obj.position[axis] - obj.lastPosition[axis]) * collision.time * target.physics.force;
+              if (diff !== 0) {
+                obj.position[axis] = obj.lastPosition[axis] + diff - Math.sign(obj.position[axis] - obj.lastPosition[axis]);
+              }
             }
 
-            let targetDiff = (target.position[axis] - target.lastPosition[axis]) * collision.time;
-            if (targetDiff !== 0) {
-              target.position[axis] = target.lastPosition[axis] + targetDiff - Math.sign(target.position[axis] - target.lastPosition[axis]);
+            if (obj.physics.force > 0) {
+              let targetDiff = (target.position[axis] - target.lastPosition[axis]) * collision.time * obj.physics.force;
+              if (targetDiff !== 0) {
+                target.position[axis] = target.lastPosition[axis] + targetDiff - Math.sign(target.position[axis] - target.lastPosition[axis]);
+              }
             }
           }
         }
@@ -290,10 +299,17 @@ export default class PhysicsEngine {
         }
 
         obj.updatePosition();
+        collided = true;
       }
       
-      let sourceBounds = obj.collisionBounds[intersection.sourceBoundsIdx];
-      let targetBounds = target.collisionBounds[intersection.targetBoundsIdx];
+      let sourceBounds = new Bounds({
+        position: obj.lastPosition.plus(prevObjPosition.minus(obj.lastPosition).times(collision.time)),
+        dimensions: obj.collisionDimensions[intersection.sourceBoundsIdx].dimensions
+      });
+      let targetBounds = new Bounds({
+        position: target.lastPosition.plus(prevTargetPosition.minus(target.lastPosition).times(collision.time)),
+        dimensions: target.collisionDimensions[intersection.targetBoundsIdx].dimensions
+      });
 
       collisions.push({
         source: obj,

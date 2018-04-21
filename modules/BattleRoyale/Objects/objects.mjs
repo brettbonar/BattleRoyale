@@ -1521,6 +1521,45 @@ objects.chest2 = {
   ]
 };
 
+objects.portal = {
+  interactionType: "portal",
+  dimensions: {
+    width: 128,
+    height: 128
+  },
+  rendering: {
+    imageSource: "/Assets/portal.png",
+    dimensions: {
+      width: 128,
+      height: 128
+    },
+    frames: 8,
+    framesPerSec: 8,
+    repeat: true
+  },
+  dimensions: {
+    width: 128,
+    height: 128,
+    zheight: 0
+  },
+  physics: {
+    surfaceType: "none",
+  },
+  isInteractable: true,
+  interactionDimensions: [
+    {
+      offset: {
+        x: 16,
+        y: 16
+      },
+      dimensions: {
+        width: 96,
+        height: 96
+      }
+    }
+  ]
+};
+
 objects.door1 = {
   interactionType: "door",
   images: {

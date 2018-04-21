@@ -23,13 +23,13 @@ import Magic from "./Magic/Magic.mjs"
 import StaticObject from "./Objects/StaticObject.mjs"
 import Item from "./Objects/Item.mjs"
 import effects from "./Effects/effects.mjs"
-import attacks from "./Magic/attacks.mjs"
 import RenderObject from "./Objects/RenderObject.mjs"
 import ImageCache from "../Engine/Rendering/ImageCache.mjs"
 import ParticleEffect from "../Engine/Effects/ParticleEffect.mjs"
 import Grid from "../Engine/Grid.mjs"
 import LevelGrids from "../Engine/LevelGrids.mjs";
 import magicEffects from "./Magic/magicEffects.mjs";
+import attacks from "./Magic/attacks.mjs"
 
 let sequenceNumber = 1;
 
