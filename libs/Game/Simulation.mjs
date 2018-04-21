@@ -40,6 +40,7 @@ function addTreasure(game) {
 
   freeGrids = _.shuffle(freeGrids);
   for (let i = 0; i < count && i < freeGrids.length; i++) {
+    console.log(freeGrids[i].position);
     game.addObject(new StaticObject({
       objectType: "chest2",
       position: freeGrids[i].position,
