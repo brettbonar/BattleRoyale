@@ -117,16 +117,18 @@ class Game {
       console.log("Got ready");
       player.ready = true;
 
-      if (_.sumBy(this.players, "ready") >= this.players.length) {
+      if (_.sumBy(this.players, "ready") >= this.players.length && !this.initialized) {
         console.log("Initializing");
         this.initialize();
+        this.initialized = true;
       }
 
       player.socket.on("initialized", () => {
         player.initialized = true;
-        if (_.sumBy(this.players, "initialized") >= this.players.length) {
+        if (_.sumBy(this.players, "initialized") >= this.players.length && !this.started) {
           console.log("Starting");
           this.start();
+          this.started = true;
         }
       });
     });
