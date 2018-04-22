@@ -124,16 +124,19 @@ export default class ShadowField extends GameObject {
       z: 0
     });
 
-    return new Character({
-      level: target.level,
-      team: Teams.SHADOW,
-      characterInfo: spawn.characterInfo,
-      isPlayer: true,
-      playerId: target.playerId,
-      simulation: true,
-      state: spawn.state,
-      position: position
-    });
+    return {
+      character: new Character({
+        level: target.level,
+        team: Teams.SHADOW,
+        characterInfo: spawn.characterInfo,
+        isPlayer: true,
+        playerId: target.playerId,
+        simulation: true,
+        state: spawn.state,
+        position: position
+      }),
+      type: spawn.name
+    };
   }
 
   handleTargets(elapsedTime) {
@@ -160,15 +163,20 @@ export default class ShadowField extends GameObject {
             event: {
               eventType: "playerAvatarChange",
               playerId: target.playerId,
-              objectId: spawn.objectId
+              objectId: spawn.character.objectId,
+              type: spawn.type
             },
             //remove: target,
-            create: spawn
+            create: spawn.character
           });
           this.spawnedCharacters.push(target);
         } else if (!target.state.dead) {
           if (target.state.currentMana) {
-            target.state.currentMana = Math.max(0, target.state.currentMana - damageRate);
+            let diff = target.state.currentMana - damageRate;
+            target.state.currentMana = Math.max(0, diff);
+            if (diff < 0) {
+              target.damage(this, -diff);
+            }
           } else {
             target.damage(this, damageRate);
           }

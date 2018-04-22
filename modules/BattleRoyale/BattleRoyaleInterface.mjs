@@ -5,11 +5,12 @@ const EVENTS_TIMEOUT = 5000;
 const MAX_EVENTS = 5;
 
 export default class BattleRoyaleInterface {
-  constructor() {
+  constructor(params) {
     this.overlay = $("#game-overlay");
     this.eventsList = $("#events-list");
     this.events = [];
 
+    this.players = params.players;
     this.ui = ImageCache.get("/Assets/UI/png/bars.png");
     this.mapBackground = ImageCache.get("/Assets/UI/png/map.png");
     this.mapCompass = ImageCache.get("/Assets/UI/png/compass.png");
@@ -84,21 +85,40 @@ export default class BattleRoyaleInterface {
       this.mapCompass.width, this.mapCompass.height);
   }
 
+  getPlayerName(playerId) {
+    let player = _.find(this.players, { playerId: playerId });
+    return player && player.playerName;
+  }
+
   getEvent(event) {
+    if (event.eventType === "kill") {
+      let killedBy = this.getPlayerName(event.killedByPlayer);
+      if (killedBy) {
+        return killedBy + " killed " + this.getPlayerName(event.killed);
+      } else {
+        return this.getPlayerName(event.killed) + " died";
+      }
+    } else if (event.eventType === "playerAvatarChange") {
+      return this.getPlayerName(event.playerId) + " changed into " + event.type;
+    }
     return event.eventType;
   }
 
   addEvent(event) {
+    clearTimeout(this.eventsTimeout);
+
     this.events.push(event);
     this.eventsList.show();
     this.eventsList.empty();
     let visibleEvents = _.takeRight(this.events, MAX_EVENTS);
     for (const event of visibleEvents) {
-      this.eventsList.append("<li>" + this.getEvent(event) + "</li>");
+      let item = $("<li>" + this.getEvent(event) + "</li>").addClass(event.eventType);
+      this.eventsList.append(item);
     }
 
     this.eventsTimeout = setTimeout(() => {
       this.eventsList.hide();
+      this.events.length = 0;
     }, EVENTS_TIMEOUT);
   }
 

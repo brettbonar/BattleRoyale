@@ -44,6 +44,7 @@ export default class BattleRoyaleController extends GameController {
 
     this.initializedDeferred = Q.defer();
     this.initialized = this.initializedDeferred.promise;
+    this.scores = [];
 
     // TODO: put asset initialization in a function somewhere else
     let imagePromises = [];
@@ -63,19 +64,17 @@ export default class BattleRoyaleController extends GameController {
     Q.all(imagePromises).then(this.initializedDeferred.resolve());
   }
 
-  showCharacterCreation() {
-    $("#character-name").focus();
-  }
-
-  createCharacter() {
-    let name = $("#character-name").val();
-    this.player.playerName = name;
-    this.menus.transition("MAIN");
-  }
-
   leaveGame() {
     API.leaveGame(this.gameInfo.gameId, this.player);
     this.menus.transition("JOIN_GAME");
+  }
+
+  quitGame() {
+    if (this.game) {
+      API.leaveGame(this.gameInfo.gameId, this.player);
+      this.game.quit();
+      this.game = null;
+    }
   }
 
   joinGame(game) {
@@ -92,15 +91,26 @@ export default class BattleRoyaleController extends GameController {
       //console.log("Got update");
       this.game.onCollisions(data);
     });
+    this.socket.on("gameOver", (data) => {
+      //console.log("Got update");
+      this.game.onGameOver(data);
+      this.scores = data;
+    });
+    this.socket.on("scores", (data) => {
+      this.scores = data;
+    });
     this.socket.on("event", (data) => {
       //console.log("Got update");
       this.game.onEvents(data);
     });
+    this.socket.on("updateLobby", (data) => {
+      this.menus.updateLobby(data);
+    });
     this.socket.on("initialize", (data) => {
       console.log("Initializing");
 
-      $.when(API.getMaps(game.gameId), API.getObjects(game.gameId))
-        .done((mapsData, objectsData) => {
+      $.when(API.getMaps(game.gameId), API.getObjects(game.gameId), API.getLobby(game.gameId))
+        .done((mapsData, objectsData, lobbyData) => {
           let maps = {};
           _.each(mapsData[0], (map, level) => {
             maps[level] = new Map(Object.assign({
@@ -108,11 +118,14 @@ export default class BattleRoyaleController extends GameController {
             }, map), level);
           });
           let mapCanvas = document.getElementById("canvas-map");
+          this.players = lobbyData[0].players;
           this.game = new BattleRoyaleClient({
             canvas: document.getElementById("canvas-main"),
+            menus: this.menus,
             mapCanvas: mapCanvas,
             maps: maps,
             player: this.player,
+            players: lobbyData[0].players,
             gameSettings: {
               viewDistance: 32 * 12
             },
@@ -128,6 +141,66 @@ export default class BattleRoyaleController extends GameController {
           });
         });
     });
+  }
+
+  getPlayerName(playerId) {
+    let player = _.find(this.players, { playerId: playerId });
+    return player && player.playerName;
+  }
+
+  getGameScores() {
+    return this.scores.map((score) => {
+      return {
+        playerName: this.getPlayerName(score.playerId),
+        kills: score.kills,
+        status: score.status
+      };
+    });
+  }
+
+  register() {
+    let user = {
+      username: this.menus.menus.REGISTER.find("#registerUsername").val(),
+      password: this.menus.menus.REGISTER.find("#registerPassword").val(),
+      confirmPassword: this.menus.menus.REGISTER.find("#registerConfirmPassword").val()
+    };
+    API.register(user)
+      .done(() => {
+        this.menus.menus.REGISTER.find("#register-notification")
+          .removeClass("error")
+          .addClass("success")
+          .html("Registration succeeded!");
+      })
+      .fail((response) => {
+        this.menus.menus.REGISTER.find("#register-notification")
+          .removeClass("success")
+          .addClass("error")
+          .html(response.responseText);
+      });
+  }
+
+  login() {
+    let user = {
+      username: this.menus.menus.LOGIN.find("#loginUsername").val(),
+      password: this.menus.menus.LOGIN.find("#loginPassword").val()
+    };
+    API.login(user)
+      .done((response) => {
+        this.menus.menus.LOGIN.find("#login-notification")
+          .removeClass("error")
+          .addClass("success");
+        this.menus.transition("MAIN");
+        this.player.playerName = user.username;
+        this.player.playerId = response;
+        this.socket.emit("playerId", response);
+        // TODO: set session token?
+      })
+      .fail((response) => {
+        this.menus.menus.LOGIN.find("#login-notification")
+          .removeClass("success")
+          .addClass("error")
+          .html(response.responseText);
+      });
   }
 
   ready() {

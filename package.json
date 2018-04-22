@@ -6,6 +6,7 @@
   "dependencies": {
     "ag-grid": "^17.0.0",
     "babel-plugin-transform-commonjs-es2015-modules": "^4.0.1",
+    "bcrypt": "^2.0.1",
     "body-parser": "^1.18.2",
     "browser-or-node": "^1.0.2",
     "express": "^4.16.2",
@@ -13,11 +14,14 @@
     "jquery": "^3.3.1",
     "keycode-js": "^1.0.0",
     "lodash": "^4.17.5",
+    "node-json-db": "^0.7.5",
     "performance-now": "^2.1.0",
     "q": "^1.5.1",
     "quadtree-lib": "^1.0.9",
+    "simple-json-db": "^1.2.1",
     "simplex-noise": "^2.4.0",
-    "socket.io": "^2.0.4"
+    "socket.io": "^2.0.4",
+    "uuid": "^3.2.1"
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",

@@ -2,6 +2,7 @@
 import path from "path"
 import express from "express"
 import games from "./routes/games.mjs"
+import users from "./routes/users.mjs"
 import http from "http"
 import socketIo from "socket.io"
 //import clientSockets from "./clientSockets.mjs"
@@ -28,6 +29,7 @@ app.use("/shared", express.static("shared/client"));
 app.use("/extern", express.static("node_modules"));
 app.use("/node_modules", express.static("node_modules"));
 app.use("/games", games);
+app.use("/users", users);
 
 app.use(function (error, req, res, next) {
   res.status(400).send(error);

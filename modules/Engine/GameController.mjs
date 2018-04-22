@@ -14,11 +14,10 @@ class GameController {
     this.player = {};
     this.socket = io();
     this.socket.on("id", (id) => {
-      this.player.playerId = id;
-      this.player.playerName = id;
+      this.player.socketId = id;
     }); 
     this.socket.on('disconnect', function(){
-      //window.alert("You Disconnected");
+      window.alert("You Disconnected");
     });
     // this.socket.on("pingpong", () => {
     //   this.socket.emit("pingpong");
@@ -83,7 +82,7 @@ class GameController {
       return res;
     };
   }
-
+  
   parseElement(element) {
     this.menus.parseElement(element);    
     element.find("[gui-click]").each((index, clickElement) => {

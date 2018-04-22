@@ -251,6 +251,9 @@ export default class Character extends GameObject {
   addItem(itemType) {
     if (!this.state.inventory.includes(itemType)) {
       this.state.inventory.push(itemType);
+      if (this.state.inventory.filter(this.isWeapon).length === 1) {
+        this.nextWeapon();
+      }
     }
   }
 

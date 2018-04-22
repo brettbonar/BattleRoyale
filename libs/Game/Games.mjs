@@ -3,6 +3,7 @@ import _ from "lodash";
 global._ = _;
 import q from "q";
 import now from "performance-now"
+import * as Users from "../Users/Users.mjs"
 
 let games = [];
 let gameId = 1;
@@ -22,6 +23,7 @@ function setPing(client) {
 function initSockets(socketIo) {
   io = socketIo;
   io.sockets.setMaxListeners(0);
+
   io.on("connection", (socket) => {
     let client = {
       socket: socket,
@@ -46,13 +48,24 @@ function initSockets(socketIo) {
 
     // socket.send(socket.id);
 
+    socket.on("playerId", (playerId) => {
+      client.playerId = playerId;
+      client.playerName = Users.getPlayerName(playerId);
+    });
+
     socket.on("disconnect", () => {
-      console.log("Disconnected", socket.id);
       // TODO: remove player from game
       let client = sockets[socket.id];
-      if (client) {
+      if (client && client.playerId) {
+        let game = _.find(games, { gameId: client.gameId });
+        if (game) {
+          game.onDisconnect(client.playerId);
+        }
+        console.log("Disconnected", client.playerName);
         clearInterval(client.ping);
         delete sockets[socket.id];
+      } else {
+        console.log("Disconnected", socket.id);
       }
     });
   });
@@ -61,6 +74,13 @@ function initSockets(socketIo) {
 const STATUS = {
   LOBBY: "lobby",
   IN_PROGRESS: "inProgress"
+};
+
+const PLAYER_STATUS = {
+  NOT_READY: "notReady",
+  READY: "ready",
+  LOADING: "loading",
+  INITIALIZED: "initialized"
 };
 
 class Game {
@@ -90,6 +110,20 @@ class Game {
     // this.start();
   }
 
+  onDisconnect(playerId) {
+    if (this.status === STATUS.IN_PROGRESS) {
+      if (this.simulation) {
+        this.simulation.addEvent({
+          eventType: "disconnect",
+          playerId: playerId
+        });
+      }
+    } else {
+      this.removePlayer(playerId);
+      this.updateLobby();
+    }
+  }
+
   getObjects() {
     return this.simulation.getObjects();
   }
@@ -103,30 +137,47 @@ class Game {
   }
 
   addPlayer(player) {
-    player.client = sockets[player.playerId];
-    player.socket = sockets[player.playerId].socket;
+    let client = sockets[player.socketId];
+    if (!client) {
+      return "Player not found";
+    }
+    if (client.gameId) {
+      return "Player already in a game";
+    }
+
+    player.client = sockets[player.socketId];
+    player.client.gameId = this.gameId;
+    player.socket = sockets[player.socketId].socket;
     player.lastUpdates = [];
+    player.lastInView = [];
+    player.status = PLAYER_STATUS.NOT_READY;
     this.players.push(player);
     player.socket.join(this.gameId);
     player.socket.on("update", (data) => {
       //console.log("Got update");
-      if (data.source.playerId === player.playerId) {
+      if (!this.done && data.source.playerId === player.playerId) {
         this.simulation.updateState(data, player.client.latency);
       }
     });
     player.socket.on("ready", (data) => {
       console.log("Got ready");
       player.ready = true;
+      player.status = PLAYER_STATUS.READY;
+      this.updateLobby();
 
       console.log("Ready players", _.sumBy(this.players, "ready"));
       if (_.sumBy(this.players, "ready") >= this.players.length && !this.initialized) {
         console.log("Initializing");
         this.initialized = true;
         this.initialize();
+        this.status = STATUS.IN_PROGRESS;
       }
 
       player.socket.on("initialized", () => {
         player.initialized = true;
+        player.status = PLAYER_STATUS.INITIALIZED;
+        this.updateLobby();
+
         console.log("Initialized players", _.sumBy(this.players, "initialized"));
         if (_.sumBy(this.players, "initialized") >= this.players.length && !this.started) {
           console.log("Starting");
@@ -138,7 +189,7 @@ class Game {
   }
 
   getPlayers() {
-    return _.map(this.players, (player) => _.pick(player, ["playerId", "playerName"]));
+    return _.map(this.players, (player) => _.pick(player, ["playerId", "playerName", "status"]));
   }
 
   getLobby() {
@@ -156,8 +207,23 @@ class Game {
     let player = _.find(this.players, { playerId: playerId });
     player.socket.leave(this.gameId);
     _.pull(this.players, player);
-    // TODO: remove from game state as well
-    // TODO: update "quit" for player
+    
+    if (this.simulation) {
+      this.simulation.addEvent({
+        eventType: "leave",
+        playerId: playerId
+      });
+    } else {
+      // TODO: add disconnect message to chat
+    }
+  }
+
+  onDone(scores) {
+    Users.updateScores(scores);
+    this.done = true;
+    for (const player of this.players) {
+      player.socket.emit("gameOver", this.scores);
+    }
   }
 
   initialize() {
@@ -165,11 +231,19 @@ class Game {
       gameId: this.gameId,
       players: this.players,
       gameParams: this.gameParams,
-      io: io
+      io: io,
+      onDone: (scores) => this.onDone(scores)
     });
     
     for (const player of this.players) {
       player.socket.emit("initialize", "initialize");
+    }
+  }
+
+  updateLobby(game) {
+    for (const player of this.players) {
+      player.socket.emit("updateLobby", this.getLobby());
+      //player.socket.emit("updateLobby", "updateLobby");
     }
   }
 
@@ -221,14 +295,26 @@ function getMaps(gameId) {
 
 function join(gameId, player) {
   let game = _.find(games, { gameId: gameId });
-  game.addPlayer(player);
-  console.log(game.getLobby());
-  return q.resolve(game.getLobby());
+  if (game) {
+    if (game.status === STATUS.LOBBY) {
+      game.addPlayer(player);
+      game.updateLobby(game);
+      return q.resolve(game.getLobby());
+    } else {
+      return q.reject("Game in progress");
+    }
+  }
+  return q.reject("Game not found");
 }
 
 function leave(gameId, player) {
   let game = _.find(games, { gameId: gameId });
-  return q.resolve(game.removePlayer(player.playerId));
+  if (game) {
+    game.removePlayer(player.playerId)
+    game.updateLobby(game);
+    return q.resolve("Left game");
+  }
+  return q.reject("Game not found");
 }
 
 function validateCreateGame(req, res, next) {
@@ -237,6 +323,9 @@ function validateCreateGame(req, res, next) {
   }
   if (!req.body.name) {
     next("Game name is required");
+  }
+  if (!_.some(req.body.biomes, (val) => parseInt(val, 10))) {
+    next("Game requires some biome");
   }
   next();
 }

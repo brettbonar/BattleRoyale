@@ -51,6 +51,12 @@ function addTreasure(game) {
   game.initTreasure();
 }
 
+const PLAYER_STATUS = {
+  ALIVE: "alive",
+  DEAD: "dead",
+  SHADOW: "shadow"
+};
+
 export default class Simulation {
   constructor(params) {
     _.merge(this, params);
@@ -69,9 +75,15 @@ export default class Simulation {
         width: 2048,
         height: 2048
       },
+      players: this.players,
       maps: maps,
       objects: objects
     });
+
+    this.scores = [];
+    this.onDone = params.onDone;
+    this.initScores();
+    this.updateScores();
 
     // TODO: fix this awful hack
     this.game.addScript(createScript("EntryPortals", {
@@ -88,6 +100,21 @@ export default class Simulation {
     this.lastCollisions = [];
     this.lastElapsedTime = 0;
     this.removedObjects = [];
+    this.events = [];
+  }
+
+  addEvent(event) {
+    this.events.push(event);
+  }
+
+  initScores() {
+    for (const player of this.players) {
+      this.scores.push({
+        playerId: player.playerId,
+        kills: 0,
+        status: PLAYER_STATUS.ALIVE
+      });
+    }
   }
 
   getCollision(collision) {
@@ -117,10 +144,19 @@ export default class Simulation {
     // TRICKY: intersect by player's last updates and visible objects to handle cases where
     // a previously object goes out of view - you want the update that moves it out of view
     let visibleObjects = this.game.grid.getRenderObjects(player.character.viewBounds, player.character.level);
-    return _.intersectionBy(this.lastState,
+    let newVisible = _.difference(visibleObjects, player.lastInView);
+    player.lastInView = visibleObjects; 
+
+    // Make sure we also update objects that the player was aware of last time, even if they
+    // are no longer in view
+    let intersection = _.intersectionBy(this.lastState,
       visibleObjects.concat(player.lastUpdates),
       "objectId");
-    //return this.lastState;
+
+    // Also make sure we update any objects that are newly in view
+    intersection = intersection.concat(newVisible.map((obj) => _.cloneDeep(obj.getUpdateState())));
+      
+    return _.uniqBy(intersection, "objectId");
   }
 
   getPlayerViewCollisions(player) {
@@ -135,17 +171,47 @@ export default class Simulation {
     return character && character.playerId;
   }
 
+  updateScores() {
+    let alive = this.scores.filter((player) => player.status === PLAYER_STATUS.ALIVE);
+    if (alive.length === 1) {
+      alive[0].won = true;
+      this.done = true;
+    }
+
+    for (const player of this.players) {
+      player.socket.emit("scores", this.scores);
+    }
+  }
+
   getEvent(event) {
     if (event.eventType === "kill") {
+      let killedByPlayer = this.getPlayerIdFromObjectId(event.killedBy);
+      let killer = this.scores.find((score) => score.playerId === killedByPlayer);
+      if (killer) {
+        killer.kills++;
+      }
+      let player = this.scores.find((score) => score.playerId === event.killed);
+      if (player) {
+        player.status = PLAYER_STATUS.DEAD;
+      }
+
+      this.updateScores();
       return {
         eventType: event.eventType,
         killed: event.killed,
-        killedByPlayer: this.getPlayerIdFromObjectId(event.killedBy),
+        killedByPlayer: killedByPlayer,
         killedBy: event.killedBy
       };
     } else if (event.eventType === "playerAvatarChange") {
       let player = this.players.find((player) => player.playerId === event.playerId);
       player.character = this.game.gameState.objects.find((obj) => obj.objectId === event.objectId);
+
+      let playerScore = this.scores.find((score) => score.playerId === event.playerId);
+      if (playerScore) {
+        playerScore.status = PLAYER_STATUS.SHADOW;
+      }
+
+      this.updateScores();
       return event;
     }
     return event;
@@ -166,7 +232,8 @@ export default class Simulation {
   }
 
   sendUpdates() {
-    let broadcastEvents = this.game.broadcastEvents.map((event) => this.getEvent(event));
+    let broadcastEvents = this.game.broadcastEvents.map((event) => this.getEvent(event))
+      .concat(this.events);
 
     for (const player of this.players) {
       if (this.lastState.length > 0) {
@@ -194,9 +261,18 @@ export default class Simulation {
   }
 
   update() {
+    if (!this.game) return;
+
     let currentTime = now();
     let elapsedTime = currentTime - this.previousTime;
     this.previousTime = currentTime;
+
+    if (this.done) {
+      this.sendUpdates();
+      this.onDone(this.scores);
+      this.game = null;
+      return;
+    }
     
     this.game.processUpdates(elapsedTime, currentTime);
     this.game._update(elapsedTime);

@@ -10,12 +10,50 @@
   </div>
 </gui-menu> -->
 
-<gui-menu class="menu" gui-start id="MAIN" gui-on-show="returnToMain()">
+<gui-menu class="menu" gui-start id="START">
+  <h1 class="title">Mage Wars</h1>
+  <div class="sub-menu controls">
+    <button class="control" gui-click="menus.transition('LOGIN')">Login</button>
+    <button class="control" gui-click="menus.transition('REGISTER')">Register</button>
+  </div>
+</gui-menu>
+
+<gui-menu class="menu" id="LOGIN" gui-on-show="menus.onShowLogin()">
+  <h1 class="subtitle">LOGIN</h1>
+  <form id="login-form" class="sub-menu form" onsubmit="return false">
+    <label for="loginUsername" value="">Username</label>
+    <input id="loginUsername" />
+    <label for="loginPassword" value="">Password</label>
+    <input id="loginPassword" type="password" />
+    <div id="login-notification" class="notification"></div>
+    <hr />
+    <button type="submit" class="control" gui-click="login()">Login</button>
+    <button class="control float-right" gui-click="menus.transition('START')">Back</button>
+  </form>
+</gui-menu>
+
+<gui-menu class="menu" id="REGISTER" gui-on-show="menus.onShowRegister()">
+  <h1 class="subtitle">Register</h1>
+  <form id="register-form" class="sub-menu form" onsubmit="return false">
+    <label for="registerUsername" value="">Username</label>
+    <input id="registerUsername" />
+    <label for="registerPassword" value="">Password</label>
+    <input id="registerPassword" type="password" />
+    <label for="registerConfirmPassword" value="">Confirm Password</label>
+    <input id="registerConfirmPassword" type="password" />
+    <div id="register-notification" class="notification"></div>
+    <hr />
+    <button type="submit" class="control" gui-click="register()">Register</button>
+    <button class="control float-right" gui-click="menus.transition('START')">Back</button>
+  </form>
+</gui-menu>
+
+<gui-menu class="menu" id="MAIN" gui-on-show="returnToMain()">
   <h1 class="title">Mage Wars</h1>
   <div class="sub-menu controls">
     <button class="control" gui-click="menus.transition('JOIN_GAME')">Join Game</button>
     <button class="control" gui-click="menus.transition('CREATE_GAME')">Create Game</button>
-    <button class="control" gui-click="menus.transition('HIGH_SCORES')">High Scores</button>
+    <button class="control" gui-click="menus.transition('LEADERBOARD')">Leaderboard</button>
     <button class="control" gui-click="menus.transition('CREDITS')">Credits</button>
   </div>
 </gui-menu>
@@ -24,6 +62,7 @@
   <h1 class="subtitle">Join Game</h1>
   <div class="sub-menu">
     <div id="games-list" class="ag-theme-blue list-table"></div>
+    <div id="join-notification" class="notification"></div>
     <hr />
     <button class="control float-right" gui-click="menus.transition('MAIN')">Back</button>
     <button id="join-game" class="control" disabled gui-click="menus.joinGame()">Join</button>
@@ -31,7 +70,7 @@
   </div>
 </gui-menu>
 
-<gui-menu class="menu" id="CREATE_GAME" gui-on-show="menus.listGames()">
+<gui-menu class="menu" id="CREATE_GAME" gui-on-show="menus.onShowCreate()">
   <h1 class="subtitle">Create Game</h1>
   <div class="sub-menu form">
     <label for="name">Name</label>
@@ -53,6 +92,7 @@
     <div class="slidecontainer">
       <input id="desert" type="range" min="0" max="100" value="25" class="slider">
     </div>
+    <div id="create-notification" class="notification"></div>
     <hr />
     <button type="submit" class="control" gui-click="menus.createGame()">Create</button>
     <button class="control float-right" gui-click="menus.transition('MAIN')">Back</button>
@@ -70,14 +110,14 @@
     </div>
   </gui-menu>
 
-<gui-menu class="menu" id="HIGH_SCORES" gui-on-show="menus.showScores(getHighScores())">
-  <h1 class="title">Mage Wars</h1>
-  <div class="sub-menu">
-    <table class="list-table" id="high-scores-list">
+<gui-menu class="menu" id="LEADERBOARD" gui-on-show="menus.showLeaderboard()">
+  <h1 class="subtitle">Leaderboard</h1>
+  <div class="sub-menu leaderboard">
+    <table class="score-table" id="leaderboard-list">
       <tr>
-        <th>Score</th>
-        <th>Bricks Destroyed</th>
-        <th>Max Combo</th>
+        <th>Player</th>
+        <th>Wins</th>
+        <th>Kills</th>
       </tr>
     </table>
     <hr />
@@ -87,7 +127,7 @@
 </gui-menu>
 
 <gui-menu class="menu" id="CREDITS">
-  <h1 class="title">Mage Wars</h1>
+  <h1 class="subtitle">Credits</h1>
   <div class="sub-menu credits">
     <div>Created by Brett Bonar for CS5460 taught by Dean Mathias</div>
     <hr />
@@ -95,16 +135,33 @@
   </div>
 </gui-menu>
 
-<gui-menu class="menu" id="PAUSE">
-  <div id="pause-menu" class="controls pause-menu sub-menu ">
-    <button class="control" gui-click="game.resume()">Resume</button>
-    <button class="control" gui-click="game.quit()">Quit</button>
+<gui-menu class="menu" id="SCOREBOARD" gui-on-show="menus.showScoreboard(getGameScores())">
+  <div class="scoreboard">
+    <div class="players-remaining">Players Remaining: <div id="players-remaining" class="players-remaining-count"></div></div>
+    <table class="score-table" id="scoreboard-list">
+      <tr>
+        <th>Player</th>
+        <th>Kills</th>
+        <th>Status</th>
+      </tr>
+    </table>
   </div>
 </gui-menu>
 
-<gui-menu class="menu retry-menu" id="RETRY">
-  <div id="pause-menu" class="controls retry-menu sub-menu ">
-    <button class="control" gui-click="newGame()">Retry</button>
-    <button class="control" gui-click="game.quit()">Quit</button>
+<gui-menu class="menu" id="IN_GAME_MENU">
+  <div class="sub-menu controls">
+    <button class="control" gui-click="menus.hide('IN_GAME_MENU')">Resume</button>
+    <!-- <button class="control" gui-click="menus.show('IN_GAME_CONTROLS')">Controls</button> -->
+    <button class="control" gui-click="quitGame()">Quit Game</button>
+  </div>
+</gui-menu>
+
+<gui-menu class="menu" id="CONTROLS">
+  <h1 class="subtitle">Controls</h1>
+  <div class="sub-menu controls">
+    <label for="move_up">Move Up</label>
+    <input id="move_up" value="W" />
+    <hr />
+    <button class="control float-right" gui-click="menus.transition('MAIN')">Back</button>
   </div>
 </gui-menu>

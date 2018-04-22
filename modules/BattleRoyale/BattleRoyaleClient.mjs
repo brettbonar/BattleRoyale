@@ -50,7 +50,9 @@ const EVENTS = {
   USE: "use",
   FLY_UP: "raiseAltitude",
   FLY_DOWN: "lowerAltitude",
-  SHOW_MAP: "showMap"
+  SHOW_MAP: "showMap",
+  SHOW_SCORES: "showScores",
+  SHOW_MENU: "showMenu"
 }
 
 let sequenceNumber = 1;
@@ -98,7 +100,9 @@ export default class BattleRoyaleClient extends BattleRoyale {
       }
     };
 
-    this.interface = new BattleRoyaleInterface();
+    this.interface = new BattleRoyaleInterface({
+      players: this.players
+    });
     this.pendingCollisions = [];
     this.pendingRemoves = [];
 
@@ -113,6 +117,8 @@ export default class BattleRoyaleClient extends BattleRoyale {
     this.keyBindings[KEY_CODE.M] = EVENTS.SHOW_MAP;
     this.keyBindings[KEY_CODE.SPACE] = EVENTS.FLY_UP;
     this.keyBindings[KEY_CODE.SHIFT] = EVENTS.FLY_DOWN;
+    this.keyBindings[KEY_CODE.TAB] = EVENTS.SHOW_SCORES;
+    this.keyBindings[KEY_CODE.ESCAPE] = EVENTS.SHOW_MENU;
     this.keyBindings["leftClick"] = EVENTS.PRIMARY_FIRE;
     this.keyBindings["rightClick"] = EVENTS.SECONDARY_FIRE;
     this.activeEvents = [];
@@ -133,9 +139,30 @@ export default class BattleRoyaleClient extends BattleRoyale {
     this.addEventHandler(EVENTS.PREVIOUS_WEAPON, (event) => this.previousWeapon(event));
     this.addEventHandler(EVENTS.NEXT_WEAPON, (event) => this.nextWeapon(event));
     this.addEventHandler(EVENTS.SHOW_MAP, (event) => this.showMap(event));
+    this.addEventHandler(EVENTS.SHOW_SCORES, (event) => this.showScores(event));
+    this.addEventHandler(EVENTS.SHOW_MENU, (event) => this.showMenu(event));
 
     this.stateFunctions[Game.STATE.PLAYING].update = (elapsedTime) => this._update(elapsedTime);
     this.stateFunctions[Game.STATE.PLAYING].render = (elapsedTime) => this._render(elapsedTime);
+  }
+
+  onGameOver(scores) {
+    this.quit();
+    this.menus.show("SCOREBOARD");
+  }
+
+  showMenu(event) {
+    if (!event.release) {
+      this.menus.transition("IN_GAME_MENU");
+    }
+  }
+
+  showScores(event) {
+    if (event.release) {
+      this.menus.hide("SCOREBOARD");
+    } else {
+      this.menus.show("SCOREBOARD");
+    }
   }
 
   onEvents(events) {

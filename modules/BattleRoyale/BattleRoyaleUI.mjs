@@ -20,7 +20,7 @@ export default class BattleRoyaleUI extends GameUI {
         {
           headerName: "Status",
           field: "status",
-          valueGetter: (params) => _.capitalize(params.data.status)
+          valueGetter: (params) => _.startCase(params.data.status)
         }
       ],
       rowData: [],
@@ -30,8 +30,20 @@ export default class BattleRoyaleUI extends GameUI {
       rowSelection: "single",
       onRowSelected: (event) => this.gamesListRowSelected(event),
       onRowDoubleClicked: (event) => {
-        if (event.node.selected && event.data.numberOfPlayers < event.data.maxPlayers && event.data.status === "lobby") {
-          this.joinGame();
+        if (event.data.status === "lobby") {
+          if (event.data.numberOfPlayers < event.data.maxPlayers) {
+            this.joinGame();  
+          } else {
+            this.menus.JOIN_GAME.find("#join-notification")
+              .removeClass("success")
+              .addClass("error")
+              .html("Game is full");
+          }
+        } else {
+          this.menus.JOIN_GAME.find("#join-notification")
+            .removeClass("success")
+            .addClass("error")
+            .html("Game in progress");
         }
       }
     };
@@ -41,6 +53,11 @@ export default class BattleRoyaleUI extends GameUI {
         {
           headerName: "Player",
           field: "playerName"
+        },
+        {
+          headerName: "Status",
+          field: "status",
+          valueGetter: (params) => _.startCase(params.data.status)
         }
       ],
       rowData: [],
@@ -64,6 +81,12 @@ export default class BattleRoyaleUI extends GameUI {
       .done((game) => {
         this.controller.joinGame(game);
         this.transition("LOBBY");
+      })
+      .fail((response) => {
+        this.menus.JOIN_GAME.find("#join-notification")
+          .removeClass("success")
+          .addClass("error")
+          .html(response.responseText);
       });
   }
   
@@ -85,6 +108,12 @@ export default class BattleRoyaleUI extends GameUI {
             this.controller.joinGame(game);
             this.transition("LOBBY");
           });
+      })
+      .fail((response) => {
+        this.menus.CREATE_GAME.find("#create-notification")
+          .removeClass("success")
+          .addClass("error")
+          .html(response.responseText);
       });
   }
 
@@ -92,10 +121,15 @@ export default class BattleRoyaleUI extends GameUI {
     if (!this.gamesListGridOptions.api) {
       this.gameListGrid = new agGrid.Grid($("#games-list")[0], this.gamesListGridOptions);
     }
+    $("#join-game").attr("disabled", true);
     API.listGames()
       .done((games) => {
         this.gamesListGridOptions.api.setRowData(games);
       });
+  }
+
+  updateLobby(lobby) {
+    this.lobbyListGridOptions.api.setRowData(lobby.players);
   }
 
   showLobby() {
@@ -103,11 +137,49 @@ export default class BattleRoyaleUI extends GameUI {
       this.lobbyListGrid = new agGrid.Grid($("#lobby-list")[0], this.lobbyListGridOptions);
     }
     API.getLobby(this.controller.gameInfo.gameId)
-      .done((game) => {
-        this.lobbyListGridOptions.api.setRowData(game.players);
+      .done((lobby) => {
+        this.updateLobby(lobby);
       });
   }
 
-  showScores(scores) {
+  onShowRegister() {
+    this.menus.REGISTER.find("#registerUsername").focus();
+  }
+
+  onShowLogin() {
+    this.menus.LOGIN.find("#loginUsername").focus();
+  }
+
+  onShowCreate() {
+    this.menus.CREATE_GAME.find("#name").focus();
+  }
+
+  buildRow(data) {
+    return "<tr>" + data.map((item) => "<td>" + item + "</td>").join("") + "</tr>";
+  }
+
+  showLeaderboard() {
+    API.getScores()
+      .done((scores) => {
+        let leaderboardList = this.menus.LEADERBOARD.find("#leaderboard-list");
+        leaderboardList.find("tr:gt(0)").remove();
+        scores = _.sortBy(scores, "wins", "kills").reverse();
+        
+        for (const score of scores) {
+          leaderboardList.append(this.buildRow([score.playerName, score.wins, score.kills]));
+        }
+      });
+  }
+
+  showScoreboard(scores) {
+    let remaining = this.menus.SCOREBOARD.find("#players-remaining");
+    remaining.html(scores.filter((score) => score.status === "alive").length);
+    let scoreboardList = this.menus.SCOREBOARD.find("#scoreboard-list");
+    scoreboardList.find("tr:gt(0)").remove();
+    scores = _.sortBy(scores, (score) => score.status === "alive", "kills").reverse();
+    
+    for (const score of scores) {
+      scoreboardList.append(this.buildRow([score.playerName, score.kills, _.startCase(score.status)]));
+    }
   }
 }

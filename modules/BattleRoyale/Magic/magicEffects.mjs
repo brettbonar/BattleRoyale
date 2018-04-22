@@ -153,7 +153,7 @@ let magicEffects = {
         // }
       },
       hitEffect: {
-        particleEffect: "splash"
+        particleEffect: "bigSplash"
       },
       dimensions: {
         width: 128,

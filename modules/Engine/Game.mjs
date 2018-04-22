@@ -100,6 +100,7 @@ export default class Game {
         inputEvent: inputEvent,
         release: keyUp
       });
+      inputEvent.preventDefault();
     }
   }
 

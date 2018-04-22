@@ -24,6 +24,17 @@ class GameUI {
     this.showMenuCbs[state].push(cb);
   }
 
+  show(menu) {
+    this.menus[menu].show();
+    for (const cb of this.showMenuCbs[menu]) {
+      cb(menu);
+    }
+  }
+
+  hide(menu) {
+    this.menus[menu].hide();
+  }
+
   transition(state) {
     _.each(this.menus, (menu) => {
       menu.hide();

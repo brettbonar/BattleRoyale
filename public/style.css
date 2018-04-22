@@ -23,7 +23,7 @@ hr {
 .title {
   text-align: center;
   /* text-transform: uppercase; */
-  font-size: 7vw;
+  font-size: 90px;
   white-space: nowrap;
   /* text-shadow: 4px 4px 0 rgba(140, 117, 117, 0.7); */
   text-shadow:
@@ -87,7 +87,18 @@ hr {
 
 ul.events-list {
   list-style-type: none;
-  color: #3328cc;
+}
+
+ul.events-list li.kill {
+  font-size: 24px;
+  text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black;
+  color: white;
+}
+
+ul.events-list li.playerAvatarChange {
+  font-size: 24px;
+  text-shadow: -1px 0 white, 0 1px white, 1px 0 white, 0 -1px white;
+  color: black;
 }
 
 .events-area {
@@ -155,7 +166,7 @@ ul.events-list {
 .controls {
   display: flex;
   flex-direction: column;
-  font-size: 2vw;
+  font-size: 26px;
 }
 
 .menu .controls {
@@ -177,7 +188,7 @@ ul.events-list {
 }
 
 .credits {
-  font-size: calc(5px + 1vw);
+  font-size: 24px;
 }
 
 .list-table {
@@ -224,7 +235,7 @@ ul.events-list {
   box-shadow: rgba(255,255,255,0.4) 0 1px 0, inset rgba(255,255,255,0.4) 0 1px 0;
   text-shadow: #8f3232 0 1px 0;
   color: #ffffff;
-  font-size: 1.75vw;
+  font-size: 24px;
   text-decoration: none;
   vertical-align: middle;
   }
@@ -301,4 +312,37 @@ ul.events-list {
   border-radius: 50%;
   background: #3328cc;
   cursor: pointer;
+}
+
+.scoreboard {
+  /* height: 75vw; */
+  max-height: 75vh;
+  width: 800px;
+  /* margin: auto; */
+  margin-top: 100px;
+  margin-left: auto;
+  margin-right: auto;
+  font-size: 30px;
+  text-shadow: -1px 0 white, 0 1px white, 1px 0 white, 0 -1px white;
+}
+
+.leaderboard {
+  font-size: 30px;
+}
+
+.players-remaining {
+  margin-bottom: 25px;
+}
+.players-remaining-count {
+  display: inline-block;
+}
+
+.score-table {
+  width: 100%;
+  height: 100%;
+}
+
+.score-table th {
+  text-align: left;
+  border-bottom: 1px solid white;
 }
