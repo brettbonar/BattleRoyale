@@ -65,6 +65,10 @@ https://opengameart.org/content/rpg-gui-contstruction-kit-vmoon
 https://nestlelion.deviantart.com/art/Some-Effects-107393192
 https://xypter.deviantart.com/art/Ultimate-Beam-Fx-3-150022444
 
+SOUND:
+https://opengameart.org/content/spell-sounds-starter-pack
+https://opengameart.org/content/rpg-sound-package
+
 FUTURE:
 
 https://opengameart.org/content/lpc-pennomis-ui-elements

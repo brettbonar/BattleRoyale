@@ -458,6 +458,9 @@ let attacks = {
   flamethrower: {
     type: "projectile",
     name: "flamethrower",
+    audio: {
+      onCreate: "/Assets/Audio/spells/flamethrower_short.ogg"
+    },
     rendering: {
       imageSource: "/Assets/projectiles/flame.png",
       dimensions: {

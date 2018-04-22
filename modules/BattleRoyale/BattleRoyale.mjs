@@ -88,6 +88,12 @@ export default class BattleRoyale extends Game {
     if (object instanceof Character) {
       _.pull(this.gameState.characters, object);
     }
+    // if (object.audio && object.audio.length > 0) {
+    //   for (const audio of object.audio) {
+    //     audio.muted = true;
+    //   }
+    //   object.audio.length = 0;
+    // }
   }
 
   addScript(script) {

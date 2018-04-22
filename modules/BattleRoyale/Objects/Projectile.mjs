@@ -7,6 +7,7 @@ import Dimensions from "../../Engine/GameObject/Dimensions.mjs"
 import { getDistance, getRotatedEndpoint } from "../../Engine/util.mjs"
 import { getRangeMap, smoothStop } from "../../Engine/Math.mjs"
 import BeamRenderer from "../Renderers/BeamRenderer.mjs"
+import AudioCache from "../../Engine/Audio/AudioCache.mjs";
 
 export default class Projectile extends GameObject {
   constructor(params) {
@@ -25,6 +26,15 @@ export default class Projectile extends GameObject {
     if (params.attackType) {
       this.attack = attacks[params.attackType];
     }
+
+    if (!this.simulation && this.attack.audio) {
+      if (this.attack.audio.onCreate) {
+        let audio = new Audio(this.attack.audio.onCreate);
+        audio.play();
+        this.audio.push(audio);
+      }
+    }
+
     // this.dimensions = {
     //   width: 32,
     //   height: 52

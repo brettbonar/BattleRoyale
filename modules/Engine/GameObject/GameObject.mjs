@@ -37,6 +37,7 @@ export default class GameObject extends GameObjectProxy {
     this.type = "GameObject";
     _.merge(this, params);
     _.defaults(this, {
+      audio: [],
       boundsType: Bounds.TYPE.RECTANGLE,
       // Dimensions are render dimensions
       dimensions: new Dimensions({

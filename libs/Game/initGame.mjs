@@ -207,8 +207,8 @@ function initGame(players, maps) {
         inventory: [
           "bow",
           // "shadowBow",
-          // "lightStaffMale",
-          // "fireStaffMale",
+          "lightStaffMale",
+          "fireStaffMale",
           "waterStaffMale",
           // "staffMale"
         ]
