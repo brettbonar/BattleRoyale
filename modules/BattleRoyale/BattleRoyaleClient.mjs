@@ -66,6 +66,8 @@ export default class BattleRoyaleClient extends BattleRoyale {
     this.tempCanvas = temp.canvas;
     this.tempContext = temp.context;
 
+    this.crosshairImage = ImageCache.get("/Assets/crosshairs/image0044.png");
+
     // this.tempContext.mozImageSmoothingEnabled = false;
     // this.tempContext.webkitImageSmoothingEnabled = false;
     // this.context.mozImageSmoothingEnabled = false;
@@ -441,19 +443,23 @@ export default class BattleRoyaleClient extends BattleRoyale {
       objectId: this.gameState.player.objectId
     };
 
-    // TODO: start animation immediately
-    this.doAttack(this.gameState.player, {
+    let params = {
       source: source,
       attackType: attackType,
       release: event.release
-    }, 0, true);
+    };
 
-    this.sendEvent({
-      type: "attack",
-      source: source,
-      attackType: attackType,
-      release: event.release
-    });
+    let action = this.getAction(this.gameState.player, params);
+    if (action && (this.gameState.player.canQueueAction(action.action) || this.gameState.player.isActionQueued(action.action))) {
+      let actionId = this.doAttack(this.gameState.player, params, action, 0, true);
+      this.sendEvent({
+        type: "attack",
+        source: source,
+        attackType: attackType,
+        release: event.release,
+        actionId: actionId
+      });
+    }
   }
 
   flyDown(event) {
@@ -609,14 +615,12 @@ export default class BattleRoyaleClient extends BattleRoyale {
     
     this.tempContext.restore();
 
-    // TODO: put somewhere else
     // Render cursor
-    this.tempContext.beginPath();
-    this.tempContext.arc(this.gameState.cursor.position.x, this.gameState.cursor.position.y, 5, 0, 2 * Math.PI);
-    this.tempContext.closePath();
-
-    this.tempContext.strokeStyle = "red";
-    this.tempContext.stroke();
+    if (this.crosshairImage.complete) {
+      this.tempContext.drawImage(this.crosshairImage,
+        this.gameState.cursor.position.x - this.crosshairImage.width / 2,
+        this.gameState.cursor.position.y - this.crosshairImage.height / 2);
+    }
 
     this.tempContext.restore();
 

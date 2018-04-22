@@ -301,7 +301,7 @@ export default class Projectile extends GameObject {
     // TODO: subtract?
     origin.add(attack.effect.offset);
     // Move projectile bounds along direction until they no longer collide with character bounds
-    let directionOffset;
+    let directionScale;
     if (direction.x || direction.y) {
       let directionXOffset = Number.MAX_VALUE;
       if (direction.x) {
@@ -315,14 +315,14 @@ export default class Projectile extends GameObject {
         ((((sourceOrigin.y + sourceDimensions.height) - origin.y) /
           direction.y));
       }
-      directionOffset = Math.min(directionXOffset, directionYOffset);
+      directionScale = Math.min(directionXOffset, directionYOffset);
     } else {
       // Just move in Y direction
-      directionOffset = (sourceOrigin.y + sourceDimensions.width) - origin.y;
+      directionScale = (sourceOrigin.y + sourceDimensions.width) - origin.y;
     }
     origin.add({
-      x: directionOffset * direction.x + Math.sign(direction.x),
-      y: directionOffset * direction.y + Math.sign(direction.y)
+      x: directionScale * direction.x + Math.sign(direction.x) * 5,
+      y: directionScale * direction.y + Math.sign(direction.y) * 5
     });
 
     return origin;

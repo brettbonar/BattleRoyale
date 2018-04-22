@@ -51,6 +51,8 @@ https://opengameart.org/content/lpc-terrain-extension
 https://opengameart.org/content/lpc-snowy-tree
 https://opengameart.org/content/lpc-misc-animations-and-items
 https://opengameart.org/content/lpc-modified-art
+https://opengameart.org/content/64-crosshairs-pack
+https://opengameart.org/content/64-crosshairs-pack-split
 
 GUI:
 https://opengameart.org/content/gui-elements
@@ -70,7 +72,6 @@ https://opengameart.org/content/lpc-farming-tilesets-magic-animations-and-ui-ele
 https://opengameart.org/content/painterly-spell-icons-part-1
 https://opengameart.org/content/25-special-effects-rendered-with-blender
 https://opengameart.org/content/animated-particle-effects-1
-https://opengameart.org/content/64-crosshairs-pack
 https://opengameart.org/content/elemental-absorbtion-animation
 ****https://opengameart.org/content/2d-rpg-lpc-compatible-tilessprites
 

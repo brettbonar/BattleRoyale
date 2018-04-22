@@ -1451,11 +1451,11 @@ objects.chest1 = {
     {
       offset: {
         x: -8,
-        y: 24
+        y: 12
       },
       dimensions: {
         width: 48,
-        height: 24
+        height: 36
       }
     }
   ]
@@ -1511,11 +1511,11 @@ objects.chest2 = {
     {
       offset: {
         x: -8,
-        y: 24
+        y: 12
       },
       dimensions: {
         width: 48,
-        height: 24
+        height: 36
       }
     }
   ]

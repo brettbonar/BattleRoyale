@@ -177,7 +177,7 @@ let magicEffects = {
       actionRate: 1,
       actionType: "exclusive",
       automatic: false,
-      manaCost: 0
+      manaCost: 15
     },
     positionOffset: {
       x: 64,

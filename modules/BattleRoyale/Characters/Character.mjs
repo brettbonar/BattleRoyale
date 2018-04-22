@@ -29,8 +29,8 @@ export default class Character extends GameObject {
   constructor(params) {
     super(params);
 
-    this.actionIdIncrement = GameSettings.isServer ? 1 : -1;
-    this.actionId = GameSettings.isServer ? 1 : -1;
+    this.actionIdIncrement = 1;//GameSettings.isServer ? 1 : -1;
+    this.actionId = 1;// GameSettings.isServer ? 1 : -1;
 
     this.type = "Character";
     this.characterInfo = params.characterInfo;
@@ -46,6 +46,7 @@ export default class Character extends GameObject {
     this.losHidden = true;
     this.cooldowns = [];
     this.actionStack = [];
+    this.actionTime = 0;
     
     this.physics.surfaceType = "character";
 
@@ -208,6 +209,7 @@ export default class Character extends GameObject {
     this.latestAction = action;
     if (!this.currentAction) {
       this.actionStack.unshift(action);
+      this.actionTime = 0;
     }
   }
 
@@ -243,7 +245,7 @@ export default class Character extends GameObject {
     let hasEnoughHealth = !healthCost || this.state.currentHealth >= healthCost;
     // TODO: add elapsedTime to cooldown here?
     let cooldown = _.find(this.cooldowns, { actionName: action.name });
-    return this.canQueueAction(action) && hasEnoughHealth && hasEnoughMana && !cooldown;
+    return this.canQueueAction(action.action) && hasEnoughHealth && hasEnoughMana && !cooldown;
   }
 
   addItem(itemType) {
@@ -254,10 +256,14 @@ export default class Character extends GameObject {
 
   canQueueAction(action) {
     let top = this.currentAction;
-    if (top !== action && top && (top.action.actionType === "exclusive" && action.action.actionType === "exclusive" || top.action.actionType === "blocking")) {
+    if (top && top.action !== action && (top.action.actionType === "exclusive" && action.actionType === "exclusive" || top.action.actionType === "blocking")) {
       return false;
     }
     return true;
+  }
+
+  isActionQueued(action) {
+    return _.find(this.actionStack, { name: action.name });
   }
 
   nextAction(elapsedTime) {
@@ -270,7 +276,7 @@ export default class Character extends GameObject {
   }
 
   // TODO: pull this outside of character class
-  doAction(type, stopAction, action, elapsedTime, cb, stopCb) {
+  doAction(type, stopAction, action, elapsedTime, cb, stopCb, actionId) {
     let top = this.currentAction;
     elapsedTime = elapsedTime || 0;
     if (stopAction) {
@@ -284,7 +290,7 @@ export default class Character extends GameObject {
         let newAction = {
           type: type,
           name: action.name,
-          actionId: this.actionId += this.actionIdIncrement,
+          actionId: actionId || this.actionId++,
           currentTime: elapsedTime || 0,
           action: action,
           new: true,
@@ -292,6 +298,7 @@ export default class Character extends GameObject {
           cb: cb
         };
         this.actionStack.unshift(newAction);
+        this.actionTime = 0;
 
         // Pause previous action
         if (top) {
@@ -299,6 +306,8 @@ export default class Character extends GameObject {
           top.finalTime = 0;
         }
         this.startAction(newAction, elapsedTime);
+
+        return newAction.actionId;
       }
     }
   }
@@ -364,31 +373,41 @@ export default class Character extends GameObject {
   }
 
   updateAction(action, elapsedTime) {
-    if (action && !action.channeling) {
-      // TRICKY: make each action last for at least one frame even if it has 0 duration
-      // Find a better way of dealing with this
-      if (action.new) {
-        if (this.canDoAction(action)) {
-          elapsedTime = 0;
-          action.new = false;
-        }
-        return;
-      }
-      let cooldownTimeDiff = 0;
-      let cooldown = _.find(this.cooldowns, { actionName: action.name });
-      if (cooldown) {
-        cooldownTimeDiff = cooldown.currentTime - cooldown.cooldownTime;
-      }
-
-      if (cooldownTimeDiff >= 0) {
-        _.pull(this.cooldowns, cooldown);
-        action.currentTime += (elapsedTime + cooldownTimeDiff);
-        if (!action.action.actionDuration || action.currentTime >= action.action.actionDuration) {
-          if (!action.finishedTime) {
-            action.finishedTime = action.currentTime || 0;
+    if (action) {
+      if (action.channeling) {
+        if (action.action.manaCostPerSec) {
+          this.state.currentMana = Math.max(0,
+            this.state.currentMana - action.action.manaCostPerSec * (elapsedTime / 1000));
+          if (this.state.currentMana === 0) {
+            this.stopAction(action, 0);
           }
-          if (!action.action.charge) {
-            this.completeAction(action);
+        }
+      } else {
+        // TRICKY: make each action last for at least one frame even if it has 0 duration
+        // Find a better way of dealing with this
+        if (action.new) {
+          if (this.canDoAction(action)) {
+            elapsedTime = 0;
+            action.new = false;
+          }
+          return;
+        }
+        let cooldownTimeDiff = 0;
+        let cooldown = _.find(this.cooldowns, { actionName: action.name });
+        if (cooldown) {
+          cooldownTimeDiff = cooldown.currentTime - cooldown.cooldownTime;
+        }
+
+        if (cooldownTimeDiff >= 0) {
+          _.pull(this.cooldowns, cooldown);
+          action.currentTime += (elapsedTime + cooldownTimeDiff);
+          if (!action.action.actionDuration || action.currentTime >= action.action.actionDuration) {
+            if (!action.finishedTime) {
+              action.finishedTime = action.currentTime || 0;
+            }
+            if (!action.action.charge) {
+              this.completeAction(action);
+            }
           }
         }
       }
@@ -449,6 +468,11 @@ export default class Character extends GameObject {
       this.position.z = this.state.maxAltitude;
     }
 
+    if (this.state.hasMana && this.state.manaRegeneration) {
+      this.state.currentMana = Math.min(this.state.maxMana,
+        this.state.currentMana + this.state.manaRegeneration * (elapsedTime / 1000));
+    }
+
     // if (this.targetPosition) {
     //   if (Math.abs(this.position.x - this.targetPosition.x) <= 15 && 
     //       Math.abs(this.position.y - this.targetPosition.y) <= 15) {
@@ -481,6 +505,7 @@ export default class Character extends GameObject {
   
         state.latestAction.action = getAction(state.latestAction.name);
         this.actionStack.unshift(state.latestAction);
+        this.actionTime = 0;
         this.startAction(state.latestAction);
       } else if (!state.latestAction && !this.isThisPlayer) { // TODO: set a timeout for the current action in case the player really shouldn't be able to do it
         this.actionStack.length = 0;

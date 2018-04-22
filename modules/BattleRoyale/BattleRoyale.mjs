@@ -131,38 +131,26 @@ export default class BattleRoyale extends Game {
     }
   }
 
-  doAttack(character, params, elapsedTime, animateOnly) {
+  getAction(character, params) {
     let weapon = equipment[character.state.loadout.weapon];
     if (character.state.dead || !weapon) return;
 
-    let attack = attacks[weapon.attacks[params.attackType]];
-    if (!attack) {
-      attack = magicEffects[weapon.attacks[params.attackType]];
+    let action = attacks[weapon.attacks[params.attackType]];
+    if (!action) {
+      action = magicEffects[weapon.attacks[params.attackType]];
     }
-    if (!attack) {
-      attack = actions[weapon.attacks[params.attackType]];
+    if (!action) {
+      action = actions[weapon.attacks[params.attackType]];
     }
-    
-    if (attack) {
-      character.doAction("attack", params.release, attack.action, elapsedTime, 
-        (timeDiff, mods, action) => {
-        this.createAttack(character, params, attack, timeDiff, mods, action, animateOnly);
-      });
-    }
+
+    return action;
   }
 
-  attack(event, attackType) {
-    let source = {
-      playerId: this.player.playerId,
-      objectId: this.gameState.player.objectId
-    };
-
-    // TODO: start animation immediately
-    this.doAttack(this.gameState.player, {
-      source: source,
-      attackType: attackType,
-      release: event.release
-    });
+  doAttack(character, params, attack, elapsedTime, animateOnly) {
+    character.doAction("attack", params.release, attack.action, elapsedTime, 
+      (timeDiff, mods, action) => {
+      this.createAttack(character, params, attack, timeDiff, mods, action, animateOnly);
+    }, null, params.actionId);
   }
   
   getPhysicsObjects() {

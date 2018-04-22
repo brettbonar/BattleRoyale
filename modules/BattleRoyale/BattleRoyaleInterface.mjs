@@ -15,7 +15,7 @@ export default class BattleRoyaleInterface {
     context.save();
 
     context.beginPath();
-    context.arc(context.canvas.width - (this.minimapSize + MINIMAP_MARGIN), this.minimapSize + MINIMAP_MARGIN, this.minimapSize, 0, 2 * Math.PI);
+    context.arc(context.canvas.width - (this.minimapSize + MINIMAP_MARGIN), this.minimapSize + MINIMAP_MARGIN, this.minimapSize + 5, 0, 2 * Math.PI);
     context.closePath();
 
     context.fillStyle = "grey";
@@ -23,6 +23,8 @@ export default class BattleRoyaleInterface {
     context.strokeStyle = "grey";
     context.stroke();
 
+    context.beginPath();
+    context.arc(context.canvas.width - (this.minimapSize + MINIMAP_MARGIN), this.minimapSize + MINIMAP_MARGIN , this.minimapSize, 0, 2 * Math.PI);
     context.clip();
 
     let dimensions = {

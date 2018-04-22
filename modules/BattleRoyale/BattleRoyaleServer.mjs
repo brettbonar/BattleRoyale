@@ -203,8 +203,9 @@ export default class BattleRoyaleServer extends BattleRoyale {
     });
     if (object) {
       object.revision = data.source.revision;
-      if (!object.state.dead) {
-        this.doAttack(object, data, elapsedTime);
+      let action = this.getAction(object, data);
+      if (!object.state.dead && action && (object.canQueueAction(action.action) || object.isActionQueued(action.action))) {
+        this.doAttack(object, data, action, elapsedTime);
       }
     }
   }

@@ -33,7 +33,7 @@ let attacks = {
       actionRate: 2,
       actionType: "exclusive",
       automatic: false,
-      manaCost: 0,
+      manaCost: 10,
       charge: {
         speed: {
           maxTime: 1000,
@@ -101,8 +101,8 @@ let attacks = {
       actionRate: 4,
       actionType: "channeling",
       automatic: false,
-      manaCost: 0,
-      manaCostPerSec: 0
+      manaCost: 5,
+      manaCostPerSec: 10
     },
     rendering: {
       start: {
@@ -201,8 +201,8 @@ let attacks = {
       actionRate: 4,
       actionType: "channeling",
       automatic: false,
-      manaCost: 0,
-      manaCostPerSec: 0
+      manaCost: 10,
+      //manaCostPerSec: 0
     },
     rendering: {
       imageSource: "/Assets/projectiles/lightMote.png",
@@ -482,7 +482,7 @@ let attacks = {
       actionRate: 16,
       actionType: "exclusive",
       automatic: true,
-      manaCost: 0
+      manaCost: 1
     },
     effect: {
       path: "stream",
@@ -521,8 +521,8 @@ let attacks = {
       actionRate: 4,
       actionType: "channeling",
       automatic: false,
-      manaCost: 0,
-      manaCostPerSec: 0
+      manaCost: 5,
+      manaCostPerSec: 10
     },
     rendering: {
       start: {
@@ -616,7 +616,7 @@ let attacks = {
       actionRate: .75,
       actionType: "exclusive",
       automatic: false,
-      manaCost: 0,
+      manaCost: 15,
       charge: {
         speed: {
           maxTime: 1000,

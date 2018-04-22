@@ -18,7 +18,7 @@ class GameController {
       this.player.playerName = id;
     }); 
     this.socket.on('disconnect', function(){
-      window.alert("You Disconnected");
+      //window.alert("You Disconnected");
     });
     // this.socket.on("pingpong", () => {
     //   this.socket.emit("pingpong");
