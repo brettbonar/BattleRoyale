@@ -75,7 +75,7 @@ export default class BattleRoyaleController extends GameController {
 
   leaveGame() {
     API.leaveGame(this.gameInfo.gameId, this.player);
-    this.menus.transition("MAIN");
+    this.menus.transition("JOIN_GAME");
   }
 
   joinGame(game) {

@@ -1,6 +1,7 @@
 body {
-  font-family: "Trebuchet MS";
-  color: white;
+  font-family: "Kristen ITC";
+  color: #3328cc;
+  background-color: white;
 }
 
 hr {
@@ -21,16 +22,16 @@ hr {
 
 .title {
   text-align: center;
-  text-transform: uppercase;
+  /* text-transform: uppercase; */
   font-size: 7vw;
   white-space: nowrap;
   /* text-shadow: 4px 4px 0 rgba(140, 117, 117, 0.7); */
   text-shadow:
-  -1px -1px 0 magenta,
-  1px -1px 0 magenta,
-  -1px 1px 0 magenta,
-  1px 1px 0 magenta;
-  color: white;
+  -1px -1px 0 #3328cc,
+  1px -1px 0 #3328cc,
+  -1px 1px 0 #3328cc,
+  1px 1px 0 #3328cc;
+  color: #3328cc;
 }
 
 .subtitle {
@@ -38,11 +39,11 @@ hr {
   white-space: nowrap;
   /* text-shadow: 4px 4px 0 rgba(140, 117, 117, 0.7); */
   text-shadow:
-  -1px -1px 0 magenta,
-  1px -1px 0 magenta,
-  -1px 1px 0 magenta,
-  1px 1px 0 magenta;
-  color: white;
+  -1px -1px 0 #3328cc,
+  1px -1px 0 #3328cc,
+  -1px 1px 0 #3328cc,
+  1px 1px 0 #3328cc;
+  color: #3328cc;
 }
 
 .float-right {
@@ -86,7 +87,7 @@ hr {
 
 ul.events-list {
   list-style-type: none;
-  color: black;
+  color: #3328cc;
 }
 
 .events-area {
@@ -138,7 +139,6 @@ ul.events-list {
 }
 
 .menu {
-  background-color: black;
   z-index: 9999;
   position: absolute;
   left: 0;
@@ -182,7 +182,7 @@ ul.events-list {
 
 .list-table {
   width: 100%;
-  height: 300px;
+  height: 400px;
 }
 
 /* .high-scores-list {
@@ -203,22 +203,22 @@ ul.events-list {
 } */
 
 .control {
-  font-family: "Trebuchet MS";
+  font-family: "Kristen ITC";
   /* flex: 1; */
   margin: 10px;
   /* Button style */
   border: 1px solid #ffffff;
-  background: #ca2fa3;
-  background: -webkit-gradient(linear, left top, left bottom, from(#cc28a3), to(#ca2fa3));
-  background: -webkit-linear-gradient(top, #cc28a3, #ca2fa3);
-  background: -moz-linear-gradient(top, #cc28a3, #ca2fa3);
-  background: -ms-linear-gradient(top, #cc28a3, #ca2fa3);
-  background: -o-linear-gradient(top, #cc28a3, #ca2fa3);
-  background-image: -ms-linear-gradient(top, #cc28a3 0%, #ca2fa3 100%);
+  background: #322fca;
+  background: -webkit-gradient(linear, left top, left bottom, from(#3328cc), to(#322fca));
+  background: -webkit-linear-gradient(top, #3328cc, #322fca);
+  background: -moz-linear-gradient(top, #3328cc, #322fca);
+  background: -ms-linear-gradient(top, #3328cc, #322fca);
+  background: -o-linear-gradient(top, #3328cc, #322fca);
+  background-image: -ms-linear-gradient(top, #3328cc 0%, #322fca 100%);
   padding: 13.5px 27px;
-  -webkit-border-radius: 1px;
-  -moz-border-radius: 1px;
-  border-radius: 1px;
+  -webkit-border-radius: 12px;
+  -moz-border-radius: 12px;
+  border-radius: 12px;
   -webkit-box-shadow: rgba(255,255,255,0.4) 0 1px 0, inset rgba(255,255,255,0.4) 0 1px 0;
   -moz-box-shadow: rgba(255,255,255,0.4) 0 1px 0, inset rgba(255,255,255,0.4) 0 1px 0;
   box-shadow: rgba(255,255,255,0.4) 0 1px 0, inset rgba(255,255,255,0.4) 0 1px 0;
@@ -231,25 +231,25 @@ ul.events-list {
 .control:hover {
   border: 1px solid #ffffff;
   text-shadow: #571e1e 0 1px 0;
-  background: #cc64b2;
-  background: -webkit-gradient(linear, left top, left bottom, from(#cc64b2), to(#c968b0));
-  background: -webkit-linear-gradient(top, #cc64b2, #c968b0);
-  background: -moz-linear-gradient(top, #cc64b2, #c968b0);
-  background: -ms-linear-gradient(top, #cc64b2, #c968b0);
-  background: -o-linear-gradient(top, #cc64b2, #c968b0);
-  background-image: -ms-linear-gradient(top, #cc64b2 0%, #c968b0 100%);
+  background: #646bcc;
+  background: -webkit-gradient(linear, left top, left bottom, from(#646bcc), to(#686ec9));
+  background: -webkit-linear-gradient(top, #646bcc, #686ec9);
+  background: -moz-linear-gradient(top, #646bcc, #686ec9);
+  background: -ms-linear-gradient(top, #646bcc, #686ec9);
+  background: -o-linear-gradient(top, #646bcc, #686ec9);
+  background-image: -ms-linear-gradient(top, #646bcc 0%, #686ec9 100%);
   color: #fff;
   }
 .control:active {
   text-shadow: #571e1e 0 1px 0;
   border: 1px solid #ffffff;
-  background: #cc28a3;
-  background: -webkit-gradient(linear, left top, left bottom, from(#ca2fa3), to(#ca2fa3));
-  background: -webkit-linear-gradient(top, #ca2fa3, #cc28a3);
-  background: -moz-linear-gradient(top, #ca2fa3, #cc28a3);
-  background: -ms-linear-gradient(top, #ca2fa3, #cc28a3);
-  background: -o-linear-gradient(top, #ca2fa3, #cc28a3);
-  background-image: -ms-linear-gradient(top, #ca2fa3 0%, #cc28a3 100%);
+  background: #3328cc;
+  background: -webkit-gradient(linear, left top, left bottom, from(#322fca), to(#322fca));
+  background: -webkit-linear-gradient(top, #322fca, #3328cc);
+  background: -moz-linear-gradient(top, #322fca, #3328cc);
+  background: -ms-linear-gradient(top, #322fca, #3328cc);
+  background: -o-linear-gradient(top, #322fca, #3328cc);
+  background-image: -ms-linear-gradient(top, #322fca 0%, #3328cc 100%);
   color: #fff;
   }
 
@@ -291,7 +291,7 @@ ul.events-list {
   width: 25px;
   height: 25px;
   border-radius: 50%;
-  background: #4CAF50;
+  background: #3328cc;
   cursor: pointer;
 }
 
@@ -299,6 +299,6 @@ ul.events-list {
   width: 25px;
   height: 25px;
   border-radius: 50%;
-  background: #4CAF50;
+  background: #3328cc;
   cursor: pointer;
 }

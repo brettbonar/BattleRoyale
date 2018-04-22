@@ -11,7 +11,7 @@
 </gui-menu> -->
 
 <gui-menu class="menu" gui-start id="MAIN" gui-on-show="returnToMain()">
-  <h1 class="title">Battle Royale</h1>
+  <h1 class="title">Mage Wars</h1>
   <div class="sub-menu controls">
     <button class="control" gui-click="menus.transition('JOIN_GAME')">Join Game</button>
     <button class="control" gui-click="menus.transition('CREATE_GAME')">Create Game</button>
@@ -23,7 +23,7 @@
 <gui-menu class="menu" id="JOIN_GAME" gui-on-show="menus.listGames()">
   <h1 class="subtitle">Join Game</h1>
   <div class="sub-menu">
-    <div id="games-list" class="ag-theme-balham-dark list-table"></div>
+    <div id="games-list" class="ag-theme-blue list-table"></div>
     <hr />
     <button class="control float-right" gui-click="menus.transition('MAIN')">Back</button>
     <button id="join-game" class="control" disabled gui-click="menus.joinGame()">Join</button>
@@ -62,7 +62,7 @@
 <gui-menu class="menu" id="LOBBY" gui-on-show="menus.showLobby()">
     <h1 class="subtitle">Lobby</h1>
     <div class="sub-menu">
-        <div id="lobby-list" class="ag-theme-balham-dark list-table"></div>
+        <div id="lobby-list" class="ag-theme-blue list-table"></div>
       <hr />
       <button class="control" gui-click="ready()">Ready</button>
       <button class="control" gui-click="menus.showLobby()">Refresh</button>
@@ -71,7 +71,7 @@
   </gui-menu>
 
 <gui-menu class="menu" id="HIGH_SCORES" gui-on-show="menus.showScores(getHighScores())">
-  <h1 class="title">Battle Royale</h1>
+  <h1 class="title">Mage Wars</h1>
   <div class="sub-menu">
     <table class="list-table" id="high-scores-list">
       <tr>
@@ -87,7 +87,7 @@
 </gui-menu>
 
 <gui-menu class="menu" id="CREDITS">
-  <h1 class="title">Battle Royale</h1>
+  <h1 class="title">Mage Wars</h1>
   <div class="sub-menu credits">
     <div>Created by Brett Bonar for CS5460 taught by Dean Mathias</div>
     <hr />
