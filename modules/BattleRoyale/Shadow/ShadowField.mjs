@@ -17,20 +17,20 @@ const BUFFER_RADIUS = 512;
 const COLLAPSE_RATE = 15;
 
 const SHADOW_SPAWNS = [
-  // {
-  //   name: "Shadow Bat",
-  //   characterInfo: {
-  //     type: "shadow_bat"
-  //   },
-  //   weight: 4
-  // },
-  // {
-  //   name: "Shadow Wolf",
-  //   characterInfo: {
-  //     type: "shadow_wolf"
-  //   },
-  //   weight: 10
-  // },
+  {
+    name: "Shadow Bat",
+    characterInfo: {
+      type: "shadow_bat"
+    },
+    weight: 4
+  },
+  {
+    name: "Shadow Wolf",
+    characterInfo: {
+      type: "shadow_wolf"
+    },
+    weight: 10
+  },
   {
     name: "Shadow Ranger",
     characterInfo: {
