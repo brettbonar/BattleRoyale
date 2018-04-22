@@ -135,6 +135,19 @@ export default class BattleRoyaleClient extends BattleRoyale {
     this.stateFunctions[Game.STATE.PLAYING].render = (elapsedTime) => this._render(elapsedTime);
   }
 
+  onEvents(events) {
+    for (const event of events) {
+      if (event.type === "kill") {
+        let existing = _.find(this.gameState.objects, {
+          objectId: event.killed
+        });
+        if (existing && !existing.state.dead) {
+          existing.kill();
+        }
+      }
+    }
+  }
+
   initObjects(objects) {
     objects = objects || [];
     _.each(this.maps, (map) => {
@@ -220,7 +233,7 @@ export default class BattleRoyaleClient extends BattleRoyale {
       return new SpawnMap(object, this.maps[object.mapLevel]);
     } else if (object.type === "ShadowField") {
       return new ShadowField(object);
-    }else {
+    } else {
       console.log("Unsupported object type in createObject: " + object.type);
     }
   }
@@ -281,7 +294,6 @@ export default class BattleRoyaleClient extends BattleRoyale {
 
   onCollisions(collisions) {
     for (const collision of collisions) {
-
       let pending = this.pendingCollisions.find((col) => {
         return col.source.objectId === collision.sourceId && col.target.objectId === collision.targetId;
       });

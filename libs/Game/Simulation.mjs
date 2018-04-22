@@ -181,7 +181,7 @@ export default class Simulation {
         player.socket.emit("remove", this.removedObjects);
       }
       if (this.game.broadcastEvents.length > 0) {
-        player.socket.emit("event", )
+        player.socket.emit("event", broadcastEvents);
       }
     }
 
