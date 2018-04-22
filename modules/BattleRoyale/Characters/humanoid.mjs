@@ -544,7 +544,7 @@ export default {
     canPickUp: true,
     maxHealth: 100,
     maxMana: 100,
-    speed: 96
+    speed: 128
   },
   dimensions: {
     up: dimensions,

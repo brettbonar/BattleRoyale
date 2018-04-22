@@ -427,7 +427,7 @@ export default {
   },
   stats: {
     maxHealth: 30,
-    speed: 128,
+    speed: 150,
     canInteract: false,
     loadout: {
       weapon: "shadow_wolf"
