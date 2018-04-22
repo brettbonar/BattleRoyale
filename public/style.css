@@ -72,6 +72,10 @@ hr {
   z-index: -1;
 }
 
+.game-overlay {
+  z-index: 1000;
+}
+
 .overlay-canvas {
   z-index: 1;
 }
@@ -80,8 +84,17 @@ hr {
   z-index: -1;
 }
 
+ul.events-list {
+  list-style-type: none;
+  color: black;
+}
+
+.events-area {
+  width: 400px;
+  height: 200px;
+}
+
 .game-canvas {
-  z-index: -1;
   /* position: absolute;
   left: 0;
   top: 0;

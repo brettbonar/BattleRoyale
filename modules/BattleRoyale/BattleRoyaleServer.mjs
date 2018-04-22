@@ -286,13 +286,13 @@ export default class BattleRoyaleServer extends BattleRoyale {
 
         if (collision.source.physics.surfaceType !== SURFACE_TYPE.GAS) {
           if (!collision.source.effect.punchThrough && collision.source.effect.path !== "beam") {
-            this.removeObject(collision.source);
+            collision.source.done = true;
           }
         }
       } else {
         if (collision.source.physics.surfaceType === SURFACE_TYPE.PROJECTILE &&
             collision.source.physics.elasticity === 0 && collision.source.effect.path !== "beam") {
-          this.removeObject(collision.source);
+          collision.source.done = true;
         }
       }
       if (collision.source.effect.path === "beam") collision.source.damageReady = false;

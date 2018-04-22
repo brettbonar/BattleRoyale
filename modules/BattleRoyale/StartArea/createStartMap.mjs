@@ -13,7 +13,7 @@ function createStartMap(maps, players) {
   let startMap = new Map({
     mapWidth: 50,
     mapHeight: 50
-  });
+  }, "start");
 
   for (const column of startMap.map) {
     for (const tile of column) {

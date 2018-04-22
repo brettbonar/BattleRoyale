@@ -1,9 +1,15 @@
 import ImageCache from "../Engine/Rendering/ImageCache.mjs"
 
 const MINIMAP_MARGIN = 25;
+const EVENTS_TIMEOUT = 5000;
+const MAX_EVENTS = 5;
 
 export default class BattleRoyaleInterface {
   constructor() {
+    this.overlay = $("#game-overlay");
+    this.eventsList = $("#events-list");
+    this.events = [];
+
     this.ui = ImageCache.get("/Assets/UI/png/bars.png");
     this.mapBackground = ImageCache.get("/Assets/UI/png/map.png");
     this.mapCompass = ImageCache.get("/Assets/UI/png/compass.png");
@@ -76,6 +82,24 @@ export default class BattleRoyaleInterface {
     maps[player.level].renderMinimap(context, location);
     context.drawImage(this.mapCompass, position.x, position.y,
       this.mapCompass.width, this.mapCompass.height);
+  }
+
+  getEvent(event) {
+    return event.eventType;
+  }
+
+  addEvent(event) {
+    this.events.push(event);
+    this.eventsList.show();
+    this.eventsList.empty();
+    let visibleEvents = _.takeRight(this.events, MAX_EVENTS);
+    for (const event of visibleEvents) {
+      this.eventsList.append("<li>" + this.getEvent(event) + "</li>");
+    }
+
+    this.eventsTimeout = setTimeout(() => {
+      this.eventsList.hide();
+    }, EVENTS_TIMEOUT);
   }
 
   render(context, player, maps) {

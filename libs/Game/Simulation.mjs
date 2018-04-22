@@ -7,7 +7,6 @@ import now from "performance-now"
 import StaticObject from "../../modules/BattleRoyale/Objects/StaticObject.mjs"
 import Bounds from "../../modules/Engine/GameObject/Bounds.mjs"
 import GameSettings from "../../modules/Engine/GameSettings.mjs"
-import Quadtree from "quadtree-lib"
 import BattleRoyaleServer from "../../modules/BattleRoyale/BattleRoyaleServer.mjs"
 import createStartMap from "../../modules/BattleRoyale/StartArea/createStartMap.mjs"
 import createScript from "../../modules/BattleRoyale/Scripts/Script.mjs";
@@ -56,7 +55,7 @@ export default class Simulation {
   constructor(params) {
     _.merge(this, params);
     let maps = {};
-    maps[0] = new Map(params.gameParams);
+    maps[0] = new Map(params.gameParams, 0);
     maps[0].generateSimplex();
 
     let startArea = createStartMap(maps, params.players);
@@ -171,11 +170,9 @@ export default class Simulation {
 
     for (const player of this.players) {
       if (this.lastState.length > 0) {
-        let updates = this.refineUpdates(player.lastUpdates, this.getPlayerViewObjects(player));
-        player.lastUpdates = updates;
         player.socket.emit("update", {
           elapsedTime: this.lastElapsedTime,
-          objects: updates
+          objects: player.lastUpdates
         });
       }
       if (this.lastCollisions.length > 0) {
@@ -193,6 +190,7 @@ export default class Simulation {
     this.lastState.length = 0;
     this.lastCollisions.length = 0;
     this.removedObjects.length = 0;
+    this.game.broadcastEvents.length = 0;
   }
 
   update() {
@@ -217,6 +215,10 @@ export default class Simulation {
         //obj._modifiedKeys.length = 0;
         return result;
       });
+
+    for (const player of this.players) {
+      player.lastUpdates = this.refineUpdates(player.lastUpdates, this.getPlayerViewObjects(player));
+    }
 
     this.interval = setTimeout(() => {
       this.update();

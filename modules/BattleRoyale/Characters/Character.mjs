@@ -320,8 +320,12 @@ export default class Character extends GameObject {
       let healthCost = action.action.healthCost || 0;
       if ((!manaCost || this.state.currentMana >= manaCost) &&
            (!healthCost || this.state.currentHealth >= healthCost)) {
-        this.state.currentHealth -= action.action.healthCost || 0;
-        this.state.currentMana -= action.action.manaCost || 0;
+
+        // TODO: remove this hack
+        if (this.simulation) {
+          this.state.currentHealth -= action.action.healthCost || 0;
+          this.state.currentMana -= action.action.manaCost || 0;
+        }
         if (action.cb) action.cb(actionTimeDiff, modifiers, action);
       }
     }
@@ -375,7 +379,8 @@ export default class Character extends GameObject {
   updateAction(action, elapsedTime) {
     if (action) {
       if (action.channeling) {
-        if (action.action.manaCostPerSec) {
+        // TODO: remove this hack
+        if (action.action.manaCostPerSec && this.simulation) {
           this.state.currentMana = Math.max(0,
             this.state.currentMana - action.action.manaCostPerSec * (elapsedTime / 1000));
           if (this.state.currentMana === 0) {
@@ -468,9 +473,9 @@ export default class Character extends GameObject {
       this.position.z = this.state.maxAltitude;
     }
 
-    if (this.state.hasMana && this.state.manaRegeneration) {
+    if (this.state.hasMana && this.state.manaRegen && elapsedTime) {
       this.state.currentMana = Math.min(this.state.maxMana,
-        this.state.currentMana + this.state.manaRegeneration * (elapsedTime / 1000));
+        this.state.currentMana + this.state.manaRegen * (elapsedTime / 1000));
     }
 
     // if (this.targetPosition) {

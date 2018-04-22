@@ -34,6 +34,7 @@ class GameObjectProxy {
 export default class GameObject extends GameObjectProxy {
   constructor(params) {
     super(params);
+    this.type = "GameObject";
     _.merge(this, params);
     _.defaults(this, {
       boundsType: Bounds.TYPE.RECTANGLE,

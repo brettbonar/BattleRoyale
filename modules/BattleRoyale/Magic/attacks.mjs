@@ -565,7 +565,7 @@ let attacks = {
     effect: {
       path: "beam",
       persistAfterHit: true,
-      damage: 0,
+      damage: 2,
       damageRate: 8,
       physics: {
         force: 0

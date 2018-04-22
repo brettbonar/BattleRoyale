@@ -6,7 +6,6 @@ import ShadowField from "../../BattleRoyale/Shadow/ShadowField.mjs";
 
 export default class PhysicsEngine {
   constructor(grid) {
-    //this.quadTrees = params;
     //this.grid = grid;
   }
 
@@ -334,11 +333,6 @@ export default class PhysicsEngine {
         targetBounds: sourceBounds,
         position: targetBounds.center
       });
-
-      // this.quadTrees[obj.level].remove(obj);
-      // this.quadTrees[obj.level].push(obj);
-      // this.quadTrees[target.level].remove(target);
-      // this.quadTrees[target.level].push(target);
     }
 
     return collisions;
@@ -431,9 +425,6 @@ export default class PhysicsEngine {
           z: obj.acceleration.z * (time / 1000)
         });
       }
-
-      // this.quadTrees[obj.level].remove(obj);
-      // this.quadTrees[obj.level].push(obj);
     }
   }
 }

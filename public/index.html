@@ -27,6 +27,11 @@
 <body>
   <div game-controller="BattleRoyaleController" template="Menu/menus.html">
     <div id="canvas-group" class="canvas-group">
+      <div class="game-canvas game-overlay" id="game-overlay">
+        <div class="events-area" id="game-events">
+          <ul class="events-list" id="events-list"></ul>
+        </div>
+      </div>
       <canvas class="game-canvas primary-canvas" id="canvas-main" width="1600" height="1200"></canvas>
       <canvas class="game-canvas map-canvas" id="canvas-map" width="1600" height="1200"></canvas>
       <!-- <canvas class="game-canvas primary-canvas" id="canvas-main" width="2133" height="1200"></canvas>

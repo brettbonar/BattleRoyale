@@ -36,6 +36,7 @@ import Canvas from "../Engine/Rendering/Canvas.mjs";
 import Teams from "./Teams.mjs"
 import Door from "./Objects/Door.mjs";
 import Portal from "./Objects/Portal.mjs";
+import Boundary from "./Objects/Boundary.mjs";
 
 const EVENTS = {
   MOVE_UP: "moveUp",
@@ -139,7 +140,8 @@ export default class BattleRoyaleClient extends BattleRoyale {
 
   onEvents(events) {
     for (const event of events) {
-      if (event.type === "kill") {
+      this.interface.addEvent(event);
+      if (event.eventType === "kill") {
         let existing = _.find(this.gameState.objects, {
           objectId: event.killed
         });
@@ -231,6 +233,10 @@ export default class BattleRoyaleClient extends BattleRoyale {
       return new Item(object);
     } else if (object.type === "Portal") {
       return new Portal(object);
+    } else if (object.type === "Boundary") {
+      return new Boundary(object);
+    } else if (object.type === "GameObject") {
+      return new GameObject(object);
     } else if (object.type === "SpawnMap") {
       return new SpawnMap(object, this.maps[object.mapLevel]);
     } else if (object.type === "ShadowField") {

@@ -6,6 +6,7 @@ import ImageCache from "./Engine/Rendering/ImageCache.mjs"
 import SimplexNoise from "../shared/SimplexNoise.mjs"
 import Canvas from "./Engine/Rendering/Canvas.mjs";
 import Bounds from "./Engine/GameObject/Bounds.mjs"
+import Boundary from "./BattleRoyale/Objects/Boundary.mjs"
 
 const MAX_CANVAS_SIZE = 1024;
 const MINIMAP_CANVAS_SIZE = 2048;
@@ -115,7 +116,7 @@ const TERRAIN_OFFSETS = {
 };
 
 class Map {
-  constructor(params) {
+  constructor(params, level) {
     _.merge(this, params);
     _.defaultsDeep(this, {
       mapSize: DEFAULT_MAP_SIZE,
@@ -131,6 +132,8 @@ class Map {
         // "fire": 1
       }
     });
+
+    this.level = level;
 
     let totalMapWidth = this.mapSize * this.tileSize;
     let totalMapHeight = this.mapSize * this.tileSize;
@@ -180,6 +183,7 @@ class Map {
       // Avoid rounding/one off errors
       //_.last(this.biomeWeights).max = 1;
       this.initializeMap();
+      this.addBoundaries();
     }    
   }
 
@@ -232,6 +236,72 @@ class Map {
     }
 
     this.saveMap();
+  }
+
+  addBoundaries() {
+    // Top
+    this.objects.push(
+      new Boundary({
+        level: this.level,
+        position: {
+          x: 0,
+          y: -32
+        },
+        dimensions: {
+          width: this.mapParams.totalMapWidth,
+          height: 32,
+          zheight: 8192
+        }
+      })
+    );
+
+    // Bottom
+    this.objects.push(
+      new Boundary({
+        level: this.level,
+        position: {
+          x: 0,
+          y: this.mapParams.totalMapHeight
+        },
+        dimensions: {
+          width: this.mapParams.totalMapWidth,
+          height: 32,
+          zheight: 8192
+        }
+      })
+    );
+
+    // Left
+    this.objects.push(
+      new Boundary({
+        level: this.level,
+        position: {
+          x: -32,
+          y: 0
+        },
+        dimensions: {
+          width: 32,
+          height: this.mapParams.totalMapHeight,
+          zheight: 8192
+        }
+      })
+    );
+
+    // Right
+    this.objects.push(
+      new Boundary({
+        level: this.level,
+        position: {
+          x: this.mapParams.totalMapWidth,
+          y: 0
+        },
+        dimensions: {
+          width: 32,
+          height: this.mapParams.totalMapHeight,
+          zheight: 8192
+        }
+      })
+    );
   }
 
   initializeMap() {
@@ -520,6 +590,7 @@ class Map {
   toJSON() {
     return {
       mapSize: this.mapSize,
+      level: this.level,
       tileSize: this.tileSize,
       map: this.serializeMap(this.map),
       objects: this.objects.map((obj) => obj.getUpdateState())
