@@ -264,7 +264,10 @@ magicEffects.bat_bite = {
         y: 0
       }
     },
-    imageSize: 512,
+    dimensions: {
+      width: 512,
+      height: 512
+    },
     renderSize: 128,
     frames: 16,
     framesPerSec: 32
@@ -323,7 +326,10 @@ magicEffects.wolf_bite = {
         y: 0
       }
     },
-    imageSize: 512,
+    dimensions: {
+      width: 512,
+      height: 512
+    },
     renderSize: 128,
     frames: 16,
     framesPerSec: 32
