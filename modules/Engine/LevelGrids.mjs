@@ -43,4 +43,14 @@ export default class LevelGrids {
 
     return [];
   }
+  
+  getRenderObjectsAllLevels(bounds) {
+    let objects = [];
+
+    _.each(this.levelGrids, (grid, level) => {
+      objects = objects.concat(this.levelGrids[level].getRenderObjects(bounds));
+    });
+
+    return objects;
+  }
 }

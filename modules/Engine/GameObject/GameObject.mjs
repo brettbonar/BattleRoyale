@@ -264,6 +264,10 @@ export default class GameObject extends GameObjectProxy {
     // return [this.boundingBox];
   }
 
+  setLevel(level) {
+    this.level = level;
+  }
+
   getRayBounds(dimensions) {
     // Place the ray start/end positions perpendicular to the path of the start/end position of this object
     let direction = this.position.minus(this.lastPosition).normalize();

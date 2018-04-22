@@ -126,17 +126,17 @@ export default class Bounds {
 
   static intersectsAABB_AABB(first, second) {
     return Bounds.checkZ(first.box.ul.z, first.zheight, second.box.ul.z, second.zheight) &&
-      first.box.ul.x < second.box.lr.x &&
-      first.box.lr.x > second.box.ul.x &&
-      first.box.ul.y < second.box.lr.y &&
-      first.box.lr.y > second.box.ul.y;
+      first.box.ul.x <= second.box.lr.x &&
+      first.box.lr.x >= second.box.ul.x &&
+      first.box.ul.y <= second.box.lr.y &&
+      first.box.lr.y >= second.box.ul.y;
   }
 
   static intersectsAABB_AABB2D(first, second) {
-    return first.box.ul.x < second.box.lr.x &&
-      first.box.lr.x > second.box.ul.x &&
-      first.box.ul.y < second.box.lr.y &&
-      first.box.lr.y > second.box.ul.y;
+    return first.box.ul.x <= second.box.lr.x &&
+      first.box.lr.x >= second.box.ul.x &&
+      first.box.ul.y <= second.box.lr.y &&
+      first.box.lr.y >= second.box.ul.y;
   }
 
   constructFromTriangle(params) {

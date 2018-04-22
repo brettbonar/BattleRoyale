@@ -529,13 +529,16 @@ export default class Character extends GameObject {
       }
 
       if (state.latestAction) {
-        if (!this.currentAction || state.latestAction.name !== this.currentAction.name) {
-          state.latestAction.action = getAction(state.latestAction.name);
-          this.actionStack.unshift(state.latestAction);
-          this.startAction(state.latestAction);
-        } else if (state.latestAction.name === this.currentAction.name) {
+        if (this.currentAction && state.latestAction.name === this.currentAction.name) {
           this.currentAction.actionId = state.latestAction.actionId;
         }
+        // if (!this.currentAction || state.latestAction.name !== this.currentAction.name) {
+        //   state.latestAction.action = getAction(state.latestAction.name);
+        //   this.actionStack.unshift(state.latestAction);
+        //   this.startAction(state.latestAction);
+        // } else if (state.latestAction.name === this.currentAction.name) {
+        //   this.currentAction.actionId = state.latestAction.actionId;
+        // }
       }
     }
   }

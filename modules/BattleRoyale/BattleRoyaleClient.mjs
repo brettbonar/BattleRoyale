@@ -272,11 +272,11 @@ export default class BattleRoyaleClient extends BattleRoyale {
           playerId: object.playerId
         });
         if (existing) {
-          if (existing.revision <= object.revision) {
+          //if (existing.revision <= object.revision) {
             existing.updateState(object, update.elapsedTime);
           //}
             //existing.updateState(object, object.elapsedTime - (now - update.time));
-          }
+          //}
           this.clearAndApplyUpdates(object);
         } else {
           // Don't recreate an object that has been removed
@@ -327,7 +327,7 @@ export default class BattleRoyaleClient extends BattleRoyale {
         }
       }
 
-      if (!collision.source.collided) {
+      if (!collision.source.collided && collision.source.damageReady) {
         collision.source.collided = true;
 
         if (collision.target && collision.target.damagedEffect &&

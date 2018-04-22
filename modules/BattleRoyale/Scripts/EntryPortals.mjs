@@ -25,7 +25,7 @@ export default class EntryPortals {
       let loc = _.sample(grids);
       object.lastPosition = new Vec3(loc.position);
       object.position = new Vec3(loc.position);
-      object.level = 0;
+      object.setLevel(0);
       object.updatePosition();
       this.grid.update(object);
     } else {

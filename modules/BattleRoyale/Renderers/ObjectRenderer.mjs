@@ -43,9 +43,17 @@ export default class ObjectRenderer {
       context.globalAlpha = this.opacity;
     }
 
+    let dimensions = this.dimensions;
+    if (this.renderSize) {
+      dimensions = {
+        width: this.renderSize,
+        height: this.renderSize
+      };
+    }
+
     context.drawImage(this.image, frameOffset.x, frameOffset.y,
       this.dimensions.width, this.dimensions.height,
-      position.x, position.y, this.dimensions.width, this.dimensions.height);
+      position.x, position.y, dimensions.width, dimensions.height);
 
     if (this.opacity !== 1.0) {
       context.globalAlpha = 1.0;

@@ -12,16 +12,18 @@ export default class PhysicsEngine {
 
   getCollisionTime(A1, A2, B1, B2) {
     let times = AXES.map((axis) => {
-      let diff = A2.ul[axis] - A1.ul[axis];
+      let Adiff = A2.ul[axis] - A1.ul[axis];
+      let Bdiff = A2.ul[axis] - A1.ul[axis];
+      let diff = v[axis];
       let time = 0;
       if (diff > 0) { // moving in positive direction
-        time = 1 - (Math.abs(B2.min[axis] - A2.max[axis]) / Math.abs(diff));
+        time = 1 - (Math.abs(A2.max[axis] - B2.min[axis]) / Math.abs(diff));
       } else if (diff < 0) { // moving in negative direction
         time = 1 - (Math.abs(B2.max[axis] - A2.min[axis]) / Math.abs(diff));
       }
       return {
         axis: axis,
-        time: time
+        time: Math.min(0, time)
       };
     });
 
@@ -47,6 +49,12 @@ export default class PhysicsEngine {
     // if (A2.intersects(B2)) {
     //   return this.getCollisionTime(A1, A2, B1, B2);
     // }
+    if (A1.intersects(B1)) {
+      return {
+        axis: "x",
+        time: 0
+      };
+    }
 
     // Just check if both Z's are within range
     let AminZ = Math.min(A1.box.ul.z, A2.box.ul.z);

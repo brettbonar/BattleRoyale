@@ -565,8 +565,11 @@ let attacks = {
     effect: {
       path: "beam",
       persistAfterHit: true,
-      damage: 2,
+      damage: 0,
       damageRate: 8,
+      physics: {
+        force: 0
+      },
       // TODO: more shapes
       collisionDimensions: [{
         offset: {
@@ -641,7 +644,7 @@ let attacks = {
         }
       },
       hitEffect: {
-        particleEffect: "lightSmall"
+        particleEffect: "sparkSmall"
       },
       shadowColor: "rgba(230, 140, 100, 1)",
       shadow: "/Assets/shadows/shadow16orange.png"

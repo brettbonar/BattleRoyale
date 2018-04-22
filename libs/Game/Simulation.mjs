@@ -31,7 +31,7 @@ function addTreasure(game) {
 
   console.log("Free grids", freeGrids.length);
 
-  let count = Math.floor(game.maps[0].mapParams.totalMapWidth / 1000);
+  let count = Math.floor(game.maps[0].mapParams.totalMapWidth / 2000);
   count *= count;
 
   console.log(game.maps[0].mapParams.totalMapWidth);
@@ -115,7 +115,12 @@ export default class Simulation {
   getObjects() { return this.game.gameState.objects.map((obj) => obj.getUpdateState()) }
 
   getPlayerViewObjects(player) {
-    return _.intersectionBy(this.lastState, this.game.grid.getRenderObjects(player.character.viewBounds, player.character.level), "objectId");
+    // TRICKY: intersect by player's last updates and visible objects to handle cases where
+    // a previously object goes out of view - you want the update that moves it out of view
+    let visibleObjects = this.game.grid.getRenderObjects(player.character.viewBounds, player.character.level);
+    return _.intersectionBy(this.lastState,
+      visibleObjects.concat(player.lastUpdates),
+      "objectId");
     //return this.lastState;
   }
 

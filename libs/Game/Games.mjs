@@ -266,7 +266,14 @@ function getGame(gameId) {
   return _.find(games, { gameId: gameId });
 }
 
-games.push(new Game({ name: "Game1" }));
+games.push(new Game({
+  name: "Game1",
+  biomes: {
+    desert: 25,
+    forest: 50,
+    plain: 50
+  }
+}));
 //games.push(new Game({ name: "Game2", maxPlayers: 5 }));
 
 export { 
