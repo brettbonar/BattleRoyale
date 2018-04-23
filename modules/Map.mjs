@@ -34,7 +34,7 @@ const BIOME_PARAMS = {
   },
   [BIOMES.DESERT]: {
     flavorDensity: 0.1,
-    sceneDensity: 0.025
+    sceneDensity: 0.001
   },
   [BIOMES.FOREST]: {
     flavorDensity: 0.1,
@@ -125,7 +125,7 @@ class Map {
       objects: [],
       biomes: {
         [BIOMES.PLAIN]: 50,
-        [BIOMES.FOREST]: 25,
+        [BIOMES.FOREST]: 50,
         [BIOMES.DESERT]: 25,
         // "death": 1,
         // "water": 1,
@@ -777,8 +777,8 @@ class Map {
     }
   }
 
-  generateSimplex() {
-    let simplexNoise = new SimplexNoise();
+  generateSimplex(seed) {
+    let simplexNoise = new SimplexNoise(seed);
 
     let width = this.map.length;
     for (let x = 0; x < width; x++) {

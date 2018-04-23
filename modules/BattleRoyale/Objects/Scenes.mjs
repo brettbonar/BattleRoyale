@@ -79,6 +79,71 @@ scenes.forestTree = {
   }
 }
 
+scenes.crackedPillar = {
+  biomes: ["desert"],
+  type: "ruin",
+  size: {
+    width: 80,
+    height: 200
+  },
+  weight: 20,
+  getObjects: function (position, dimensions) {
+    return [
+      new StaticObject({
+        objectType: "crackedPillar",
+        position: {
+          x: position.x,
+          y: position.y + 119
+        },
+        simulation: true
+      })
+    ];
+  }
+}
+
+scenes.brokenHead = {
+  biomes: ["desert"],
+  type: "ruin",
+  size: {
+    width: 200,
+    height: 200
+  },
+  weight: 5,
+  getObjects: function (position, dimensions) {
+    return [
+      new StaticObject({
+        objectType: "brokenHead",
+        position: {
+          x: position.x,
+          y: position.y + 64
+        },
+        simulation: true
+      })
+    ];
+  }
+}
+
+scenes.head = {
+  biomes: ["desert"],
+  type: "ruin",
+  size: {
+    width: 256,
+    height: 512
+  },
+  weight: 2,
+  getObjects: function (position, dimensions) {
+    return [
+      new StaticObject({
+        objectType: "head",
+        position: {
+          x: position.x,
+          y: position.y + 135
+        },
+        simulation: true
+      })
+    ];
+  }
+}
 // scenes.treasure = {
 //   biomes: ["plain", "forest", "desert"],
 //   type: "treasure",

@@ -65,6 +65,7 @@ function initSockets(socketIo) {
       client.playerName = Users.getPlayerName(playerId);
       let playerGame = getPlayerInGame(playerId);
       if (playerGame) {
+        console.log("Reconnected", client.playerName);
         playerGame.game.initPlayerSocket(playerGame.player, client);
       }
     });

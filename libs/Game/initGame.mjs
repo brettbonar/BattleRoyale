@@ -119,8 +119,8 @@ function addScenes(maps) {
 function initGame(players, maps) {
   let gameObjects = [];
   let positions = [];
-  for (let x = 0; x < 1000; x += 100) {
-    for (let y = 0; y < 1000; y += 100) {
+  for (let x = 100; x < 1100; x += 100) {
+    for (let y = 100; y < 1100; y += 100) {
       positions.push({
         x: x,
         y: y,

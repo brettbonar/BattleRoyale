@@ -866,39 +866,101 @@ let objects = {
       height: 56
     }
   },
-  head: {
-    biome: "ruins",
+  crackedPillar: {
+    biome: "desert",
     imageSource: "/Assets/terrain_atlas-64.png",
+    losFade: true,
     imageDimensions: {
-      x: 968,
-      y: 776,
-      width: 108,
-      height: 182
+      x: 1210,
+      y: 969,
+      width: 66,
+      height: 184
     },
     physics: {
       surfaceType: "terrain"
     },
     dimensions: {
-      width: 104,
-      height: 58
-    }
+      width: 66,
+      height: 184,
+      zheight: 182
+    },
+    collisionDimensions: [
+      {
+        opacity: 1.0,
+        offset: {
+          x: 0,
+          y: 119
+        },
+        dimensions: {
+          width: 66,
+          height: 64,
+          zheight: 182
+        }
+      }
+    ]
+  },
+  head: {
+    biome: "desert",
+    imageSource: "/Assets/terrain_atlas-64.png",
+    losFade: true,
+    imageDimensions: {
+      x: 967,
+      y: 775,
+      width: 110,
+      height: 172
+    },
+    physics: {
+      surfaceType: "terrain"
+    },
+    dimensions: {
+      width: 110,
+      height: 172,
+      zheight: 136
+    },
+    collisionDimensions: [
+      {
+        opacity: 1.0,
+        offset: {
+          x: 0,
+          y: 135
+        },
+        dimensions: {
+          width: 105,
+          height: 36,
+          zheight: 172
+        }
+      }
+    ]
   },
   brokenHead: {
-    biome: "ruins",
+    biome: "desert",
     imageSource: "/Assets/terrain_atlas-64.png",
     imageDimensions: {
-      x: 1156,
-      y: 784,
-      width: 112,
-      height: 110
+      x: 1155,
+      y: 783,
+      width: 114,
+      height: 112
     },
     physics: {
       surfaceType: "terrain"
     },
     dimensions: {
-      width: 112,
-      height: 55
-    }
+      width: 114,
+      height: 112,
+      zheight: 64
+    },
+    collisionDimensions: [{
+      offset: {
+        x: 0,
+        y: 64
+      },
+      dimensions: {
+        width: 114,
+        height: 30,
+        zheight: 64
+      },
+      opacity: 1.0
+    }]
   },
   pillarBase1: {
     // cracked, ivy

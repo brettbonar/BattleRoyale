@@ -12,6 +12,7 @@ export default class StaticObject extends GameObject {
       renderClipped: object.renderClipped
     }, params));
     _.merge(this, object);
+    this.losFade = object.losFade;
     this.type = "StaticObject";
 
     if (!params.simulation) {
