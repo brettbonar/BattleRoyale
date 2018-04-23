@@ -327,28 +327,20 @@ ul.events-list li.playerAvatarChange {
 }
 
 .in-game-menu {
-  /* max-height: 75vh;
-  width: 800px;
-  margin-top: 100px;
+  max-height: 75vh;
+  width: 100%;
+  margin-top: 250px;
   margin-left: auto;
-  margin-right: auto; */
+  margin-right: auto;
 
-  width: 100vw; 
-  /* height: 100vw; */
-  /* height:width ratio = 9/16 = .5625 */
-  /* height: 56.25vw;  */
-  /* 12/16 */
+  /* width: 100vw; 
   height: 75vw;
   max-height: 100vh;
-  /* max-width: 100vh; */
-  /* 16/9 = 1.778 */
-  /* max-width: 177.78vh;   */
-  /* 16/12 */
   max-width: 133.33vh; 
   margin: auto;
   position: absolute;
-  top:0;bottom:0; /* vertical center */
-  left:0;right:0; /* horizontal center */
+  top:0;bottom:0;
+  left:0;right:0; */
 }
 
 .leaderboard {

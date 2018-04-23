@@ -130,14 +130,15 @@ export default class Game {
     if (document.pointerLockElement === this.canvas ||
         document.mozPointerLockElement === this.canvas) {
       this.canvas.addEventListener("mousemove", this.mouseMoveListener);
-    } else {
-      let event = this.keyBindings[KEY_CODE.ESCAPE];
-      if (event) {
-        this.inputEvents.push({
-          event: event,
-          release: false
-        });
-      }
+    } else if (!this.done) {
+      // TODO: figure out how to make this work right
+      // let event = this.keyBindings[KEY_CODE.ESCAPE];
+      // if (event) {
+      //   this.inputEvents.push({
+      //     event: event,
+      //     release: false
+      //   });
+      // }
       this.canvas.removeEventListener("mousemove", this.mouseMoveListener);
     }
   }
@@ -243,6 +244,7 @@ export default class Game {
   }
 
   quit() {
+    this.done = true;
     document.removeEventListener("mousemove", this.mouseMoveListener);
     document.removeEventListener("keydown", this.keyDownListener);
     document.removeEventListener("keyup", this.keyUpListener);
@@ -258,6 +260,7 @@ export default class Game {
   }
 
   start() {
+    this.done = false;
     if (!this.isServer) {
       if (this._settings.requestPointerLock) {
         document.addEventListener("pointerlockchange", this.pointerLockListener, false);

@@ -20,6 +20,22 @@ function setPing(client) {
   }, PING_INTERVAL);
 }
 
+function getPlayerInGame(playerId) {
+  for (const game of games) {
+    let player = game.players.find((player) => player.playerId === playerId);
+    if (player) {
+      return {
+        player: player,
+        game: game
+      };
+    }
+  }
+}
+
+function getPlayerSocket(playerId) {
+  return _.find(sockets, { playerId: playerId });
+}
+
 function initSockets(socketIo) {
   io = socketIo;
   io.sockets.setMaxListeners(0);
@@ -44,14 +60,13 @@ function initSockets(socketIo) {
     // });
 
     console.log("Connected");
-    //console.log(socket);
-    socket.emit("id", socket.id);
-
-    // socket.send(socket.id);
-
     socket.on("playerId", (playerId) => {
       client.playerId = playerId;
       client.playerName = Users.getPlayerName(playerId);
+      let playerGame = getPlayerInGame(playerId);
+      if (playerGame) {
+        playerGame.game.initPlayerSocket(playerGame.player, client);
+      }
     });
 
     socket.on("disconnect", () => {
@@ -137,22 +152,10 @@ class Game {
     return mapsJson;
   }
 
-  addPlayer(player) {
-    let client = sockets[player.socketId];
-    if (!client) {
-      return "Player not found";
-    }
-    if (client.gameId) {
-      return "Player already in a game";
-    }
-
-    player.client = sockets[player.socketId];
+  initPlayerSocket(player, client) {
+    player.client = client;
     player.client.gameId = this.gameId;
-    player.socket = sockets[player.socketId].socket;
-    player.lastUpdates = [];
-    player.lastInView = [];
-    player.status = PLAYER_STATUS.NOT_READY;
-    this.players.push(player);
+    player.socket = client.socket;
     player.socket.join(this.gameId);
     player.socket.on("update", (data) => {
       //console.log("Got update");
@@ -195,6 +198,23 @@ class Game {
         }
       });
     });
+  }
+
+  addPlayer(player) {
+    let client = getPlayerSocket(player.playerId);
+    if (!client) {
+      return "Player not found";
+    }
+    if (client.gameId) {
+      return "Player already in a game";
+    }
+
+    player.lastUpdates = [];
+    player.lastInView = [];
+    player.status = PLAYER_STATUS.NOT_READY;
+    this.players.push(player);
+
+    this.initPlayerSocket(player, client);
   }
 
   getPlayers() {

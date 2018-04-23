@@ -13,10 +13,12 @@ class GameController {
     //this.socket = io(location.protocol + "//" + location.host);
     this.player = {};
     this.socket = io();
-    this.socket.on("id", (id) => {
-      this.player.socketId = id;
-    }); 
-    this.socket.on('disconnect', function(){
+    this.socket.on("connection", (socket) => {
+      if (this.player.playerId) {
+        this.socket.emit("playerId", this.player.playerId);
+      }
+    });
+    this.socket.on("disconnect", function(){
       window.alert("You Disconnected");
     });
     // this.socket.on("pingpong", () => {

@@ -129,6 +129,9 @@ export default class BattleRoyaleUI extends GameUI {
   }
 
   updateLobby(lobby) {
+    if (!this.lobbyListGridOptions.api) {
+      this.lobbyListGrid = new agGrid.Grid($("#lobby-list")[0], this.lobbyListGridOptions);
+    }
     this.lobbyListGridOptions.api.setRowData(lobby.players);
   }
 
