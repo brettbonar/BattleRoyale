@@ -206,17 +206,19 @@ class Game {
 
   removePlayer(playerId) {
     let player = _.find(this.players, { playerId: playerId });
-    player.client.gameId = null;
-    player.socket.leave(this.gameId);
-    _.pull(this.players, player);
-    
-    if (this.simulation) {
-      this.simulation.addEvent({
-        eventType: "leave",
-        playerId: playerId
-      });
-    } else {
-      // TODO: add disconnect message to chat
+    if (player) {
+      player.client.gameId = null;
+      player.socket.leave(this.gameId);
+      _.pull(this.players, player);
+      
+      if (this.simulation) {
+        this.simulation.addEvent({
+          eventType: "leave",
+          playerId: playerId
+        });
+      } else {
+        // TODO: add disconnect message to chat
+      }
     }
   }
 
