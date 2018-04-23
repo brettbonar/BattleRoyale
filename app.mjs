@@ -11,11 +11,10 @@ import { initSockets } from "./libs/Game/Games.mjs"
 
 const app = express();
 let server = http.Server(app);
-let io = socketIo(server, {
+let io = socketIo.listen(server, {
   pingInterval: 60000,
   pingTimeout: 60000
 });
-io.set('transports', ['websocket']);
 initSockets(io);
 
 server.listen(3000);
