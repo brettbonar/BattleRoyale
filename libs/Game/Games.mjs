@@ -160,6 +160,13 @@ class Game {
         this.simulation.updateState(data, player.client.latency);
       }
     });
+    player.socket.on("chat", (data) => {
+      for (const pl of this.players) {
+        if (pl !== player) {
+          pl.socket.emit("chat", data);
+        }
+      }
+    });
     player.socket.on("ready", (data) => {
       console.log("Got ready");
       if (!player.ready) player.status = PLAYER_STATUS.READY;
@@ -170,8 +177,8 @@ class Game {
       let readyPlayers = _.sumBy(this.players, "ready");
       if (readyPlayers >= this.players.length && readyPlayers > 1 && !this.initialized) {
         console.log("Initializing");
-        this.initialized = true;
         this.initialize();
+        this.initialized = true;
         this.status = STATUS.IN_PROGRESS;
       }
 
@@ -220,6 +227,12 @@ class Game {
       } else {
         // TODO: add disconnect message to chat
       }
+    }
+
+    if ((this.done || this.status !== STATUS.LOBBY) && this.players.length === 0) {
+      this.simulation.done = true;
+      this.simulation = null;
+      _.pull(games, this);
     }
   }
 

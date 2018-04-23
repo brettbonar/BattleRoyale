@@ -105,7 +105,7 @@ export default class Game {
   }
 
   handleMouseEventImpl(inputEvent, mouseUp) {
-    if (!mouseUp && this._settings.requestPointerLock) {
+    if (!mouseUp && this._settings.requestPointerLock && !this.inMenu) {
       this.canvas.requestPointerLock();
     }
 
@@ -131,7 +131,13 @@ export default class Game {
         document.mozPointerLockElement === this.canvas) {
       this.canvas.addEventListener("mousemove", this.mouseMoveListener);
     } else {
-      this.callEvent(EVENT.PAUSE);
+      let event = this.keyBindings[KEY_CODE.ESCAPE];
+      if (event) {
+        this.inputEvents.push({
+          event: event,
+          release: false
+        });
+      }
       this.canvas.removeEventListener("mousemove", this.mouseMoveListener);
     }
   }
@@ -187,33 +193,53 @@ export default class Game {
     this.stateFunctions[this.state].processInput(elapsedTime);
   }
 
-  unbind() {
-    document.removeEventListener("mousemove", this.mouseMoveListener);
-    document.removeEventListener("keydown", this.keyDownListener);
-    document.removeEventListener("keyup", this.keyUpListener);
-    document.removeEventListener("mousedown", this.mouseDownListener);
-    document.removeEventListener("mouseup", this.mouseUpListener);
+  // unbind() {
+  //   document.removeEventListener("mousemove", this.mouseMoveListener);
+  //   document.removeEventListener("keydown", this.keyDownListener);
+  //   document.removeEventListener("keyup", this.keyUpListener);
+  //   document.removeEventListener("mousedown", this.mouseDownListener);
+  //   document.removeEventListener("mouseup", this.mouseUpListener);
+  //   if (this._settings.requestPointerLock) {
+  //     document.removeEventListener("pointerlockchange", this.pointerLockListener, false);
+  //     document.removeEventListener("mozpointerlockchange", this.pointerLockListener, false);
+  //     document.exitPointerLock();
+  //   }
+  // }
+
+  // rebind() {
+  //   if (this._settings.requestPointerLock) {
+  //     document.addEventListener("pointerlockchange", this.pointerLockListener, false);
+  //     document.addEventListener("mozpointerlockchange", this.pointerLockListener, false);
+  //     this.canvas.requestPointerLock = this.canvas.requestPointerLock || this.canvas.mozRequestPointerLock;
+  //     document.exitPointerLock = document.exitPointerLock || document.mozExitPointerLock;
+  //     this.canvas.requestPointerLock();
+  //   } else {
+  //     window.addEventListener("mousemove", this.mouseMoveListener);
+  //   }
+  //   document.addEventListener("keydown", this.keyDownListener);
+  //   document.addEventListener("keyup", this.keyUpListener);
+  //   document.addEventListener("mousedown", this.mouseDownListener);
+  //   document.addEventListener("mouseup", this.mouseUpListener);
+  // }
+
+  unbindPointerLock() {
     if (this._settings.requestPointerLock) {
       document.removeEventListener("pointerlockchange", this.pointerLockListener, false);
       document.removeEventListener("mozpointerlockchange", this.pointerLockListener, false);
       document.exitPointerLock();
+      this.inMenu = true;
     }
   }
 
-  rebind() {
+  bindPointerLock() {
     if (this._settings.requestPointerLock) {
       document.addEventListener("pointerlockchange", this.pointerLockListener, false);
       document.addEventListener("mozpointerlockchange", this.pointerLockListener, false);
       this.canvas.requestPointerLock = this.canvas.requestPointerLock || this.canvas.mozRequestPointerLock;
       document.exitPointerLock = document.exitPointerLock || document.mozExitPointerLock;
       this.canvas.requestPointerLock();
-    } else {
-      window.addEventListener("mousemove", this.mouseMoveListener);
+      this.inMenu = false;
     }
-    document.addEventListener("keydown", this.keyDownListener);
-    document.addEventListener("keyup", this.keyUpListener);
-    document.addEventListener("mousedown", this.mouseDownListener);
-    document.addEventListener("mouseup", this.mouseUpListener);
   }
 
   quit() {
@@ -227,6 +253,8 @@ export default class Game {
       document.removeEventListener("mozpointerlockchange", this.pointerLockListener, false);
       document.exitPointerLock();
     }
+
+    $(this.canvas).hide();
   }
 
   start() {
@@ -245,6 +273,8 @@ export default class Game {
       document.addEventListener("mousedown", this.mouseDownListener);
       document.addEventListener("mouseup", this.mouseUpListener);
     }
+
+    $(this.canvas).show();
 
     this.previousTime = performance.now();
     this.transitionState(STATE.PLAYING);

@@ -45,6 +45,7 @@ export default class BattleRoyaleController extends GameController {
     this.initializedDeferred = Q.defer();
     this.initialized = this.initializedDeferred.promise;
     this.scores = [];
+    this.initSocket();
 
     // TODO: put asset initialization in a function somewhere else
     let imagePromises = [];
@@ -64,44 +65,44 @@ export default class BattleRoyaleController extends GameController {
     Q.all(imagePromises).then(this.initializedDeferred.resolve());
   }
 
-  leaveGame() {
-    API.leaveGame(this.gameInfo.gameId, this.player);
-    this.menus.transition("JOIN_GAME");
-  }
-
-  quitGame() {
-    if (this.game) {
-      API.leaveGame(this.gameInfo.gameId, this.player);
-      this.game.quit();
-      this.game = null;
-    }
-  }
-
-  joinGame(game) {
-    this.gameInfo = game;
+  initSocket() {
     this.socket.on("update", (data) => {
       //console.log("Got update");
-      this.game.updateObjects(data);
+      if (this.game) {
+        this.game.updateObjects(data);
+      }
     });
     this.socket.on("remove", (data) => {
       //console.log("Got update");
-      this.game.removeObjects(data);
+      if (this.game) {
+        this.game.removeObjects(data);
+      }
     });
     this.socket.on("collision", (data) => {
       //console.log("Got update");
-      this.game.onCollisions(data);
+      if (this.game) {
+        this.game.onCollisions(data);
+      }
     });
     this.socket.on("gameOver", (data) => {
       //console.log("Got update");
-      this.game.onGameOver(data);
-      this.scores = data;
+      if (this.game) {
+        this.game.onGameOver(data);
+      }
+      if (data) {
+        this.scores = data;
+      }
     });
     this.socket.on("scores", (data) => {
-      this.scores = data;
+      if (data) {
+        this.scores = data;
+      }
     });
     this.socket.on("event", (data) => {
       //console.log("Got update");
-      this.game.onEvents(data);
+      if (this.game) {
+        this.game.onEvents(data);
+      }
     });
     this.socket.on("updateLobby", (data) => {
       this.menus.updateLobby(data);
@@ -109,20 +110,18 @@ export default class BattleRoyaleController extends GameController {
     this.socket.on("initialize", (data) => {
       console.log("Initializing");
 
-      $.when(API.getMaps(game.gameId), API.getObjects(game.gameId), API.getLobby(game.gameId))
+      $.when(API.getMaps(this.gameInfo.gameId),
+             API.getObjects(this.gameInfo.gameId),
+             API.getLobby(this.gameInfo.gameId))
         .done((mapsData, objectsData, lobbyData) => {
           let maps = {};
           _.each(mapsData[0], (map, level) => {
-            maps[level] = new Map(Object.assign({
-              gameCanvas: document.getElementById("canvas-main")
-            }, map), level);
+            maps[level] = new Map(map, level);
           });
-          let mapCanvas = document.getElementById("canvas-map");
           this.players = lobbyData[0].players;
           this.game = new BattleRoyaleClient({
             canvas: document.getElementById("canvas-main"),
             menus: this.menus,
-            mapCanvas: mapCanvas,
             maps: maps,
             player: this.player,
             players: lobbyData[0].players,
@@ -141,6 +140,23 @@ export default class BattleRoyaleController extends GameController {
           });
         });
     });
+  }
+
+  leaveGame() {
+    API.leaveGame(this.gameInfo.gameId, this.player);
+    this.menus.transition("JOIN_GAME");
+  }
+
+  quitGame() {
+    if (this.game) {
+      API.leaveGame(this.gameInfo.gameId, this.player);
+      this.quit();
+      this.menus.transition("MAIN");
+    }
+  }
+
+  joinGame(game) {
+    this.gameInfo = game;
   }
 
   getPlayerName(playerId) {
@@ -209,30 +225,13 @@ export default class BattleRoyaleController extends GameController {
     this.doLogin(user);
   }
 
+  resume() {
+    this.menus.hide('IN_GAME_MENU');
+    this.game.bindPointerLock();
+  }
+
   ready() {
     this.socket.emit("ready", "ready");
-  }
-
-  getHighScores() {
-    // Get top 5
-    return this.highScores;
-  }
-
-  newGame() {
-    // this.game = new Breakout({
-    //   canvas: document.getElementById("canvas-main"),
-    //   menus: this.menus,
-    //   rows: 8,
-    //   columns: 14
-    // });
-    this.game.onStateChange(Game.STATE.DONE, (game) => this.saveScore(game));
-    this.game.onStateChange(Game.STATE.GAME_OVER, (game) => this.saveScore(game));
-
-    this.menus.hideAll();
-    this.start();
-  }
-  
-  returnToMain() {
   }
 }
 

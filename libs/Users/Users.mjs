@@ -51,6 +51,14 @@ function login(data) {
 }
 
 function validateLogin(req, res, next) {
+  if (!req.body.username) {
+    return next("Username required");
+  }
+
+  if (!req.body.password) {
+    return next("Password required");
+  }
+
   let user;
   try {
     user = db.getData(DB_ROOT + req.body.username);

@@ -82,12 +82,22 @@ class GameController {
       return res;
     };
   }
+
+  quit() {
+    this.game.quit();
+    this.game = null;
+    this.done = true;
+  }
   
   parseElement(element) {
     this.menus.parseElement(element);    
     element.find("[gui-click]").each((index, clickElement) => {
       let fn = this.parseExpression(clickElement.getAttribute("gui-click"));
-      clickElement.onclick = (event) => fn(event);
+      clickElement.onclick = (event) => {
+        fn(event);
+        // event.preventDefault();
+        // event.stopPropagation();
+      };
     });
     
     element.find("[gui-on-show]").each((index, showElement) => {
@@ -100,6 +110,7 @@ class GameController {
   }
 
   start() {
+    this.done = false;
     this.previousTime = performance.now();
     this.menus.hideAll();
     this.game.start();
@@ -107,6 +118,8 @@ class GameController {
   }
 
   gameLoop(currentTime) {
+    if (this.done) return;
+
     let elapsedTime = currentTime - this.previousTime;
     this.previousTime = currentTime;
   
