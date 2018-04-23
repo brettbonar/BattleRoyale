@@ -33,7 +33,8 @@ function initSockets(socketIo) {
       pingTime: now()
     }
     sockets[socket.id] = client;
-    client.ping = setPing(client);
+    //client.ping = setPing(client);
+
     // socket.on("pingpong", () => {
     //   let newPing = (client.lastPing + 1) % 5;
     //   client.pings[newPing] = (now() - client.pingTime) / 2;
@@ -62,7 +63,7 @@ function initSockets(socketIo) {
           game.onDisconnect(client.playerId);
         }
         console.log("Disconnected", client.playerName);
-        clearInterval(client.ping);
+        //clearInterval(client.ping);
         delete sockets[socket.id];
       } else {
         console.log("Disconnected", socket.id);
