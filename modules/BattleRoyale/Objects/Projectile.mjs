@@ -181,7 +181,7 @@ export default class Projectile extends GameObject {
     }
 
     if (this.effect.path === "beam") {
-      if (!this.source || !this.source.currentAction || this.source.currentAction.name !== this.attack.action.name) {
+      if (!this.source || !this.source.currentAction || this.source.currentAction.actionId !== this.attack.action.actionId) {
         this.done = true;
       } else {
         this.direction = Projectile.getAttackDirection(this.source, this.attack);
@@ -200,7 +200,7 @@ export default class Projectile extends GameObject {
         this.updatePosition();
       }
     } else if (this.effect.path === "tracking") {
-      if (!this.source || !this.source.currentAction || this.source.currentAction.name !== this.attack.action.name) {
+      if (!this.source || !this.source.currentAction || this.source.currentAction.actionId !== this.attack.action.actionId) {
         this.speed = this.effect.speed;
       } else {
         let center = this.collisionBounds[0].center;

@@ -540,15 +540,15 @@ export default class Character extends GameObject {
           this.lastPosition = this.position.copy();
         } else {
           let dist = this.position.distanceTo(state.position);
-          if (interpolateTime > 0 && dist >= 1) {
+          if (interpolateTime > 0 && dist >= 10) {
             this.startPosition = new Vec3(this.position);
             this.moveToPosition = new Vec3(state.position);
             this.setDirection(this.moveToPosition.minus(this.startPosition));
             //this.speed = dist * (1000 / interpolateTime);
             //this.targetDirection = state.direction;
           } else {
-            // this.position = new Vec3(state.position);
-            // this.lastPosition = new Vec3(this.position);
+            this.position = new Vec3(state.position);
+            this.lastPosition = new Vec3(this.position);
             this.speed = state.speed || this.baseSpeed;
             this.direction = new Vec3(state.direction) || new Vec3();
           }
