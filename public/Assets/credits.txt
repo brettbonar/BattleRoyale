@@ -53,6 +53,7 @@ https://opengameart.org/content/lpc-misc-animations-and-items
 https://opengameart.org/content/lpc-modified-art
 https://opengameart.org/content/64-crosshairs-pack
 https://opengameart.org/content/64-crosshairs-pack-split
+http://game-icons.net/
 
 GUI:
 https://opengameart.org/content/gui-elements

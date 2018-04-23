@@ -582,12 +582,12 @@ export default class BattleRoyaleClient extends BattleRoyale {
 
   renderInteractions() {
     if (this.interaction && this.gameState.player.state.canInteract) {
-      this.tempContext.save();
-      this.tempContext.fillStyle = "green";
-      this.tempContext.fillRect(this.interaction.center.x - 8,
-        this.interaction.position.y - 20, 
-        16, 16);
-      this.tempContext.restore();
+      let image = ImageCache.get("/Assets/hand.png");
+      if (image.complete) {
+        this.tempContext.drawImage(image,
+          this.interaction.center.x - image.width / 2,
+          this.interaction.position.y - image.height - 4);
+      }
     }
   }
 
