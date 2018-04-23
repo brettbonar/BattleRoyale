@@ -155,7 +155,7 @@ function initGame(players, maps) {
         inventory: [
           //"bow",
           // "shadowBow",
-          // "lightStaffMale",
+          //"lightStaffMale",
           // "fireStaffMale",
           // "waterStaffMale",
           "staffMale"
@@ -191,7 +191,7 @@ function initGame(players, maps) {
   //   simulation: true
   // }));
   // gameObjects.push(new Item({
-  //   position: {
+  //   position: {h
   //     x: 255,
   //     y: 510
   //   },

@@ -206,8 +206,14 @@ export default class PhysicsEngine {
     let objLastCollisionBounds = obj.lastCollisionBounds;
 
     for (const target of targets) {
+      if (obj.physics.surfaceType === SURFACE_TYPE.CHARACTER && target.physics.surfaceType === SURFACE_TYPE.PROJECTILE) {
+        // TODO: find a better way of doing this. Don't want characters to think they collided with projectiles that
+        // collided with something else earlier
+        return;
+      }
       if (target === obj || target.physics.surfaceType === SURFACE_TYPE.NONE) continue;
       if (obj.interactsWith && obj.interactsWith.length > 0 && !obj.interactsWith.includes(target.type)) continue;
+      if (target.interactsWith && target.interactsWith.length > 0 && !target.interactsWith.includes(obj.type)) continue;
       if (obj.actionId && obj.actionId === target.actionId) continue;
       if (this.alreadyCollided(obj, target, allCollisions)) continue;
 
@@ -276,6 +282,7 @@ export default class PhysicsEngine {
 
       if (obj.physics.solidity > 0 && target.physics.solidity > 0 &&
           obj.physics.surfaceType !== SURFACE_TYPE.GAS && target.physics.surfaceType !== SURFACE_TYPE.GAS) {
+        collided = true;
         // TODO: find a good way to allow you to slide along walls without also screwing up beams
         if (collision.time === 0) {
           obj.position = obj.lastPosition.copy();
@@ -306,7 +313,6 @@ export default class PhysicsEngine {
         }
 
         obj.updatePosition();
-        collided = true;
       }
       
       let sourceBounds = new Bounds({
