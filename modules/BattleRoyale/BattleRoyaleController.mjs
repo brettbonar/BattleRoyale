@@ -166,10 +166,11 @@ export default class BattleRoyaleController extends GameController {
     };
     API.register(user)
       .done(() => {
-        this.menus.menus.REGISTER.find("#register-notification")
-          .removeClass("error")
-          .addClass("success")
-          .html("Registration succeeded!");
+
+        // this.menus.menus.REGISTER.find("#register-notification")
+        //   .removeClass("error")
+        //   .addClass("success")
+        //   .html("Registration succeeded!");
       })
       .fail((response) => {
         this.menus.menus.REGISTER.find("#register-notification")
@@ -179,11 +180,7 @@ export default class BattleRoyaleController extends GameController {
       });
   }
 
-  login() {
-    let user = {
-      username: this.menus.menus.LOGIN.find("#loginUsername").val(),
-      password: this.menus.menus.LOGIN.find("#loginPassword").val()
-    };
+  doLogin(user) {
     API.login(user)
       .done((response) => {
         this.menus.menus.LOGIN.find("#login-notification")
@@ -201,6 +198,13 @@ export default class BattleRoyaleController extends GameController {
           .addClass("error")
           .html(response.responseText);
       });
+  }
+
+  login() {
+    let user = {
+      username: this.menus.menus.LOGIN.find("#loginUsername").val(),
+      password: this.menus.menus.LOGIN.find("#loginPassword").val()
+    };
   }
 
   ready() {
