@@ -282,6 +282,7 @@ export default class Character extends GameObject {
   doAction(type, stopAction, action, elapsedTime, cb, stopCb, actionId) {
     let top = this.currentAction;
     elapsedTime = elapsedTime || 0;
+    console.log(actionId);
     if (stopAction) {
       let actionToStop = _.find(this.actionStack, { name: action.name });
       // TODO: change "blocking" to "charging"?
