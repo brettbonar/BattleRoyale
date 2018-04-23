@@ -107,7 +107,7 @@ scenes.house = {
     width: 200,
     height: 800
   },
-  weight: 1,
+  weight: 2,
   getObjects: function (position, dimensions) {
     return [
       new Building({

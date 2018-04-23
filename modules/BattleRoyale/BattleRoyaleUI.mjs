@@ -78,7 +78,7 @@ export default class BattleRoyaleUI extends GameUI {
         if (!_.isNaN(keyValue)) {
           keyValue = _.startCase(_.findKey(KEY_CODES, (val) => val === keyValue));
         } else {
-          keyValue = _.startCase(event);
+          keyValue = _.startCase(keyBindings[event]);
         }
 
         controls.append("<label for='" + event + "'>" + _.startCase(event) + "</label>");
