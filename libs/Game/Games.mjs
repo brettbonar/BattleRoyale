@@ -167,7 +167,7 @@ class Game {
 
       console.log("Ready players", _.sumBy(this.players, "ready"));
       let readyPlayers = _.sumBy(this.players, "ready");
-      if (readyPlayers >= this.players.length && readyPlayers.length > 1 && !this.initialized) {
+      if (readyPlayers >= this.players.length && readyPlayers > 1 && !this.initialized) {
         console.log("Initializing");
         this.initialized = true;
         this.initialize();
