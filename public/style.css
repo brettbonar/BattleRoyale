@@ -158,8 +158,8 @@ ul.events-list li.playerAvatarChange {
   /* padding-top: calc((50vw - 7px) / 4); */
   /* width: 50%; */
   /* margin: 0 auto; */
-  width: calc(100vw);
-  height: calc(50vw);
+  width: 100vw;
+  height: 50vh;
   /* font-size: 1.5vw; */
 }
 
@@ -399,6 +399,7 @@ ul.events-list li.playerAvatarChange {
   background-color: white;
   height: 295px;
   margin: 5px;
+  overflow-y: auto;
 }
 
 .chat-messages li {

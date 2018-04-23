@@ -545,7 +545,7 @@ export default {
     maxHealth: 100,
     maxMana: 100,
     speed: 128,
-    manaRegen: 1
+    manaRegen: 4
   },
   dimensions: {
     up: dimensions,

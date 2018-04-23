@@ -13,7 +13,7 @@ const app = express();
 let server = http.Server(app);
 let io = socketIo(server);
 // let io = socketIo.listen(server, {
-//   pingInterval: 60000,
+//   pingInterval: 45000,
 //   pingTimeout: 60000
 // });
 initSockets(io);

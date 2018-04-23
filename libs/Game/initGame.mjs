@@ -117,73 +117,21 @@ function addScenes(maps) {
 }
 
 function initGame(players, maps) {
-  let gameObjects = [
-    // new Character({
-    //   body: "darkelf",
-    //   gender: "female",
-    //   simulation: true,
-    //   damagedEffect: effects.blood,
-    //   loadout: {
-    //     weapon: equipment.axe,
-    //     torso: equipment.leatherChestMale,
-    //     legs: equipment.tealPantsMale,
-    //     head: equipment.clothHoodMale,
-    //     feet: equipment.brownShoesMale,
-    //     hands: equipment.leatherBracersMale
-    //   },
-    //   characterDirection: "right",
-    //   fireReady: true,
-    //   position: {
-    //     x: 600,
-    //     y: 285,
-    //     z: 0
-    //   }
-    // }),
-    // new Character({
-    //   body: "darkelf",
-    //   gender: "female",
-    //   simulation: true,
-    //   damagedEffect: effects.blood,
-    //   loadout: {
-    //     weapon: equipment.axe,
-    //     torso: equipment.leatherChestMale,
-    //     legs: equipment.tealPantsMale,
-    //     head: equipment.clothHoodMale,
-    //     feet: equipment.brownShoesMale,
-    //     hands: equipment.leatherBracersMale
-    //   },
-    //   fireReady: true,
-    //   position: {
-    //     x: 550,
-    //     y: 550,
-    //     z: 0
-    //   }
-    // }),
-    // new Character({
-    //   body: "darkelf",
-    //   gender: "female",
-    //   simulation: true,
-    //   damagedEffect: effects.blood,
-    //   loadout: {
-    //     weapon: equipment.axe,
-    //     torso: equipment.leatherChestMale,
-    //     legs: equipment.tealPantsMale,
-    //     head: equipment.clothHoodMale,
-    //     feet: equipment.brownShoesMale,
-    //     hands: equipment.leatherBracersMale
-    //   },
-    //   fireReady: true,
-    //   position: {
-    //     x: 500,
-    //     y: 100,
-    //     z: 0
-    //   }
-    // }),
-  ];
+  let gameObjects = [];
+  let positions = [];
+  for (let x = 0; x < 1000; x += 100) {
+    for (let y = 0; y < 1000; y += 100) {
+      positions.push({
+        x: x,
+        y: y,
+        z: 0
+      });
+    }
+  }
+  positions = _.shuffle(positions);
 
-  let pos = 255;
-  //players.push({ playerId: 1, socket: { emit: _.noop } });
-  for (const player of players) {
+  for (let i = 0; i < players.length; i++) {
+    let player = players[i];
     let char = new Character({
       level: "start",
       team: teams.SOLO,
@@ -218,11 +166,7 @@ function initGame(players, maps) {
       //   y: maps[0].mapParams.totalMapHeight - 200,
       //   z: 0
       // },
-      position: {
-        x: pos,
-        y: pos,
-        z: 0
-      },
+      position: positions[i],
       // position: {
       //   x: _.random(100, maps[0].mapWidth - 100),
       //   y: _.random(100, maps[0].mapHeight - 100),
@@ -236,8 +180,6 @@ function initGame(players, maps) {
     });
     gameObjects.push(char);
     player.character = char;
-
-    pos += 100;
   }
 
   // gameObjects.push(new Item({
