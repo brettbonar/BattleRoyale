@@ -253,6 +253,46 @@ let magicEffects = {
   }
 };
 
+magicEffects.staffHit = {
+  type: "magic",
+  name: "staffHit",
+  dimensions: {
+    width: 32,
+    height: 32,
+    zheight: 16
+  },
+  action: {
+    name: "staffHit",
+    actionDuration: 0,
+    actionRate: 2,
+    actionType: "blocking",
+    automatic: false,
+    manaCost: 0
+  },
+  effect: {
+    triggerDamagedEffect: true,
+    distance: 16,
+    noFriendlyFire: true,
+    damage: 5,
+    duration: 500,
+    collisionDimensions: [{
+      offset: {
+        x: 0,
+        y: 0
+      },
+      dimensions: {
+        width: 32,
+        height: 32,
+        zheight: 16
+      }
+    }],
+    physics: {
+      surfaceType: "gas",
+      solidity: 0
+    }
+  }
+};
+
 magicEffects.bat_bite = {
   type: "magic",
   name: "bat_bite",

@@ -165,9 +165,10 @@ class Game {
     });
     player.socket.on("chat", (data) => {
       for (const pl of this.players) {
-        if (pl !== player) {
-          pl.socket.emit("chat", data);
-        }
+        pl.socket.emit("chat", {
+          message: data,
+          playerId: player.playerId
+        });
       }
     });
     player.socket.on("ready", (data) => {

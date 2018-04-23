@@ -37,23 +37,7 @@ import Teams from "./Teams.mjs"
 import Door from "./Objects/Door.mjs";
 import Portal from "./Objects/Portal.mjs";
 import Boundary from "./Objects/Boundary.mjs";
-
-const EVENTS = {
-  MOVE_UP: "moveUp",
-  MOVE_DOWN: "moveDown",
-  MOVE_LEFT: "moveLeft",
-  MOVE_RIGHT: "moveRight",
-  PRIMARY_FIRE: "primaryFire",
-  SECONDARY_FIRE: "secondaryFire",
-  PREVIOUS_WEAPON: "previousWeapon",
-  NEXT_WEAPON: "nextWeapon",
-  USE: "use",
-  FLY_UP: "raiseAltitude",
-  FLY_DOWN: "lowerAltitude",
-  SHOW_MAP: "showMap",
-  SHOW_SCORES: "showScores",
-  SHOW_MENU: "showMenu"
-}
+import { EVENTS, keyBindings } from "./controls.mjs";
 
 let sequenceNumber = 1;
 
@@ -107,20 +91,7 @@ export default class BattleRoyaleClient extends BattleRoyale {
     this.pendingRemoves = [];
 
     //this.addEventHandler(Game.EVENT.PAUSE, () => this.pause());
-    this.keyBindings[KEY_CODE.W] = EVENTS.MOVE_UP;
-    this.keyBindings[KEY_CODE.S] = EVENTS.MOVE_DOWN;
-    this.keyBindings[KEY_CODE.A] = EVENTS.MOVE_LEFT;
-    this.keyBindings[KEY_CODE.D] = EVENTS.MOVE_RIGHT;
-    this.keyBindings[KEY_CODE.E] = EVENTS.USE;
-    this.keyBindings[KEY_CODE.Q] = EVENTS.PREVIOUS_WEAPON;
-    this.keyBindings[KEY_CODE.R] = EVENTS.NEXT_WEAPON;
-    this.keyBindings[KEY_CODE.M] = EVENTS.SHOW_MAP;
-    this.keyBindings[KEY_CODE.SPACE] = EVENTS.FLY_UP;
-    this.keyBindings[KEY_CODE.SHIFT] = EVENTS.FLY_DOWN;
-    this.keyBindings[KEY_CODE.TAB] = EVENTS.SHOW_SCORES;
-    this.keyBindings[KEY_CODE.ESCAPE] = EVENTS.SHOW_MENU;
-    this.keyBindings["leftClick"] = EVENTS.PRIMARY_FIRE;
-    this.keyBindings["rightClick"] = EVENTS.SECONDARY_FIRE;
+    this.keyBindings = keyBindings;
     this.activeEvents = [];
 
     // this.eventHandlers = {};
@@ -381,7 +352,7 @@ export default class BattleRoyaleClient extends BattleRoyale {
           }, effects[collision.target.damagedEffect]));
         }
         
-        if (collision.source.rendering.hitEffect) {
+        if (collision.source.rendering && collision.source.rendering.hitEffect) {
           if (!collision.source.effect.persistAfterHit) {
             collision.source.done = true;
           }

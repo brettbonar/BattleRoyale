@@ -24,6 +24,7 @@ let items = {
       height: 64,
       zheight: 16
     },
+    losHidden: true,
     isInteractable: true,
     interactionDimensions: [
       {
@@ -55,6 +56,7 @@ let items = {
       height: 64,
       zheight: 16
     },
+    losHidden: true,
     isInteractable: true,
     interactionDimensions: [
       {
@@ -86,6 +88,7 @@ let items = {
       height: 32,
       zheight: 8
     },
+    losHidden: true,
     isInteractable: true,
     interactionDimensions: [
       {
@@ -117,6 +120,7 @@ let items = {
       height: 32,
       zheight: 8
     },
+    losHidden: true,
     isInteractable: true,
     interactionDimensions: [
       {
@@ -148,6 +152,7 @@ let items = {
       height: 32,
       zheight: 8
     },
+    losHidden: true,
     isInteractable: true,
     interactionDimensions: [
       {
@@ -251,12 +256,11 @@ export default {
     },
     itemType: "staffMale",
     type: "weapon",
-    attackType: "staff",
+    attackType: "thrust",
     hands: 1,
     gender: "male",
     attacks: {
-      1: "plasmaBall",
-      2: "boulder"
+      1: "staffHit"
     }
   },
   fireStaffMale: {

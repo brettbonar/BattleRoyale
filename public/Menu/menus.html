@@ -53,6 +53,7 @@
   <div class="sub-menu controls">
     <button class="control" gui-click="menus.transition('JOIN_GAME')">Join Game</button>
     <button class="control" gui-click="menus.transition('CREATE_GAME')">Create Game</button>
+    <button class="control" gui-click="menus.transition('CONTROLS')">Controls</button>
     <button class="control" gui-click="menus.transition('LEADERBOARD')">Leaderboard</button>
     <button class="control" gui-click="menus.transition('CREDITS')">Credits</button>
   </div>
@@ -100,15 +101,29 @@
 </gui-menu>
 
 <gui-menu class="menu" id="LOBBY" gui-on-show="menus.showLobby()">
-    <h1 class="subtitle">Lobby</h1>
-    <div class="sub-menu">
-        <div id="lobby-list" class="ag-theme-blue list-table"></div>
-      <hr />
-      <button class="control" gui-click="ready()">Ready</button>
-      <button class="control" gui-click="menus.showLobby()">Refresh</button>
-      <button class="control float-right" gui-click="leaveGame()">Leave</button>
+  <h1 class="subtitle">Lobby</h1>
+  <div class="sub-menu">
+    <div class="lobby">
+      <div id="chat-area" class="chat-area">
+        <div id="chat-messages" class="chat-messages">
+        </div>
+        <form onsubmit="return false">
+          <input id="lobby-chat-input" class="lobby-chat-input" />
+          <button gui-click="sendChat()"
+                  type="submit"
+                  id="submit-chat"
+                  class="lobby-chat-submit control control-sm">
+            Send
+          </button>
+        </form>
+      </div>
+      <div id="lobby-list" class="ag-theme-blue list-table lobby-list"></div>
     </div>
-  </gui-menu>
+    <hr />
+    <button class="control" gui-click="ready()">Ready</button>
+    <button class="control float-right" gui-click="leaveGame()">Leave</button>
+  </div>
+</gui-menu>
 
 <gui-menu class="menu" id="LEADERBOARD" gui-on-show="menus.showLeaderboard()">
   <h1 class="subtitle">Leaderboard</h1>
@@ -156,11 +171,11 @@
   </div>
 </gui-menu>
 
-<gui-menu class="menu" id="CONTROLS">
+<gui-menu class="menu" id="CONTROLS" gui-on-show="menus.initControls()">
   <h1 class="subtitle">Controls</h1>
-  <div class="sub-menu controls">
-    <label for="move_up">Move Up</label>
-    <input id="move_up" value="W" />
+  <div class="sub-menu form">
+    <div id="control-settings">
+    </div>
     <hr />
     <button class="control float-right" gui-click="menus.transition('MAIN')">Back</button>
   </div>

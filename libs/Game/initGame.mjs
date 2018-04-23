@@ -197,7 +197,7 @@ function initGame(players, maps) {
       simulation: true,
       state: {
         loadout: {
-          //weapon: "bow",
+          weapon: "staffMale",
           torso: "leatherChestMale",
           legs: "tealPantsMale",
           head: "clothHoodMale",
@@ -210,7 +210,7 @@ function initGame(players, maps) {
           // "lightStaffMale",
           // "fireStaffMale",
           // "waterStaffMale",
-          // "staffMale"
+          "staffMale"
         ]
       },
       // position: {

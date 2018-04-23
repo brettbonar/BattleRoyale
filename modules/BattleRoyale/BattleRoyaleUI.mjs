@@ -1,5 +1,7 @@
 import GameUI from "../Engine/GameUI.mjs"
 import * as API from "./API.mjs"
+import { EVENTS, defaultKeyBindings, keyBindings, eventsOrder } from "./controls.mjs"
+import KEY_CODES from "../util/keyCodes.mjs"
 
 export default class BattleRoyaleUI extends GameUI {
   constructor(params) {
@@ -65,6 +67,55 @@ export default class BattleRoyaleUI extends GameUI {
       enableFilter: true,
       enableColResize: true
     };
+  }
+
+  initControls() {
+    if (!this.keyBindingsInit) {
+      this.keyBindingsInit = true;
+      let controls = $("#control-settings");
+      for (const event of eventsOrder) {
+        let keyValue = parseInt(keyBindings[event], 10);
+        if (!_.isNaN(keyValue)) {
+          keyValue = _.startCase(_.findKey(KEY_CODES, (val) => val === keyValue));
+        } else {
+          keyValue = _.startCase(event);
+        }
+
+        controls.append("<label for='" + event + "'>" + _.startCase(event) + "</label>");
+        let input = $("<input id='" + event + "'/>");
+        controls.append(input);
+        input.val(keyValue);
+
+        let selectHandler = () => {
+          let keyHandler = (inputEvent) => {
+            keyBindings[event] = inputEvent.keyCode;
+            input.val(_.startCase(_.findKey(KEY_CODES, (val) => val === inputEvent.keyCode)));
+            input.blur();
+            window.removeEventListener("keydown", keyHandler);
+            window.removeEventListener("mousedown", mouseHandler);
+          };
+          let mouseHandler = (inputEvent) => {
+            if (inputEvent.button === 0) {
+              keyBindings[event] = "leftClick";
+              input.val("Left Click");
+              input.blur();
+              window.removeEventListener("keydown", keyHandler);
+              window.removeEventListener("mousedown", mouseHandler);
+            } else if (inputEvent.button === 2) {
+              keyBindings[event] = "rightClick";
+              input.val("Right Click");
+              input.blur();
+              window.removeEventListener("keydown", keyHandler);
+              window.removeEventListener("mousedown", mouseHandler);
+            }
+          };
+          window.addEventListener("keydown", keyHandler);
+          window.addEventListener("mousedown", mouseHandler);
+        }
+
+        input.focus(selectHandler);
+      }
+    }
   }
 
   gamesListRowSelected(event) {

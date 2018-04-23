@@ -66,6 +66,10 @@ export default class BattleRoyaleController extends GameController {
   }
 
   initSocket() {
+    this.socket.on("chat", (data) => {
+      let text = this.getPlayerName(data.playerId) + ": " + data.message;
+      $("#chat-messages").append($("<li>").text(text));
+    });
     this.socket.on("update", (data) => {
       //console.log("Got update");
       if (this.game) {
@@ -106,6 +110,7 @@ export default class BattleRoyaleController extends GameController {
     });
     this.socket.on("updateLobby", (data) => {
       this.menus.updateLobby(data);
+      this.players = data.players;
     });
     this.socket.on("initialize", (data) => {
       console.log("Initializing");
@@ -140,6 +145,14 @@ export default class BattleRoyaleController extends GameController {
           });
         });
     });
+  }
+
+  sendChat() {
+    let chat = $("#lobby-chat-input").val();
+    if (chat) {
+      this.socket.emit("chat", chat);
+      $("#lobby-chat-input").val("");
+    }
   }
 
   leaveGame() {

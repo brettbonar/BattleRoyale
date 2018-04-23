@@ -27,7 +27,7 @@ export default class Magic extends GameObject {
     this.source = params.source;
     this.ownerId = params.source && params.source.objectId;
 
-    if (!params.simulation) {
+    if (!params.simulation && this.rendering) {
       let image = this.magic.rendering.image;
       if (!image) {
         let direction = params.direction; //  || params.target.minus(params.source).normalize();

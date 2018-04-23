@@ -93,7 +93,7 @@ export default class Game {
   }
 
   handleKeyEvent(inputEvent, keyUp) {
-    let event = this.keyBindings[inputEvent.keyCode];
+    let event = _.findKey(this.keyBindings, (key) => key === inputEvent.keyCode);
     if (event) {
       this.inputEvents.push({
         event: event,
@@ -116,7 +116,7 @@ export default class Game {
     } else if (inputEvent.button === 2) {
       eventName = "rightClick";
     }
-    let event = this.keyBindings[eventName];
+    let event = _.findKey(this.keyBindings, (key) => key === eventName);
     if (event) {
       this.inputEvents.push({
         event: event,
