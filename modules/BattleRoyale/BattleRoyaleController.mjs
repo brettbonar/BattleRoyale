@@ -166,7 +166,7 @@ export default class BattleRoyaleController extends GameController {
     };
     API.register(user)
       .done(() => {
-
+        this.doLogin(user);
         // this.menus.menus.REGISTER.find("#register-notification")
         //   .removeClass("error")
         //   .addClass("success")
@@ -205,6 +205,8 @@ export default class BattleRoyaleController extends GameController {
       username: this.menus.menus.LOGIN.find("#loginUsername").val(),
       password: this.menus.menus.LOGIN.find("#loginPassword").val()
     };
+
+    this.doLogin(user);
   }
 
   ready() {
