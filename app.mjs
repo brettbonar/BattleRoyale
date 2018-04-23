@@ -11,7 +11,7 @@ import { initSockets } from "./libs/Game/Games.mjs"
 
 const app = express();
 let server = http.Server(app);
-let io = socketIo.listen(server, {
+let io = socketIo(server, {
   pingInterval: 60000,
   pingTimeout: 60000
 });
