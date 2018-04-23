@@ -161,8 +161,8 @@ class Game {
     });
     player.socket.on("ready", (data) => {
       console.log("Got ready");
+      if (!player.ready) player.status = PLAYER_STATUS.READY;
       player.ready = true;
-      player.status = PLAYER_STATUS.READY;
       this.updateLobby();
 
       console.log("Ready players", _.sumBy(this.players, "ready"));
@@ -175,8 +175,8 @@ class Game {
       }
 
       player.socket.on("initialized", () => {
+        if (!player.initialized) player.status = PLAYER_STATUS.INITIALIZED;
         player.initialized = true;
-        player.status = PLAYER_STATUS.INITIALIZED;
         this.updateLobby();
 
         console.log("Initialized players", _.sumBy(this.players, "initialized"));
