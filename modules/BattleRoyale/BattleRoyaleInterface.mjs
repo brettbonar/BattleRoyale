@@ -100,6 +100,8 @@ export default class BattleRoyaleInterface {
       }
     } else if (event.eventType === "playerAvatarChange") {
       return this.getPlayerName(event.playerId) + " changed into " + event.type;
+    } else if (event.eventType === "disconnect") {
+      return this.getPlayerName(event.playerId) + " disconnected";
     }
     return event.eventType;
   }

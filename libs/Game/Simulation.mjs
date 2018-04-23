@@ -30,7 +30,7 @@ function addTreasure(game) {
 
   console.log("Free grids", freeGrids.length);
 
-  let count = game.maps[0].mapParams.totalMapWidth / 1500;
+  let count = game.maps[0].mapParams.totalMapWidth / 1000;
   count = Math.ceil(count * count);
 
   console.log(game.maps[0].mapParams.totalMapWidth);
