@@ -206,6 +206,7 @@ class Game {
 
   removePlayer(playerId) {
     let player = _.find(this.players, { playerId: playerId });
+    player.client.gameId = null;
     player.socket.leave(this.gameId);
     _.pull(this.players, player);
     
