@@ -18,8 +18,7 @@ export default class Projectile extends GameObject {
     this.boundsType = "circle";
     this.damagedTargets = [];
     this.source = params.source;
-    this.level = params.source.level;
-    // TODO: action IDs?
+    this.level = params.level || params.source.level;
     this.action = params.action;
     this.damageReady = true;
 
@@ -30,8 +29,10 @@ export default class Projectile extends GameObject {
     if (!this.simulation && this.attack.audio) {
       if (this.attack.audio.onCreate) {
         let audio = new Audio(this.attack.audio.onCreate);
-        audio.play();
-        this.audio.push(audio);
+        if (audo && audio.readyState === 4) {
+          audio.play();
+          this.audio.push(audio);
+        }
       }
     }
 

@@ -149,6 +149,10 @@ ul.events-list li.playerAvatarChange {
   z-index: -999;
 }
 
+.start-game {
+  display: none;
+}
+
 .menu {
   z-index: 9999;
   position: absolute;

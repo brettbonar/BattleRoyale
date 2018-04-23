@@ -172,6 +172,10 @@ class Game {
         });
       }
     });
+    player.socket.on("startGame", (data) => {
+      let game = games[player.client.gameId];
+    });
+
     player.socket.on("ready", (data) => {
       console.log("Got ready");
       if (!player.ready) player.status = PLAYER_STATUS.READY;

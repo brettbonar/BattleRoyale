@@ -358,7 +358,8 @@ export default class CharacterRenderer {
     this.setAnimation(elapsedTime, object);
     let animationSettings = this.currentAnimationSettings;
     this.currentTime += elapsedTime;
-    if (animationSettings.frames > 1) {
+    // TODO: fix frames of undefined
+    if (animationSettings && animationSettings.frames > 1) {
       while (this.currentTime >= 1000 / this.currentAnimationFramesPerSec) {
         this.currentTime -= 1000 / this.currentAnimationFramesPerSec;
         this.frame++;

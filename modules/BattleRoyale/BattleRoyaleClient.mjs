@@ -230,8 +230,11 @@ export default class BattleRoyaleClient extends BattleRoyale {
     } else if (object.type === "Door") {
       return new Door(object);
     } else if (object.type === "Projectile") {
-      object.source = _.find(this.gameState.objects, { objectId: object.ownerId });
-      return new Projectile(object);
+      let source = _.find(this.gameState.objects, { objectId: object.ownerId });
+      if (source) {
+        object.source = source;
+        return new Projectile(object);
+      }
     } else if (object.type === "Item") {
       return new Item(object);
     } else if (object.type === "Portal") {

@@ -131,6 +131,11 @@ export default class BattleRoyaleUI extends GameUI {
     API.joinGame(game.gameId, this.controller.player)
       .done((game) => {
         this.controller.joinGame(game);
+        if (game.ownerId === this.controller.player.playerId) {
+          $("#start-game").show();
+        } else {
+          $("#start-game").hide();
+        }
         this.transition("LOBBY");
       })
       .fail((response) => {
@@ -146,6 +151,7 @@ export default class BattleRoyaleUI extends GameUI {
       name: this.menus.CREATE_GAME.find("#name").val(),
       mapSize: this.menus.CREATE_GAME.find("#mapSize").val(),
       maxPlayers: this.menus.CREATE_GAME.find("#maxPlayers").val(),
+      ownerId: this.controller.player.playerId,
       biomes: {
         plain: this.menus.CREATE_GAME.find("#plain").val(),
         forest: this.menus.CREATE_GAME.find("#forest").val(),

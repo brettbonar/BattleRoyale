@@ -3,6 +3,6 @@ let assets = {
   audio: []
 };
 
-assets.audio.push("/Assets/Audio/flamethrower.ogg");
+assets.audio.push("/Assets/Audio/flamethrower_short.ogg");
 
 export default assets;
