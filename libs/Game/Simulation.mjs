@@ -249,7 +249,7 @@ export default class Simulation {
         // TODO: also filter this by player position - do when it is removed?
         player.socket.emit("remove", this.removedObjects);
       }
-      if (this.game.broadcastEvents.length > 0) {
+      if (broadcastEvents.length > 0) {
         player.socket.emit("event", broadcastEvents);
       }
     }
@@ -258,6 +258,7 @@ export default class Simulation {
     this.lastCollisions.length = 0;
     this.removedObjects.length = 0;
     this.game.broadcastEvents.length = 0;
+    this.events.length = 0;
   }
 
   update() {
