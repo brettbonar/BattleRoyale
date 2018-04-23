@@ -23,6 +23,19 @@ class GameUI {
   onStateChange(state, cb) {
     this.showMenuCbs[state].push(cb);
   }
+  
+  toggle(menu) {
+    this.menus[menu].toggle();
+    if (this.menus[menu].is(":visible")) {
+      for (const cb of this.showMenuCbs[menu]) {
+        cb(menu);
+      }
+    }
+  }
+
+  isShown(menu) {
+    return this.menus[menu].is(":visible");
+  }
 
   show(menu) {
     this.menus[menu].show();

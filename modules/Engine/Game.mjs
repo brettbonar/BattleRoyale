@@ -187,6 +187,35 @@ export default class Game {
     this.stateFunctions[this.state].processInput(elapsedTime);
   }
 
+  unbind() {
+    document.removeEventListener("mousemove", this.mouseMoveListener);
+    document.removeEventListener("keydown", this.keyDownListener);
+    document.removeEventListener("keyup", this.keyUpListener);
+    document.removeEventListener("mousedown", this.mouseDownListener);
+    document.removeEventListener("mouseup", this.mouseUpListener);
+    if (this._settings.requestPointerLock) {
+      document.removeEventListener("pointerlockchange", this.pointerLockListener, false);
+      document.removeEventListener("mozpointerlockchange", this.pointerLockListener, false);
+      document.exitPointerLock();
+    }
+  }
+
+  rebind() {
+    if (this._settings.requestPointerLock) {
+      document.addEventListener("pointerlockchange", this.pointerLockListener, false);
+      document.addEventListener("mozpointerlockchange", this.pointerLockListener, false);
+      this.canvas.requestPointerLock = this.canvas.requestPointerLock || this.canvas.mozRequestPointerLock;
+      document.exitPointerLock = document.exitPointerLock || document.mozExitPointerLock;
+      this.canvas.requestPointerLock();
+    } else {
+      window.addEventListener("mousemove", this.mouseMoveListener);
+    }
+    document.addEventListener("keydown", this.keyDownListener);
+    document.addEventListener("keyup", this.keyUpListener);
+    document.addEventListener("mousedown", this.mouseDownListener);
+    document.addEventListener("mouseup", this.mouseUpListener);
+  }
+
   quit() {
     document.removeEventListener("mousemove", this.mouseMoveListener);
     document.removeEventListener("keydown", this.keyDownListener);

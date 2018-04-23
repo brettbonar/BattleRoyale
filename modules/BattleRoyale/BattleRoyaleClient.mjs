@@ -152,9 +152,14 @@ export default class BattleRoyaleClient extends BattleRoyale {
   }
 
   showMenu(event) {
-    if (!event.release) {
-      this.menus.transition("IN_GAME_MENU");
-    }
+    // if (!event.release) {
+    //   this.menus.toggle("IN_GAME_MENU");
+    //   if (this.menus.isShown("IN_GAME_MENU")) {
+    //     this.unbind();
+    //   } else {
+    //     this.rebind();
+    //   }
+    // }
   }
 
   showScores(event) {
