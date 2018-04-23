@@ -150,7 +150,7 @@ export default class BattleRoyale extends Game {
   }
 
   doAttack(character, params, attack, elapsedTime, animateOnly) {
-    character.doAction("attack", params.release, attack.action, elapsedTime, 
+    return character.doAction("attack", params.release, attack.action, elapsedTime, 
       (timeDiff, mods, action) => {
       this.createAttack(character, params, attack, timeDiff, mods, action, animateOnly);
     }, null, params.actionId);
