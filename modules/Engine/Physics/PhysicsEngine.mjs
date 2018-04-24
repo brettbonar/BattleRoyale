@@ -294,7 +294,9 @@ export default class PhysicsEngine {
 
     if (obj.physics.solidity > 0 && target.physics.solidity > 0 &&
         obj.physics.surfaceType !== SURFACE_TYPE.GAS && target.physics.surfaceType !== SURFACE_TYPE.GAS) {
-      collided = true;
+      if (!obj.static) {
+        collided = true;
+      }
       // TODO: find a good way to allow you to slide along walls without also screwing up beams
       if (collision.time === 0) {
         obj.position = obj.lastPosition.copy();
@@ -317,13 +319,10 @@ export default class PhysicsEngine {
           }
 
           // Sanity check that objects are no longer intersecting
-          if (this.intersects(obj, target)) {
-            if (target.physics.push || obj.physics.alwaysPushed) {
-              obj.position = obj.lastPosition.copy();
-            }
-            if (obj.physics.push || target.physics.alwaysPushed) {
-              target.position = target.lastPosition.copy();
-            }
+          // TODO: this is another really bad hack to fix beams
+          if (this.intersects(obj, target) && target.physics.push && obj.physics.push) {
+            obj.position = obj.lastPosition.copy();
+            target.position = target.lastPosition.copy();
           }
         }
       }
