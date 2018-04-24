@@ -4,6 +4,7 @@ import Vec3 from "../../Engine/GameObject/Vec3.mjs"
 import Dimensions from "../../Engine/GameObject/Dimensions.mjs"
 import { SURFACE_TYPE } from "../../Engine/Physics/PhysicsConstants.mjs"
 import ObjectRenderer from "../Renderers/ObjectRenderer.mjs"
+import AudioCache from "../../Engine/Audio/AudioCache.mjs";
 
 export default class Magic extends GameObject {
   constructor(params) {
@@ -50,6 +51,15 @@ export default class Magic extends GameObject {
         this.perspectiveOffset = image.perspectiveOffset;
       }
       this.renderer = new ObjectRenderer(Object.assign({}, image, this.magic.rendering));
+    }
+
+    if (!this.simulation && this.magic.audio) {
+      if (this.magic.audio.play) {
+        new Audio(this.magic.audio.play).play();
+      }
+      if (this.magic.audio.loop) {
+        this.audio.push(AudioCache.loop(this.magic.audio.loop));
+      }
     }
     
     this.currentTime = 0;

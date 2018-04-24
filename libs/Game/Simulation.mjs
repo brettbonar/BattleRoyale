@@ -28,17 +28,17 @@ function addTreasure(game) {
     }
   }), 0);
 
-  console.log("Free grids", freeGrids.length);
+  //console.log("Free grids", freeGrids.length);
 
   let count = game.maps[0].mapParams.totalMapWidth / 1000;
   count = Math.ceil(count * count);
 
-  console.log(game.maps[0].mapParams.totalMapWidth);
-  console.log("Count", count);
+  // console.log(game.maps[0].mapParams.totalMapWidth);
+  // console.log("Count", count);
 
   freeGrids = _.shuffle(freeGrids);
   for (let i = 0; i < count && i < freeGrids.length; i++) {
-    console.log(freeGrids[i].position);
+    //console.log(freeGrids[i].position);
     game.addObject(new StaticObject({
       objectType: "chest2",
       position: freeGrids[i].position,

@@ -12,6 +12,7 @@ import equipment from "./Objects/equipment.mjs"
 import buildings from "./Buildings/buildings.mjs"
 import attacks from "./Magic/attacks.mjs";
 import magicEffects from "./Magic/magicEffects.mjs";
+import AudioCache from "../Engine/Audio/AudioCache.mjs";
 //import { initialize } from "../Engine/Rendering/Scratch.mjs"
 
 function loadAssets(group) {
@@ -163,6 +164,7 @@ export default class BattleRoyaleController extends GameController {
   quitGame() {
     if (this.game) {
       API.leaveGame(this.gameInfo.gameId, this.player);
+      AudioCache.clear();
       this.quit();
       this.menus.transition("MAIN");
     }

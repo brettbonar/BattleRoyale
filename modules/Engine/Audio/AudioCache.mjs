@@ -1,30 +1,27 @@
 class _AudioCache {
   constructor() {
-    this.audio = {};
+    this.loops = [];
   }
 
-  put(source) {
-    if (!this.audio[source]) {
-      this.audio[source] = new Audio(source);
-    }
-  }
-
-  get(source) {
-    if (this.audio[source]) {
-      return this.audio[source];
-    }
+  play(source) {
     let audio = new Audio(source);
-    this.audio[source] = audio;
+    audio.play();
     return audio;
   }
-  
-  play(source) {
-    if (this.audio[source]) {
-      return this.audio[source].play();
-    }
+
+  loop(source) {
     let audio = new Audio(source);
-    this.audio[source] = audio;
-    return audio.play();
+    audio.loop = true;
+    audio.play();
+    this.loops.push(audio);
+    return audio;
+  }
+
+  clear() {
+    for (const audio of this.loops) {
+      audio.pause();
+      audio.currentTime = 0;
+    }
   }
 }
 

@@ -561,7 +561,6 @@ export default class Character extends GameObject {
       }
     } else {
       // Updates just for this player
-      console.log(state.position);
       if (state.position && (state.level !== this.level || this.position.distanceTo(state.position) > this.speed / 2)) {
         this.position = new Vec3(state.position);
         this.lastPosition = this.position.copy();

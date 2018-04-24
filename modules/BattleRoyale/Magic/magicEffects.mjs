@@ -12,6 +12,9 @@ let magicEffects = {
       x: 0,
       y: -32
     },
+    audio: {
+      play: "/Assets/Audio/spells/explode1.ogg"
+    },
     rendering: {
       images: {
         up: {
@@ -144,6 +147,9 @@ let magicEffects = {
   torrentacle: {
     type: "magic",
     name: "torrentacle",
+    audio: {
+      play: "/Assets/Audio/soundpack/environment/water-wave1.wav"
+    },
     rendering: {
       image: {
         imageSource: "/Assets/magic/torrentacle.png",
@@ -256,6 +262,9 @@ let magicEffects = {
 magicEffects.staffHit = {
   type: "magic",
   name: "staffHit",
+  audio: {
+    play: "/Assets/Audio/soundpack/combat/swing.wav"
+  },
   dimensions: {
     width: 32,
     height: 32,

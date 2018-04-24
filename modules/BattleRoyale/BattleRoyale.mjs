@@ -90,12 +90,13 @@ export default class BattleRoyale extends Game {
     if (object instanceof Character) {
       _.pull(this.gameState.characters, object);
     }
-    // if (object.audio && object.audio.length > 0) {
-    //   for (const audio of object.audio) {
-    //     audio.muted = true;
-    //   }
-    //   object.audio.length = 0;
-    // }
+    if (object.audio && object.audio.length > 0) {
+      for (const audio of object.audio) {
+        audio.pause();
+        audio.currentTime = 0;
+      }
+      object.audio.length = 0;
+    }
   }
 
   addScript(script) {
@@ -205,7 +206,6 @@ export default class BattleRoyale extends Game {
     //   }
     // }
 
-    // TODO: move above physics?
     let updates = [];
     for (const script of this.gameState.scripts) {
       let update = script.update(elapsedTime);
@@ -247,9 +247,10 @@ export default class BattleRoyale extends Game {
     // this.physicsEngine.getCollisions(_.map(collisions, "source"))
     //   .filter((obj) => !(obj instanceof Projectile && obj.effect.path === "beam"));
 
-    if (this.gameState.collisions.length > 0) {
-      console.log(this.gameState.collisions);
-    }
+    // if (this.gameState.collisions.length > 0) {
+    //   console.log(this.gameState.collisions);
+    // }
+
     for (const collision of this.gameState.collisions) {
       this.handleCollision(collision);
     }

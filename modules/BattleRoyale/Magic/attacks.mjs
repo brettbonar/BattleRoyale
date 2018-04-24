@@ -95,6 +95,9 @@ let attacks = {
       height: 32,
       zheight: 16
     },
+    audio: {
+      loop: "/Assets/Audio/beam.ogg"
+    },
     action: {
       name: "lightBeam",
       actionDuration: 0,
@@ -191,6 +194,9 @@ let attacks = {
   lightMote: {
     type: "projectile",
     name: "lightMote",
+    audio: {
+      play: "/Assets/Audio/lightMote.ogg"
+    },
     dimensions: {
       width: 32,
       height: 32,
@@ -256,6 +262,9 @@ let attacks = {
   arrow: {
     type: "projectile",
     name: "arrow",
+    audio: {
+      play: "/Assets/Audio/soundpack/combat/bow.wav"
+    },
     dimensions: {
       width: 30,
       height: 7
@@ -281,6 +290,9 @@ let attacks = {
         height: 7
       },
       hitEffect: {
+        audio: {
+          play: "/Assets/Audio/soundpack/combat/hit.wav"
+        },
         imageSource: "/Assets/projectiles/arrow_hit.png",
         imageDimensions: {
           width: 30,
@@ -320,6 +332,9 @@ let attacks = {
   shadowArrow: {
     type: "projectile",
     name: "shadowArrow",
+    audio: {
+      play: "/Assets/Audio/soundpack/combat/bow.wav"
+    },
     dimensions: {
       width: 30,
       height: 7
@@ -345,6 +360,9 @@ let attacks = {
         height: 7
       },
       hitEffect: {
+        audio: {
+          play: "/Assets/Audio/soundpack/combat/hit.wav"
+        },
         imageSource: "/Assets/projectiles/shadow_arrow_hit.png",
         imageDimensions: {
           width: 30,
@@ -460,7 +478,7 @@ let attacks = {
     type: "projectile",
     name: "flamethrower",
     audio: {
-      onCreate: "/Assets/Audio/spells/flamethrower_short.ogg"
+      play: "/Assets/Audio/spells/flamethrower_short.ogg"
     },
     rendering: {
       imageSource: "/Assets/projectiles/flame.png",
@@ -518,6 +536,9 @@ let attacks = {
       width: 32,
       height: 32,
       zheight: 16
+    },
+    audio: {
+      loop: "/Assets/Audio/soundpack/environment/stream.wav"
     },
     action: {
       name: "waterJet",

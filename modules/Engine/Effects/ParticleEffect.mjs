@@ -1,6 +1,7 @@
 import Vec3 from "../GameObject/Vec3.mjs"
 import ImageCache from "../Rendering/ImageCache.mjs"
 import Effect from "./Effect.mjs"
+import AudioCache from "../Audio/AudioCache.mjs";
 
 class Particle {
   constructor(params) {
@@ -156,6 +157,12 @@ export default class ParticleEffect extends Effect {
         this.createParticle();
       }
     }
+    
+    if (params.effect.audio) {
+      if (params.effect.audio.play) {
+        new Audio(params.effect.audio.play).play();
+      }
+    }
   }
 
   createParticle() {
@@ -194,6 +201,10 @@ export default class ParticleEffect extends Effect {
   }
 
   update(elapsedTime) {
+    if (this.audioLoop && this.audioLoop.ended) {
+      this.audioLoop.play();
+    }
+
     this.currentTime += elapsedTime;
     this.particleTime += elapsedTime;
 

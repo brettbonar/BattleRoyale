@@ -1,6 +1,7 @@
 //import Effect from "../../Engine/Effects/Effect.mjs";
 import ImageCache from "../../Engine/Rendering/ImageCache.mjs"
 import Effect from "./Effect.mjs"
+import AudioCache from "../Audio/AudioCache.mjs";
 
 export default class AnimationEffect extends Effect {
   constructor(params, effect) {
@@ -17,6 +18,12 @@ export default class AnimationEffect extends Effect {
       width: effect.imageSize,
       height: effect.imageSize
     };
+
+    if (effect.audio) {
+      if (effect.audio.play) {
+        new Audio(effect.audio.play).play();
+      }
+    }
   }
 
   applyFade(context) {
@@ -53,6 +60,10 @@ export default class AnimationEffect extends Effect {
   }
 
   update(elapsedTime) {
+    if (this.audioLoop && this.audioLoop.ended) {
+      this.audioLoop.play();
+    }
+    
     this.currentTime += elapsedTime;
     this.totalTime += elapsedTime;
     while (this.currentTime > 1000 / this.framesPerSec) {

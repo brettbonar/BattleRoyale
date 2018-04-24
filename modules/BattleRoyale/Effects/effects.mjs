@@ -3,6 +3,9 @@ import Vec3 from "../../Engine/GameObject/Vec3.mjs"
 
 export default {
   smoke: {
+    audio: {
+      play: "/Assets/Audio/soundpack/spells/cursespell.wav"
+    },
     imageSource: "/Assets/Shadow/Smoke/dark_smoke_animation.png",
     imageSize: 128,
     frames: 91,
@@ -25,6 +28,9 @@ export default {
     initialCount: 10,
     radius: 5,
     duration: 0,
+    audio: {
+      play: "/Assets/Audio/spells/flamethrower_short.ogg"
+    },
     particles: {
       imageSource: "/Assets/effects/sparkSmall.png",
       dimensions: {
@@ -67,6 +73,9 @@ export default {
     initialCount: 10,
     radius: 5,
     duration: 0,
+    audio: {
+      play: "/Assets/Audio/spells/zap11.ogg"
+    },
     particles: {
       imageSource: "/Assets/effects/lightSmall.png",
       dimensions: {
@@ -109,6 +118,9 @@ export default {
     initialCount: 50,
     radius: 20,
     duration: 0,
+    audio: {
+      play: "/Assets/Audio/soundpack/spells/splash.ogg"
+    },
     particles: {
       imageSource: "/Assets/effects/water_drop.png",
       dimensions: {
@@ -155,6 +167,9 @@ export default {
     initialCount: 10,
     radius: 10,
     duration: 0,
+    audio: {
+      play: "/Assets/Audio/soundpack/spells/splash.ogg"
+    },
     particles: {
       imageSource: "/Assets/effects/water_drop.png",
       dimensions: {
@@ -201,6 +216,9 @@ export default {
     initialCount: 15,
     radius: 10,
     duration: 0,
+    audio: {
+      play: "/Assets/Audio/spells/zap11.ogg"
+    },
     particles: {
       imageSource: "/Assets/effects/light.png",
       dimensions: {

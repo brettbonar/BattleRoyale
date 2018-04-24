@@ -32,12 +32,11 @@ export default class Projectile extends GameObject {
     }
 
     if (!this.simulation && this.attack.audio) {
-      if (this.attack.audio.onCreate) {
-        let audio = new Audio(this.attack.audio.onCreate);
-        if (audio && audio.readyState === 4) {
-          audio.play();
-          this.audio.push(audio);
-        }
+      if (this.attack.audio.play) {
+        new Audio(this.attack.audio.play).play();
+      }
+      if (this.attack.audio.loop) {
+        this.audio.push(AudioCache.loop(this.attack.audio.loop));
       }
     }
 

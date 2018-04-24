@@ -399,6 +399,15 @@ export default class BattleRoyaleClient extends BattleRoyale {
             if (collision.source.rendering.hitEffect.location === "self") {
               position = collision.source.position;
             }
+
+            if (collision.target instanceof Character) {
+              if (collision.source.rendering.hitEffect.audio) {
+                if (collision.source.rendering.hitEffect.audio.play) {
+                  new Audio(collision.source.rendering.hitEffect.audio.play).play();
+                }
+              }
+            }
+
             this.addObject(new RenderObject({
               position: position,
               //dimensions: collision.source.dimensions,
