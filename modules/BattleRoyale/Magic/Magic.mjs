@@ -107,7 +107,7 @@ export default class Magic extends GameObject {
       position.add(params.direction.times(magic.effect.distance))
       position
         .subtract(magic.positionOffset)
-        .subttract({
+        .subtract({
           x: magic.dimensions.width,
           y: magic.dimensions.height
         });
