@@ -263,7 +263,7 @@ magicEffects.staffHit = {
   type: "magic",
   name: "staffHit",
   audio: {
-    play: "/Assets/Audio/rpg_sound_pack/RPG Sound Pack/swing.wav"
+    play: "/Assets/Audio/rpg_sound_pack/battle/swing.wav"
   },
   dimensions: {
     width: 32,
@@ -371,7 +371,7 @@ magicEffects.wolf_bite = {
   type: "magic",
   name: "wolf_bite",
   audio: {
-    play: "/Assets/Audio/rpg_sound_pack/RPG Sound Pack/NPC/gutteral beast/mnstr6.wav"
+    play: "/Assets/Audio/rpg_sound_pack/NPC/gutteral beast/mnstr6.wav"
   },
   rendering: {
     image: {
