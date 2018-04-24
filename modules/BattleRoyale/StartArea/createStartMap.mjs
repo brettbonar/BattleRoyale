@@ -17,7 +17,7 @@ function createStartMap(maps, players) {
 
   for (const column of startMap.map) {
     for (const tile of column) {
-      startMap.initTile(tile, Map.BIOMES.STONE);
+      startMap.initTile(tile, Map.BIOMES.NONE);
     }
   }
 

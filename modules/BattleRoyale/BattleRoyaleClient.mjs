@@ -74,6 +74,7 @@ export default class BattleRoyaleClient extends BattleRoyale {
 
     this.menus = params.menus;
     this.updates = [];
+    this.pendingOwnerAssignments = [];
     this.pendingUpdates = [];
     this.objectUpdates = [];
 
@@ -219,22 +220,42 @@ export default class BattleRoyaleClient extends BattleRoyale {
       } else if (character.isPlayer) {
         character.isOtherPlayer = true;
       }
+
+      let pendingOwner = _.find(this.pendingOwnerAssignments, { objectId: object.objectId });
+      if (pendingOwner) {
+        pendingOwner.ownedObject.source = character;
+        _.pull(this.pendingOwnerAssignments, pendingOwner);
+      }
+
       return character;
     } else if (object.type === "Building") {
       return new Building(object);
     } else if (object.type === "Magic") {
-      object.source = _.find(this.gameState.objects, { objectId: object.ownerId });
-      return new Magic(object);
+      let source = _.find(this.gameState.objects, { objectId: object.ownerId });
+      object.source = source;
+      let magic = new Magic(object);
+      if (!source) {
+        this.pendingOwnerAssignments.push({
+          ownerId: object.ownerId,
+          ownedObject: magic
+        });
+      }
+      return magic;
     } else if (object.type === "StaticObject") {
       return new StaticObject(object);
     } else if (object.type === "Door") {
       return new Door(object);
     } else if (object.type === "Projectile") {
       let source = _.find(this.gameState.objects, { objectId: object.ownerId });
-      if (source) {
-        object.source = source;
-        return new Projectile(object);
+      object.source = source;
+      let projectile = new Projectile(object);
+      if (!source) {
+        this.pendingOwnerAssignments.push({
+          ownerId: object.ownerId,
+          ownedObject: projectile
+        });
       }
+      return projectile;
     } else if (object.type === "Item") {
       return new Item(object);
     } else if (object.type === "Portal") {
@@ -296,8 +317,10 @@ export default class BattleRoyaleClient extends BattleRoyale {
           // Don't recreate an object that has been removed
           if (!this.pendingRemoves.includes(object.objectId)) {
             let obj = this.createObject(object);
-            obj.elapsedTime = (now - update.time) - elapsedTime;
-            this.addObject(obj);
+            if (obj) {
+              obj.elapsedTime = (now - update.time) - elapsedTime;
+              this.addObject(obj);
+            }
           }
         }
       }

@@ -10,7 +10,7 @@ export default class EntryPortals {
     this.map = params.map;
     this.duration = params.duration || 15000;
     this.portalDuration = params.portalDuration || 10000;
-    this.portalFrequency = params.portalFrequency || 0.5;
+    this.portalFrequency = params.portalFrequency || 1;
     this.portalSpawnTime = 1000 / this.portalFrequency;
     this.characters = params.characters;
     this.spawnMap = params.spawnMap;

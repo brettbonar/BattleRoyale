@@ -148,7 +148,8 @@ let attacks = {
       damage: 2,
       damageRate: 8,
       physics: {
-        force: 0
+        push: false,
+        alwaysPushed: true
       },
       // TODO: more shapes
       collisionDimensions: [{
@@ -571,7 +572,8 @@ let attacks = {
       damage: 2,
       damageRate: 8,
       physics: {
-        force: 0
+        push: false,
+        alwaysPushed: true
       },
       // TODO: more shapes
       collisionDimensions: [{
@@ -690,6 +692,7 @@ let attacks = {
           create: {
             type: "Magic",
             attackType: "fireLion",
+            ownerId: collision.source.ownerId,
             position: position,
             direction: collision.source.direction
           },

@@ -151,8 +151,14 @@ export default class BattleRoyaleServer extends BattleRoyale {
       // TODO: test if create is instance of GameObject?
       // Or just require that create is instance
       if (update.create.type === "Magic") {
+        if (update.create.ownerId) {
+          update.create.source = this.getObject(update.create.ownerId);
+        }
         this.addObject(Magic.create(update.create));
       } else {
+        if (update.create.ownerId) {
+          update.create.source = this.getObject(update.create.ownerId);
+        }
         this.addObject(update.create);
       }
     }
@@ -187,10 +193,14 @@ export default class BattleRoyaleServer extends BattleRoyale {
     if (object) {
       object.revision = data.source.revision;
       if (!object.state.dead) {
-        if (data.position && object.position.distanceTo(data.position) <= object.speed / 2) {
-          object.position = new Vec3(data.position);
-        }
         object.setDirection(data.direction);
+        
+        if (data.position) {
+          object.position = new Vec3(data.position);
+          object.updatePosition();
+          this.grid.update(object);
+          this.physicsEngine.getObjectCollisions(object, this.grid);
+        }
         //object.elapsedTime = elapsedTime || 0;
       }
     }

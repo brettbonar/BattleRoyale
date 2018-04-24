@@ -301,9 +301,10 @@ export default class CharacterRenderer {
 
     // We may start and finish an action within a frame, make sure we still animate it
     //  !currentAction.new &&
-    if (currentAction && !currentAction.new && (!this.currentAction || (this.currentAction.name !== currentAction.name))) {
+    if (currentAction && !currentAction.new && (!this.currentAction || (this.currentAction.actionId !== currentAction.actionId))) {
       this.currentAction = currentAction;
       this.currentAnimationTime = 0;
+      this.frame = 0;
       // if (currentAction.name !== (this.currentAction && this.currentAction.name)) {
       //   this.currentAction = currentAction;
       //   this.currentAnimationTime = 0;

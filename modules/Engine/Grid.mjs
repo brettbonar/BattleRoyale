@@ -158,7 +158,7 @@ export default class Grid {
         return objs.concat(this.collisionGrid[grid.x][grid.y]);
       }, this.collisionAll);
     }
-    return this.collisionAll;
+    return _.uniq(this.collisionAll);
   }
   
   getRenderObjects(bounds) {

@@ -75,7 +75,9 @@ export default class GameObject extends GameObjectProxy {
         elasticity: 0,
         reflectivity: 0,
         solidity: 1.0,
-        force: 1.0
+        force: 1.0,
+        push: true,
+        alwaysPushed: false
       },
       position: {
         z: 0

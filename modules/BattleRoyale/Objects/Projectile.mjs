@@ -18,7 +18,12 @@ export default class Projectile extends GameObject {
     this.boundsType = "circle";
     this.damagedTargets = [];
     this.source = params.source;
-    this.level = params.level || params.source.level;
+    if (this.source) {
+      this.isFromSource = true;
+      this.level = params.source.level;
+    } else if (params.level) {
+      this.level = params.level;
+    }
     this.action = params.action;
     this.damageReady = true;
 
@@ -29,7 +34,7 @@ export default class Projectile extends GameObject {
     if (!this.simulation && this.attack.audio) {
       if (this.attack.audio.onCreate) {
         let audio = new Audio(this.attack.audio.onCreate);
-        if (audo && audio.readyState === 4) {
+        if (audio && audio.readyState === 4) {
           audio.play();
           this.audio.push(audio);
         }
@@ -181,7 +186,19 @@ export default class Projectile extends GameObject {
       this.done = true;
     }
 
-    if (this.effect.path === "beam") {
+    if (this.moveToPosition) {
+      let direction = this.moveToPosition.minus(this.position);
+      let dist = this.position.distanceTo(this.moveToPosition);
+      if (dist <= 1 || !this.direction.sameAs(direction)) {
+        this.position = this.moveToPosition;
+        this.moveToPosition = null;
+        this.direction = new Vec3();
+      } else {
+        //this.position.add(direction);
+      }
+    }
+
+    if (this.source && this.effect.path === "beam") {
       if (!this.source || !this.source.currentAction || this.source.currentAction.actionId !== this.actionId) {
         this.done = true;
       } else {
@@ -201,28 +218,29 @@ export default class Projectile extends GameObject {
         this.updatePosition();
       }
     } else if (this.effect.path === "tracking") {
-      if (!this.source || !this.source.currentAction || this.source.currentAction.actionId !== this.actionId) {
-        this.speed = this.effect.speed;
-      } else {
-        let center = this.collisionBounds[0].center;
-        let dist = Math.min(100, getDistance(center, this.source.state.target));
-
-        if (dist < 5) {
-          this.speed = 0;
+      if (this.source) {
+        if (!this.source || !this.source.currentAction || this.source.currentAction.actionId !== this.actionId) {
+          this.speed = this.effect.speed;
         } else {
-          let targetDirection = Projectile.getAttackDirection(this.source, this.attack, center);
-          let xdiff = targetDirection.x - this.direction.x;
-          let ydiff = targetDirection.y - this.direction.y;
-          this.direction.add({
-            x: Math.max(xdiff, xdiff * ((elapsedTime + this.elapsedTime) / 50)),
-            y: Math.max(ydiff, ydiff * ((elapsedTime + this.elapsedTime) / 50))
-          }).normalize();
-          this.speed = getRangeMap(dist, 100, 0, this.effect.speed, 0, smoothStop(2));
-        }
+          let center = this.collisionBounds[0].center;
+          let dist = Math.min(100, getDistance(center, this.source.state.target));
 
-        // Keep resetting until the tracking projectile is released
-        this.currentTime = 0;
+          if (dist < 5) {
+            this.speed = 0;
+          } else {
+            let targetDirection = Projectile.getAttackDirection(this.source, this.attack, center);
+            let xdiff = targetDirection.x - this.direction.x;
+            let ydiff = targetDirection.y - this.direction.y;
+            this.direction.add({
+              x: Math.max(xdiff, xdiff * ((elapsedTime + this.elapsedTime) / 50)),
+              y: Math.max(ydiff, ydiff * ((elapsedTime + this.elapsedTime) / 50))
+            }).normalize();
+            this.speed = getRangeMap(dist, 100, 0, this.effect.speed, 0, smoothStop(2));
+          }
+        }
       }
+      // Keep resetting until the tracking projectile is released
+      this.currentTime = 0;
     }
 
     this.rotation = Math.atan2(this.direction.y - this.direction.z, this.direction.x ) * 180 / Math.PI;
@@ -240,12 +258,28 @@ export default class Projectile extends GameObject {
     }
   }
 
-  updateState(state) {
+  updateState(state, interpolateTime) {
     _.merge(this, _.omit(state, "position"));
 
-    // TODO: smarter interpolation
-    if (this.position.distanceTo(state.position) > 50) {
-      this.position = new Vec3(state.position);
+    if (state.position && !this.position.equals(state.position)) {
+      if (state.level !== this.level || this.position.distanceTo(state.position) > this.speed / 2) {
+        this.position = new Vec3(state.position);
+        this.lastPosition = this.position.copy();
+      } else if (this.effect.path === "tracking" && !this.source) {
+        let dist = this.position.distanceTo(state.position);
+        if (interpolateTime > 0 && dist >= 10) {
+          this.startPosition = new Vec3(this.position);
+          this.moveToPosition = new Vec3(state.position);
+          this.direction = this.moveToPosition.minus(this.startPosition).normalize();
+          //this.speed = dist * (1000 / interpolateTime);
+          //this.targetDirection = state.direction;
+        } else {
+          this.position = new Vec3(state.position);
+          this.lastPosition = new Vec3(this.position);
+          this.speed = state.speed || this.baseSpeed;
+          this.direction = new Vec3(state.direction) || new Vec3();
+        }
+      }
     }
   }
 

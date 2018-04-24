@@ -25,6 +25,10 @@ export default class Vec3 {
     return point;
   }
 
+  isZero() {
+    return this.x === 0 && this.y === 0 && this.z === 0;
+  }
+
   round() {
     this.x = Math.round(this.x);
     this.y = Math.round(this.y);

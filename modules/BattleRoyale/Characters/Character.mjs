@@ -29,8 +29,7 @@ export default class Character extends GameObject {
   constructor(params) {
     super(params);
 
-    this.actionIdIncrement = 1;//GameSettings.isServer ? 1 : -1;
-    this.actionId = 1;// GameSettings.isServer ? 1 : -1;
+    this.nextActionId = 1;
 
     this.type = "Character";
     this.characterInfo = params.characterInfo;
@@ -57,6 +56,8 @@ export default class Character extends GameObject {
     if (this.state.dead) {
       this.kill();
     }
+
+    this.updatePosition();
   }
 
   sameTeamAs(target) {
@@ -265,6 +266,11 @@ export default class Character extends GameObject {
     return true;
   }
 
+  // TODO: fix weirdness between canQueueAction, canAddActionToQueue, and canDoAction...
+  canAddActionToQueue(action) {
+    return this.canDoAction(action) || action.actionType === "channeling" || action.charge;
+  }
+
   isActionQueued(action) {
     return _.find(this.actionStack, { name: action.name });
   }
@@ -289,11 +295,11 @@ export default class Character extends GameObject {
         this.stopAction(actionToStop, elapsedTime);
       }
     } else {
-      if (this.canQueueAction(action)) {
+      if (this.canAddActionToQueue(action) && !_.find(this.actionStack, { name: action.name })) {
         let newAction = {
           type: type,
           name: action.name,
-          actionId: actionId || this.actionId++,
+          actionId: actionId || this.nextActionId++,
           currentTime: elapsedTime || 0,
           action: action,
           new: true,
@@ -439,7 +445,6 @@ export default class Character extends GameObject {
     //     this.moving = false;
     //   }
     // }
-    // TODO: handle overshooting movetoposition
     if (this.moveToPosition) {
       let direction = this.moveToPosition.minus(this.position);
       let dist = this.position.distanceTo(this.moveToPosition);
@@ -556,11 +561,12 @@ export default class Character extends GameObject {
       }
     } else {
       // Updates just for this player
+      console.log(state.position);
       if (state.position && (state.level !== this.level || this.position.distanceTo(state.position) > this.speed / 2)) {
         this.position = new Vec3(state.position);
         this.lastPosition = this.position.copy();
       } else if (state.position) {
-        state.lastPosition = new Vec3(state.position);
+        //state.lastPosition = new Vec3(state.position);
       }
 
       if (state.latestAction) {

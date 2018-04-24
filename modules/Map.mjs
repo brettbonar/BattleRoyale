@@ -23,6 +23,10 @@ const BIOMES = {
 };
 
 const BIOME_PARAMS = {
+  [BIOMES.NONE]: {
+    flavorDensity: 0,
+    sceneDensity: 0
+  },
   [BIOMES.DEATH]: {
     flavorDensity: 0.05
   },
@@ -346,61 +350,7 @@ class Map {
       }
     }
   }
-
-  growJagged(tiles, used) {
-    let tile;
-    while (!tile && tiles.length > 0) {
-      tile = tiles[tiles.length - 1];
-      let neighbors = _.shuffle(tile.growNeighbors);
-      let next;
-      for (const neighbor of neighbors) {
-        if (neighbor && !used.includes(neighbor)) {
-          // if (neighbor === tile.neighbors.left || neighbor === tile.neighbors.right) {
-          //   let top = tile.neighbors.top;
-          //   if (top && !used.includes(top)) {
-          //     top.type = tile.type;
-          //     top.biome = tile.biome;
-          //     tiles.push(top);
-          //     used.push(top);
-          //   }
-          //   let bottom = tile.neighbors.bottom;
-          //   if (bottom && !used.includes(bottom)) {
-          //     bottom.type = tile.type;
-          //     bottom.biome = tile.biome;
-          //     tiles.push(bottom);
-          //     used.push(bottom);
-          //   }
-          // } else if (neighbor === tile.neighbors.top || neighbor === tile.neighbors.bottom) {
-          //   let left = tile.neighbors.left;
-          //   if (left && !used.includes(left)) {
-          //     left.type = tile.type;
-          //     left.biome = tile.biome;
-          //     tiles.push(left);
-          //     used.push(left);
-          //   }
-          //   let right = tile.neighbors.right;
-          //   if (right && !used.includes(right)) {
-          //     right.type = tile.type;
-          //     right.biome = tile.biome;
-          //     tiles.push(right);
-          //     used.push(right);
-          //   }
-          // }
-          next = neighbor;
-          next.type = tile.type;
-          tiles.push(next);
-          used.push(next);
-          break;
-        }
-      }
-
-      if (!next) {
-        tiles.pop();
-      }
-    }
-
-  }
-
+  
   getTile(x, y) {
     if (x >= 0 && x < this.map.length && y >= 0 && y < this.map.length) {
       return this.map[x][y];
@@ -442,6 +392,8 @@ class Map {
   }
 
   renderTile(context, positionOffset, tile, offset, position) {
+    if (!TERRAIN_OFFSETS[tile.type]) return;
+
     let size = this.tileSize;
     offset = offset || Object.assign({}, TERRAIN_OFFSETS[tile.type]);
     position = position || tile.position;

@@ -9,25 +9,25 @@ export default class PhysicsEngine {
     //this.grid = grid;
   }
 
-  getCollisionTime(A1, A2, B1, B2) {
-    let times = AXES.map((axis) => {
-      let Adiff = A2.ul[axis] - A1.ul[axis];
-      let Bdiff = A2.ul[axis] - A1.ul[axis];
-      let diff = v[axis];
-      let time = 0;
-      if (diff > 0) { // moving in positive direction
-        time = 1 - (Math.abs(A2.max[axis] - B2.min[axis]) / Math.abs(diff));
-      } else if (diff < 0) { // moving in negative direction
-        time = 1 - (Math.abs(B2.max[axis] - A2.min[axis]) / Math.abs(diff));
-      }
-      return {
-        axis: axis,
-        time: Math.min(0, time)
-      };
-    });
+  // getCollisionTime(A1, A2, B1, B2) {
+  //   let times = AXES.map((axis) => {
+  //     let Adiff = A2.ul[axis] - A1.ul[axis];
+  //     let Bdiff = A2.ul[axis] - A1.ul[axis];
+  //     let diff = v[axis];
+  //     let time = 0;
+  //     if (diff > 0) { // moving in positive direction
+  //       time = 1 - (Math.abs(A2.max[axis] - B2.min[axis]) / Math.abs(diff));
+  //     } else if (diff < 0) { // moving in negative direction
+  //       time = 1 - (Math.abs(B2.max[axis] - A2.min[axis]) / Math.abs(diff));
+  //     }
+  //     return {
+  //       axis: axis,
+  //       time: Math.min(0, time)
+  //     };
+  //   });
 
-    return _.maxBy(times, "time");
-  }
+  //   return _.maxBy(times, "time");
+  // }
 
   // https://gamedev.stackexchange.com/questions/13774/how-do-i-detect-the-direction-of-2d-rectangular-object-collisions
   getCollisionAxis(A1, A2, B1, B2) {
@@ -45,15 +45,16 @@ export default class PhysicsEngine {
 
   // https://www.gamasutra.com/view/feature/3383/simple_intersection_tests_for_games.php?page=3
   sweepTest(A1, A2, B1, B2) {
-    // if (A2.intersects(B2)) {
-    //   return this.getCollisionTime(A1, A2, B1, B2);
-    // }
     if (A1.intersects(B1)) {
       return {
         axis: "x",
         time: 0
       };
     }
+
+    // if (A2.intersects(B2)) {
+    //   return this.getCollisionTime(A1, A2, B1, B2);
+    // }
 
     // Just check if both Z's are within range
     let AminZ = Math.min(A1.box.ul.z, A2.box.ul.z);
@@ -200,6 +201,38 @@ export default class PhysicsEngine {
         .some((targetBounds) => targetBounds.intersects(bounds)));
   }
 
+  getTargetIntersections(obj, objCollisionBounds, objLastCollisionBounds, target) {
+    let intersections = [];
+
+    let targetCollisionBounds = target.collisionBounds;
+    let targetLastCollisionBounds = target.lastCollisionBounds;
+
+    for (let objBoundIdx = 0; objBoundIdx < objCollisionBounds.length; objBoundIdx++) {
+      // TODO: do this after all other physics calculations?
+      for (const functionBounds of target.getAllFunctionBounds()) {
+        if (objCollisionBounds[objBoundIdx].intersects(functionBounds.bounds)) {
+          functionBounds.cb(obj);
+        }
+      }
+
+      for (let targetBoundIdx = 0; targetBoundIdx < targetCollisionBounds.length; targetBoundIdx++) {
+        let collision = this.getCollision(objLastCollisionBounds[objBoundIdx], objCollisionBounds[objBoundIdx],
+          targetLastCollisionBounds[targetBoundIdx], targetCollisionBounds[targetBoundIdx])
+        if (collision) {
+          intersections.push({
+            source: obj,
+            sourceBoundsIdx: objBoundIdx,
+            target: target,
+            targetBoundsIdx: targetBoundIdx,
+            collision: collision
+          });
+        }
+      }
+    }
+
+    return intersections;
+  }
+
   getIntersections(obj, targets, allCollisions) {
     let intersections = [];
     let objCollisionBounds = obj.collisionBounds;
@@ -217,31 +250,7 @@ export default class PhysicsEngine {
       if (obj.actionId && obj.actionId === target.actionId) continue;
       if (this.alreadyCollided(obj, target, allCollisions)) continue;
 
-      let targetCollisionBounds = target.collisionBounds;
-      let targetLastCollisionBounds = target.lastCollisionBounds;
-
-      for (let objBoundIdx = 0; objBoundIdx < objCollisionBounds.length; objBoundIdx++) {
-        // TODO: do this after all other physics calculations?
-        for (const functionBounds of target.getAllFunctionBounds()) {
-          if (objCollisionBounds[objBoundIdx].intersects(functionBounds.bounds)) {
-            functionBounds.cb(obj);
-          }
-        }
-
-        for (let targetBoundIdx = 0; targetBoundIdx < targetCollisionBounds.length; targetBoundIdx++) {
-          let collision = this.getCollision(objLastCollisionBounds[objBoundIdx], objCollisionBounds[objBoundIdx],
-            targetLastCollisionBounds[targetBoundIdx], targetCollisionBounds[targetBoundIdx])
-          if (collision) {
-            intersections.push({
-              source: obj,
-              sourceBoundsIdx: objBoundIdx,
-              target: target,
-              targetBoundsIdx: targetBoundIdx,
-              collision: collision
-            });
-          }
-        }
-      }
+      intersections = intersections.concat(this.getTargetIntersections(obj, objCollisionBounds, objLastCollisionBounds, target));
     }
 
     return intersections;
@@ -265,6 +274,102 @@ export default class PhysicsEngine {
     return 0;//obj.direction[axis];
   }
 
+  intersects(obj, target) {
+    let objCollisionBounds = obj.collisionBounds;
+    let targetCollisionBounds = target.collisionBounds;
+    return objCollisionBounds.some((objBounds) => {
+      return targetCollisionBounds.some((targetBounds) => {
+        return objBounds.intersects(targetBounds);
+      });
+    });
+  }
+
+  updatePositionsAfterCollision(obj, prevObjPosition, intersection) {
+    let collisions = [];
+    let collided = false;
+
+    let target = intersection.target;
+    let collision = intersection.collision;
+    let prevTargetPosition = target.position.copy();
+
+    if (obj.physics.solidity > 0 && target.physics.solidity > 0 &&
+        obj.physics.surfaceType !== SURFACE_TYPE.GAS && target.physics.surfaceType !== SURFACE_TYPE.GAS) {
+      collided = true;
+      // TODO: find a good way to allow you to slide along walls without also screwing up beams
+      if (collision.time === 0) {
+        obj.position = obj.lastPosition.copy();
+        target.position = target.lastPosition.copy();
+      } else {
+        for (const axis of AXES) {
+          // TODO: also test that direction matches, so if target is moving away from obj it doesn't get pulled back
+          if (target.physics.push || obj.physics.alwaysPushed) {
+            let diff = (obj.position[axis] - obj.lastPosition[axis]) * collision.time * target.physics.force;
+            if (diff !== 0) {
+              obj.position[axis] = obj.lastPosition[axis] + diff - Math.sign(obj.position[axis] - obj.lastPosition[axis]);
+            }
+          }
+
+          if (obj.physics.push || target.physics.alwaysPushed) {
+            let targetDiff = (target.position[axis] - target.lastPosition[axis]) * collision.time * obj.physics.force;
+            if (targetDiff !== 0) {
+              target.position[axis] = target.lastPosition[axis] + targetDiff - Math.sign(target.position[axis] - target.lastPosition[axis]);
+            }
+          }
+
+          // Sanity check that objects are no longer intersecting
+          if (this.intersects(obj, target)) {
+            if (target.physics.push || obj.physics.alwaysPushed) {
+              obj.position = obj.lastPosition.copy();
+            }
+            if (obj.physics.push || target.physics.alwaysPushed) {
+              target.position = target.lastPosition.copy();
+            }
+          }
+        }
+      }
+
+      // TODO: handle diagonal intersections
+      if (obj.physics.elasticity !== 0 || target.physics.reflectivity !== 0) {
+        let newDirection = this.getCollisionDirection(obj, target, collision.axis);
+        target.direction[collision.axis] = this.getCollisionDirection(target, obj, collision.axis);
+        obj.direction[collision.axis] = newDirection;
+      }
+
+      obj.updatePosition();
+      target.updatePosition();
+    }
+    
+    let sourceBounds = new Bounds({
+      position: obj.lastPosition.plus(prevObjPosition.minus(obj.lastPosition).times(collision.time)),
+      dimensions: obj.collisionDimensions[intersection.sourceBoundsIdx].dimensions
+    });
+    let targetBounds = new Bounds({
+      position: target.lastPosition.plus(prevTargetPosition.minus(target.lastPosition).times(collision.time)),
+      dimensions: target.collisionDimensions[intersection.targetBoundsIdx].dimensions
+    });
+
+    collisions.push({
+      source: obj,
+      sourceBounds: sourceBounds,
+      target: target,
+      targetBounds: targetBounds,
+      position: sourceBounds.center
+    });
+
+    collisions.push({
+      source: target,
+      sourceBounds: targetBounds,
+      target: obj,
+      targetBounds: sourceBounds,
+      position: targetBounds.center
+    });
+
+    return {
+      collisions: collisions,
+      collided: collided
+    };
+  }
+
   detectCollisions(obj, objects, allCollisions) {
     let collisions = [];
     let intersections = this.getIntersections(obj, objects, allCollisions);
@@ -275,70 +380,39 @@ export default class PhysicsEngine {
 
     let prevObjPosition = obj.position.copy();
     for (let i = 0; i < intersections.length && !collided; i++) {
-      let intersection = intersections[i];
-      let target = intersection.target;
-      let collision = intersection.collision;
-      let prevTargetPosition = target.position.copy();
+      let result = this.updatePositionsAfterCollision(obj, prevObjPosition, intersections[i]);
+      collisions = collisions.concat(result.collisions);
+      collided = result.collided;
+    }
 
-      if (obj.physics.solidity > 0 && target.physics.solidity > 0 &&
-          obj.physics.surfaceType !== SURFACE_TYPE.GAS && target.physics.surfaceType !== SURFACE_TYPE.GAS) {
-        collided = true;
-        // TODO: find a good way to allow you to slide along walls without also screwing up beams
-        if (collision.time === 0) {
-          obj.position = obj.lastPosition.copy();
-          target.position = target.lastPosition.copy();
-        } else {
-          for (const axis of AXES) {
-            if (target.physics.force > 0) {
-              let diff = (obj.position[axis] - obj.lastPosition[axis]) * collision.time * target.physics.force;
-              if (diff !== 0) {
-                obj.position[axis] = obj.lastPosition[axis] + diff - Math.sign(obj.position[axis] - obj.lastPosition[axis]);
-              }
-            }
+    return collisions;
+  }
 
-            if (obj.physics.force > 0) {
-              let targetDiff = (target.position[axis] - target.lastPosition[axis]) * collision.time * obj.physics.force;
-              if (targetDiff !== 0) {
-                target.position[axis] = target.lastPosition[axis] + targetDiff - Math.sign(target.position[axis] - target.lastPosition[axis]);
-              }
-            }
-          }
-        }
+  getObjectCollisions(obj, grid) {
+    let collisions = [];
+    // if (obj.physics.movementType === MOVEMENT_TYPE.NORMAL) {
+    //   collisions = collisions.concat(this.detectCollisions(obj, objects));
+    // }
+    if (obj.physics.surfaceType === SURFACE_TYPE.CHARACTER || 
+        obj.physics.surfaceType === SURFACE_TYPE.PROJECTILE ||
+        obj.physics.surfaceType === SURFACE_TYPE.GAS) {
+      let collisionObjects = grid.getAdjacentCollision(obj);
+      collisions = collisions.concat(this.detectCollisions(obj, collisionObjects, collisions));
+      // Do twice to capture additional collisions after movement
+      //collisions = collisions.concat(this.detectCollisions(obj, objects));
+    }
 
-        // TODO: handle diagonal intersections
-        if (obj.physics.elasticity !== 0 || target.physics.reflectivity !== 0) {
-          let newDirection = this.getCollisionDirection(obj, target, collision.axis);
-          target.direction[collision.axis] = this.getCollisionDirection(target, obj, collision.axis);
-          obj.direction[collision.axis] = newDirection;
-        }
-
-        obj.updatePosition();
-      }
-      
-      let sourceBounds = new Bounds({
-        position: obj.lastPosition.plus(prevObjPosition.minus(obj.lastPosition).times(collision.time)),
-        dimensions: obj.collisionDimensions[intersection.sourceBoundsIdx].dimensions
-      });
-      let targetBounds = new Bounds({
-        position: target.lastPosition.plus(prevTargetPosition.minus(target.lastPosition).times(collision.time)),
-        dimensions: target.collisionDimensions[intersection.targetBoundsIdx].dimensions
-      });
-
+    if (obj.position.z < 0) {
+      obj.position.z = 0;
+      obj.direction.z = -obj.direction.z * obj.physics.elasticity;
+      if (Math.abs(obj.direction.z) < 0.15) obj.direction.z = 0;
+      // TODO: make sure you cant doubly collide with an object AND the ground
       collisions.push({
         source: obj,
-        sourceBounds: sourceBounds,
-        target: target,
-        targetBounds: targetBounds,
-        position: sourceBounds.center
+        target: "ground",
+        position: obj.position.copy()
       });
-
-      collisions.push({
-        source: target,
-        sourceBounds: targetBounds,
-        target: obj,
-        targetBounds: sourceBounds,
-        position: targetBounds.center
-      });
+      obj.updatePosition();
     }
 
     return collisions;
@@ -347,33 +421,63 @@ export default class PhysicsEngine {
   getCollisions(objects, grid) {
     let collisions = [];
     for (const obj of objects) {
-      // if (obj.physics.movementType === MOVEMENT_TYPE.NORMAL) {
-      //   collisions = collisions.concat(this.detectCollisions(obj, objects));
-      // }
-      if (obj.physics.surfaceType === SURFACE_TYPE.CHARACTER || 
-          obj.physics.surfaceType === SURFACE_TYPE.PROJECTILE ||
-          obj.physics.surfaceType === SURFACE_TYPE.GAS) {
-        let collisionObjects = grid.getAdjacentCollision(obj);
-        collisions = collisions.concat(this.detectCollisions(obj, collisionObjects, collisions));
-        // Do twice to capture additional collisions after movement
-        //collisions = collisions.concat(this.detectCollisions(obj, objects));
-      }
-
-      if (obj.position.z < 0) {
-        obj.position.z = 0;
-        obj.direction.z = -obj.direction.z * obj.physics.elasticity;
-        if (Math.abs(obj.direction.z) < 0.15) obj.direction.z = 0;
-        // TODO: make sure you cant doubly collide with an object AND the ground
-        collisions.push({
-          source: obj,
-          target: "ground",
-          position: obj.position.copy()
-        });
-        obj.updatePosition();
-      }
+      collisions = collisions.concat(this.getObjectCollisions(obj, grid));
     }
 
     return collisions;
+  }
+
+  updateObject(elapsedTime, obj, grid) {
+    let time = elapsedTime;
+    if (obj.elapsedTime) {
+      time += obj.elapsedTime;
+    }
+
+    // if (obj.physics.surfaceType === SURFACE_TYPE.CHARACTER) {
+    //   obj.position.z += (elapsedTime / 10) * this.test;
+    //   if (obj.position.z > 500) {
+    //     this.test = -1;
+    //   }
+    //   if (obj.position.z < 0) {
+    //     obj.position.z = 0;
+    //     this.test = 1;
+    //   }
+    // }
+
+    if (obj.speed && (obj.direction.x || obj.direction.y || obj.direction.z)) {
+      obj.lastPosition = new Vec3(obj.position);
+      obj.position.x = obj.position.x + obj.direction.x * obj.speed * (time / 1000);
+      obj.position.y = obj.position.y + obj.direction.y * obj.speed * (time / 1000);
+      // TODO: use zspeed so friction won't slow down falling
+      if (obj.direction.z) {
+        obj.position.z = obj.position.z + obj.direction.z * (obj.zspeed || obj.speed) * (time / 1000);
+      }
+
+      if (obj.physics.friction > 0 && obj.position.z === 0) {
+        if (obj.physics.friction === Infinity) {
+          obj.speed = 0;
+        } else {
+          let amount = obj.speed * (time / 1000);
+          obj.speed = obj.speed - obj.speed * (time / 1000) * obj.physics.friction;
+          if (obj.speed < 1) {
+            obj.speed = 0;
+          }
+        }
+      }
+
+      obj.updatePosition();
+      grid.update(obj);
+    }
+    if (obj.spin) {
+      obj.rotation += obj.spin * (time / 1000);
+    }
+    if (obj.acceleration) {
+      obj.direction = new Vec3(obj.direction).add({
+        x: obj.acceleration.x * (time / 1000),
+        y: obj.acceleration.y * (time / 1000),
+        z: obj.acceleration.z * (time / 1000)
+      });
+    }
   }
 
   update(elapsedTime, objects, grid) {
@@ -381,56 +485,7 @@ export default class PhysicsEngine {
     if (!elapsedTime) return [];
 
     for (const obj of objects) {
-      let time = elapsedTime;
-      if (obj.elapsedTime) {
-        time += obj.elapsedTime;
-      }
-
-      // if (obj.physics.surfaceType === SURFACE_TYPE.CHARACTER) {
-      //   obj.position.z += (elapsedTime / 10) * this.test;
-      //   if (obj.position.z > 500) {
-      //     this.test = -1;
-      //   }
-      //   if (obj.position.z < 0) {
-      //     obj.position.z = 0;
-      //     this.test = 1;
-      //   }
-      // }
-
-      if (obj.speed && (obj.direction.x || obj.direction.y || obj.direction.z)) {
-        obj.lastPosition = new Vec3(obj.position);
-        obj.position.x = obj.position.x + obj.direction.x * obj.speed * (time / 1000);
-        obj.position.y = obj.position.y + obj.direction.y * obj.speed * (time / 1000);
-        // TODO: use zspeed so friction won't slow down falling
-        if (obj.direction.z) {
-          obj.position.z = obj.position.z + obj.direction.z * (obj.zspeed || obj.speed) * (time / 1000);
-        }
-
-        if (obj.physics.friction > 0 && obj.position.z === 0) {
-          if (obj.physics.friction === Infinity) {
-            obj.speed = 0;
-          } else {
-            let amount = obj.speed * (time / 1000);
-            obj.speed = obj.speed - obj.speed * (time / 1000) * obj.physics.friction;
-            if (obj.speed < 1) {
-              obj.speed = 0;
-            }
-          }
-        }
-
-        grid.update(obj);
-        obj.updatePosition();
-      }
-      if (obj.spin) {
-        obj.rotation += obj.spin * (time / 1000);
-      }
-      if (obj.acceleration) {
-        obj.direction = new Vec3(obj.direction).add({
-          x: obj.acceleration.x * (time / 1000),
-          y: obj.acceleration.y * (time / 1000),
-          z: obj.acceleration.z * (time / 1000)
-        });
-      }
+      this.updateObject(elapsedTime, obj, grid);
     }
   }
 }

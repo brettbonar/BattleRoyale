@@ -52,7 +52,8 @@ export default class BattleRoyale extends Game {
       objects: [],
       killed: [],
       characters: [],
-      scripts: []
+      scripts: [],
+      collisions: []
     };
     this.broadcastEvents = [];
 
@@ -241,10 +242,15 @@ export default class BattleRoyale extends Game {
     this.physicsEngine.update(elapsedTime, this.getPhysicsObjects(), this.grid);
 
     // TODO: don't simulate projectile collisions on client. Send collision results to client instead.
-    this.collisions = this.physicsEngine.getCollisions(this.getPhysicsObjects(), this.grid);
+    this.gameState.collisions = this.gameState.collisions.concat(
+      this.physicsEngine.getCollisions(this.getPhysicsObjects(), this.grid));
     // this.physicsEngine.getCollisions(_.map(collisions, "source"))
     //   .filter((obj) => !(obj instanceof Projectile && obj.effect.path === "beam"));
-    for (const collision of this.collisions) {
+
+    if (this.gameState.collisions.length > 0) {
+      console.log(this.gameState.collisions);
+    }
+    for (const collision of this.gameState.collisions) {
       this.handleCollision(collision);
     }
 
@@ -276,5 +282,8 @@ export default class BattleRoyale extends Game {
         this.delayedUpdates.splice(i, 1);
       }
     }
+
+    this.collisions = this.gameState.collisions.slice();
+    this.gameState.collisions.length = 0;
   }
 }
