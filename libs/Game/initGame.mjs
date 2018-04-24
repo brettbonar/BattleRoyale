@@ -136,7 +136,7 @@ function initGame(players, maps) {
       level: "start",
       team: teams.SOLO,
       characterInfo: {
-        type: "shadow_wolf",
+        type: "humanoid",
         body: "tanned",
         gender: "male"
       },
@@ -144,22 +144,22 @@ function initGame(players, maps) {
       playerId: player.playerId,
       simulation: true,
       state: {
-        // loadout: {
-        //   weapon: "staffMale",
-        //   torso: "leatherChestMale",
-        //   legs: "tealPantsMale",
-        //   head: "clothHoodMale",
-        //   feet: "brownShoesMale",
-        //   hands: "leatherBracersMale"
-        // },
-        // inventory: [
-        //   "bow",
-        //   "shadowBow",
-        //   "lightStaffMale",
-        //   "fireStaffMale",
-        //   "waterStaffMale",
-        //   "staffMale"
-        // ]
+        loadout: {
+          weapon: "staffMale",
+          torso: "leatherChestMale",
+          legs: "tealPantsMale",
+          head: "clothHoodMale",
+          feet: "brownShoesMale",
+          hands: "leatherBracersMale"
+        },
+        inventory: [
+          // "bow",
+          // "shadowBow",
+          // "lightStaffMale",
+          // "fireStaffMale",
+          // "waterStaffMale",
+          "staffMale"
+        ]
       },
       // position: {
       //   x: maps[0].mapParams.totalMapWidth - 200,
