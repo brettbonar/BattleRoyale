@@ -48,7 +48,7 @@ let magicEffects = {
       duration: 1000,
       punchThrough: true,
       //aoe: 64,
-      damage: 15,
+      damage: 20,
       collisionDimensions: [{
         offset: {
           x: 16,
