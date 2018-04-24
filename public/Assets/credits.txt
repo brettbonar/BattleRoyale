@@ -55,6 +55,9 @@ https://opengameart.org/content/64-crosshairs-pack
 https://opengameart.org/content/64-crosshairs-pack-split
 http://game-icons.net/
 https://opengameart.org/content/sci-fi-sound-effects-library
+https://opengameart.org/content/monster-sound-effects-2
+https://opengameart.org/content/rpg-sound-pack
+https://opengameart.org/content/monster-sound-pack-volume-1
 
 GUI:
 https://opengameart.org/content/gui-elements

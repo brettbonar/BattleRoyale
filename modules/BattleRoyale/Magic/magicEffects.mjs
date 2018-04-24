@@ -263,7 +263,7 @@ magicEffects.staffHit = {
   type: "magic",
   name: "staffHit",
   audio: {
-    play: "/Assets/Audio/soundpack/combat/swing.wav"
+    play: "/Assets/Audio/rpg_sound_pack/RPG Sound Pack/swing.wav"
   },
   dimensions: {
     width: 32,
@@ -305,6 +305,9 @@ magicEffects.staffHit = {
 magicEffects.bat_bite = {
   type: "magic",
   name: "bat_bite",
+  audio: {
+    play: "/Assets/Audio/monster-sounds-volume-2/Monster-Sounds-Volume-2/monster-17.wav"
+  },
   rendering: {
     image: {
       imageSource: "/Assets/magic/bite.png",
@@ -367,6 +370,9 @@ magicEffects.bat_bite = {
 magicEffects.wolf_bite = {
   type: "magic",
   name: "wolf_bite",
+  audio: {
+    play: "/Assets/Audio/rpg_sound_pack/RPG Sound Pack/NPC/gutteral beast/mnstr6.wav"
+  },
   rendering: {
     image: {
       imageSource: "/Assets/magic/bite.png",
