@@ -105,7 +105,12 @@ export default class Magic extends GameObject {
         position.z = 0;
       }
       position.add(params.direction.times(magic.effect.distance))
-      position.subtract(magic.positionOffset);
+      position
+        .subtract(magic.positionOffset)
+        .subttract({
+          x: magic.effect.dimensions.width,
+          y: magic.effect.dimensions.height
+        });
     }
 
     return new Magic({

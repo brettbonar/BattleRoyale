@@ -280,7 +280,7 @@ magicEffects.staffHit = {
   },
   effect: {
     triggerDamagedEffect: true,
-    distance: 16,
+    distance: 32,
     noFriendlyFire: true,
     damage: 5,
     duration: 500,
