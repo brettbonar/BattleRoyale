@@ -501,7 +501,7 @@ let attacks = {
     action: {
       name: "flamethrower",
       actionDuration: 0,
-      actionRate: 16,
+      actionRate: 12,
       actionType: "exclusive",
       automatic: true,
       manaCost: 1

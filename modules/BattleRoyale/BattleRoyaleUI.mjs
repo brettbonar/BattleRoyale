@@ -6,6 +6,11 @@ import KEY_CODES from "../util/keyCodes.mjs"
 export default class BattleRoyaleUI extends GameUI {
   constructor(params) {
     super(params);
+
+    let userKeyBindings = localStorage.getItem("MageWars/KeyBindings");
+    if (userKeyBindings) {
+      _.merge(keyBindings, JSON.parse(userKeyBindings));
+    }
     
     this.gamesListGridOptions = {
       columnDefs: [
@@ -89,6 +94,7 @@ export default class BattleRoyaleUI extends GameUI {
         let selectHandler = () => {
           let keyHandler = (inputEvent) => {
             keyBindings[event] = inputEvent.keyCode;
+            localStorage.setItem("MageWars/KeyBindings", JSON.stringify(keyBindings));
             input.val(_.startCase(_.findKey(KEY_CODES, (val) => val === inputEvent.keyCode)));
             input.blur();
             window.removeEventListener("keydown", keyHandler);
@@ -97,12 +103,14 @@ export default class BattleRoyaleUI extends GameUI {
           let mouseHandler = (inputEvent) => {
             if (inputEvent.button === 0) {
               keyBindings[event] = "leftClick";
+              localStorage.setItem("MageWars/KeyBindings", keyBindings);
               input.val("Left Click");
               input.blur();
               window.removeEventListener("keydown", keyHandler);
               window.removeEventListener("mousedown", mouseHandler);
             } else if (inputEvent.button === 2) {
               keyBindings[event] = "rightClick";
+              localStorage.setItem("MageWars/KeyBindings", keyBindings);
               input.val("Right Click");
               input.blur();
               window.removeEventListener("keydown", keyHandler);
@@ -131,11 +139,6 @@ export default class BattleRoyaleUI extends GameUI {
     API.joinGame(game.gameId, this.controller.player)
       .done((game) => {
         this.controller.joinGame(game);
-        if (game.ownerId === this.controller.player.playerId) {
-          $("#start-game").show();
-        } else {
-          $("#start-game").hide();
-        }
         this.transition("LOBBY");
       })
       .fail((response) => {

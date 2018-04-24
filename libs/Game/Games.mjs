@@ -105,6 +105,7 @@ class Game {
     _.merge(this, params);
 
     this.gameId = gameId++;
+    this.ownerId = params.ownerId;
     this.players = [];
     this.sockets = [];
     this.gameParams = {
@@ -158,6 +159,7 @@ class Game {
     player.client.gameId = this.gameId;
     player.socket = client.socket;
     player.socket.join(this.gameId);
+
     player.socket.on("update", (data) => {
       //console.log("Got update");
       if (!this.done && data.source.playerId === player.playerId) {
@@ -173,7 +175,12 @@ class Game {
       }
     });
     player.socket.on("startGame", (data) => {
-      let game = games[player.client.gameId];
+      let playerGame = getPlayerInGame(player.playerId);
+      if (playerGame && playerGame.game === this && this.ownerId === player.playerId) {
+        this.initialized = true;
+        this.initialize();
+        this.status = STATUS.IN_PROGRESS;
+      }
     });
 
     player.socket.on("ready", (data) => {
@@ -186,23 +193,23 @@ class Game {
       let readyPlayers = _.sumBy(this.players, "ready");
       if (readyPlayers >= this.players.length && readyPlayers > 1 && !this.initialized) {
         console.log("Initializing");
-        this.initialize();
         this.initialized = true;
+        this.initialize();
         this.status = STATUS.IN_PROGRESS;
       }
+    });
 
-      player.socket.on("initialized", () => {
-        if (!player.initialized) player.status = PLAYER_STATUS.INITIALIZED;
-        player.initialized = true;
-        this.updateLobby();
+    player.socket.on("initialized", () => {
+      if (!player.initialized) player.status = PLAYER_STATUS.INITIALIZED;
+      player.initialized = true;
+      this.updateLobby();
 
-        console.log("Initialized players", _.sumBy(this.players, "initialized"));
-        if (_.sumBy(this.players, "initialized") >= this.players.length && !this.started) {
-          console.log("Starting");
-          this.started = true;
-          this.start();
-        }
-      });
+      console.log("Initialized players", _.sumBy(this.players, "initialized"));
+      if (_.sumBy(this.players, "initialized") >= this.players.length && !this.started) {
+        console.log("Starting");
+        this.started = true;
+        this.start();
+      }
     });
   }
 
@@ -231,6 +238,7 @@ class Game {
     return {
       name: this.name,
       gameId: this.gameId,
+      ownerId: this.ownerId,
       numberOfPlayers: this.players.length,
       maxPlayers: this.maxPlayers,
       status: this.status,

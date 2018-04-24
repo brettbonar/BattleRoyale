@@ -172,6 +172,11 @@ export default class BattleRoyaleController extends GameController {
 
   joinGame(game) {
     this.gameInfo = game;
+    if (game.ownerId === this.player.playerId) {
+      $("#start-game").show();
+    } else {
+      $("#start-game").hide();
+    }
   }
 
   getPlayerName(playerId) {
