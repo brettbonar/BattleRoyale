@@ -242,13 +242,23 @@ export default class PhysicsEngine {
       if (obj.physics.surfaceType === SURFACE_TYPE.CHARACTER && target.physics.surfaceType === SURFACE_TYPE.PROJECTILE) {
         // TODO: find a better way of doing this. Don't want characters to think they collided with projectiles that
         // collided with something else earlier
-        return;
+        continue;
       }
-      if (target === obj || target.physics.surfaceType === SURFACE_TYPE.NONE) continue;
-      if (obj.interactsWith && obj.interactsWith.length > 0 && !obj.interactsWith.includes(target.type)) continue;
-      if (target.interactsWith && target.interactsWith.length > 0 && !target.interactsWith.includes(obj.type)) continue;
-      if (obj.actionId && obj.actionId === target.actionId) continue;
-      if (this.alreadyCollided(obj, target, allCollisions)) continue;
+      if (target === obj || target.physics.surfaceType === SURFACE_TYPE.NONE) {
+        continue;
+      }
+      if (obj.interactsWith && obj.interactsWith.length > 0 && !obj.interactsWith.includes(target.type)) {
+        continue;
+      }
+      if (target.interactsWith && target.interactsWith.length > 0 && !target.interactsWith.includes(obj.type)) {
+        continue;
+      }
+      if (obj.actionId && obj.actionId === target.actionId) {
+        continue;
+      }
+      if (this.alreadyCollided(obj, target, allCollisions)) {
+        continue;
+      }
 
       intersections = intersections.concat(this.getTargetIntersections(obj, objCollisionBounds, objLastCollisionBounds, target));
     }
@@ -301,12 +311,14 @@ export default class PhysicsEngine {
       if (collision.time === 0) {
         obj.position = obj.lastPosition.copy();
         target.position = target.lastPosition.copy();
+        collided = true;
       } else {
         for (const axis of AXES) {
           // TODO: also test that direction matches, so if target is moving away from obj it doesn't get pulled back
           if (target.physics.push || obj.physics.alwaysPushed) {
             let diff = (obj.position[axis] - obj.lastPosition[axis]) * collision.time * target.physics.force;
             if (diff !== 0) {
+              collided = true;
               obj.position[axis] = obj.lastPosition[axis] + diff - Math.sign(obj.position[axis] - obj.lastPosition[axis]);
             }
           }
@@ -314,6 +326,7 @@ export default class PhysicsEngine {
           if (obj.physics.push || target.physics.alwaysPushed) {
             let targetDiff = (target.position[axis] - target.lastPosition[axis]) * collision.time * obj.physics.force;
             if (targetDiff !== 0) {
+              collided = true;
               target.position[axis] = target.lastPosition[axis] + targetDiff - Math.sign(target.position[axis] - target.lastPosition[axis]);
             }
           }
@@ -371,8 +384,8 @@ export default class PhysicsEngine {
 
   detectCollisions(obj, objects, allCollisions) {
     let collisions = [];
+
     let intersections = this.getIntersections(obj, objects, allCollisions);
-    // TODO: order by collision time?
     intersections = _.sortBy(intersections, (intersection) => intersection.collision.time);
     //for (const intersection of intersections) {
     let collided = false;
