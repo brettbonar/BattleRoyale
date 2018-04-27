@@ -201,7 +201,7 @@ export default class PhysicsEngine {
         .some((targetBounds) => targetBounds.intersects(bounds)));
   }
 
-  getTargetIntersections(obj, objCollisionBounds, objLastCollisionBounds, target) {
+  getTargetIntersections(obj, objCollisionBounds, objLastCollisionBounds, target, allCollisions) {
     let intersections = [];
 
     let targetCollisionBounds = target.collisionBounds;
@@ -219,13 +219,14 @@ export default class PhysicsEngine {
         let collision = this.getCollision(objLastCollisionBounds[objBoundIdx], objCollisionBounds[objBoundIdx],
           targetLastCollisionBounds[targetBoundIdx], targetCollisionBounds[targetBoundIdx])
         if (collision) {
-          intersections.push({
+          let intersection = {
             source: obj,
             sourceBoundsIdx: objBoundIdx,
             target: target,
             targetBoundsIdx: targetBoundIdx,
             collision: collision
-          });
+          };
+          intersections.push(intersection);
         }
       }
     }
@@ -260,7 +261,7 @@ export default class PhysicsEngine {
         continue;
       }
 
-      intersections = intersections.concat(this.getTargetIntersections(obj, objCollisionBounds, objLastCollisionBounds, target));
+      intersections = intersections.concat(this.getTargetIntersections(obj, objCollisionBounds, objLastCollisionBounds, target, allCollisions));
     }
 
     return intersections;
@@ -393,14 +394,14 @@ export default class PhysicsEngine {
     let prevObjPosition = obj.position.copy();
     for (let i = 0; i < intersections.length && !collided; i++) {
       let result = this.updatePositionsAfterCollision(obj, prevObjPosition, intersections[i]);
-      collisions = collisions.concat(result.collisions);
+      collisions.push(...result.collisions);
       collided = result.collided;
     }
 
     return collisions;
   }
 
-  getObjectCollisions(obj, grid) {
+  getObjectCollisions(obj, grid, allCollisions) {
     let collisions = [];
     // if (obj.physics.movementType === MOVEMENT_TYPE.NORMAL) {
     //   collisions = collisions.concat(this.detectCollisions(obj, objects));
@@ -409,7 +410,7 @@ export default class PhysicsEngine {
         obj.physics.surfaceType === SURFACE_TYPE.PROJECTILE ||
         obj.physics.surfaceType === SURFACE_TYPE.GAS) {
       let collisionObjects = grid.getAdjacentCollision(obj);
-      collisions = collisions.concat(this.detectCollisions(obj, collisionObjects, collisions));
+      collisions.push(...this.detectCollisions(obj, collisionObjects, allCollisions));
       // Do twice to capture additional collisions after movement
       //collisions = collisions.concat(this.detectCollisions(obj, objects));
     }
@@ -433,7 +434,7 @@ export default class PhysicsEngine {
   getCollisions(objects, grid) {
     let collisions = [];
     for (const obj of objects) {
-      collisions = collisions.concat(this.getObjectCollisions(obj, grid));
+      collisions.push(...this.getObjectCollisions(obj, grid, collisions));
     }
 
     return collisions;

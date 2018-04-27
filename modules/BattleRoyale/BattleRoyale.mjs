@@ -219,7 +219,6 @@ export default class BattleRoyale extends Game {
       //obj.elapsedTime = 0;
       // TODO: fix this hack
       // TODO: remove objects outside of game bounds
-      obj._modifiedKeys.length = 0;
       if (obj.done) {
         this.removeObject(obj);
 
@@ -253,17 +252,6 @@ export default class BattleRoyale extends Game {
 
     for (const collision of this.gameState.collisions) {
       this.handleCollision(collision);
-    }
-
-    this.modified = [];
-    for (const obj of this.gameState.objects) {
-      if (obj.elapsedTime) {
-        obj.elapsedTime = 0;
-      }
-      if (obj._modified) {
-        this.modified.push(obj);
-        obj._modified = false;
-      }
     }
 
     for (const character of this.gameState.characters) {

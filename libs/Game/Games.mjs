@@ -12,6 +12,7 @@ let io;
 let sockets = {};
 
 const PING_INTERVAL = 5000;
+let updateCount = 1;
 
 function setPing(client) {
   return setInterval(() => {
@@ -222,6 +223,7 @@ class Game {
       return "Player already in a game";
     }
 
+    player.refinedUpdates = [];
     player.lastUpdates = [];
     player.lastInView = [];
     player.status = PLAYER_STATUS.NOT_READY;

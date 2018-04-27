@@ -39,7 +39,8 @@ import Portal from "./Objects/Portal.mjs";
 import Boundary from "./Objects/Boundary.mjs";
 import { EVENTS, keyBindings } from "./controls.mjs";
 
-let sequenceNumber = 1;
+const TARGET_EVENT_TIME = 250;
+const TARGET_CHANNELING_EVENT_TIME = 50;
 
 export default class BattleRoyaleClient extends BattleRoyale {
   constructor(params) {
@@ -52,6 +53,9 @@ export default class BattleRoyaleClient extends BattleRoyale {
     let temp = Canvas.create(this.canvas);
     this.tempCanvas = temp.canvas;
     this.tempContext = temp.context;
+
+    this.lastSentTarget = new Vec3();
+    this.targetEventTime = 0;
 
     this.crosshairImage = ImageCache.get("/Assets/crosshairs/image0044.png");
 
@@ -303,8 +307,7 @@ export default class BattleRoyaleClient extends BattleRoyale {
       for (const object of update.objects) {
         object.simulation = this.simulation;
         let existing = _.find(this.gameState.objects, {
-          objectId: object.objectId,
-          playerId: object.playerId
+          objectId: object.objectId
         });
         if (existing) {
           //if (existing.revision <= object.revision) {
@@ -503,6 +506,16 @@ export default class BattleRoyaleClient extends BattleRoyale {
         release: event.release,
         actionId: actionId
       });
+
+      this.targetEventTime = 0;
+      this.sendEvent({
+        type: "changeTarget",
+        source: {
+          playerId: this.player.playerId,
+          objectId: this.gameState.player.objectId
+        },
+        target: this.gameState.player.state.target
+      });
     }
   }
 
@@ -576,17 +589,18 @@ export default class BattleRoyaleClient extends BattleRoyale {
       direction.x += 1;
     }
 
-    this.gameState.player.setDirection(direction);
-
-    this.sendEvent({
-      type: "changeDirection",
-      source: {
-        playerId: this.player.playerId,
-        objectId: this.gameState.player.objectId
-      },
-      direction: direction,
-      position: this.gameState.player.position
-    });
+    if (!this.gameState.player.direction.equals(direction)) {
+      this.gameState.player.setDirection(direction);
+      this.sendEvent({
+        type: "changeDirection",
+        source: {
+          playerId: this.player.playerId,
+          objectId: this.gameState.player.objectId
+        },
+        direction: direction,
+        position: this.gameState.player.position
+      });
+    }
   }
 
   getVisibleBounds() {
@@ -677,6 +691,21 @@ export default class BattleRoyaleClient extends BattleRoyale {
     this.context.drawImage(this.tempCanvas, 0, 0, this.tempCanvas.width, this.tempCanvas.height);
   }
 
+  sendTargetEvent() {
+    if (!this.gameState.player.state.target.equals(this.lastSentTarget)) {
+      this.lastSentTarget = this.gameState.player.state.target;
+      this.targetEventTime = 0;
+      this.sendEvent({
+        type: "changeTarget",
+        source: {
+          playerId: this.player.playerId,
+          objectId: this.gameState.player.objectId
+        },
+        target: this.gameState.player.state.target
+      });
+    }
+  }
+
   sendEvent(params) {
     if (params.source) {
       params.source.revision = ++this.gameState.player.revision;
@@ -693,6 +722,7 @@ export default class BattleRoyaleClient extends BattleRoyale {
   }
 
   _update(elapsedTime) {
+    this.targetEventTime += elapsedTime;
     this.processUpdates(elapsedTime);
     super._update(elapsedTime);
 
@@ -700,14 +730,11 @@ export default class BattleRoyaleClient extends BattleRoyale {
     if (!this.gameState.player.state.target || !target.equals(this.gameState.player.state.target)) {
       this.gameState.player.setTarget(target);
 
-      this.sendEvent({
-        type: "changeTarget",
-        source: {
-          playerId: this.player.playerId,
-          objectId: this.gameState.player.objectId
-        },
-        target: target
-      });
+      if ((this.targetEventTime >= TARGET_EVENT_TIME || 
+          this.gameState.player.currentAction && this.gameState.player.currentAction.action.actionType === "channeling" &&
+          this.targetEventTime >= TARGET_CHANNELING_EVENT_TIME)) {
+        this.sendTargetEvent();
+      }
     }
     this.showInteractions();
     this.particleEngine.update(elapsedTime);

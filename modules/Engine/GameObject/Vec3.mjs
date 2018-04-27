@@ -29,6 +29,11 @@ export default class Vec3 {
     return this.x === 0 && this.y === 0 && this.z === 0;
   }
 
+  // Override this vec3 with any defined properties on the input
+  assign(vec3) {
+    Object.assign(this, vec3);
+  }
+
   round() {
     this.x = Math.round(this.x);
     this.y = Math.round(this.y);

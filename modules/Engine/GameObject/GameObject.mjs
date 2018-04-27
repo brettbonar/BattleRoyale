@@ -141,6 +141,7 @@ export default class GameObject extends GameObjectProxy {
   }
 
   updatePosition() {
+    this._modified = true;
     let zheight = this.dimensions.zheight || 0;
 
     // Anything with a z position and zheight of 0 should be rendered as ground
@@ -270,6 +271,7 @@ export default class GameObject extends GameObjectProxy {
 
   setLevel(level) {
     this.level = level;
+    this._modified = true;
   }
 
   getRayBounds(dimensions) {
@@ -329,6 +331,7 @@ export default class GameObject extends GameObjectProxy {
   }
 
   updateBounds() {
+    this._modified = true;
     let position = {
       x: this.position.x,
       y: this.position.y - this.position.z,
@@ -497,6 +500,10 @@ export default class GameObject extends GameObjectProxy {
     this.setDirection(new Vec3(position).minus(this.position));
   }
   
+  getInitializeState() {
+    return this.getUpdateState();
+  }
+
   getUpdateState() {
     // TODO: probably don't want to do this here
     return _.pick(this, [

@@ -10,6 +10,7 @@ import GameSettings from "../../modules/Engine/GameSettings.mjs"
 import BattleRoyaleServer from "../../modules/BattleRoyale/BattleRoyaleServer.mjs"
 import createStartMap from "../../modules/BattleRoyale/StartArea/createStartMap.mjs"
 import createScript from "../../modules/BattleRoyale/Scripts/Script.mjs";
+import { difference } from "../../modules/Engine/util.mjs"
 
 const TICK_RATE = 20;
 const SIMULATION_TIME = 1000 / TICK_RATE;
@@ -142,7 +143,7 @@ export default class Simulation {
 
   getPlayerViewObjects(player) {
     // TRICKY: intersect by player's last updates and visible objects to handle cases where
-    // a previously object goes out of view - you want the update that moves it out of view
+    // a previously visible object goes out of view - you want the update that moves it out of view
     let visibleObjects = this.game.grid.getRenderObjects(player.character.viewBounds, player.character.level);
     let newVisible = _.difference(visibleObjects, player.lastInView);
     player.lastInView = visibleObjects; 
@@ -217,15 +218,33 @@ export default class Simulation {
     return event;
   }
 
+  refine(object, base) {
+    return _.transform(object, (result, value, key) => {
+      // Bad hack, interpolated values need to be copied fully
+      if (!_.isEqual(value, base[key])) {
+        result[key] = 
+          _.isObject(value) && _.isObject(base[key]) && !_.isArray(value) && !_.isArray(base[key]) ?
+          difference(value, base[key]) : value;
+      }
+    });
+  }
+
   // Don't send updates for properties that haven't actually changed
   refineUpdates(lastUpdates, updates) {
-    let refinedUpdates = updates;
+    let refinedUpdates = [];
 
     for (let i = 0; i < updates.length; i++) {
       let existing = lastUpdates.find((update) => update.objectId === updates[i].objectId);
-      updates[i] = _.omitBy(updates[i], (key) => {
-        return lastUpdates[key] && _.isEqual(lastUpdates[key] === updates[i][key]);
-      });
+      if (existing) {
+        let update = this.refine(updates[i], existing);
+
+        if (!_.isEmpty(update)) {
+          update.objectId = updates[i].objectId;
+          refinedUpdates.push(update);
+        }
+      } else {
+        refinedUpdates.push(updates[i]);
+      }
     }
 
     return refinedUpdates;
@@ -236,15 +255,16 @@ export default class Simulation {
       .concat(this.events);
 
     for (const player of this.players) {
-      if (this.lastState.length > 0) {
+      if (player.refinedUpdates.length > 0) {
         player.socket.emit("update", {
           elapsedTime: this.lastElapsedTime,
-          objects: player.lastUpdates
+          objects: player.refinedUpdates
         });
       }
-      if (this.lastCollisions.length > 0) {
-        player.socket.emit("collision", this.getPlayerViewCollisions(player));
-      }
+      // TODO: fix issues with sending too many collision events first
+      // if (this.lastCollisions.length > 0) {
+      //   player.socket.emit("collision", this.getPlayerViewCollisions(player));
+      // }
       if (this.removedObjects.length > 0) {
         // TODO: also filter this by player position - do when it is removed?
         player.socket.emit("remove", this.removedObjects);
@@ -286,15 +306,29 @@ export default class Simulation {
     this.lastObjects = this.game.gameState.objects.slice();
     this.lastCollisions = this.game.collisions.map(this.getCollision);
     
-    this.lastState = this.game.modified
-      .map(obj => {
-        let result = _.cloneDeep(obj.getUpdateState());
-        //obj._modifiedKeys.length = 0;
-        return result;
-      });
+    let lastState = this.lastState.slice();
+    this.lastState = []
+    for (const obj of this.game.modified) {
+      if (!obj._skipUpdate) {
+        let result = obj.getUpdateState();
+        this.lastState.push(_.cloneDeep(result));
+        // TODO: find a way to make this work. Can't only get modified keys since
+        // a player may not have received the latest update and needs more info
+        // _.pickBy(obj.getUpdateState(), (val, key) => {
+        //   obj._modifiedKeys.includes(key);
+        // });
+        obj._modifiedKeys.length = 0;
+        // if (!_.isEmpty(result)) {
+        //   this.lastState.push(_.cloneDeep(result));
+        // }
+      }
+    }
 
     for (const player of this.players) {
-      player.lastUpdates = this.refineUpdates(player.lastUpdates, this.getPlayerViewObjects(player));
+      let updates = this.getPlayerViewObjects(player);
+      player.refinedUpdates = this.refineUpdates(player.lastUpdates, updates);
+      player.lastUpdates = updates;
+      //player.awareOf = _.union(player.awareOf, player.lastUpdates.map((update) => update.objectId));
     }
 
     this.interval = setTimeout(() => {

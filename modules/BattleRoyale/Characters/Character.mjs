@@ -46,6 +46,7 @@ export default class Character extends GameObject {
     this.cooldowns = [];
     this.actionStack = [];
     this.actionTime = 0;
+    this.regenTime = 0;
     
     this.physics.surfaceType = "character";
 
@@ -288,6 +289,7 @@ export default class Character extends GameObject {
   doAction(type, stopAction, action, elapsedTime, cb, stopCb, actionId) {
     let top = this.currentAction;
     elapsedTime = elapsedTime || 0;
+    this._modified = true;
     if (stopAction) {
       let actionToStop = _.find(this.actionStack, { name: action.name });
       // TODO: change "blocking" to "charging"?
@@ -433,7 +435,11 @@ export default class Character extends GameObject {
   }
 
   update(elapsedTime) {
-    this.latestAction = null;
+    this.regenTime += elapsedTime;
+
+    if (this.latestAction) {
+      this.latestAction = null;
+    }
     // if (this.moveToPosition) {
     //   this.moving = true;
     //   this.currentInterpolateTime += elapsedTime;
@@ -481,9 +487,11 @@ export default class Character extends GameObject {
       this.position.z = this.state.maxAltitude;
     }
 
-    if (this.state.hasMana && this.state.manaRegen && elapsedTime) {
+    if (this.state.hasMana && this.state.manaRegen && this.regenTime >= 1000) {
+      this.regenTime -= 1000;
       this.state.currentMana = Math.min(this.state.maxMana,
-        this.state.currentMana + this.state.manaRegen * (elapsedTime / 1000));
+        this.state.currentMana + this.state.manaRegen);
+      this._modified = true;
     }
 
     // if (this.targetPosition) {
@@ -510,7 +518,7 @@ export default class Character extends GameObject {
     //   this.moveToPosition = new Vec3(state.position);
     // }
     if (!this.isThisPlayer) {
-      if (state.latestAction && (!this.currentAction || state.latestAction.actionId !== this.currentAction.actionId)) {
+      if (state.latestAction && state.latestAction.actionId && (!this.currentAction || state.latestAction.actionId !== this.currentAction.actionId)) {
         // Pause previous action
         // if (this.currentAction) {
         //   this.currentAction.currentTime = 0;
@@ -532,53 +540,48 @@ export default class Character extends GameObject {
       this.currentInterpolateTime = 0;
       this.interpolateTime = interpolateTime;
       if (state.direction) {
-        this.setDirection(state.direction);
+        this.setDirection(new Vec3(this.direction).assign(state.direction));
       }
-      if (state.state.target) {
-        this.pointToTarget = new Vec3(state.state.target);
-        this.previousTarget = new Vec3(this.state.target);
+      if (state.state && state.state.target) {
+        if (!this.pointToTarget) {
+          this.pointToTarget = new Vec3(this.state.target);
+        }
+        this.pointToTarget = new Vec3(this.pointToTarget).assign(state.state.target)
+        this.previousTarget = new Vec3(this.pointToTarget);
       }
 
       if (state.position && !this.position.equals(state.position)) {
         if (state.level !== this.level || this.position.distanceTo(state.position) > this.speed / 2) {
-          this.position = new Vec3(state.position);
+          Object.assign(this.position, state.position);
           this.lastPosition = this.position.copy();
         } else {
           let dist = this.position.distanceTo(state.position);
           if (interpolateTime > 0 && dist >= 10) {
             this.startPosition = new Vec3(this.position);
-            this.moveToPosition = new Vec3(state.position);
+            this.moveToPosition = new Vec3(this.position).assign(state.position);
             this.setDirection(this.moveToPosition.minus(this.startPosition));
             //this.speed = dist * (1000 / interpolateTime);
             //this.targetDirection = state.direction;
           } else {
-            this.position = new Vec3(state.position);
+            Object.assign(this.position, state.position);
             this.lastPosition = new Vec3(this.position);
             this.speed = state.speed || this.baseSpeed;
-            this.direction = new Vec3(state.direction) || new Vec3();
+            if (state.direction) {
+              Object.assign(this.direction, state.direction);
+            } else {
+              this.direction = new Vec3();
+            }
           }
         }
       }
     } else {
       // Updates just for this player
-      if (state.position && (state.level !== this.level || this.position.distanceTo(state.position) > this.speed / 2)) {
-        this.position = new Vec3(state.position);
+      this.serverPosition = new Vec3(this.serverPosition).assign(state.position);
+      if (this.serverPosition && (state.level !== this.level || this.position.distanceTo(this.serverPosition) > this.speed / 2)) {
+        this.position = this.serverPosition.copy();
         this.lastPosition = this.position.copy();
       } else if (state.position) {
         //state.lastPosition = new Vec3(state.position);
-      }
-
-      if (state.latestAction) {
-        if (this.currentAction && state.latestAction.name === this.currentAction.name) {
-          this.currentAction.actionId = state.latestAction.actionId;
-        }
-        // if (!this.currentAction || state.latestAction.name !== this.currentAction.name) {
-        //   state.latestAction.action = getAction(state.latestAction.name);
-        //   this.actionStack.unshift(state.latestAction);
-        //   this.startAction(state.latestAction);
-        // } else if (state.latestAction.name === this.currentAction.name) {
-        //   this.currentAction.actionId = state.latestAction.actionId;
-        // }
       }
     }
   }

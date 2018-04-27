@@ -260,23 +260,32 @@ export default class Projectile extends GameObject {
   updateState(state, interpolateTime) {
     _.merge(this, _.omit(state, "position"));
 
-    if (state.position && !this.position.equals(state.position)) {
-      if (state.level !== this.level || this.position.distanceTo(state.position) > this.speed / 2) {
-        this.position = new Vec3(state.position);
-        this.lastPosition = this.position.copy();
-      } else if (this.effect.path === "tracking" && !this.source) {
-        let dist = this.position.distanceTo(state.position);
-        if (interpolateTime > 0 && dist >= 10) {
-          this.startPosition = new Vec3(this.position);
-          this.moveToPosition = new Vec3(state.position);
-          this.direction = this.moveToPosition.minus(this.startPosition).normalize();
-          //this.speed = dist * (1000 / interpolateTime);
-          //this.targetDirection = state.direction;
-        } else {
-          this.position = new Vec3(state.position);
-          this.lastPosition = new Vec3(this.position);
-          this.speed = state.speed || this.baseSpeed;
-          this.direction = new Vec3(state.direction) || new Vec3();
+    if (state.position) {
+      let position = new Vec3(state.position);
+
+      if (!this.position.equals(position)) {
+        if (state.level !== this.level || this.position.distanceTo(position) > this.speed / 2) {
+          this.position = position;
+          this.lastPosition = this.position.copy();
+        } else if (this.effect.path === "tracking" && !this.source) {
+          let dist = this.position.distanceTo(position);
+          if (interpolateTime > 0 && dist >= 10) {
+            this.startPosition = new Vec3(this.position);
+            this.moveToPosition = position;
+            this.direction = this.moveToPosition.minus(this.startPosition).normalize();
+            //this.speed = dist * (1000 / interpolateTime);
+            //this.targetDirection = state.direction;
+          } else {
+            this.position = position;
+            this.lastPosition = new Vec3(this.position);
+            this.speed = state.speed || this.baseSpeed;
+            
+            if (state.direction) {
+              Object.assign(this.direction, state.direction);
+            } else {
+              this.direction = new Vec3();
+            }
+          }
         }
       }
     }

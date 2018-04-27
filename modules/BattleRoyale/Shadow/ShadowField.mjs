@@ -15,6 +15,7 @@ const DAMAGE_RATE = 15;
 const HEAL_RATE = 1;
 const BUFFER_RADIUS = 512;
 const COLLAPSE_RATE = 15;
+const UPDATE_RATE = 10000;
 
 const SHADOW_SPAWNS = [
   {
@@ -71,6 +72,7 @@ export default class ShadowField extends GameObject {
     this.bufferRadius = BUFFER_RADIUS;
     this.spawnedCharacters = [];
     this.interactsWith = ["Character"];
+    this.updateTime = 0;
 
     this.shadowSpawns = [];
     for (const spawn of SHADOW_SPAWNS) {
@@ -191,6 +193,7 @@ export default class ShadowField extends GameObject {
 
   update(elapsedTime) {
     if (elapsedTime) {
+      this.updateTime += elapsedTime;
       this.currentTime += elapsedTime;
       this.shadowRadius = Math.max(MIN_RADIUS, this.shadowRadius - (this.collapseRate * (elapsedTime / 1000)));
       if (this.shadowRadius === MIN_RADIUS) {
@@ -201,7 +204,16 @@ export default class ShadowField extends GameObject {
       this.updatePosition();
       this.renderer.update(elapsedTime);
 
-      return this.handleTargets(elapsedTime);
+      let result = this.handleTargets(elapsedTime);
+
+      if (this.updateTime >= UPDATE_RATE) {
+        this.updateTime = 0;
+        this._skipUpdate = false;
+      } else {
+        this._skipUpdate = true;
+      }
+      
+      return result;
     }
   }
 

@@ -315,4 +315,20 @@ export default class BattleRoyaleServer extends BattleRoyale {
       this.handleObjectUpdate(collision.source.onCollision(collision));
     }
   }
+  
+  _update(elapsedTime) {
+    super._update(elapsedTime);
+  
+    this.modified = [];
+    for (const obj of this.gameState.objects) {
+      if (obj.elapsedTime) {
+        obj.elapsedTime = 0;
+      }
+      if (obj._modified) {
+        this.modified.push(obj);
+        obj._modified = false;
+        obj._modifiedKeys.length = 0;
+      }
+    }
+  }
 }
