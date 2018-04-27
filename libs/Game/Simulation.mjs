@@ -221,7 +221,9 @@ export default class Simulation {
   refine(object, base) {
     return _.transform(object, (result, value, key) => {
       // Bad hack, interpolated values need to be copied fully
-      if (!_.isEqual(value, base[key])) {
+      if (key === "position") {
+        result[key] = value;
+      } else if (!_.isEqual(value, base[key])) {
         result[key] = 
           _.isObject(value) && _.isObject(base[key]) && !_.isArray(value) && !_.isArray(base[key]) ?
           difference(value, base[key]) : value;

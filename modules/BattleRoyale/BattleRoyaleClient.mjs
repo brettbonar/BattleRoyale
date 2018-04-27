@@ -282,6 +282,8 @@ export default class BattleRoyaleClient extends BattleRoyale {
       let obj = _.find(this.gameState.objects, update.source);
       if (obj) {
         obj.setDirection(update.direction);
+        this.grid.update(obj);
+        this.physicsEngine.getObjectCollisions(obj, this.grid);
       }
     } else if (update.type === "changeTarget") {
       let obj = _.find(this.gameState.objects, update.source);
@@ -296,7 +298,7 @@ export default class BattleRoyaleClient extends BattleRoyale {
       if (update.source.revision <= object.revision) {
         _.pull(this.pendingUpdates, update);
       } else {
-        //this.applyUpdate(update);
+        this.applyUpdate(update);
       }
     }
   }

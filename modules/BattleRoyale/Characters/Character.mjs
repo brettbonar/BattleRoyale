@@ -576,12 +576,14 @@ export default class Character extends GameObject {
       }
     } else {
       // Updates just for this player
-      this.serverPosition = new Vec3(this.serverPosition).assign(state.position);
-      if (this.serverPosition && (state.level !== this.level || this.position.distanceTo(this.serverPosition) > this.speed / 2)) {
-        this.position = this.serverPosition.copy();
-        this.lastPosition = this.position.copy();
-      } else if (state.position) {
-        //state.lastPosition = new Vec3(state.position);
+      if (state.position) {
+        let position = new Vec3(state.position);
+        if (position && (state.level !== this.level || this.position.distanceTo(position) > this.speed / 2)) {
+          this.position = position;
+        } else if (state.position) {
+          state.lastPosition = position;
+        }
+        this.updatePosition();
       }
     }
   }
