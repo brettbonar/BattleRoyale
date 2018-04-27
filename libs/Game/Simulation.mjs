@@ -236,7 +236,7 @@ export default class Simulation {
     for (let i = 0; i < updates.length; i++) {
       let existing = lastUpdates.find((update) => update.objectId === updates[i].objectId);
       if (existing) {
-        let update = updates[i];//this.refine(updates[i], existing);
+        let update = this.refine(updates[i], existing);
 
         if (!_.isEmpty(update)) {
           update.objectId = updates[i].objectId;
@@ -339,6 +339,7 @@ export default class Simulation {
   start() {
     this.game.previousTime = now();
     this.game.transitionState(Game.STATE.PLAYING);
+    this.previousTime = now();
 
     this.interval = setTimeout(() => {
       this.update();

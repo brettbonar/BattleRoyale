@@ -192,29 +192,27 @@ export default class ShadowField extends GameObject {
   }
 
   update(elapsedTime) {
-    if (elapsedTime) {
-      this.updateTime += elapsedTime;
-      this.currentTime += elapsedTime;
-      this.shadowRadius = Math.max(MIN_RADIUS, this.shadowRadius - (this.collapseRate * (elapsedTime / 1000)));
-      if (this.shadowRadius === MIN_RADIUS) {
-        this.bufferRadius = Math.max(100, this.bufferRadius - (this.collapseRate * (elapsedTime / 1000)));
-      }
-      this.modelDimensions.dimensions.radius = this.shadowRadius;
-      this.functions[0].bounds.dimensions.radius = this.shadowRadius;
-      this.updatePosition();
-      this.renderer.update(elapsedTime);
-
-      let result = this.handleTargets(elapsedTime);
-
-      if (this.updateTime >= UPDATE_RATE) {
-        this.updateTime = 0;
-        this._skipUpdate = false;
-      } else {
-        this._skipUpdate = true;
-      }
-      
-      return result;
+    this.updateTime += elapsedTime;
+    this.currentTime += elapsedTime;
+    this.shadowRadius = Math.max(MIN_RADIUS, this.shadowRadius - (this.collapseRate * (elapsedTime / 1000)));
+    if (this.shadowRadius === MIN_RADIUS) {
+      this.bufferRadius = Math.max(100, this.bufferRadius - (this.collapseRate * (elapsedTime / 1000)));
     }
+    this.modelDimensions.dimensions.radius = this.shadowRadius;
+    this.functions[0].bounds.dimensions.radius = this.shadowRadius;
+    this.updatePosition();
+    this.renderer.update(elapsedTime);
+
+    let result = this.handleTargets(elapsedTime);
+
+    if (this.updateTime >= UPDATE_RATE) {
+      this.updateTime = 0;
+      this._skipUpdate = false;
+    } else {
+      this._skipUpdate = true;
+    }
+    
+    return result;
   }
 
   render(context, elapsedTime, clipping, player) {
