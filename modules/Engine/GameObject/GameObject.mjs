@@ -142,6 +142,9 @@ export default class GameObject extends GameObjectProxy {
 
   updatePosition() {
     this._modified = true;
+    this._collisionBounds = null;
+    this._lastCollisionBounds = null;
+    this._collisionExtents = null;
     let zheight = this.dimensions.zheight || 0;
 
     // Anything with a z position and zheight of 0 should be rendered as ground
@@ -379,14 +382,24 @@ export default class GameObject extends GameObjectProxy {
   }
 
   get lastCollisionBounds() {
+    if (this._lastCollisionBounds) {
+      return this._lastCollisionBounds;
+    }
     return this.getBoundsFromDimens(this.lastPosition, this.collisionDimensions);
   }
 
   get collisionBounds() {
+    if (this._collisionBounds) {
+      return this._collisionBounds;
+    }
     return this.getBoundsFromDimens(this.position, this.collisionDimensions);
   }
 
   get collisionExtents() {
+    if (this._collisionExtents) {
+      return this._collisionExtents;
+    }
+
     let bounds = this.collisionBounds
       .concat(this.interactionsBounds)
       .concat(_.map(this.getAllFunctionBounds(), ("bounds")));

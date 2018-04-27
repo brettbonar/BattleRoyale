@@ -2,12 +2,15 @@ import Dimensions from "./Dimensions.mjs";
 
 export default class Vec3 {
   constructor(params) {
-    Object.assign(this, params);
-    _.defaults(this, {
-      x: 0,
-      y: 0,
-      z: 0
-    });
+    if (params) {
+      this.x = params.x || 0;
+      this.y = params.y || 0;
+      this.z = params.z || 0;
+    } else {
+      this.x = 0;
+      this.y = 0;
+      this.z = 0;
+    }
   }
 
   static normalize(point) {
@@ -32,6 +35,7 @@ export default class Vec3 {
   // Override this vec3 with any defined properties on the input
   assign(vec3) {
     Object.assign(this, vec3);
+    return this;
   }
 
   round() {

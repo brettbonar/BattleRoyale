@@ -4,10 +4,10 @@ import Vec3 from "./GameObject/Vec3.mjs"
 export default class Grid {
   constructor(size) {
     this.size = size;
-    this.collisionGrid = [];
-    this.renderGrid = [];
-    this.collisionAll = [];
-    this.renderAll = [];
+    this.collisionGrid = {};
+    this.renderGrid = {};
+    this.collisionAll = {};
+    this.renderAll = {};
   }
 
   setGrid(grid, object, x, y) {
@@ -15,10 +15,10 @@ export default class Grid {
       grid[x] = [];
     }
     if (!grid[x][y]) {
-      grid[x][y] = [];
+      grid[x][y] = {};
     }
 
-    grid[x][y].push(object);
+    grid[x][y][object.objectId] = object;
   }
 
   // TODO: fix performance issues with this method
@@ -96,7 +96,7 @@ export default class Grid {
       for (let y = ystart; y <= yend; y++) {
         if (!this.collisionGrid[x] ||
             !this.collisionGrid[x][y] ||
-             this.collisionGrid[x][y].length === 0) {
+             _.size(this.collisionGrid[x][y]) === 0) {
           grids.push({
             position: {
               x: x * this.size,
@@ -129,22 +129,26 @@ export default class Grid {
 
   remove(object) {
     if (object.collisionGrids) {
-      for (const grid of object.collisionGrids) {
-        if (this.collisionGrid[grid.x] && this.collisionGrid[grid.x][grid.y]) {
-          _.pull(this.collisionGrid[grid.x][grid.y], object);
+      for (let i = 0; i < object.collisionGrids.length; i++) {
+        if (this.collisionGrid[object.collisionGrids[i].x] && this.collisionGrid[object.collisionGrids[i].x][object.collisionGrids[i].y]) {
+          this.collisionGrid[object.collisionGrids[i].x][object.collisionGrids[i].y][object.objectId] = undefined;
         }
       }
     }
-    _.pull(this.collisionAll, object);
+    if (this.collisionAll[object.objectId]) {
+      this.collisionAll[object.objectId] = undefined;
+    }
 
     if (object.renderGrids) {
-      for (const grid of object.renderGrids) {
-        if (this.renderGrid[grid.x] && this.renderGrid[grid.x][grid.y]) {
-          _.pull(this.renderGrid[grid.x][grid.y], object);
+      for (let i = 0; i < object.renderGrids.length; i++) {
+        if (this.renderGrid[object.renderGrids[i].x] && this.renderGrid[object.renderGrids[i].x][object.renderGrids[i].y]) {
+          this.renderGrid[object.renderGrids[i].x][object.renderGrids[i].y][object.objectId] = undefined;
         }
       }
     }
-    _.pull(this.renderAll, object);
+    if (this.renderAll[object.objectId]) {
+      this.renderAll[object.objectId] = undefined;
+    }
   }
 
   update(object) {
@@ -155,14 +159,14 @@ export default class Grid {
   getAdjacentCollision(object) {
     if (object.collisionGrids) {
       return object.collisionGrids.reduce((objs, grid) => {
-        return objs.concat(this.collisionGrid[grid.x][grid.y]);
-      }, this.collisionAll);
+        return objs.concat(_.filter(this.collisionGrid[grid.x][grid.y]));
+      }, _.filter(this.collisionAll));
     }
     return _.uniq(this.collisionAll);
   }
   
   getRenderObjects(bounds) {
-    let objs = this.renderAll;
+    let objs = _.filter(this.renderAll);
 
     let xstart = Math.max(0, Math.floor(bounds.ul.x / this.size));
     let xend = Math.max(0, Math.floor(bounds.lr.x / this.size));
@@ -172,7 +176,7 @@ export default class Grid {
     for (let x = xstart; x <= xend; x++) {
       for (let y = ystart; y <= yend; y++) {
         if (this.renderGrid[x] && this.renderGrid[x][y]) {
-          objs = objs.concat(this.renderGrid[x][y]);
+          objs = objs.concat(_.filter(this.renderGrid[x][y]));
         }
       }
     }

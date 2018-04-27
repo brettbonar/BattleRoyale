@@ -9,6 +9,14 @@
       "request": "launch",
       "name": "Launch Program",
       "program": "${workspaceFolder}\\app.mjs",
+      // "cwd": "${workspaceRoot}",
+      // "restart": true,
+      // "protocol": "inspect",
+      // "localRoot": "${workspaceRoot}",
+      // "sourceMaps": false,
+      // "outFiles": [
+      //   "${workspaceRoot}/**/*.mjs"
+      // ],
       "runtimeArgs": [
         "--experimental-modules",
         "--inspect-brk"

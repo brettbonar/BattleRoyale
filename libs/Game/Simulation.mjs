@@ -236,7 +236,7 @@ export default class Simulation {
     for (let i = 0; i < updates.length; i++) {
       let existing = lastUpdates.find((update) => update.objectId === updates[i].objectId);
       if (existing) {
-        let update = this.refine(updates[i], existing);
+        let update = updates[i];//this.refine(updates[i], existing);
 
         if (!_.isEmpty(update)) {
           update.objectId = updates[i].objectId;
@@ -261,10 +261,10 @@ export default class Simulation {
           objects: player.refinedUpdates
         });
       }
-      // TODO: fix issues with sending too many collision events first
-      // if (this.lastCollisions.length > 0) {
-      //   player.socket.emit("collision", this.getPlayerViewCollisions(player));
-      // }
+      // TODO: fix issues with sending too many collision events
+      if (this.lastCollisions.length > 0) {
+        player.socket.emit("collision", this.getPlayerViewCollisions(player));
+      }
       if (this.removedObjects.length > 0) {
         // TODO: also filter this by player position - do when it is removed?
         player.socket.emit("remove", this.removedObjects);
