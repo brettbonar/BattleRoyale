@@ -4,10 +4,10 @@ import Vec3 from "./GameObject/Vec3.mjs"
 export default class Grid {
   constructor(size) {
     this.size = size;
-    this.collisionGrid = [];
-    this.renderGrid = [];
-    this.collisionAll = [];
-    this.renderAll = [];
+    this.collisionGrid = {};
+    this.renderGrid = {};
+    this.collisionAll = {};
+    this.renderAll = {};
   }
 
   setGrid(grid, object, x, y) {
@@ -15,7 +15,7 @@ export default class Grid {
       grid[x] = [];
     }
     if (!grid[x][y]) {
-      grid[x][y] = [];
+      grid[x][y] = {};
     }
 
     grid[x][y][object.objectId] = object;
