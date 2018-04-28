@@ -158,11 +158,11 @@ export default class ParticleEffect extends Effect {
       }
     }
     
-    if (params.effect.audio) {
-      if (params.effect.audio.play) {
-        new Audio(params.effect.audio.play).play();
-      }
-    }
+    // if (params.effect.audio) {
+    //   if (params.effect.audio.play) {
+    //     new Audio(params.effect.audio.play).play();
+    //   }
+    // }
   }
 
   createParticle() {

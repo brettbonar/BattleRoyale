@@ -295,10 +295,12 @@ export default class BattleRoyaleClient extends BattleRoyale {
 
   clearAndApplyUpdates(object) {
     for (const update of this.pendingUpdates) {
-      if (update.source.revision <= object.revision) {
-        _.pull(this.pendingUpdates, update);
-      } else {
-        this.applyUpdate(update);
+      if (update.source.objectId === object.objectId) {
+        if (update.source.revision < object.revision) {
+          _.pull(this.pendingUpdates, update);
+        } else {
+          //this.applyUpdate(update);
+        }
       }
     }
   }
@@ -591,18 +593,18 @@ export default class BattleRoyaleClient extends BattleRoyale {
       direction.x += 1;
     }
 
-    if (!this.gameState.player.direction.equals(direction)) {
-      this.gameState.player.setDirection(direction);
-      this.sendEvent({
-        type: "changeDirection",
-        source: {
-          playerId: this.player.playerId,
-          objectId: this.gameState.player.objectId
-        },
-        direction: direction,
-        position: this.gameState.player.position
-      });
-    }
+    //if (!this.gameState.player.direction.equals(direction)) {
+    this.gameState.player.setDirection(direction);
+    this.sendEvent({
+      type: "changeDirection",
+      source: {
+        playerId: this.player.playerId,
+        objectId: this.gameState.player.objectId
+      },
+      direction: direction,
+      position: this.gameState.player.position
+    });
+    //}
   }
 
   getVisibleBounds() {
@@ -729,14 +731,13 @@ export default class BattleRoyaleClient extends BattleRoyale {
     super._update(elapsedTime);
 
     let target = this.getAbsoluteCursorPosition();
-    if (!this.gameState.player.state.target || !target.equals(this.gameState.player.state.target)) {
+    if (!this.gameState.player.state.target ||
+        !target.equals(this.gameState.player.state.target) ||
+        this.targetEventTime >= TARGET_EVENT_TIME || 
+        this.gameState.player.currentAction && this.gameState.player.currentAction.action.actionType === "channeling" &&
+        this.targetEventTime >= TARGET_CHANNELING_EVENT_TIME) {
       this.gameState.player.setTarget(target);
-
-      if ((this.targetEventTime >= TARGET_EVENT_TIME || 
-          this.gameState.player.currentAction && this.gameState.player.currentAction.action.actionType === "channeling" &&
-          this.targetEventTime >= TARGET_CHANNELING_EVENT_TIME)) {
-        this.sendTargetEvent();
-      }
+      this.sendTargetEvent();
     }
     this.showInteractions();
     this.particleEngine.update(elapsedTime);

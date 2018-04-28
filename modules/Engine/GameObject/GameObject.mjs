@@ -18,7 +18,7 @@ class GameObjectProxy {
           if (object[key] !== value) {
             object[key] = value;
             object._modified = true;
-            object._modifiedKeys.push(key);
+            //object._modifiedKeys.push(key);
             // if (key === "position" && this.dimensions) {
             //   this.updatePosition();
             // }
@@ -63,12 +63,12 @@ export default class GameObject extends GameObjectProxy {
       level: 0,
       revision: 0,
       renderer: new Renderer(),
-      objectId: objectId,
-      ownerId: objectId,
+      objectId: GameObject.getNextObjectId(),
       playerId: 0,
       elapsedTime: 0
     });
     _.defaultsDeep(this, {
+      ownerId: this.objectId,
       physics: {
         surfaceType: SURFACE_TYPE.TERRAIN,
         movementType: MOVEMENT_TYPE.NORMAL,
@@ -100,11 +100,14 @@ export default class GameObject extends GameObjectProxy {
     this.direction = new Vec3(this.direction).normalize();
     this.updatePosition();
 
+  }
+
+  static getNextObjectId() {
     // TODO: fix this hack
     if (GameSettings.isServer) {
-      objectId++;
+      return objectId++;
     } else {
-      objectId--;
+      return objectId--;
     }
   }
 

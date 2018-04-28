@@ -528,7 +528,7 @@ export default class Character extends GameObject {
         this.actionStack.unshift(state.latestAction);
         this.actionTime = 0;
         this.startAction(state.latestAction);
-      } else if (!state.latestAction && !this.isThisPlayer) { // TODO: set a timeout for the current action in case the player really shouldn't be able to do it
+      } else if (state.latestAction && state.latestAction === "none") { // TODO: set a timeout for the current action in case the player really shouldn't be able to do it
         this.actionStack.length = 0;
       }
       // if (this.moveToPosition) {
@@ -578,8 +578,9 @@ export default class Character extends GameObject {
       // Updates just for this player
       if (state.position) {
         let position = new Vec3(state.position);
-        if (position && (state.level !== this.level || this.position.distanceTo(position) > this.speed / 2)) {
+        if (position && (!_.isUndefined(state.level) && state.level !== this.level || this.position.distanceTo(position) > this.speed / 2)) {
           this.position = position;
+          this.lastPosition = position.copy();
         } else if (state.position) {
           state.lastPosition = position;
         }
@@ -599,6 +600,8 @@ export default class Character extends GameObject {
         "new",
         "actionId"
       ]);
+    } else {
+      latestAction = "none";
     }
     // let actionStack = [];
     // if (this.actionStack.length > 0) {

@@ -153,11 +153,11 @@ function initGame(players, maps) {
           hands: "leatherBracersMale"
         },
         inventory: [
-          // "bow",
-          // "shadowBow",
-          // "lightStaffMale",
-          // "fireStaffMale",
-          // "waterStaffMale",
+          "bow",
+          "shadowBow",
+          "lightStaffMale",
+          "fireStaffMale",
+          "waterStaffMale",
           "staffMale"
         ]
       },

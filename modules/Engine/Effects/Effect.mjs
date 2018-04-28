@@ -1,6 +1,7 @@
 import Vec3 from "../GameObject/Vec3.mjs"
 import ImageCache from "../Rendering/ImageCache.mjs"
 import Bounds from "../GameObject/Bounds.mjs";
+import GameObject from "../GameObject/GameObject.mjs";
 
 export default class Effect {
   constructor(params) {
@@ -11,6 +12,7 @@ export default class Effect {
     this.speed = params.speed;
     this.duration = params.duration;
     this.level = params.level || 0;
+    this.objectId = GameObject.getNextObjectId();
     
     if (params.dimensions) {
       this.dimensions = params.dimensions;

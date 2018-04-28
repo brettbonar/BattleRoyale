@@ -6,6 +6,7 @@ import Projectile from "../../modules/BattleRoyale/Objects/Projectile.mjs"
 import now from "performance-now"
 import StaticObject from "../../modules/BattleRoyale/Objects/StaticObject.mjs"
 import Bounds from "../../modules/Engine/GameObject/Bounds.mjs"
+import Vec3 from "../../modules/Engine/GameObject/Vec3.mjs"
 import GameSettings from "../../modules/Engine/GameSettings.mjs"
 import BattleRoyaleServer from "../../modules/BattleRoyale/BattleRoyaleServer.mjs"
 import createStartMap from "../../modules/BattleRoyale/StartArea/createStartMap.mjs"
@@ -218,15 +219,18 @@ export default class Simulation {
     return event;
   }
 
+  // https://gist.github.com/Yimiprod/7ee176597fef230d1451
   refine(object, base) {
     return _.transform(object, (result, value, key) => {
-      // Bad hack, interpolated values need to be copied fully
-      if (key === "position") {
-        result[key] = value;
-      } else if (!_.isEqual(value, base[key])) {
-        result[key] = 
-          _.isObject(value) && _.isObject(base[key]) && !_.isArray(value) && !_.isArray(base[key]) ?
-          difference(value, base[key]) : value;
+      if (!_.isEqual(value, base[key])) {
+        // Bad hack, interpolated values need to be copied fully
+        if (value instanceof Vec3) {
+          result[key] = value;
+        } else {
+          result[key] = 
+            _.isObject(value) && _.isObject(base[key]) && !_.isArray(value) && !_.isArray(base[key]) ?
+            this.refine(value, base[key]) : value;
+        }
       }
     });
   }
@@ -242,6 +246,8 @@ export default class Simulation {
 
         if (!_.isEmpty(update)) {
           update.objectId = updates[i].objectId;
+          update.type = updates[i].type;
+          update.revision = updates[i].revision;
           refinedUpdates.push(update);
         }
       } else {
@@ -319,7 +325,7 @@ export default class Simulation {
         // _.pickBy(obj.getUpdateState(), (val, key) => {
         //   obj._modifiedKeys.includes(key);
         // });
-        obj._modifiedKeys.length = 0;
+        //obj._modifiedKeys.length = 0;
         // if (!_.isEmpty(result)) {
         //   this.lastState.push(_.cloneDeep(result));
         // }
@@ -328,7 +334,8 @@ export default class Simulation {
 
     for (const player of this.players) {
       let updates = this.getPlayerViewObjects(player);
-      player.refinedUpdates = this.refineUpdates(player.lastUpdates, updates);
+      // TODO: make this work
+      player.refinedUpdates = updates;//this.refineUpdates(player.lastUpdates, updates);
       player.lastUpdates = updates;
       //player.awareOf = _.union(player.awareOf, player.lastUpdates.map((update) => update.objectId));
     }

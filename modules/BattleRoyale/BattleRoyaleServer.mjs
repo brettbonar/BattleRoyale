@@ -327,7 +327,7 @@ export default class BattleRoyaleServer extends BattleRoyale {
       if (obj._modified) {
         this.modified.push(obj);
         obj._modified = false;
-        obj._modifiedKeys.length = 0;
+        //obj._modifiedKeys.length = 0;
       }
     }
   }

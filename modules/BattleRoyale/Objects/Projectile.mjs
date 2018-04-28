@@ -264,7 +264,7 @@ export default class Projectile extends GameObject {
       let position = new Vec3(state.position);
 
       if (!this.position.equals(position)) {
-        if (state.level !== this.level || this.position.distanceTo(position) > this.speed / 2) {
+        if ((state.level && state.level !== this.level) || this.position.distanceTo(position) > this.speed / 2) {
           this.position = position;
           this.lastPosition = this.position.copy();
         } else if (this.effect.path === "tracking" && !this.source) {
