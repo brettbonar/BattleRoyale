@@ -24,7 +24,7 @@ export default class Grid {
   // TODO: fix performance issues with this method
   addInverseCircleToGrid(grid, allGrid, object, extents) {
     let grids = [];
-    allGrid.push(object);
+    allGrid[object.objectId] = object;
 
     // if (extents.radius > 0) {
     //   let xstart = Math.max(0, Math.floor(extents.ul.x / this.size));
